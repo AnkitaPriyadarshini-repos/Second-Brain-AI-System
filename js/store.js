@@ -1,6 +1,6 @@
 // ============================================
 // BlogSphere AI — Blogging & Content Platform
-// Module: Local Data Store & Persistence Engine
+// Module: Local Data Store, Theme Engine & Persistence
 // Author: Ankita Priyadarshini Pallai
 // ============================================
 
@@ -106,6 +106,7 @@ Scaling web applications across multiple independent teams requires modular boun
 class BlogStore {
   constructor() {
     this.storageKey = 'blogsphere_posts_v1';
+    this.themeKey = 'blogsphere_theme_v1';
     this.init();
   }
 
