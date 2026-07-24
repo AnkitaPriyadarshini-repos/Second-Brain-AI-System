@@ -1,6 +1,6 @@
 // ============================================
-// AlgoVerse — Backtracking Algorithm Visualizer
-// Module: Utility Engine & Sound Synthesizer
+// AlgoVerse — Interactive Backtracking Visualizer
+// Module: Utility Engine, Sound Synth & State Scrubber
 // Author: Ankita Priyadarshini Pallai
 // ============================================
 
@@ -48,25 +48,25 @@ class SoundEngine {
       osc.start();
       osc.stop(this.audioCtx.currentTime + duration);
     } catch (e) {
-      // Ignore audio errors if context blocked
+      // Audio context catch
     }
   }
 
   playTrySound() {
-    this.playNote(523.25 + Math.random() * 80, 0.04, 'sine', 0.03); // C5
+    this.playNote(523.25 + Math.random() * 60, 0.04, 'sine', 0.03);
   }
 
   playBacktrackSound() {
-    this.playNote(220, 0.08, 'triangle', 0.05); // A3 low pop
+    this.playNote(220, 0.07, 'triangle', 0.04);
   }
 
   playSuccessSound() {
     if (!this.enabled) return;
-    const notes = [523.25, 659.25, 783.99, 1046.50]; // C Major chord
+    const notes = [523.25, 659.25, 783.99, 1046.50];
     notes.forEach((freq, idx) => {
       setTimeout(() => {
-        this.playNote(freq, 0.3, 'sine', 0.08);
-      }, idx * 100);
+        this.playNote(freq, 0.25, 'sine', 0.07);
+      }, idx * 90);
     });
   }
 }
@@ -83,7 +83,6 @@ class StepHistoryRecorder {
   }
 
   push(stepData) {
-    // Drop any redo history if we push a new step
     if (this.currentIndex < this.steps.length - 1) {
       this.steps = this.steps.slice(0, this.currentIndex + 1);
     }
@@ -115,6 +114,14 @@ class StepHistoryRecorder {
     return null;
   }
 
+  seekTo(index) {
+    if (index >= 0 && index < this.steps.length) {
+      this.currentIndex = index;
+      return this.steps[this.currentIndex];
+    }
+    return null;
+  }
+
   getCurrentStep() {
     if (this.currentIndex >= 0 && this.currentIndex < this.steps.length) {
       return this.steps[this.currentIndex];
@@ -134,6 +141,7 @@ class ExecutionStats {
     this.isRunning = false;
     this.maxDepth = 0;
     this.currentDepth = 0;
+    this.solutionCount = 0;
   }
 
   reset() {
@@ -145,6 +153,7 @@ class ExecutionStats {
     this.elapsedMs = 0;
     this.maxDepth = 0;
     this.currentDepth = 0;
+    this.solutionCount = 0;
     this.updateUI();
   }
 
@@ -167,12 +176,13 @@ class ExecutionStats {
     }
   }
 
-  recordStep(isBacktrack = false, depth = 0) {
+  recordStep(isBacktrack = false, depth = 0, isSolution = false) {
     this.steps++;
     this.visitedStates++;
     this.currentDepth = depth;
     if (depth > this.maxDepth) this.maxDepth = depth;
     if (isBacktrack) this.backtracks++;
+    if (isSolution) this.solutionCount++;
     this.updateUI();
   }
 
@@ -181,15 +191,17 @@ class ExecutionStats {
     const elBacktracks = document.getElementById('stat-backtracks');
     const elVisited = document.getElementById('stat-visited');
     const elDepth = document.getElementById('stat-depth');
+    const elSolutions = document.getElementById('stat-solutions');
 
     if (elSteps) elSteps.textContent = this.steps.toLocaleString();
     if (elBacktracks) elBacktracks.textContent = this.backtracks.toLocaleString();
     if (elVisited) elVisited.textContent = this.visitedStates.toLocaleString();
     if (elDepth) elDepth.textContent = `${this.currentDepth} (Max: ${this.maxDepth})`;
+    if (elSolutions) elSolutions.textContent = this.solutionCount.toLocaleString();
   }
 }
 
-// Toast Notification System
+// Toast Notifications
 function showToast(message, type = 'info') {
   const container = document.getElementById('toast-container');
   if (!container) return;
@@ -208,7 +220,7 @@ function showToast(message, type = 'info') {
   setTimeout(() => {
     toast.classList.remove('show');
     setTimeout(() => toast.remove(), 300);
-  }, 3500);
+  }, 3200);
 }
 
 window.soundEngine = new SoundEngine();

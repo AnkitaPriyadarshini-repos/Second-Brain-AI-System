@@ -1,6 +1,6 @@
 // ============================================
-// AlgoVerse — Backtracking Algorithm Visualizer
-// Module: Main Orchestration & UI Controller
+// AlgoVerse — Interactive Backtracking Visualizer
+// Module: Advanced Main Controller & Interactive Presets
 // Author: Ankita Priyadarshini Pallai
 // ============================================
 
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const knightVis = new KnightTourVisualizer('visualizer-grid-container');
   const graphVis = new GraphVisualizer('canvas-visualizer');
 
-  // Algorithm Data Presets
+  // Presets Data
   const sudokuPresets = {
     easy: [
       [5,3,0, 0,7,0, 0,0,0],
@@ -32,17 +32,49 @@ document.addEventListener('DOMContentLoaded', () => {
       [0,6,0, 0,0,0, 2,8,0],
       [0,0,0, 4,1,9, 0,0,5],
       [0,0,0, 0,8,0, 0,7,9]
+    ],
+    medium: [
+      [0,0,0, 6,0,0, 4,0,0],
+      [7,0,0, 0,0,3, 6,0,0],
+      [0,0,0, 0,9,1, 0,8,0],
+      [0,0,0, 0,0,0, 0,0,0],
+      [0,5,0, 1,8,0, 0,0,3],
+      [0,0,0, 3,0,6, 0,4,5],
+      [0,4,0, 2,0,0, 0,6,0],
+      [9,0,3, 0,0,0, 0,0,0],
+      [0,2,0, 0,0,0, 1,0,0]
+    ],
+    hard: [
+      [0,0,0, 0,0,0, 0,1,2],
+      [0,0,0, 0,0,0, 0,0,3],
+      [0,0,2, 3,0,0, 4,0,0],
+      [0,0,1, 8,0,0, 0,0,5],
+      [0,6,0, 0,7,0, 8,0,0],
+      [0,0,0, 0,0,9, 0,0,0],
+      [0,0,8, 5,0,0, 0,0,0],
+      [9,0,0, 0,4,0, 5,0,0],
+      [4,7,0, 0,0,6, 0,0,0]
     ]
   };
 
-  const defaultMazeGrid = [
-    [1, 0, 0, 0, 1, 1],
-    [1, 1, 0, 1, 1, 0],
-    [0, 1, 0, 0, 1, 1],
-    [1, 1, 1, 1, 0, 1],
-    [0, 0, 0, 1, 1, 1],
-    [1, 1, 1, 0, 0, 1]
-  ];
+  const mazePresets = {
+    standard: [
+      [1, 0, 0, 0, 1, 1],
+      [1, 1, 0, 1, 1, 0],
+      [0, 1, 0, 0, 1, 1],
+      [1, 1, 1, 1, 0, 1],
+      [0, 0, 0, 1, 1, 1],
+      [1, 1, 1, 0, 0, 1]
+    ],
+    open: [
+      [1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1]
+    ]
+  };
 
   const defaultGraph = {
     nodes: [
@@ -59,11 +91,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentSudokuBoard = JSON.parse(JSON.stringify(sudokuPresets.easy));
   let initialSudokuBoard = JSON.parse(JSON.stringify(sudokuPresets.easy));
-  let currentMazeGrid = JSON.parse(JSON.stringify(defaultMazeGrid));
+  let currentMazeGrid = JSON.parse(JSON.stringify(mazePresets.standard));
   let currentQueensN = 4;
   let currentKnightSize = 5;
 
-  // Pseudocode Definitions
+  // Interactive Custom Click Handlers
+  sudokuVis.onCellClick = (r, c) => {
+    if (isRunning) return;
+    const input = prompt(`Enter number (1-9) for cell (${r + 1}, ${c + 1}) or 0 to clear:`, currentSudokuBoard[r][c]);
+    if (input !== null) {
+      const val = parseInt(input);
+      if (!isNaN(val) && val >= 0 && val <= 9) {
+        currentSudokuBoard[r][c] = val;
+        initialSudokuBoard[r][c] = val;
+        sudokuVis.render(currentSudokuBoard, initialSudokuBoard);
+      }
+    }
+  };
+
+  mazeVis.onWallToggle = (r, c) => {
+    if (isRunning) return;
+    currentMazeGrid[r][c] = currentMazeGrid[r][c] === 1 ? 0 : 1;
+    mazeVis.render(currentMazeGrid);
+  };
+
+  // Pseudocode Map
   const pseudocodeMap = {
     sudoku: [
       'function solveSudoku(board):',
@@ -130,17 +182,15 @@ document.addEventListener('DOMContentLoaded', () => {
     ]
   };
 
-  // Complexity & Information Map
   const complexityMap = {
     sudoku: { time: 'O(9^(N*N))', space: 'O(N*N)', desc: 'Brute-force constraint checking with 9x9 recursion depth.' },
     maze: { time: 'O(4^(N*N))', space: 'O(N*N)', desc: 'Explores 4 movement directions per cell until destination or dead-end.' },
     nqueens: { time: 'O(N!)', space: 'O(N)', desc: 'Prunes illegal columns and diagonal attack lines at each recursive row depth.' },
-    knighttour: { time: 'O(8^(N*N))', space: 'O(N*N)', desc: 'Warnsdorff heuristic prioritizes moves with minimum onward onward degree.' },
+    knighttour: { time: 'O(8^(N*N))', space: 'O(N*N)', desc: 'Warnsdorff heuristic prioritizes moves with minimum onward degree.' },
     graphcoloring: { time: 'O(M^V)', space: 'O(V)', desc: 'Tries M colors for V vertices checking adjacency list conflicts.' },
     hamiltonian: { time: 'O(N!)', space: 'O(N)', desc: 'Checks all permutation paths searching for a simple closed vertex loop.' }
   };
 
-  // Switch Algorithm Handler
   function selectAlgorithm(algoName) {
     currentAlgo = algoName;
     resetExecution();
@@ -153,14 +203,54 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('visualizer-grid-container').style.display = isGraph ? 'none' : 'grid';
     document.getElementById('canvas-visualizer').style.display = isGraph ? 'block' : 'none';
 
+    updatePresetUI(algoName);
     updatePseudocodeUI(algoName);
     updateComplexityUI(algoName);
     renderInitialVisualizer();
   }
 
+  function updatePresetUI(algo) {
+    const select = document.getElementById('preset-select');
+    const customBtn = document.getElementById('btn-custom-action');
+    if (!select || !customBtn) return;
+
+    select.innerHTML = '';
+    if (algo === 'sudoku') {
+      select.innerHTML = `
+        <option value="easy">Easy Puzzle</option>
+        <option value="medium">Medium Puzzle</option>
+        <option value="hard">Hard Puzzle</option>
+      `;
+      customBtn.textContent = '✏️ Clear Board';
+    } else if (algo === 'maze') {
+      select.innerHTML = `
+        <option value="standard">Standard Maze</option>
+        <option value="open">Open Field</option>
+      `;
+      customBtn.textContent = '🎲 Random Walls';
+    } else if (algo === 'nqueens') {
+      select.innerHTML = `
+        <option value="4">4x4 Board</option>
+        <option value="5">5x5 Board</option>
+        <option value="6">6x6 Board</option>
+        <option value="8">8x8 Board</option>
+      `;
+      customBtn.textContent = '👑 Solved Demo';
+    } else if (algo === 'knighttour') {
+      select.innerHTML = `
+        <option value="5">5x5 Board</option>
+        <option value="6">6x6 Board</option>
+        <option value="8">8x8 Board</option>
+      `;
+      customBtn.textContent = '♞ Reset Tour';
+    } else {
+      select.innerHTML = `<option value="default">Default Graph</option>`;
+      customBtn.textContent = '🎨 Reset Graph';
+    }
+  }
+
   function renderInitialVisualizer() {
     if (currentAlgo === 'sudoku') {
-      currentSudokuBoard = JSON.parse(JSON.stringify(sudokuPresets.easy));
       sudokuVis.render(currentSudokuBoard, initialSudokuBoard);
     } else if (currentAlgo === 'maze') {
       mazeVis.render(currentMazeGrid);
@@ -205,7 +295,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Execution Step Processing Loop
   function startExecution() {
     if (isRunning && !isPaused) return;
 
@@ -237,6 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.executionStats.reset();
     window.historyRecorder.reset();
     highlightCodeLine(0);
+    updateScrubberUI();
     renderInitialVisualizer();
     showToast('Execution reset to initial state.', 'info');
   }
@@ -271,12 +361,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const step = res.value;
     window.historyRecorder.push(step);
+    updateScrubberUI();
     applyStep(step);
 
     timerId = setTimeout(stepLoop, executionSpeed);
   }
 
+  function updateScrubberUI() {
+    const scrubber = document.getElementById('progress-scrubber');
+    if (!scrubber) return;
+    const count = window.historyRecorder.steps.length;
+    scrubber.max = count > 0 ? count - 1 : 0;
+    scrubber.value = window.historyRecorder.currentIndex >= 0 ? window.historyRecorder.currentIndex : 0;
+  }
+
   function applyStep(step) {
+    if (!step) return;
     const isBacktrack = step.type === 'BACKTRACK';
     window.executionStats.recordStep(isBacktrack, step.depth || 0);
     highlightCodeLine(step.line || 0);
@@ -302,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Event Listeners
+  // Event Handlers
   document.querySelectorAll('.algo-card').forEach(card => {
     card.addEventListener('click', () => selectAlgorithm(card.dataset.algo));
   });
@@ -319,7 +419,64 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!generator) initGenerator();
     const res = generator.next();
     if (!res.done) {
+      window.historyRecorder.push(res.value);
+      updateScrubberUI();
       applyStep(res.value);
+    }
+  });
+
+  document.getElementById('btn-step-back').addEventListener('click', () => {
+    pauseExecution();
+    const prevStep = window.historyRecorder.stepBack();
+    if (prevStep) {
+      updateScrubberUI();
+      applyStep(prevStep);
+    }
+  });
+
+  document.getElementById('progress-scrubber').addEventListener('input', (e) => {
+    pauseExecution();
+    const targetIdx = parseInt(e.target.value);
+    const step = window.historyRecorder.seekTo(targetIdx);
+    if (step) {
+      applyStep(step);
+    }
+  });
+
+  document.getElementById('preset-select').addEventListener('change', (e) => {
+    const val = e.target.value;
+    if (currentAlgo === 'sudoku' && sudokuPresets[val]) {
+      currentSudokuBoard = JSON.parse(JSON.stringify(sudokuPresets[val]));
+      initialSudokuBoard = JSON.parse(JSON.stringify(sudokuPresets[val]));
+    } else if (currentAlgo === 'maze' && mazePresets[val]) {
+      currentMazeGrid = JSON.parse(JSON.stringify(mazePresets[val]));
+    } else if (currentAlgo === 'nqueens') {
+      currentQueensN = parseInt(val);
+    } else if (currentAlgo === 'knighttour') {
+      currentKnightSize = parseInt(val);
+    }
+    resetExecution();
+  });
+
+  document.getElementById('btn-custom-action').addEventListener('click', () => {
+    if (currentAlgo === 'sudoku') {
+      currentSudokuBoard = Array.from({ length: 9 }, () => Array(9).fill(0));
+      initialSudokuBoard = Array.from({ length: 9 }, () => Array(9).fill(0));
+      resetExecution();
+      showToast('Cleared Sudoku board for custom input.', 'info');
+    } else if (currentAlgo === 'maze') {
+      const n = currentMazeGrid.length;
+      for (let r = 0; r < n; r++) {
+        for (let c = 0; c < n; c++) {
+          if (!(r === 0 && c === 0) && !(r === n - 1 && c === n - 1)) {
+            currentMazeGrid[r][c] = Math.random() > 0.3 ? 1 : 0;
+          }
+        }
+      }
+      resetExecution();
+      showToast('Generated random maze walls!', 'info');
+    } else {
+      resetExecution();
     }
   });
 
@@ -333,6 +490,5 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-sound-toggle').innerHTML = enabled ? '🔊 Sound On' : '🔇 Muted';
   });
 
-  // Init default algorithm
   selectAlgorithm('sudoku');
 });
