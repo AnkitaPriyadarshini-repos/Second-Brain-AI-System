@@ -1,12 +1,13 @@
 // ============================================
-// AlgoVerse — Backtracking Algorithm Visualizer
-// Module: Render Engine & Canvas/DOM Visualizers
+// AlgoVerse — Interactive Backtracking Visualizer
+// Module: Advanced Visualizer & Renderer Engines
 // Author: Ankita Priyadarshini Pallai
 // ============================================
 
 class SudokuVisualizer {
   constructor(containerId) {
     this.container = document.getElementById(containerId);
+    this.onCellClick = null;
   }
 
   render(board, initialBoard = null, activeRow = -1, activeCol = -1, stateType = null) {
@@ -37,6 +38,10 @@ class SudokuVisualizer {
         cell.dataset.row = r;
         cell.dataset.col = c;
 
+        cell.addEventListener('click', () => {
+          if (this.onCellClick) this.onCellClick(r, c);
+        });
+
         this.container.appendChild(cell);
       }
     }
@@ -47,6 +52,7 @@ class MazeVisualizer {
   constructor(containerId) {
     this.container = document.getElementById(containerId);
     this.onWallToggle = null;
+    this.isMouseDown = false;
   }
 
   render(grid, path = [], activeRow = -1, activeCol = -1, stateType = null) {
@@ -71,10 +77,10 @@ class MazeVisualizer {
 
         if (r === 0 && c === 0) {
           cell.classList.add('start');
-          cell.innerHTML = '🐭'; // Rat start
+          cell.innerHTML = '🐭';
         } else if (r === n - 1 && c === n - 1) {
           cell.classList.add('target');
-          cell.innerHTML = '🧀'; // Cheese target
+          cell.innerHTML = '🧀';
         }
 
         if (pathSet.has(`${r},${c}`)) {
@@ -90,10 +96,22 @@ class MazeVisualizer {
 
         cell.dataset.row = r;
         cell.dataset.col = c;
-        cell.addEventListener('click', () => {
+
+        cell.addEventListener('mousedown', () => {
+          this.isMouseDown = true;
           if (this.onWallToggle && !(r === 0 && c === 0) && !(r === n - 1 && c === n - 1)) {
             this.onWallToggle(r, c);
           }
+        });
+
+        cell.addEventListener('mouseenter', () => {
+          if (this.isMouseDown && this.onWallToggle && !(r === 0 && c === 0) && !(r === n - 1 && c === n - 1)) {
+            this.onWallToggle(r, c);
+          }
+        });
+
+        cell.addEventListener('mouseup', () => {
+          this.isMouseDown = false;
         });
 
         this.container.appendChild(cell);
@@ -146,6 +164,7 @@ class NQueensVisualizer {
 class KnightTourVisualizer {
   constructor(containerId) {
     this.container = document.getElementById(containerId);
+    this.onCellClick = null;
   }
 
   render(board, currentMove = 0, activeRow = -1, activeCol = -1, stateType = null) {
@@ -173,6 +192,10 @@ class KnightTourVisualizer {
           if (stateType === 'BACKTRACK') cell.classList.add('backtracking');
           if (stateType === 'SUCCESS') cell.classList.add('success');
         }
+
+        cell.addEventListener('click', () => {
+          if (this.onCellClick) this.onCellClick(r, c);
+        });
 
         this.container.appendChild(cell);
       }
@@ -215,11 +238,11 @@ class GraphVisualizer {
       ctx.beginPath();
       ctx.moveTo(n1.x, n1.y);
       ctx.lineTo(n2.x, n2.y);
-      ctx.strokeStyle = isCurrentEdge ? '#ff4b2b' : 'rgba(255, 255, 255, 0.2)';
+      ctx.strokeStyle = isCurrentEdge ? '#ff4b2b' : 'rgba(255, 255, 255, 0.25)';
       ctx.lineWidth = isCurrentEdge ? 4 : 2;
       if (isCurrentEdge) {
         ctx.shadowColor = '#ff4b2b';
-        ctx.shadowBlur = 10;
+        ctx.shadowBlur = 12;
       } else {
         ctx.shadowBlur = 0;
       }
@@ -238,7 +261,6 @@ class GraphVisualizer {
       ctx.fillStyle = nodeColor;
       ctx.fill();
 
-      // Border glow if active
       if (i === activeNode) {
         ctx.strokeStyle = stateType === 'BACKTRACK' ? '#ff4b2b' : stateType === 'SUCCESS' ? '#00b09b' : '#00f2fe';
         ctx.lineWidth = 4;
@@ -252,12 +274,11 @@ class GraphVisualizer {
       ctx.stroke();
       ctx.shadowBlur = 0;
 
-      // Label
       ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 14px "Outfit", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(node.label !== undefined ? node.label : `${i}`, node.x, node.y);
+      ctx.fillText(node.label !== undefined ? node.label : `${i + 1}`, node.x, node.y);
     });
   }
 }

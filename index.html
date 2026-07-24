@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AlgoVerse — Google-Ready Interactive Backtracking Visualizer</title>
-  <meta name="description" content="Production-grade, FAANG/Google ready interactive Backtracking Algorithm Visualizer for Sudoku, Rat in a Maze, N-Queens, Knight's Tour, Graph Coloring, and Hamiltonian Cycle.">
+  <title>AlgoVerse — Industry-Standard Interactive Backtracking Visualizer</title>
+  <meta name="description" content="Production-grade interactive Backtracking Algorithm Visualizer for Sudoku, Rat in a Maze, N-Queens, Knight's Tour, Graph Coloring, and Hamiltonian Cycle.">
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 
   <!-- Google Fonts -->
@@ -22,7 +22,7 @@
   <nav class="navbar" aria-label="Main Navigation">
     <a href="#" class="nav-brand">
       <span>AlgoVerse</span>
-      <span class="brand-badge">FAANG Grade</span>
+      <span class="brand-badge">Portfolio Grade</span>
     </a>
     <ul class="nav-links">
       <li><a href="#visualizer">Workspace</a></li>
@@ -40,7 +40,7 @@
     <section class="hero-section">
       <h1 class="hero-title">Interactive Backtracking Visualizer</h1>
       <p class="hero-subtitle">
-        Explore NP-hard constraint satisfaction algorithms step-by-step with real-time state trees, synthesized audio cues, and line-by-line pseudocode execution.
+        Explore NP-hard constraint satisfaction algorithms step-by-step with real-time state trees, synthesized audio cues, line-by-line pseudocode execution, and time-travel step scrubbing.
       </p>
     </section>
 
@@ -91,18 +91,34 @@
           <div class="workspace-title">
             <span>⚡ Interactive Workspace</span>
           </div>
-          <div class="btn-group">
+
+          <!-- Dynamic Parameter Preset Controls -->
+          <div class="preset-controls">
+            <select id="preset-select" class="btn btn-secondary" aria-label="Preset Selector">
+              <option value="easy">Easy Puzzle</option>
+              <option value="medium">Medium Puzzle</option>
+              <option value="hard">Hard Puzzle</option>
+            </select>
+            <button id="btn-custom-action" class="btn btn-secondary">⚡ Custom Action</button>
             <button id="btn-reset" class="btn btn-secondary">🔄 Reset</button>
           </div>
         </div>
 
+        <!-- Viewport Display -->
         <div class="visualizer-viewport">
           <div id="visualizer-grid-container" class="visualizer-grid"></div>
           <canvas id="canvas-visualizer" style="display: none;"></canvas>
         </div>
 
+        <!-- Progress Scrubber Bar -->
+        <div class="scrubber-bar-container" style="margin-top: 1rem;">
+          <input type="range" id="progress-scrubber" min="0" max="0" value="0" style="width: 100%;">
+        </div>
+
+        <!-- Control Panel Buttons -->
         <div class="control-panel">
           <div class="btn-group">
+            <button id="btn-step-back" class="btn btn-secondary"><span>⏮ Back</span></button>
             <button id="btn-play" class="btn btn-primary"><span>▶ Play</span></button>
             <button id="btn-step-forward" class="btn btn-secondary"><span>⏭ Step</span></button>
           </div>
@@ -168,7 +184,7 @@
 
   <!-- Footer -->
   <footer>
-    <p>AlgoVerse — Google Portfolio Project | Built with HTML5, CSS Glassmorphic Design & ES6 Generators</p>
+    <p>AlgoVerse — Industry Portfolio Project | Built with HTML5, CSS Glassmorphic Design & ES6 Generators</p>
     <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Author: Ankita Priyadarshini Pallai</p>
   </footer>
 
