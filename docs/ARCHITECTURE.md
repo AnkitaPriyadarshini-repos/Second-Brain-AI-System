@@ -1,69 +1,71 @@
-# AlgoVerse — Architecture & Engineering Specification
+# BlogSphere AI — Software Architecture Specification
 
 ## 1. System Overview
 
-**AlgoVerse** is built as an interactive engineering platform for visualizing complex NP-hard and constraint satisfaction backtracking algorithms. The platform employs a decoupled **Generator-Renderer Pattern** in ES6 JavaScript with a time-travel step debugger.
+**BlogSphere AI** is a state-of-the-art AI-powered blogging, editing, and content generation platform designed with modular frontend architecture and real-time SEO score analysis.
 
 ```
        +--------------------------------------------+
-       |   UI Controller & Scrubber (main.js)       |
+       |       Main Application UI (app.js)         |
        +--------------------+-----------------------+
                             |
-           +----------------+----------------+
-           |                                 |
-           v                                 v
-+-----------------------+         +-----------------------+
-| Async Generator Engine|         | Visualizer Rendering  |
-|  (algorithms/*.js)    |         |  (visualizers.js)     |
-+-----------------------+         +-----------------------+
-           |                                 |
-           v                                 v
-   Yield Step Object                 DOM / Canvas 2D Update
-           |                                 |
-           +----------------+----------------+
+     +----------------------+----------------------+
+     |                      |                      |
+     v                      v                      v
++------------------+  +------------------+  +------------------+
+| Local Data Store |  | AI Generation    |  | SEO & Readability|
+|    (store.js)    |  | Engine (ai-*.js) |  | Engine (seo-*.js)|
++------------------+  +------------------+  +------------------+
+     |                      |                      |
+     +----------------------+----------------------+
                             |
                             v
-            +-------------------------------+
-            | Sound Synth & History Scrubber|
-            |          (utils.js)           |
-            +-------------------------------+
+             +------------------------------+
+             | Live Markdown Editor & Export|
+             |          (editor.js)         |
+             +------------------------------+
 ```
-
-## 2. Key Modules & Design Decisions
-
-### A. Generator-Renderer Execution & Step History Scrubbing
-Standard backtracking functions use blocking recursive calls (`solve(x)` calling `solve(x+1)`), which freeze the browser main thread.
-In **AlgoVerse**, every solver is implemented as an ES6 Generator function (`function*`):
-- Each state transition yields a standardized payload:
-  ```ts
-  interface StepPayload {
-    type: 'TRY' | 'BACKTRACK' | 'SUCCESS' | 'CHECK';
-    line: number;           // Synced pseudocode line
-    message: string;        // Human readable log
-    depth: number;          // Current recursion tree depth
-    [key: string]: any;     // Board, path, or colors state
-  }
-  ```
-- This architecture enables:
-  1. Non-blocking UI rendering via `requestAnimationFrame` / `setTimeout`.
-  2. Granular step scrubbing (Forward, Step-Back, and progress bar time travel).
-  3. Dynamic animation speed scaling ($1\times$ to $50\times$).
-
-### B. Sound Synthesis Engine (Web Audio API)
-Instead of loading static MP3 audio files over HTTP, `SoundEngine` synthesizes real-time sound frequencies using the browser's native Web Audio API:
-- `TRY`: Soft sine wave audio pulse at $523\text{ Hz}$ (C5).
-- `BACKTRACK`: Triangle wave low pop at $220\text{ Hz}$ (A3).
-- `SUCCESS`: C Major triad chord sweep ($523.25\text{ Hz} \rightarrow 659.25\text{ Hz} \rightarrow 783.99\text{ Hz} \rightarrow 1046.50\text{ Hz}$).
 
 ---
 
-## 3. Algorithm Complexity Reference Matrix
+## 2. Core Subsystems
 
-| Algorithm | Worst-Case Time | Auxiliary Space | Pruning Technique |
-|-----------|-----------------|------------------|-------------------|
-| **Sudoku Solver** | $O(9^{N^2})$ | $O(N^2)$ | Row, Column, and $3\times3$ Box Constraint Checks |
-| **Rat in a Maze** | $O(4^{N^2})$ | $O(N^2)$ | Wall Collision & Visited Cell Matrix Pruning |
-| **N-Queens** | $O(N!)$ | $O(N)$ | Column & Diagonal Attack Line Checks |
-| **Knight's Tour** | $O(8^{N^2})$ | $O(N^2)$ | Warnsdorff's Minimum Degree Heuristic |
-| **Graph M-Coloring** | $O(M^V)$ | $O(V)$ | Adjacent Vertex Color Conflict Validation |
-| **Hamiltonian Cycle** | $O(N!)$ | $O(N)$ | Edge Existence & Visited Vertex List Validation |
+### A. Local Data Store (`store.js`)
+- Persists user draft articles, published posts, view counts, and categories in `localStorage`.
+- Includes initial curated sample content spanning Artificial Intelligence, Web Development, UI/UX Design, and Software Engineering.
+
+### B. AI Generation & Content Synthesizer (`ai-engine.js`)
+- Agentic content synthesizer generating multi-section Markdown articles tailored by category, writing tone (Professional, Technical, Conversational), and topic prompts.
+- Synthesizes automated SEO metadata, titles, tags, and code implementation matrices.
+
+### C. Real-Time SEO & Readability Engine (`seo-analyzer.js`)
+- Analyzes title length, word density, reading time estimates, heading hierarchy ($H1$, $H2$, $H3$), and focus keyword frequency.
+- Computes real-time SEO health score ($0 - 100$) with actionable optimization recommendations.
+
+### D. Live Markdown Editor (`editor.js`)
+- Dual-pane layout featuring real-time Markdown parsing, formatting toolbar actions (Bold, Italic, Headings, Code, Quotes), and export functionality (`.md` & `.html`).
+
+---
+
+## 3. Directory Structure
+
+```text
+BlogSphere-AI/
+├── index.html                  # Semantic HTML5 & ARIA layout
+├── css/
+│   ├── style.css               # Dark theme, glassmorphic design & CSS grid
+│   └── responsive.css          # Mobile & tablet responsive breakpoints
+├── js/
+│   ├── store.js                # LocalStorage data persistence store
+│   ├── ai-engine.js            # AI article generation engine
+│   ├── seo-analyzer.js        # Real-time SEO scoring & readability engine
+│   ├── editor.js               # Live Markdown editor & export functions
+│   └── app.js                  # Main UI view router & event controller
+├── docs/
+│   └── ARCHITECTURE.md         # Architecture specification
+├── test/
+│   └── run_tests.js            # Automated test suite
+├── README.md                   # Repository documentation
+├── LICENSE                     # MIT License
+└── package.json                # Project configuration
+```

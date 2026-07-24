@@ -1,25 +1,20 @@
 {
-  "name": "algoverse-backtracking-visualizer",
+  "name": "blogsphere-ai",
   "version": "1.0.0",
-  "description": "Google & FAANG Ready Interactive Backtracking Algorithm Visualizer",
-  "main": "js/main.js",
+  "description": "BlogSphere AI — State-of-the-Art AI-Powered Blogging & Content Generation Platform",
+  "main": "js/app.js",
   "scripts": {
     "start": "npx serve .",
     "test": "node test/run_tests.js"
   },
   "keywords": [
-    "backtracking",
-    "algorithms",
-    "visualizer",
-    "sudoku",
-    "n-queens",
-    "maze",
-    "knight-tour",
-    "graph-coloring",
-    "hamiltonian-cycle",
+    "blogsphere",
+    "ai-blogging",
+    "content-generator",
+    "markdown-editor",
+    "seo-analyzer",
     "javascript",
-    "canvas",
-    "dsa"
+    "blog-platform"
   ],
   "author": "Ankita Priyadarshini Pallai",
   "license": "MIT"

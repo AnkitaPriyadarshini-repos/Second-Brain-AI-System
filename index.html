@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AlgoVerse — Industry-Standard Interactive Backtracking Visualizer</title>
-  <meta name="description" content="Production-grade interactive Backtracking Algorithm Visualizer for Sudoku, Rat in a Maze, N-Queens, Knight's Tour, Graph Coloring, and Hamiltonian Cycle.">
+  <title>BlogSphere AI — State-of-the-Art AI-Powered Content Platform</title>
+  <meta name="description" content="State-of-the-art AI-powered blogging & content generation platform with real-time SEO scoring, live markdown editor, and analytics dashboard.">
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 
   <!-- Google Fonts -->
@@ -20,183 +20,170 @@
 
   <!-- Navigation Bar -->
   <nav class="navbar" aria-label="Main Navigation">
-    <a href="#" class="nav-brand">
-      <span>AlgoVerse</span>
+    <a href="#" class="brand-logo">
+      <span>BlogSphere AI</span>
       <span class="brand-badge">Portfolio Grade</span>
     </a>
-    <ul class="nav-links">
-      <li><a href="#visualizer">Workspace</a></li>
-      <li><a href="#algorithms">Algorithms</a></li>
-      <li><a href="#architecture">Architecture</a></li>
-      <li><a href="https://github.com" target="_blank" rel="noopener">GitHub</a></li>
-    </ul>
-    <button id="btn-sound-toggle" class="btn btn-secondary" aria-label="Toggle Audio Synthesizer">
-      🔊 Sound On
-    </button>
+    <div class="nav-tabs">
+      <a class="nav-tab active" data-view="feed">🌐 Article Feed</a>
+      <a class="nav-tab" data-view="ai-studio">✨ AI Studio</a>
+      <a class="nav-tab" data-view="editor">✏️ Live Editor</a>
+      <a class="nav-tab" data-view="analytics">📊 Analytics</a>
+    </div>
   </nav>
 
   <main>
-    <!-- Hero Section -->
-    <section class="hero-section">
-      <h1 class="hero-title">Interactive Backtracking Visualizer</h1>
-      <p class="hero-subtitle">
-        Explore NP-hard constraint satisfaction algorithms step-by-step with real-time state trees, synthesized audio cues, line-by-line pseudocode execution, and time-travel step scrubbing.
-      </p>
+    <!-- View 1: Article Feed / Explorer -->
+    <section id="view-feed" class="view-section active">
+      <div id="featured-post-card" class="featured-card glass-card"></div>
+
+      <div class="filter-bar">
+        <input type="text" id="feed-search" class="input-field" style="flex: 1;" placeholder="🔍 Search articles by title, excerpt, or tag...">
+        <select id="feed-category-filter" class="select-field">
+          <option value="All">All Categories</option>
+          <option value="Artificial Intelligence">Artificial Intelligence</option>
+          <option value="UI/UX Design">UI/UX Design</option>
+          <option value="Engineering">Engineering</option>
+          <option value="Web Development">Web Development</option>
+        </select>
+      </div>
+
+      <div id="posts-grid" class="posts-grid"></div>
     </section>
 
-    <!-- Algorithm Cards Selector -->
-    <section id="algorithms" class="algo-cards-container" aria-label="Algorithm Selection">
-      <article class="algo-card active" data-algo="sudoku" tabindex="0">
-        <div class="algo-card-icon">🧩</div>
-        <h2 class="algo-card-title">Sudoku Solver</h2>
-        <p class="algo-card-desc">9x9 Grid constraint checking with 3x3 block validation & depth backtracking.</p>
-      </article>
+    <!-- View 2: AI Content Studio -->
+    <section id="view-ai-studio" class="view-section">
+      <div class="glass-card" style="max-width: 800px; margin: 0 auto;">
+        <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">✨ AI Content Studio</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+          Generate comprehensive, SEO-optimized blog posts on any topic using our agentic content synthesizer.
+        </p>
 
-      <article class="algo-card" data-algo="maze" tabindex="0">
-        <div class="algo-card-icon">🐭</div>
-        <h2 class="algo-card-title">Rat in a Maze</h2>
-        <p class="algo-card-desc">2D Pathfinding & dead-end backtracking from start to target cheese.</p>
-      </article>
+        <form id="ai-generator-form">
+          <div style="margin-bottom: 1.25rem;">
+            <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Article Topic or Prompt:</label>
+            <input type="text" id="ai-topic" class="input-field" style="width: 100%;" placeholder="e.g. Next-Gen Web Assembly & Browser Compute Capabilities" required>
+          </div>
 
-      <article class="algo-card" data-algo="nqueens" tabindex="0">
-        <div class="algo-card-icon">👑</div>
-        <h2 class="algo-card-title">N-Queens Problem</h2>
-        <p class="algo-card-desc">Places N non-attacking queens with column & diagonal attack line pruning.</p>
-      </article>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+            <div>
+              <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Category:</label>
+              <select id="ai-category" class="select-field" style="width: 100%;">
+                <option value="Artificial Intelligence">Artificial Intelligence</option>
+                <option value="Web Development">Web Development</option>
+                <option value="UI/UX Design">UI/UX Design</option>
+                <option value="Engineering">Engineering</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Writing Tone:</label>
+              <select id="ai-tone" class="select-field" style="width: 100%;">
+                <option value="Professional">Professional & Authoritative</option>
+                <option value="Technical">Technical Deep Dive</option>
+                <option value="Conversational">Conversational & Engaging</option>
+              </select>
+            </div>
+          </div>
 
-      <article class="algo-card" data-algo="knighttour" tabindex="0">
-        <div class="algo-card-icon">♞</div>
-        <h2 class="algo-card-title">Knight's Tour</h2>
-        <p class="algo-card-desc">Chessboard traversal visualizer powered by Warnsdorff's heuristic.</p>
-      </article>
-
-      <article class="algo-card" data-algo="graphcoloring" tabindex="0">
-        <div class="algo-card-icon">🎨</div>
-        <h2 class="algo-card-title">Graph Coloring</h2>
-        <p class="algo-card-desc">M-Coloring vertex assignment checking adjacent node conflicts.</p>
-      </article>
-
-      <article class="algo-card" data-algo="hamiltonian" tabindex="0">
-        <div class="algo-card-icon">🔄</div>
-        <h2 class="algo-card-title">Hamiltonian Cycle</h2>
-        <p class="algo-card-desc">Finds a closed loop visiting every graph vertex exactly once.</p>
-      </article>
+          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 1rem; padding: 0.85rem;">
+            ✨ Generate AI Article
+          </button>
+        </form>
+      </div>
     </section>
 
-    <!-- Main Workspace -->
-    <section id="visualizer" class="workspace-container">
-      <!-- Visualizer Area & Controls -->
-      <div class="visualizer-card">
-        <div class="workspace-header">
-          <div class="workspace-title">
-            <span>⚡ Interactive Workspace</span>
-          </div>
-
-          <!-- Dynamic Parameter Preset Controls -->
-          <div class="preset-controls">
-            <select id="preset-select" class="btn btn-secondary" aria-label="Preset Selector">
-              <option value="easy">Easy Puzzle</option>
-              <option value="medium">Medium Puzzle</option>
-              <option value="hard">Hard Puzzle</option>
-            </select>
-            <button id="btn-custom-action" class="btn btn-secondary">⚡ Custom Action</button>
-            <button id="btn-reset" class="btn btn-secondary">🔄 Reset</button>
-          </div>
-        </div>
-
-        <!-- Viewport Display -->
-        <div class="visualizer-viewport">
-          <div id="visualizer-grid-container" class="visualizer-grid"></div>
-          <canvas id="canvas-visualizer" style="display: none;"></canvas>
-        </div>
-
-        <!-- Progress Scrubber Bar -->
-        <div class="scrubber-bar-container" style="margin-top: 1rem;">
-          <input type="range" id="progress-scrubber" min="0" max="0" value="0" style="width: 100%;">
-        </div>
-
-        <!-- Control Panel Buttons -->
-        <div class="control-panel">
+    <!-- View 3: Live Markdown Editor & SEO Analyzer -->
+    <section id="view-editor" class="view-section">
+      <div class="glass-card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+          <input type="text" id="editor-title" class="input-field" style="flex: 1; font-size: 1.3rem; font-weight: 700;" placeholder="Article Title...">
+          <select id="editor-category" class="select-field">
+            <option value="Artificial Intelligence">Artificial Intelligence</option>
+            <option value="Web Development">Web Development</option>
+            <option value="UI/UX Design">UI/UX Design</option>
+            <option value="Engineering">Engineering</option>
+          </select>
           <div class="btn-group">
-            <button id="btn-step-back" class="btn btn-secondary"><span>⏮ Back</span></button>
-            <button id="btn-play" class="btn btn-primary"><span>▶ Play</span></button>
-            <button id="btn-step-forward" class="btn btn-secondary"><span>⏭ Step</span></button>
+            <button id="btn-save-article" class="btn btn-primary">🚀 Publish Article</button>
+            <button id="btn-export-md" class="btn btn-secondary">📥 Export .md</button>
+            <button id="btn-export-html" class="btn btn-secondary">🌐 Export .html</button>
           </div>
+        </div>
 
-          <div class="speed-slider-container">
-            <label for="speed-slider">Speed:</label>
-            <input type="range" id="speed-slider" min="1" max="20" value="10">
-            <span id="speed-label">10x</span>
+        <!-- Formatting Toolbar -->
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+          <button class="btn btn-secondary btn-format" data-format="bold"><b>B</b></button>
+          <button class="btn btn-secondary btn-format" data-format="italic"><i>I</i></button>
+          <button class="btn btn-secondary btn-format" data-format="h2">H2</button>
+          <button class="btn btn-secondary btn-format" data-format="quote">” Quote</button>
+          <button class="btn btn-secondary btn-format" data-format="code">&lt;/&gt; Code</button>
+          <input type="text" id="editor-keyword" class="input-field" style="margin-left: auto; width: 220px;" placeholder="Focus Keyword...">
+        </div>
+
+        <!-- Real-time SEO Bar -->
+        <div style="margin-bottom: 1.25rem; background: rgba(0, 0, 0, 0.3); padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--glass-border);">
+          <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 0.85rem;">
+            <span>SEO Health Score: <span id="seo-score-value" style="color: var(--accent-emerald);">0/100</span></span>
+            <span><span id="seo-word-count">0 words</span> • <span id="seo-read-time">1 min read</span></span>
+          </div>
+          <div class="seo-score-bar-bg">
+            <div id="seo-score-bar" class="seo-score-bar-fill"></div>
+          </div>
+          <ul id="seo-feedback-list" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; list-style: none; display: flex; gap: 1rem; flex-wrap: wrap;"></ul>
+        </div>
+
+        <!-- Workspace Grid -->
+        <div class="editor-workspace">
+          <textarea id="editor-textarea" class="editor-textarea" placeholder="Write your article in Markdown format here..."></textarea>
+          <div id="editor-preview" class="editor-preview"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 4: Analytics Dashboard -->
+    <section id="view-analytics" class="view-section">
+      <div class="glass-card">
+        <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 1.5rem;">📊 Content Analytics Dashboard</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem;">
+          <div style="background: rgba(0,0,0,0.3); padding: 1.25rem; border-radius: 14px; border: 1px solid var(--glass-border);">
+            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Published Articles</div>
+            <div id="analytics-total-posts" style="font-size: 2rem; font-weight: 800; color: var(--accent-cyan); margin-top: 0.25rem;">0</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 1.25rem; border-radius: 14px; border: 1px solid var(--glass-border);">
+            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Total Reader Views</div>
+            <div id="analytics-total-views" style="font-size: 2rem; font-weight: 800; color: var(--accent-emerald); margin-top: 0.25rem;">0</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 1.25rem; border-radius: 14px; border: 1px solid var(--glass-border);">
+            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Community Likes</div>
+            <div id="analytics-total-likes" style="font-size: 2rem; font-weight: 800; color: var(--accent-amber); margin-top: 0.25rem;">0</div>
           </div>
         </div>
       </div>
-
-      <!-- Sidebar Metrics & Theory Panel -->
-      <aside class="sidebar-panel">
-        <!-- Execution Metrics -->
-        <div class="panel-card">
-          <div class="panel-title">📊 Execution Metrics</div>
-          <div class="metrics-grid">
-            <div class="metric-box">
-              <div class="metric-label">Step Count</div>
-              <div id="stat-steps" class="metric-value">0</div>
-            </div>
-            <div class="metric-box">
-              <div class="metric-label">Backtracks</div>
-              <div id="stat-backtracks" class="metric-value">0</div>
-            </div>
-            <div class="metric-box">
-              <div class="metric-label">Time Elapsed</div>
-              <div id="stat-time" class="metric-value">0.00s</div>
-            </div>
-            <div class="metric-box">
-              <div class="metric-label">Recursion Depth</div>
-              <div id="stat-depth" class="metric-value">0</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Line-by-Line Pseudocode Execution -->
-        <div class="panel-card">
-          <div class="panel-title">💻 Pseudocode Execution</div>
-          <div class="pseudocode-box" id="pseudocode-lines"></div>
-        </div>
-
-        <!-- Complexity & Theory Card -->
-        <div class="panel-card">
-          <div class="panel-title">⏱ Time & Space Complexity</div>
-          <div class="complexity-row">
-            <span>Time Complexity:</span>
-            <span id="comp-time" class="complexity-value">O(9^(N*N))</span>
-          </div>
-          <div class="complexity-row">
-            <span>Space Complexity:</span>
-            <span id="comp-space" class="complexity-value">O(N*N)</span>
-          </div>
-          <p id="comp-desc" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.75rem;"></p>
-        </div>
-      </aside>
     </section>
   </main>
 
-  <!-- Toast Notification Container -->
+  <!-- Full Article Reader Modal -->
+  <div id="article-modal" class="modal-overlay">
+    <div class="modal-card">
+      <button id="btn-close-modal" class="btn btn-secondary" style="position: absolute; top: 1.5rem; right: 1.5rem;">✕ Close</button>
+      <div id="modal-article-content"></div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
   <div id="toast-container"></div>
 
   <!-- Footer -->
-  <footer>
-    <p>AlgoVerse — Industry Portfolio Project | Built with HTML5, CSS Glassmorphic Design & ES6 Generators</p>
+  <footer style="text-align: center; padding: 2.5rem 1rem; border-top: 1px solid var(--glass-border); margin-top: 3rem;">
+    <p>BlogSphere AI — State-of-the-Art AI Content Platform | Built with Glassmorphic Design & Live SEO Engine</p>
     <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Author: Ankita Priyadarshini Pallai</p>
   </footer>
 
   <!-- Scripts -->
-  <script src="js/utils.js"></script>
-  <script src="js/visualizers.js"></script>
-  <script src="js/algorithms/sudoku.js"></script>
-  <script src="js/algorithms/maze.js"></script>
-  <script src="js/algorithms/nqueens.js"></script>
-  <script src="js/algorithms/knighttour.js"></script>
-  <script src="js/algorithms/graphcoloring.js"></script>
-  <script src="js/algorithms/hamiltonian.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/ai-engine.js"></script>
+  <script src="js/seo-analyzer.js"></script>
+  <script src="js/editor.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
