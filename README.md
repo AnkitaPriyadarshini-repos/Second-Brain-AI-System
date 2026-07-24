@@ -1,34 +1,36 @@
-# ⚡ AlgoVerse — Interactive Backtracking Algorithm Visualizer
+# 🌐 BlogSphere AI — AI-Powered Blogging & Content Platform
 
-> **An Open-Source Industry-Standard Portfolio Project**  
-> An interactive web platform for visualizing NP-hard constraint satisfaction and backtracking algorithms with real-time state trees, line-by-line pseudocode execution, synthesized Web Audio sound cues, time-travel step scrubbing, and interactive grid/graph editing.
+> **State-of-the-Art AI Content Studio, Real-time SEO Scoring & Live Markdown Editor**  
+> An open-source portfolio project designed for automated content generation, real-time SEO health scoring, markdown editing, and responsive article publishing.
 
 ---
 
-## 🌟 Advanced Key Features
+## 🌟 Key Features
 
-- **6 Classic Backtracking Algorithms**:
-  1. 🧩 **9x9 Sudoku Solver**: Row, Column, and $3\times3$ box constraint checking with step-by-step trial placement, preset selector (Easy, Medium, Hard), and custom input board editing.
-  2. 🐭 **Rat in a Maze**: 2D Grid pathfinding from start to cheese target with dead-end backtrack tracing and a Random Maze Generator.
-  3. 👑 **N-Queens Problem**: Interactive $N\times N$ chessboard ($N=4, 5, 6, 8$) queen placements with attack line collision detection.
-  4. ♞ **Knight's Tour**: Chessboard traversal visualizer powered by Warnsdorff's minimum onward degree heuristic.
-  5. 🎨 **Graph M-Coloring**: Interactive vertex coloring checking adjacent node conflicts.
-  6. 🔄 **Hamiltonian Cycle**: Closed loop vertex traversal finding simple Hamiltonian circuits.
+- **✨ AI Content Studio**:
+  - Agentic article generator synthesizing multi-section technical, professional, or conversational blog posts based on user topics.
+  - Automatic category classification, tag recommendations, and code example insertion.
 
-- **Real-Time Controls & Time Travel Debugger**:
-  - **Playback Controls**: Play, Pause, Step Forward, Step Back (Travel Backward), Reset, Speed Slider ($1\times$ to $50\times$).
-  - **Progress Scrubber**: Interactive range slider to scrub through past and future algorithm states.
-  - **Web Audio Sound Effects**: Real-time synthesized chimes for placement, backtracking, and victory fanfare.
-  - **Execution Metrics**: Step counter, Backtrack count, Time elapsed (ms), Visited states count, Current recursion depth.
-  - **Synchronized Pseudocode Panel**: Active line highlighting synced with execution state.
-  - **Complexity Theory Card**: Dynamic Time Complexity $O(\dots)$ and Space Complexity $O(\dots)$ details.
+- **📈 Real-Time SEO Analyzer**:
+  - Live 0-100 SEO health score meter.
+  - Word count, estimated read time, title optimization, and focus keyword density checks.
+  - Actionable feedback recommendations list.
+
+- **✏️ Live Markdown Editor & Reader**:
+  - Split-view live Markdown parser with syntax highlighting.
+  - Formatting toolbar (Bold, Italic, Headings, Quotes, Code).
+  - Export articles to `.md` or `.html` formats.
+  - Full-screen article reader modal with view tracking.
+
+- **📊 Analytics Dashboard**:
+  - Live statistics tracking published posts, total views, and engagement metrics.
 
 ---
 
 ## 🚀 Quick Start & Installation
 
 ### Option 1: Run Locally (No dependencies required)
-Open `index.html` in any modern web browser (Chrome, Edge, Firefox, Safari).
+Simply open `index.html` in any modern web browser.
 
 ### Option 2: Run with Node / Local Server
 ```bash
@@ -47,7 +49,7 @@ npm start
 
 ## 🧪 Testing
 
-The repository includes a comprehensive automated test suite in `test/run_tests.js` that verifies all 6 generator algorithm engines deterministically:
+The repository includes an automated test suite in `test/run_tests.js`:
 
 ```bash
 node test/run_tests.js
@@ -55,30 +57,25 @@ node test/run_tests.js
 
 ---
 
-## 📐 Project Architecture
+## 📁 Directory Architecture
 
 ```text
 BlogSphere-AI/
-├── index.html                  # Semantic HTML5 & ARIA layout
+├── index.html                  # Main Application UI
 ├── css/
-│   ├── style.css               # Dark theme, glassmorphic design & CSS grid
-│   └── responsive.css          # Mobile & tablet responsive breakpoints
+│   ├── style.css               # Core styling, glassmorphism, design tokens
+│   └── responsive.css          # Mobile & tablet responsiveness
 ├── js/
-│   ├── utils.js                # Web Audio sound engine & state history recorder
-│   ├── visualizers.js          # Canvas 2D & DOM visualizer render engines
-│   ├── algorithms/             # ES6 Generator Backtracking Solvers
-│   │   ├── sudoku.js
-│   │   ├── maze.js
-│   │   ├── nqueens.js
-│   │   ├── knighttour.js
-│   │   ├── graphcoloring.js
-│   │   └── hamiltonian.js
-│   └── main.js                 # App controller, time-travel scrubber & UI event binding
+│   ├── store.js                # LocalStorage data persistence store
+│   ├── ai-engine.js            # AI article generation engine
+│   ├── seo-analyzer.js        # Real-time SEO scoring & readability engine
+│   ├── editor.js               # Live Markdown editor & export functions
+│   └── app.js                  # Main UI view router & event controller
 ├── docs/
-│   └── ARCHITECTURE.md         # Detailed technical architecture spec
+│   └── ARCHITECTURE.md         # Architecture spec
 ├── test/
-│   └── run_tests.js            # Node.js automated test harness
-├── README.md                   # Project documentation
+│   └── run_tests.js            # Automated test suite
+├── README.md                   # Repository documentation
 ├── LICENSE                     # MIT License
 └── package.json                # Project configuration
 ```
@@ -88,4 +85,4 @@ BlogSphere-AI/
 ## 👤 Author
 
 **Ankita Priyadarshini Pallai**  
-*Built to High Industry Open Source Standards*
+*BlogSphere AI Platform*
