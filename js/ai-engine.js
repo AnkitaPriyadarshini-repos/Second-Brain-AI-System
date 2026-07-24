@@ -21,6 +21,22 @@ async function generateIntelligencePayload(prompt) {
   return await model.complete({ prompt, temperature: 0.7 });
 }`
       },
+      'Cybersecurity & Cloud': {
+        outline: [
+          'Zero-Trust Architecture Principles',
+          'Cloud Native Threat Detection & IAM Policies',
+          'Cryptographic Data Protection in Transit',
+          'Automated Compliance & Security Auditing'
+        ],
+        codeSnippet: `// Zero-Trust Authorization Policy
+function validateSecurityToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized: Missing Security Token' });
+  }
+  next();
+}`
+      },
       'Web Development': {
         outline: [
           'Overview of Modern Web Engineering',
@@ -71,7 +87,6 @@ class EventBus {
   }
 
   async generateArticle(topic, category = 'Artificial Intelligence', tone = 'Professional', wordCountTarget = 600) {
-    // Simulates intelligent AI generation delay
     await new Promise(r => setTimeout(r, 600));
 
     const tpl = this.templates[category] || this.templates['Artificial Intelligence'];
