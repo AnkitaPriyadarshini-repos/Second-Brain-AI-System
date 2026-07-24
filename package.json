@@ -1,0 +1,26 @@
+{
+  "name": "algoverse-backtracking-visualizer",
+  "version": "1.0.0",
+  "description": "Google & FAANG Ready Interactive Backtracking Algorithm Visualizer",
+  "main": "js/main.js",
+  "scripts": {
+    "start": "npx serve .",
+    "test": "node test/run_tests.js"
+  },
+  "keywords": [
+    "backtracking",
+    "algorithms",
+    "visualizer",
+    "sudoku",
+    "n-queens",
+    "maze",
+    "knight-tour",
+    "graph-coloring",
+    "hamiltonian-cycle",
+    "javascript",
+    "canvas",
+    "dsa"
+  ],
+  "author": "Ankita Priyadarshini Pallai",
+  "license": "MIT"
+}

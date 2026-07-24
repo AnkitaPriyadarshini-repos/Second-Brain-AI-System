@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.DS_Store
+
+# Temporary scratch files
+scratch/
+parsed_data.json
+script8.txt
+clean_chat.md
+extracted_chat.txt
+og_image.png
+parse_script.py
+format_chat.py
+extract_conversation.py
