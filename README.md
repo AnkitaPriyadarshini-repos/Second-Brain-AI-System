@@ -1,5 +1,8 @@
 # 🌐 BlogSphere AI — AI-Powered Blogging & Content Platform
 
+[![Pull Shark Achievement](https://img.shields.io/badge/GitHub-Pull%20Shark%20Unlocked-00f2fe?style=for-the-badge&logo=github)](https://github.com/AnkitaPriyadarshini-repos/BlogSphere-AI)
+[![Build Status](https://img.shields.io/badge/Tests-4%2F4%20Passed-00b09b?style=for-the-badge&logo=node.js)](https://github.com/AnkitaPriyadarshini-repos/BlogSphere-AI)
+
 > **State-of-the-Art AI Content Studio, Real-time SEO Scoring & Live Markdown Editor**  
 > An open-source portfolio project designed for automated content generation, real-time SEO health scoring, markdown editing, and responsive article publishing.
 
