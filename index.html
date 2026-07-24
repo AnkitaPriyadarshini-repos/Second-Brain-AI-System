@@ -20,26 +20,26 @@
 
   <!-- Navigation Bar -->
   <nav class="navbar" aria-label="Main Navigation">
-    <a href="#" class="brand-logo">
+    <a href="#" class="brand-logo" aria-label="BlogSphere AI Home">
       <span>BlogSphere AI</span>
       <span class="brand-badge">Portfolio Grade</span>
     </a>
-    <div class="nav-tabs">
-      <a class="nav-tab active" data-view="feed">🌐 Article Feed</a>
-      <a class="nav-tab" data-view="ai-studio">✨ AI Studio</a>
-      <a class="nav-tab" data-view="editor">✏️ Live Editor</a>
-      <a class="nav-tab" data-view="analytics">📊 Analytics</a>
+    <div class="nav-tabs" role="tablist">
+      <a class="nav-tab active" data-view="feed" role="tab" aria-selected="true">🌐 Article Feed</a>
+      <a class="nav-tab" data-view="ai-studio" role="tab" aria-selected="false">✨ AI Studio</a>
+      <a class="nav-tab" data-view="editor" role="tab" aria-selected="false">✏️ Live Editor</a>
+      <a class="nav-tab" data-view="analytics" role="tab" aria-selected="false">📊 Analytics</a>
     </div>
   </nav>
 
   <main>
     <!-- View 1: Article Feed / Explorer -->
-    <section id="view-feed" class="view-section active">
+    <section id="view-feed" class="view-section active" aria-label="Article Feed">
       <div id="featured-post-card" class="featured-card glass-card"></div>
 
       <div class="filter-bar">
-        <input type="text" id="feed-search" class="input-field" style="flex: 1;" placeholder="🔍 Search articles by title, excerpt, or tag...">
-        <select id="feed-category-filter" class="select-field">
+        <input type="text" id="feed-search" class="input-field" style="flex: 1;" placeholder="🔍 Search articles by title, excerpt, or tag..." aria-label="Search Articles">
+        <select id="feed-category-filter" class="select-field" aria-label="Filter Category">
           <option value="All">All Categories</option>
           <option value="Artificial Intelligence">Artificial Intelligence</option>
           <option value="Cybersecurity & Cloud">Cybersecurity & Cloud</option>
@@ -53,7 +53,7 @@
     </section>
 
     <!-- View 2: AI Content Studio -->
-    <section id="view-ai-studio" class="view-section">
+    <section id="view-ai-studio" class="view-section" aria-label="AI Content Studio">
       <div class="glass-card" style="max-width: 800px; margin: 0 auto;">
         <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">✨ AI Content Studio</h2>
         <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
@@ -62,13 +62,13 @@
 
         <form id="ai-generator-form">
           <div style="margin-bottom: 1.25rem;">
-            <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Article Topic or Prompt:</label>
+            <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;" for="ai-topic">Article Topic or Prompt:</label>
             <input type="text" id="ai-topic" class="input-field" style="width: 100%;" placeholder="e.g. Next-Gen Web Assembly & Browser Compute Capabilities" required>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
             <div>
-              <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Category:</label>
+              <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;" for="ai-category">Category:</label>
               <select id="ai-category" class="select-field" style="width: 100%;">
                 <option value="Artificial Intelligence">Artificial Intelligence</option>
                 <option value="Cybersecurity & Cloud">Cybersecurity & Cloud</option>
@@ -78,7 +78,7 @@
               </select>
             </div>
             <div>
-              <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;">Writing Tone:</label>
+              <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;" for="ai-tone">Writing Tone:</label>
               <select id="ai-tone" class="select-field" style="width: 100%;">
                 <option value="Professional">Professional & Authoritative</option>
                 <option value="Technical">Technical Deep Dive</option>
@@ -95,11 +95,11 @@
     </section>
 
     <!-- View 3: Live Markdown Editor & SEO Analyzer -->
-    <section id="view-editor" class="view-section">
+    <section id="view-editor" class="view-section" aria-label="Live Editor">
       <div class="glass-card" style="margin-bottom: 1.5rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
-          <input type="text" id="editor-title" class="input-field" style="flex: 1; font-size: 1.3rem; font-weight: 700;" placeholder="Article Title...">
-          <select id="editor-category" class="select-field">
+          <input type="text" id="editor-title" class="input-field" style="flex: 1; font-size: 1.3rem; font-weight: 700;" placeholder="Article Title..." aria-label="Article Title">
+          <select id="editor-category" class="select-field" aria-label="Editor Category">
             <option value="Artificial Intelligence">Artificial Intelligence</option>
             <option value="Cybersecurity & Cloud">Cybersecurity & Cloud</option>
             <option value="Web Development">Web Development</option>
@@ -114,13 +114,13 @@
         </div>
 
         <!-- Formatting Toolbar -->
-        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
-          <button class="btn btn-secondary btn-format" data-format="bold"><b>B</b></button>
-          <button class="btn btn-secondary btn-format" data-format="italic"><i>I</i></button>
-          <button class="btn btn-secondary btn-format" data-format="h2">H2</button>
-          <button class="btn btn-secondary btn-format" data-format="quote">” Quote</button>
-          <button class="btn btn-secondary btn-format" data-format="code">&lt;/&gt; Code</button>
-          <input type="text" id="editor-keyword" class="input-field" style="margin-left: auto; width: 220px;" placeholder="Focus Keyword...">
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;" aria-label="Editor Toolbar">
+          <button class="btn btn-secondary btn-format" data-format="bold" aria-label="Format Bold"><b>B</b></button>
+          <button class="btn btn-secondary btn-format" data-format="italic" aria-label="Format Italic"><i>I</i></button>
+          <button class="btn btn-secondary btn-format" data-format="h2" aria-label="Format Subheading">H2</button>
+          <button class="btn btn-secondary btn-format" data-format="quote" aria-label="Format Blockquote">” Quote</button>
+          <button class="btn btn-secondary btn-format" data-format="code" aria-label="Format Code">&lt;/&gt; Code</button>
+          <input type="text" id="editor-keyword" class="input-field" style="margin-left: auto; width: 220px;" placeholder="Focus Keyword..." aria-label="Focus Keyword">
         </div>
 
         <!-- Real-time SEO Bar -->
@@ -137,14 +137,14 @@
 
         <!-- Workspace Grid -->
         <div class="editor-workspace">
-          <textarea id="editor-textarea" class="editor-textarea" placeholder="Write your article in Markdown format here..."></textarea>
-          <div id="editor-preview" class="editor-preview"></div>
+          <textarea id="editor-textarea" class="editor-textarea" placeholder="Write your article in Markdown format here..." aria-label="Markdown Input"></textarea>
+          <div id="editor-preview" class="editor-preview" aria-label="Live HTML Preview"></div>
         </div>
       </div>
     </section>
 
     <!-- View 4: Analytics Dashboard -->
-    <section id="view-analytics" class="view-section">
+    <section id="view-analytics" class="view-section" aria-label="Analytics Dashboard">
       <div class="glass-card">
         <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 1.5rem;">📊 Content Analytics Dashboard</h2>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem;">
@@ -166,15 +166,15 @@
   </main>
 
   <!-- Full Article Reader Modal -->
-  <div id="article-modal" class="modal-overlay">
+  <div id="article-modal" class="modal-overlay" role="dialog" aria-modal="true">
     <div class="modal-card">
-      <button id="btn-close-modal" class="btn btn-secondary" style="position: absolute; top: 1.5rem; right: 1.5rem;">✕ Close</button>
+      <button id="btn-close-modal" class="btn btn-secondary" style="position: absolute; top: 1.5rem; right: 1.5rem;" aria-label="Close Article">✕ Close</button>
       <div id="modal-article-content"></div>
     </div>
   </div>
 
   <!-- Toast Container -->
-  <div id="toast-container"></div>
+  <div id="toast-container" aria-live="polite"></div>
 
   <!-- Footer -->
   <footer style="text-align: center; padding: 2.5rem 1rem; border-top: 1px solid var(--glass-border); margin-top: 3rem;">
