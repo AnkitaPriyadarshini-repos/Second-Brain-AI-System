@@ -1,6 +1,6 @@
 // ============================================
 // BlogSphere AI — Content Platform
-// Module: Main UI Application Controller
+// Module: Main UI Application Controller & Export Analytics
 // Author: Ankita Priyadarshini Pallai
 // ============================================
 
@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderFeed(query, e.target.value);
   });
 
-  // Analytics Render
+  // Analytics Render & Export Report
   function renderAnalytics() {
     const posts = window.blogStore.getPosts();
     const totalViews = posts.reduce((sum, p) => sum + (p.views || 0), 0);
