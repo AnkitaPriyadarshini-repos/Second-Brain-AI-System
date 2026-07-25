@@ -161,6 +161,19 @@ test('Store.togglePin should toggle pinned state on note', () => {
   assert.strictEqual(Store.getNotes()[0].pinned, !originalPinState, 'Pin state did not toggle');
 });
 
+// --------------------------------------------------------
+// Test Suite 6: Audio Presets Module
+// --------------------------------------------------------
+console.log('\nSuite 6: Audio Presets Module');
+
+test('AudioPresets should return valid voice presets', () => {
+  const AudioPresets = require('../js/audio-presets');
+  const presets = AudioPresets.getAllPresets();
+  assert.ok(presets.length >= 3, 'Expected at least 3 audio voice presets');
+  const jarvis = AudioPresets.getPreset('jarvis');
+  assert.strictEqual(jarvis.rate, 1.05);
+});
+
 console.log('\n====================================================');
 console.log(`SUMMARY: ${passCount} / ${totalTests} TESTS PASSED CLEANLY.`);
 console.log('====================================================\n');
@@ -170,3 +183,4 @@ if (passCount === totalTests) {
 } else {
   process.exit(1);
 }
+
