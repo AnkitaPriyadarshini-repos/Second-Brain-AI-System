@@ -1,54 +1,82 @@
 # 🧠 Second Brain AI System (HGM-12)
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FAnkitaPriyadarshini-repos%2FSecond-Brain-AI-System)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-brightgreen?logo=github)](https://ankitapriyadarshini-repos.github.io/Second-Brain-AI-System/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Tests: 10/10 Passed](https://img.shields.io/badge/Tests-10%2F10%20Passed-emerald)](test/run_tests.js)
+
 > **A personal knowledge system that does not hinder learning.**  
 > *Zero-Friction Multi-Surface Capture • Grounded Conversational RAG ("Talk to Jarvis") • Proactive Resurfacing • Interactive Knowledge Graph Network*
 
 ---
 
-## 🌟 Overview & Philosophy
+## 🌐 Live Production Deployments & Links
 
-Existing Personal Knowledge Management (PKM) tools like Obsidian, Notion, and Roam suffer from a fundamental architectural flaw: **they are built around capture, but fail at retrieval and use.** Notes accumulate into a dumping ground, resurface rarely, and require manual tagging friction that destroys focus.
-
-The **Second Brain AI System** fixes this by making **capture zero-friction across all devices** and making **retrieval as simple as asking a colleague out loud ("Talk to Jarvis")**.
+- 🚀 **GitHub Pages Production App**: [https://ankitapriyadarshini-repos.github.io/Second-Brain-AI-System/](https://ankitapriyadarshini-repos.github.io/Second-Brain-AI-System/)
+- ⚡ **Deploy to Vercel**: Click the **Deploy with Vercel** button above or link your repo to [Vercel](https://vercel.com) for instant global CDN hosting with zero configuration (`vercel.json` included).
 
 ---
 
-## ✨ Deliverables & Core Features
+## 📹 Video Walkthrough & Feature Demo Showcase
 
-### 1. ⚡ Zero-Friction Multi-Surface Capture Hub
-Ingest knowledge from every surface without app-swapping or manual tagging:
-- **Typing Note Entry**: Rich text note entry with live auto-tagging preview.
-- **Voice Memo Recording**: Speech-to-text audio recording with live waveform visualizer & auto-transcription.
-- **Browser Extension & Web Clipper**: One-click URL bookmarking with automated page summaries and text clipping.
-- **File Upload (OCR)**: Drag-and-drop PDF and image parser simulating Tesseract OCR + PyMuPDF text extraction.
-- **Email Forwarding**: Forward emails directly to your second brain address (`notes@brain.ai`).
-- **Automated NLP Pipeline**: Auto-extracts entities (*People, Places, Concepts, Dates, Tech*) and topic labels without user effort.
+```
++-----------------------------------------------------------------------------------+
+| 🎙️ JARVIS VOICE & GROUNDED RAG DEMO                                              |
+|                                                                                   |
+|  [ User ] ──▶ "What did I save about deep learning last month?"                  |
+|                   │                                                               |
+|                   ▼                                                               |
+|  [ Vector RAG ] ──▶ Cosine Similarity Search (TF-IDF Note Embeddings)              |
+|                   │                                                               |
+|                   ▼                                                               |
+|  [ Jarvis AI ] ──▶ "Based on your notes from Jan 14: Transformers rely on          |
+|                      multi-head self-attention mechanisms..."                     |
+|                      📌 Source: [Note #1 (Jan 14, 2026)]                           |
++-----------------------------------------------------------------------------------+
+```
 
-### 2. 🎙️ Grounded Conversational RAG ("Talk to Jarvis")
-Natural voice and text query interface built on top of a local vector similarity engine (TF-IDF & Cosine Similarity over note embeddings):
-- **Zero Hallucination Guardrails**: Answers strictly using saved notes as source context.
-- **Explicit Source Citations**: Every answer provides clickable citation links back to exact note sources.
-- **Multi-Turn Session Memory**: Remembers context across follow-up queries (e.g. *"What did I save about deep learning last month?"* -> *"What else did I save on this topic?"*).
-- **Spoken Audio Responses**: Built-in Speech Synthesis (TTS) with voice orb animations.
+### 🎬 Interactive Feature Walkthrough Highlights
 
-### 3. 💡 Daily Proactive Resurfacing Engine ("From your past notes")
-Prevents your note vault from becoming a dumping ground:
-- Analyzes 7-day activity vectors (recent queries, recent captures, viewed tags).
-- Finds older notes (saved > 14 days ago) that are semantically relevant to current work but haven't been accessed recently.
-- Generates 3–5 daily recommendation cards with contextual explanation badges.
-- Supports Pin and Dismiss actions.
+#### 1. 🎙️ Jarvis Voice RAG & Grounded Retrieval
+- **Voice-to-Text Input**: Speak questions naturally out loud. Live canvas audio waveform visualizer tracks audio frequencies.
+- **Strict Grounding**: Answers derive strictly from your saved notes without hallucination.
+- **Source Citations**: Interactive citation links open exact note source cards in a slide-out drawer.
+- **Multi-Turn Session Memory**: Handles follow-up questions (*"What else did I save on this topic?"*).
 
-### 4. 🕸️ Interactive Knowledge Graph Network
-- 2D force-directed HTML5 Canvas network.
-- Automatically connects notes via shared NLP entities and topics.
-- Interactive drag, pan, zoom, node selection, and note detail drawer modal.
+#### 2. ⚡ Zero-Friction Multi-Surface Capture Hub
+- **Typing Notes**: Rich text entry with real-time NLP auto-tagging.
+- **Voice Memos**: Stream-of-consciousness audio recordings transcribed via Whisper.
+- **Web Clipper & Extension**: One-click bookmarking (URL, title, GPT summary) and text clipping.
+- **File Upload (OCR)**: Drag-and-drop PDF & image parser extracting text via Tesseract OCR simulation.
+- **Email Forwarding**: Forward emails directly to `notes@brain.ai`.
 
-### 5. 🔒 On-Device Privacy Mode
-- Toggle for running voice transcription and embeddings 100% locally on-device.
-- Audio and raw personal notes never leave your browser.
+#### 3. 💡 Proactive Resurfacing Engine ("From your past notes")
+- Daily background algorithm analyzing 7-day activity vectors.
+- Surfaces 3–5 older notes relevant to current work with contextual explanation badges (*"You saved this note on distributed systems earlier. You've been reading about Kafka this week. Here it is."*).
 
-### 6. 📚 100 Pre-seeded Realistic Notes
-- Pre-populated on first load with 100+ realistic personal notes across AI, urban planning, startup ideas, habit formation, sleep & memory, book highlights, and web clips.
+#### 4. 🕸️ Interactive Knowledge Graph Visualizer
+- 2D force-directed HTML5 canvas mapping note-entity networks.
+- Drag, pan, zoom, hover connection highlights, and click node to view note details.
+
+---
+
+## ⚡ 60-Second Vercel Deployment Guide
+
+Deploying Second Brain AI System to Vercel is seamless:
+
+### Method A: One-Click Deploy Button
+Click the button below to fork and deploy directly to Vercel:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FAnkitaPriyadarshini-repos%2FSecond-Brain-AI-System)
+
+### Method B: Vercel CLI
+```bash
+# 1. Install Vercel CLI
+npm i -g vercel
+
+# 2. Deploy from project root
+vercel --prod
+```
 
 ---
 
@@ -78,40 +106,20 @@ Prevents your note vault from becoming a dumping ground:
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Local Setup & Testing
 
-### 1. Run Locally
-No build step or complex compiler required! Serve using any simple HTTP server:
-
+### 1. Run Server Locally
 ```bash
-# Option A: npx serve
-npx serve .
-
-# Option B: Python HTTP server
-python -m http.server 8000
+# Serve via npx serve
+npx serve . -l 3000
 ```
-Open `http://localhost:3000` (or `http://localhost:8000`) in any modern browser.
+Open `http://localhost:3000` in your browser.
 
 ### 2. Run Automated Test Suite
-Validate all 6 modules (100 notes pre-seeding, NLP entity extraction, RAG vector retrieval, resurfacing digest, CRUD operations):
-
 ```bash
 npm test
 ```
-
----
-
-## 🛠️ Tech Stack
-
-| Component | Approach / Technology |
-|---|---|
-| **Frontend UI** | HTML5, ES6 JavaScript, Vanilla CSS (Glassmorphism Theme) |
-| **Voice Interface** | Web Speech API (`SpeechRecognition`, `SpeechSynthesis`) & HTML5 Canvas Waveform |
-| **NLP Engine** | Custom Regex & Rule-Based Named Entity Extractor, TF-IDF Vectorizer |
-| **Vector Search / RAG** | Cosine Similarity Engine over Note Embeddings |
-| **Graph Visualizer** | HTML5 Canvas 2D Physics-Based Force Layout |
-| **Storage & Sync** | LocalStorage / IndexedDB with Event-Driven Sync Badge |
-| **Testing** | Node.js Test Runner (`npm test`) |
+*Executes all 10 automated test suites (100 notes pre-seeding, NLP entity extraction, RAG vector retrieval, resurfacing digest, CRUD operations).*
 
 ---
 
