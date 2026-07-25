@@ -170,8 +170,8 @@ test('AudioPresets should return valid voice presets', () => {
   const AudioPresets = require('../js/audio-presets');
   const presets = AudioPresets.getAllPresets();
   assert.ok(presets.length >= 3, 'Expected at least 3 audio voice presets');
-  const jarvis = AudioPresets.getPreset('jarvis');
-  assert.strictEqual(jarvis.rate, 1.05);
+  const brainPreset = AudioPresets.getPreset('brain');
+  assert.strictEqual(brainPreset.rate, 1.05);
 });
 
 console.log('\n====================================================');
@@ -183,4 +183,5 @@ if (passCount === totalTests) {
 } else {
   process.exit(1);
 }
+
 
