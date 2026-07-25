@@ -1,91 +1,120 @@
-# 🌐 BlogSphere AI — AI-Powered Blogging & Content Platform
+# 🧠 Second Brain AI System (HGM-12)
 
-[![Pull Shark Achievement](https://img.shields.io/badge/GitHub-Pull%20Shark%20Unlocked-00f2fe?style=for-the-badge&logo=github)](https://github.com/AnkitaPriyadarshini-repos/BlogSphere-AI)
-[![Build Status](https://img.shields.io/badge/Tests-4%2F4%20Passed-00b09b?style=for-the-badge&logo=node.js)](https://github.com/AnkitaPriyadarshini-repos/BlogSphere-AI)
-
-> **State-of-the-Art AI Content Studio, Real-time SEO Scoring & Live Markdown Editor**  
-> An open-source portfolio project designed for automated content generation, real-time SEO health scoring, markdown editing, and responsive article publishing.
+> **A personal knowledge system that does not hinder learning.**  
+> *Zero-Friction Multi-Surface Capture • Grounded Conversational RAG ("Talk to Jarvis") • Proactive Resurfacing • Interactive Knowledge Graph Network*
 
 ---
 
-## 🌟 Key Features
+## 🌟 Overview & Philosophy
 
-- **✨ AI Content Studio**:
-  - Agentic article generator synthesizing multi-section technical, professional, or conversational blog posts based on user topics.
-  - Automatic category classification, tag recommendations, and code example insertion.
+Existing Personal Knowledge Management (PKM) tools like Obsidian, Notion, and Roam suffer from a fundamental architectural flaw: **they are built around capture, but fail at retrieval and use.** Notes accumulate into a dumping ground, resurface rarely, and require manual tagging friction that destroys focus.
 
-- **📈 Real-Time SEO Analyzer**:
-  - Live 0-100 SEO health score meter.
-  - Word count, estimated read time, title optimization, and focus keyword density checks.
-  - Actionable feedback recommendations list.
-
-- **✏️ Live Markdown Editor & Reader**:
-  - Split-view live Markdown parser with syntax highlighting.
-  - Formatting toolbar (Bold, Italic, Headings, Quotes, Code).
-  - Export articles to `.md` or `.html` formats.
-  - Full-screen article reader modal with view tracking.
-
-- **📊 Analytics Dashboard**:
-  - Live statistics tracking published posts, total views, and engagement metrics.
+The **Second Brain AI System** fixes this by making **capture zero-friction across all devices** and making **retrieval as simple as asking a colleague out loud ("Talk to Jarvis")**.
 
 ---
 
-## 🚀 Quick Start & Installation
+## ✨ Deliverables & Core Features
 
-### Option 1: Run Locally (No dependencies required)
-Simply open `index.html` in any modern web browser.
+### 1. ⚡ Zero-Friction Multi-Surface Capture Hub
+Ingest knowledge from every surface without app-swapping or manual tagging:
+- **Typing Note Entry**: Rich text note entry with live auto-tagging preview.
+- **Voice Memo Recording**: Speech-to-text audio recording with live waveform visualizer & auto-transcription.
+- **Browser Extension & Web Clipper**: One-click URL bookmarking with automated page summaries and text clipping.
+- **File Upload (OCR)**: Drag-and-drop PDF and image parser simulating Tesseract OCR + PyMuPDF text extraction.
+- **Email Forwarding**: Forward emails directly to your second brain address (`notes@brain.ai`).
+- **Automated NLP Pipeline**: Auto-extracts entities (*People, Places, Concepts, Dates, Tech*) and topic labels without user effort.
 
-### Option 2: Run with Node / Local Server
+### 2. 🎙️ Grounded Conversational RAG ("Talk to Jarvis")
+Natural voice and text query interface built on top of a local vector similarity engine (TF-IDF & Cosine Similarity over note embeddings):
+- **Zero Hallucination Guardrails**: Answers strictly using saved notes as source context.
+- **Explicit Source Citations**: Every answer provides clickable citation links back to exact note sources.
+- **Multi-Turn Session Memory**: Remembers context across follow-up queries (e.g. *"What did I save about deep learning last month?"* -> *"What else did I save on this topic?"*).
+- **Spoken Audio Responses**: Built-in Speech Synthesis (TTS) with voice orb animations.
+
+### 3. 💡 Daily Proactive Resurfacing Engine ("From your past notes")
+Prevents your note vault from becoming a dumping ground:
+- Analyzes 7-day activity vectors (recent queries, recent captures, viewed tags).
+- Finds older notes (saved > 14 days ago) that are semantically relevant to current work but haven't been accessed recently.
+- Generates 3–5 daily recommendation cards with contextual explanation badges.
+- Supports Pin and Dismiss actions.
+
+### 4. 🕸️ Interactive Knowledge Graph Network
+- 2D force-directed HTML5 Canvas network.
+- Automatically connects notes via shared NLP entities and topics.
+- Interactive drag, pan, zoom, node selection, and note detail drawer modal.
+
+### 5. 🔒 On-Device Privacy Mode
+- Toggle for running voice transcription and embeddings 100% locally on-device.
+- Audio and raw personal notes never leave your browser.
+
+### 6. 📚 100 Pre-seeded Realistic Notes
+- Pre-populated on first load with 100+ realistic personal notes across AI, urban planning, startup ideas, habit formation, sleep & memory, book highlights, and web clips.
+
+---
+
+## 🏗️ Technical Architecture
+
+```
+                                  [ Capture Surfaces ]
+      Typing | Voice Recording | Browser Extension | File OCR | Email Forward
+                                           │
+                                           ▼
+                                 [ NLP Ingest Pipeline ]
+                      Entity Extraction | Topic Classifier | Vectorizer
+                                           │
+                                           ▼
+                               [ Persistent Data Store ]
+                       LocalStorage / IndexedDB (100+ Notes)
+                                  /                 \
+                                 /                   \
+                                ▼                     ▼
+                    [ Vector RAG Engine ]      [ Resurfacing Digest ]
+                  Semantic Cosine Retrieval    7-Day Activity Analysis
+                           │
+                           ▼
+                 [ Jarvis Voice Output ]
+                Web Speech API / Canvas Orb
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Run Locally
+No build step or complex compiler required! Serve using any simple HTTP server:
+
 ```bash
-# Clone the repository
-git clone https://github.com/AnkitaPriyadarshini-repos/BlogSphere-AI.git
-cd BlogSphere-AI
+# Option A: npx serve
+npx serve .
 
-# Run automated test suite
+# Option B: Python HTTP server
+python -m http.server 8000
+```
+Open `http://localhost:3000` (or `http://localhost:8000`) in any modern browser.
+
+### 2. Run Automated Test Suite
+Validate all 6 modules (100 notes pre-seeding, NLP entity extraction, RAG vector retrieval, resurfacing digest, CRUD operations):
+
+```bash
 npm test
-
-# Launch dev server
-npm start
 ```
 
 ---
 
-## 🧪 Testing
+## 🛠️ Tech Stack
 
-The repository includes an automated test suite in `test/run_tests.js`:
-
-```bash
-node test/run_tests.js
-```
-
----
-
-## 📁 Directory Architecture
-
-```text
-BlogSphere-AI/
-├── index.html                  # Main Application UI
-├── css/
-│   ├── style.css               # Core styling, glassmorphism, design tokens
-│   └── responsive.css          # Mobile & tablet responsiveness
-├── js/
-│   ├── store.js                # LocalStorage data persistence store
-│   ├── ai-engine.js            # AI article generation engine
-│   ├── seo-analyzer.js        # Real-time SEO scoring & readability engine
-│   ├── editor.js               # Live Markdown editor & export functions
-│   └── app.js                  # Main UI view router & event controller
-├── docs/
-│   └── ARCHITECTURE.md         # Architecture spec
-├── test/
-│   └── run_tests.js            # Automated test suite
-├── README.md                   # Repository documentation
-├── LICENSE                     # MIT License
-└── package.json                # Project configuration
-```
+| Component | Approach / Technology |
+|---|---|
+| **Frontend UI** | HTML5, ES6 JavaScript, Vanilla CSS (Glassmorphism Theme) |
+| **Voice Interface** | Web Speech API (`SpeechRecognition`, `SpeechSynthesis`) & HTML5 Canvas Waveform |
+| **NLP Engine** | Custom Regex & Rule-Based Named Entity Extractor, TF-IDF Vectorizer |
+| **Vector Search / RAG** | Cosine Similarity Engine over Note Embeddings |
+| **Graph Visualizer** | HTML5 Canvas 2D Physics-Based Force Layout |
+| **Storage & Sync** | LocalStorage / IndexedDB with Event-Driven Sync Badge |
+| **Testing** | Node.js Test Runner (`npm test`) |
 
 ---
 
-## 👤 Author
+## 📄 License
 
-**Ankita Priyadarshini Pallai**  
-*BlogSphere AI Platform*
+Distributed under the MIT License.

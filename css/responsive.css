@@ -1,35 +1,74 @@
-/* ============================================
-   BlogSphere AI — State-of-the-Art Content Platform
-   Responsive Breakdown & Mobile Stylesheet
-   Author: Ankita Priyadarshini Pallai
-   ============================================ */
+/* 
+  Second Brain AI System — Responsive Breakpoints & Mobile Optimization
+*/
 
-@media (max-width: 1100px) {
-  .editor-workspace {
-    grid-template-columns: 1fr;
+@media (max-width: 1024px) {
+  .navbar {
+    padding: 0.85rem 1.25rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .nav-tabs {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+  
+  .graph-container {
+    height: 480px;
   }
 
-  .nav-tabs {
-    flex-wrap: wrap;
+  .note-drawer {
+    width: 100%;
+    right: -100%;
   }
 }
 
 @media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
+  main {
+    padding: 0 1rem;
+    margin: 1rem auto;
   }
 
-  .featured-title {
-    font-size: 1.8rem;
+  .brand-logo span:not(.brand-badge) {
+    font-size: 1.1rem;
+  }
+
+  .posts-grid, .resurfacing-grid {
+    grid-template-columns: 1fr;
   }
 
   .filter-bar {
     flex-direction: column;
   }
 
-  .posts-grid {
-    grid-template-columns: 1fr;
+  .chat-bubble {
+    max-width: 95%;
+  }
+
+  .graph-container {
+    height: 380px;
+  }
+
+  .sample-queries-row {
+    flex-direction: column;
+  }
+
+  .sample-query-btn {
+    width: 100%;
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .header-status-bar {
+    display: none;
   }
 }
