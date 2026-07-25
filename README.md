@@ -1,6 +1,7 @@
 # 🧠 Second Brain AI System (HGM-12)
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FAnkitaPriyadarshini-repos%2FSecond-Brain-AI-System)
+[![Vercel Production](https://img.shields.io/badge/Vercel-Live%20App-black?logo=vercel)](https://second-brain-ai-app.vercel.app)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-brightgreen?logo=github)](https://ankitapriyadarshini-repos.github.io/Second-Brain-AI-System/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Tests: 10/10 Passed](https://img.shields.io/badge/Tests-10%2F10%20Passed-emerald)](test/run_tests.js)
@@ -12,8 +13,9 @@
 
 ## 🌐 Live Production Deployments & Links
 
+- ⚡ **Vercel Official Live App**: [https://second-brain-ai-app.vercel.app](https://second-brain-ai-app.vercel.app)
 - 🚀 **GitHub Pages Production App**: [https://ankitapriyadarshini-repos.github.io/Second-Brain-AI-System/](https://ankitapriyadarshini-repos.github.io/Second-Brain-AI-System/)
-- ⚡ **Deploy to Vercel**: Click the **Deploy with Vercel** button above or link your repo to [Vercel](https://vercel.com) for instant global CDN hosting with zero configuration (`vercel.json` included).
+- 💻 **Deploy to Vercel**: Click the **Deploy with Vercel** button above or link your repo to [Vercel](https://vercel.com) for instant global CDN hosting with zero configuration (`vercel.json` included).
 
 ---
 
