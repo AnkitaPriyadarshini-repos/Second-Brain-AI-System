@@ -1,7 +1,5 @@
 # 🧠 Second Brain AI System (HGM-12)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FAnkitaPriyadarshini-repos%2FSecond-Brain-AI-System)
-[![Vercel Production](https://img.shields.io/badge/Vercel-Live%20App-black?logo=vercel)](https://second-brain-ai-app.vercel.app)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-brightgreen?logo=github)](https://ankitapriyadarshini-repos.github.io/Second-Brain-AI-System/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Tests: 10/10 Passed](https://img.shields.io/badge/Tests-10%2F10%20Passed-emerald)](test/run_tests.js)
@@ -11,15 +9,14 @@
 
 ---
 
-## 🌐 Live Production Deployments & Links
+## 🌐 Live Application & Demo Links
 
-- ⚡ **Vercel Official Live App**: [https://second-brain-ai-app.vercel.app](https://second-brain-ai-app.vercel.app)
-- 🚀 **GitHub Pages Production App**: [https://ankitapriyadarshini-repos.github.io/Second-Brain-AI-System/](https://ankitapriyadarshini-repos.github.io/Second-Brain-AI-System/)
-- 💻 **Deploy to Vercel**: Click the **Deploy with Vercel** button above or link your repo to [Vercel](https://vercel.com) for instant global CDN hosting with zero configuration (`vercel.json` included).
+- 🚀 **Live Web Application**: [https://second-brain-ai-app.vercel.app](https://second-brain-ai-app.vercel.app)
+- 📡 **GitHub Pages Live Demo**: [https://ankitapriyadarshini-repos.github.io/Second-Brain-AI-System/](https://ankitapriyadarshini-repos.github.io/Second-Brain-AI-System/)
 
 ---
 
-## 📹 Video Walkthrough & Feature Demo Showcase
+## 📹 Feature Walkthrough Showcase
 
 ```
 +-----------------------------------------------------------------------------------+
@@ -37,7 +34,7 @@
 +-----------------------------------------------------------------------------------+
 ```
 
-### 🎬 Interactive Feature Walkthrough Highlights
+### 🎬 System Capabilities Breakdown
 
 #### 1. 🎙️ Jarvis Voice RAG & Grounded Retrieval
 - **Voice-to-Text Input**: Speak questions naturally out loud. Live canvas audio waveform visualizer tracks audio frequencies.
@@ -48,7 +45,7 @@
 #### 2. ⚡ Zero-Friction Multi-Surface Capture Hub
 - **Typing Notes**: Rich text entry with real-time NLP auto-tagging.
 - **Voice Memos**: Stream-of-consciousness audio recordings transcribed via Whisper.
-- **Web Clipper & Extension**: One-click bookmarking (URL, title, GPT summary) and text clipping.
+- **Web Clipper & Extension**: One-click bookmarking (URL, title, summary) and text clipping.
 - **File Upload (OCR)**: Drag-and-drop PDF & image parser extracting text via Tesseract OCR simulation.
 - **Email Forwarding**: Forward emails directly to `notes@brain.ai`.
 
@@ -59,26 +56,6 @@
 #### 4. 🕸️ Interactive Knowledge Graph Visualizer
 - 2D force-directed HTML5 canvas mapping note-entity networks.
 - Drag, pan, zoom, hover connection highlights, and click node to view note details.
-
----
-
-## ⚡ 60-Second Vercel Deployment Guide
-
-Deploying Second Brain AI System to Vercel is seamless:
-
-### Method A: One-Click Deploy Button
-Click the button below to fork and deploy directly to Vercel:
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FAnkitaPriyadarshini-repos%2FSecond-Brain-AI-System)
-
-### Method B: Vercel CLI
-```bash
-# 1. Install Vercel CLI
-npm i -g vercel
-
-# 2. Deploy from project root
-vercel --prod
-```
 
 ---
 
