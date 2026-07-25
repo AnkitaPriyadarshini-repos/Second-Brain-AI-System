@@ -13,7 +13,7 @@
     const privacyBadge = document.getElementById('privacy-badge');
     const totalNotesCountEl = document.getElementById('total-notes-count');
 
-    // Conversational RAG / Jarvis Elements
+    // Conversational RAG Elements
     const ragQueryInput = document.getElementById('rag-query-input');
     const ragSubmitBtn = document.getElementById('rag-submit-btn');
     const voiceTriggerBtn = document.getElementById('voice-trigger-btn');
@@ -77,7 +77,7 @@
               voiceTriggerBtn.innerHTML = '🔊 Speaking...';
             } else {
               voiceTriggerBtn.classList.remove('listening', 'speaking');
-              voiceTriggerBtn.innerHTML = '🎙️ Talk to Jarvis';
+              voiceTriggerBtn.innerHTML = '🎙️ Voice Assistant';
             }
           }
         }
@@ -130,7 +130,7 @@
     });
 
     // ----------------------------------------------------
-    // Event Listeners: Conversational RAG (Jarvis)
+    // Event Listeners: Conversational RAG Q&A
     // ----------------------------------------------------
     if (ragSubmitBtn) {
       ragSubmitBtn.addEventListener('click', () => {
@@ -165,7 +165,7 @@
     });
 
     function handleRAGQuery(query) {
-      if (!query || typeof RAGEngine === 'undefined') return;
+      if (!query || typeof RAGEngine !== 'undefined') return;
 
       // Render user message card
       appendChatMessage('user', query);
@@ -178,7 +178,7 @@
       // Render AI answer card with citations
       appendChatMessage('ai', response.answer, response.citations);
 
-      // Speak Jarvis response aloud if TTS enabled
+      // Speak response aloud if TTS enabled
       if (typeof VoiceEngine !== 'undefined' && Store.settings.ttsEnabled) {
         VoiceEngine.speak(response.answer);
       }
@@ -210,9 +210,12 @@
           </div>`;
         }
 
-        msgCard.innerHTML = `<div class="chat-header"><strong style="color: var(--accent-indigo);">✨ Jarvis AI Assistant</strong></div>
-          <div class="chat-text">${formatMarkdownText(text)}</div>
-          ${citationsHTML}`;
+        msgCard.innerHTML = `<div class="chat-header">
+          <div class="ai-avatar">✨</div>
+          <strong style="color: var(--accent-indigo);">Second Brain AI Assistant</strong>
+        </div>
+        <div class="chat-text">${formatMarkdownText(text)}</div>
+        ${citationsHTML}`;
       }
 
       chatContainer.appendChild(msgCard);

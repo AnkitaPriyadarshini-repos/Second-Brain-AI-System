@@ -1,6 +1,6 @@
 /**
  * Second Brain AI System — Voice Audio Presets Module
- * Customized voice synthesis presets for Jarvis Conversational Interface
+ * Customized voice synthesis presets for Second Brain Conversational Interface
  */
 
 (function (global) {
@@ -8,12 +8,12 @@
 
   const AudioPresets = {
     presets: {
-      jarvis: {
-        name: 'Jarvis AI (Default)',
+      brain: {
+        name: 'Second Brain AI (Default)',
         rate: 1.05,
         pitch: 1.0,
         lang: 'en-US',
-        description: 'Crisp, articulate AI voice assistant'
+        description: 'Crisp, articulate AI knowledge assistant'
       },
       concise: {
         name: 'Fast Briefing',
@@ -32,7 +32,7 @@
     },
 
     getPreset: function (key) {
-      return this.presets[key] || this.presets.jarvis;
+      return this.presets[key] || this.presets.brain;
     },
 
     getAllPresets: function () {

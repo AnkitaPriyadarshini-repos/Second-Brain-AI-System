@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Second Brain AI System — Zero-Friction Capture & Conversational Retrieval</title>
-  <meta name="description" content="A personal knowledge system that does not hinder learning. Featuring zero-friction multi-surface capture, Jarvis voice RAG retrieval, proactive resurfacing digest, and interactive knowledge graph.">
+  <meta name="description" content="A personal knowledge system that does not hinder learning. Featuring zero-friction multi-surface capture, voice & text RAG retrieval, proactive resurfacing digest, and interactive knowledge graph.">
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 
   <!-- Google Fonts -->
@@ -34,7 +34,7 @@
     </a>
 
     <div class="nav-tabs" role="tablist">
-      <button class="nav-tab active" data-view="jarvis" role="tab" aria-selected="true">🎙️ Talk to Jarvis</button>
+      <button class="nav-tab active" data-view="jarvis" role="tab" aria-selected="true">🎙️ Voice & Text Q&A</button>
       <button class="nav-tab" data-view="capture" role="tab" aria-selected="false">⚡ Capture Hub</button>
       <button class="nav-tab" data-view="vault" role="tab" aria-selected="false">📚 Vault Explorer</button>
       <button class="nav-tab" data-view="graph" role="tab" aria-selected="false">🕸️ Knowledge Graph</button>
@@ -51,8 +51,8 @@
 
   <main>
 
-    <!-- View 1: Conversational RAG (Talk to Jarvis) -->
-    <section id="view-jarvis" class="view-section active" aria-label="Jarvis Voice Interface">
+    <!-- View 1: Conversational RAG Q&A Interface -->
+    <section id="view-jarvis" class="view-section active" aria-label="Conversational Q&A Interface">
       <div class="jarvis-container">
         
         <div class="jarvis-header-card glass-card">
@@ -62,7 +62,7 @@
             <div class="orb-ring orb-ring-2"></div>
           </div>
           
-          <h1 class="hero-title">Talk to Your Second Brain like Jarvis</h1>
+          <h1 class="hero-title">Conversational Knowledge Retrieval</h1>
           <p class="hero-subtitle">
             Ask questions out loud or via text. Answers are synthesized strictly from your saved notes using RAG semantic retrieval—zero hallucination, with exact source citations.
           </p>
@@ -70,9 +70,9 @@
           <canvas id="waveform-canvas" class="waveform-canvas"></canvas>
 
           <div class="query-input-bar">
-            <input type="text" id="rag-query-input" class="input-field query-input" placeholder="Ask your Second Brain... (e.g. 'What did I save about deep learning last month?')" aria-label="Jarvis Query Input">
+            <input type="text" id="rag-query-input" class="input-field query-input" placeholder="Ask your Second Brain... (e.g. 'What did I save about deep learning last month?')" aria-label="Query Input">
             <button id="rag-submit-btn" class="btn btn-primary">✨ Query RAG</button>
-            <button id="voice-trigger-btn" class="btn btn-secondary">🎙️ Talk to Jarvis</button>
+            <button id="voice-trigger-btn" class="btn btn-secondary">🎙️ Voice Assistant</button>
           </div>
 
           <div class="sample-queries-container">
@@ -96,7 +96,7 @@
             <div class="chat-bubble ai-bubble glass-card">
               <div class="chat-header">
                 <div class="ai-avatar">✨</div>
-                <strong style="color: var(--accent-indigo);">Jarvis AI Assistant</strong>
+                <strong style="color: var(--accent-indigo);">Second Brain AI Assistant</strong>
               </div>
               <div class="chat-text">
                 Hello! I am your Second Brain AI assistant. I have read all 100+ of your saved notes, voice memos, browser clips, and OCR documents. Ask me anything out loud or in text, and I will retrieve the exact answers with source citations.
