@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BlogSphere AI — State-of-the-Art AI-Powered Content Platform</title>
-  <meta name="description" content="State-of-the-art AI-powered blogging & content generation platform with real-time SEO scoring, live markdown editor, and analytics dashboard.">
+  <title>Second Brain AI System — Zero-Friction Capture & Conversational Retrieval</title>
+  <meta name="description" content="A personal knowledge system that does not hinder learning. Featuring zero-friction multi-surface capture, Jarvis voice RAG retrieval, proactive resurfacing digest, and interactive knowledge graph.">
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css">
@@ -18,175 +18,305 @@
 </head>
 <body>
 
+  <!-- Ambient Glowing Background Elements -->
+  <div class="ambient-glow ambient-glow-1"></div>
+  <div class="ambient-glow ambient-glow-2"></div>
+  <div class="ambient-glow ambient-glow-3"></div>
+
   <!-- Navigation Bar -->
   <nav class="navbar" aria-label="Main Navigation">
-    <a href="#" class="brand-logo" aria-label="BlogSphere AI Home">
-      <span>BlogSphere AI</span>
-      <span class="brand-badge">Portfolio Grade</span>
+    <a href="#" class="brand-logo" aria-label="Second Brain AI System Home">
+      <div class="brand-icon-wrapper">🧠</div>
+      <div style="display: flex; flex-direction: column;">
+        <span class="brand-name">Second Brain AI</span>
+        <span class="brand-subtext">HGM-12 PKM Platform</span>
+      </div>
     </a>
+
     <div class="nav-tabs" role="tablist">
-      <a class="nav-tab active" data-view="feed" role="tab" aria-selected="true">🌐 Article Feed</a>
-      <a class="nav-tab" data-view="ai-studio" role="tab" aria-selected="false">✨ AI Studio</a>
-      <a class="nav-tab" data-view="editor" role="tab" aria-selected="false">✏️ Live Editor</a>
-      <a class="nav-tab" data-view="analytics" role="tab" aria-selected="false">📊 Analytics</a>
+      <button class="nav-tab active" data-view="jarvis" role="tab" aria-selected="true">🎙️ Talk to Jarvis</button>
+      <button class="nav-tab" data-view="capture" role="tab" aria-selected="false">⚡ Capture Hub</button>
+      <button class="nav-tab" data-view="vault" role="tab" aria-selected="false">📚 Vault Explorer</button>
+      <button class="nav-tab" data-view="graph" role="tab" aria-selected="false">🕸️ Knowledge Graph</button>
+      <button class="nav-tab" data-view="resurfacing" role="tab" aria-selected="false">💡 Resurfacing</button>
+      <button class="nav-tab" data-view="settings" role="tab" aria-selected="false">⚙️ Privacy & System</button>
+    </div>
+
+    <div class="header-status-bar">
+      <span id="privacy-badge" class="privacy-status-pill">🔒 On-Device Privacy</span>
+      <span id="sync-badge" class="status-badge synced">Synced</span>
+      <span id="total-notes-count" class="status-badge notes-count-badge">100 Notes</span>
     </div>
   </nav>
 
   <main>
-    <!-- View 1: Article Feed / Explorer -->
-    <section id="view-feed" class="view-section active" aria-label="Article Feed">
-      <div id="featured-post-card" class="featured-card glass-card"></div>
 
-      <div class="filter-bar">
-        <input type="text" id="feed-search" class="input-field" style="flex: 1;" placeholder="🔍 Search articles by title, excerpt, or tag..." aria-label="Search Articles">
-        <select id="feed-category-filter" class="select-field" aria-label="Filter Category">
+    <!-- View 1: Conversational RAG (Talk to Jarvis) -->
+    <section id="view-jarvis" class="view-section active" aria-label="Jarvis Voice Interface">
+      <div class="jarvis-container">
+        
+        <div class="jarvis-header-card glass-card">
+          <div class="orb-container">
+            <div class="jarvis-voice-orb" id="jarvis-orb">🎙️</div>
+            <div class="orb-ring orb-ring-1"></div>
+            <div class="orb-ring orb-ring-2"></div>
+          </div>
+          
+          <h1 class="hero-title">Talk to Your Second Brain like Jarvis</h1>
+          <p class="hero-subtitle">
+            Ask questions out loud or via text. Answers are synthesized strictly from your saved notes using RAG semantic retrieval—zero hallucination, with exact source citations.
+          </p>
+
+          <canvas id="waveform-canvas" class="waveform-canvas"></canvas>
+
+          <div class="query-input-bar">
+            <input type="text" id="rag-query-input" class="input-field query-input" placeholder="Ask your Second Brain... (e.g. 'What did I save about deep learning last month?')" aria-label="Jarvis Query Input">
+            <button id="rag-submit-btn" class="btn btn-primary">✨ Query RAG</button>
+            <button id="voice-trigger-btn" class="btn btn-secondary">🎙️ Talk to Jarvis</button>
+          </div>
+
+          <div class="sample-queries-container">
+            <span class="sample-label">Try sample queries:</span>
+            <div class="sample-queries-row">
+              <button class="sample-query-btn" data-query="What did I save about deep learning last month?">"What did I save about deep learning last month?"</button>
+              <button class="sample-query-btn" data-query="What were my thoughts on the startup idea I had in January?">"Startup idea I had in January?"</button>
+              <button class="sample-query-btn" data-query="I'm writing about urban planning. What do I know about this?">"Urban planning research notes?"</button>
+              <button class="sample-query-btn" data-query="Remind me what that article said about sleep and memory.">"Article on sleep and memory?"</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card chat-card-wrapper">
+          <div class="chat-card-header">
+            <h2 class="section-heading">💬 Grounded Conversation Stream & Source Citations</h2>
+            <span class="rag-indicator">● RAG Vector Engine Active</span>
+          </div>
+
+          <div id="chat-container" class="chat-stream">
+            <div class="chat-bubble ai-bubble glass-card">
+              <div class="chat-header">
+                <div class="ai-avatar">✨</div>
+                <strong style="color: var(--accent-indigo);">Jarvis AI Assistant</strong>
+              </div>
+              <div class="chat-text">
+                Hello! I am your Second Brain AI assistant. I have read all 100+ of your saved notes, voice memos, browser clips, and OCR documents. Ask me anything out loud or in text, and I will retrieve the exact answers with source citations.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- View 2: Multi-Surface Capture Hub -->
+    <section id="view-capture" class="view-section" aria-label="Multi-Surface Capture Hub">
+      <div class="glass-card capture-card-wrapper">
+        <h2 class="hero-title" style="font-size: 1.8rem; text-align: left;">⚡ Zero-Friction Multi-Surface Capture</h2>
+        <p class="hero-subtitle" style="text-align: left; margin: 0 0 1.5rem 0; max-width: 100%;">
+          Add to your second brain from any surface without app-swapping, manual tagging, or breaking your focus. NLP auto-extracts entities and topics instantly.
+        </p>
+
+        <div class="capture-tabs-header" role="tablist">
+          <button class="capture-tab active" data-target="type">📝 Typing Note</button>
+          <button class="capture-tab" data-target="voice">🎙️ Voice Memo</button>
+          <button class="capture-tab" data-target="clipper">🌐 Web Clipper / Extension</button>
+          <button class="capture-tab" data-target="file">📄 File Upload (OCR)</button>
+          <button class="capture-tab" data-target="email">📧 Email Forward</button>
+        </div>
+
+        <!-- 1. Typing Panel -->
+        <div id="capture-type" class="capture-panel active">
+          <form id="type-capture-form">
+            <div class="form-group">
+              <label class="form-label" for="type-title">Note Title:</label>
+              <input type="text" id="type-title" class="input-field" placeholder="e.g. Distributed Consensus & Raft Protocol Notes" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="type-content">Note Content:</label>
+              <textarea id="type-content" class="textarea-field" rows="5" placeholder="Type your thought or raw notes here. NLP will auto-tag entities and assign topics..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">⚡ Save & Auto-Tag Note</button>
+          </form>
+        </div>
+
+        <!-- 2. Voice Memo Panel -->
+        <div id="capture-voice" class="capture-panel">
+          <div class="voice-memo-box">
+            <div class="voice-pulse-ring"></div>
+            <button id="voice-record-btn" class="btn btn-primary voice-record-btn">🎙️ Start Voice Memo</button>
+            <p id="voice-status-text" class="voice-status">Click microphone to record a voice memo. Audio will be transcribed via Whisper and auto-tagged.</p>
+          </div>
+        </div>
+
+        <!-- 3. Web Clipper & Extension Simulator Panel -->
+        <div id="capture-clipper" class="capture-panel">
+          <form id="clipper-form">
+            <div class="form-group">
+              <label class="form-label" for="clip-url">Webpage URL:</label>
+              <input type="url" id="clip-url" class="input-field" placeholder="https://arxiv.org/abs/2301.00000">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="clip-title">Article Title:</label>
+              <input type="text" id="clip-title" class="input-field" placeholder="e.g. Scaling Laws for Neural Language Models">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="clip-text">Clipped Text Highlight:</label>
+              <textarea id="clip-text" class="textarea-field" rows="4" placeholder="Highlighted text clipped directly from webpage..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">🌐 Save Bookmark & Generate GPT Summary</button>
+          </form>
+        </div>
+
+        <!-- 4. File Upload OCR Panel -->
+        <div id="capture-file" class="capture-panel">
+          <div id="file-upload-zone" class="file-dropzone">
+            <div class="dropzone-icon">📄</div>
+            <h3 class="dropzone-title">Drag & Drop PDF or Image</h3>
+            <p class="dropzone-sub">Supports PDFs and images. Tesseract OCR and PyMuPDF will extract text automatically.</p>
+            <input type="file" id="file-input" style="display: none;" accept=".pdf,.png,.jpg,.jpeg">
+          </div>
+        </div>
+
+        <!-- 5. Email Forwarding Panel -->
+        <div id="capture-email" class="capture-panel">
+          <form id="email-form">
+            <div class="form-group">
+              <label class="form-label" for="email-sender">Forwarder Email:</label>
+              <input type="email" id="email-sender" class="input-field" value="ankita@brain.ai" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="email-subject">Email Subject:</label>
+              <input type="text" id="email-subject" class="input-field" placeholder="e.g. Weekly Research Summary" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="email-body">Email Body Content:</label>
+              <textarea id="email-body" class="textarea-field" rows="4" placeholder="Email body forwarded to notes@brain.ai..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">📧 Ingest Forwarded Email</button>
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- View 3: Knowledge Vault Explorer -->
+    <section id="view-vault" class="view-section" aria-label="Knowledge Vault Explorer">
+      <div class="filter-bar glass-card">
+        <input type="text" id="vault-search" class="input-field" style="flex: 2;" placeholder="🔍 Search 100+ notes by semantic meaning, title, tag, or entity..." aria-label="Search Vault">
+        <select id="category-filter" class="select-field" style="flex: 1;" aria-label="Filter Category">
           <option value="All">All Categories</option>
           <option value="Artificial Intelligence">Artificial Intelligence</option>
-          <option value="Cybersecurity & Cloud">Cybersecurity & Cloud</option>
-          <option value="UI/UX Design">UI/UX Design</option>
-          <option value="Engineering">Engineering</option>
-          <option value="Web Development">Web Development</option>
+          <option value="Startup Ideas">Startup Ideas</option>
+          <option value="Urban Planning">Urban Planning</option>
+          <option value="Habit & Productivity">Habit & Productivity</option>
+          <option value="Sleep & Memory">Sleep & Memory</option>
+          <option value="Distributed Systems">Distributed Systems</option>
+          <option value="Web & Software Engineering">Web & Software Engineering</option>
+          <option value="Books & Literature">Books & Literature</option>
+        </select>
+        <select id="sourcetype-filter" class="select-field" style="flex: 1;" aria-label="Filter Source Type">
+          <option value="All">All Ingest Surfaces</option>
+          <option value="typing">Typing</option>
+          <option value="voice">Voice Memos</option>
+          <option value="clip">Web Clips</option>
+          <option value="bookmark">Bookmarks</option>
+          <option value="file">File OCR (PDF)</option>
+          <option value="email">Email Forward</option>
         </select>
       </div>
 
-      <div id="posts-grid" class="posts-grid"></div>
+      <div id="notes-grid" class="posts-grid"></div>
     </section>
 
-    <!-- View 2: AI Content Studio -->
-    <section id="view-ai-studio" class="view-section" aria-label="AI Content Studio">
-      <div class="glass-card" style="max-width: 800px; margin: 0 auto;">
-        <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem;">✨ AI Content Studio</h2>
-        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-          Generate comprehensive, SEO-optimized blog posts on any topic using our agentic content synthesizer.
-        </p>
-
-        <form id="ai-generator-form">
-          <div style="margin-bottom: 1.25rem;">
-            <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;" for="ai-topic">Article Topic or Prompt:</label>
-            <input type="text" id="ai-topic" class="input-field" style="width: 100%;" placeholder="e.g. Next-Gen Web Assembly & Browser Compute Capabilities" required>
-          </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
-            <div>
-              <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;" for="ai-category">Category:</label>
-              <select id="ai-category" class="select-field" style="width: 100%;">
-                <option value="Artificial Intelligence">Artificial Intelligence</option>
-                <option value="Cybersecurity & Cloud">Cybersecurity & Cloud</option>
-                <option value="Web Development">Web Development</option>
-                <option value="UI/UX Design">UI/UX Design</option>
-                <option value="Engineering">Engineering</option>
-              </select>
-            </div>
-            <div>
-              <label style="display: block; font-weight: 600; margin-bottom: 0.4rem;" for="ai-tone">Writing Tone:</label>
-              <select id="ai-tone" class="select-field" style="width: 100%;">
-                <option value="Professional">Professional & Authoritative</option>
-                <option value="Technical">Technical Deep Dive</option>
-                <option value="Conversational">Conversational & Engaging</option>
-              </select>
-            </div>
-          </div>
-
-          <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 1rem; padding: 0.85rem;">
-            ✨ Generate AI Article
-          </button>
-        </form>
-      </div>
-    </section>
-
-    <!-- View 3: Live Markdown Editor & SEO Analyzer -->
-    <section id="view-editor" class="view-section" aria-label="Live Editor">
-      <div class="glass-card" style="margin-bottom: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
-          <input type="text" id="editor-title" class="input-field" style="flex: 1; font-size: 1.3rem; font-weight: 700;" placeholder="Article Title..." aria-label="Article Title">
-          <select id="editor-category" class="select-field" aria-label="Editor Category">
-            <option value="Artificial Intelligence">Artificial Intelligence</option>
-            <option value="Cybersecurity & Cloud">Cybersecurity & Cloud</option>
-            <option value="Web Development">Web Development</option>
-            <option value="UI/UX Design">UI/UX Design</option>
-            <option value="Engineering">Engineering</option>
-          </select>
-          <div class="btn-group">
-            <button id="btn-save-article" class="btn btn-primary">🚀 Publish Article</button>
-            <button id="btn-export-md" class="btn btn-secondary">📥 Export .md</button>
-            <button id="btn-export-html" class="btn btn-secondary">🌐 Export .html</button>
-          </div>
-        </div>
-
-        <!-- Formatting Toolbar -->
-        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;" aria-label="Editor Toolbar">
-          <button class="btn btn-secondary btn-format" data-format="bold" aria-label="Format Bold"><b>B</b></button>
-          <button class="btn btn-secondary btn-format" data-format="italic" aria-label="Format Italic"><i>I</i></button>
-          <button class="btn btn-secondary btn-format" data-format="h2" aria-label="Format Subheading">H2</button>
-          <button class="btn btn-secondary btn-format" data-format="quote" aria-label="Format Blockquote">” Quote</button>
-          <button class="btn btn-secondary btn-format" data-format="code" aria-label="Format Code">&lt;/&gt; Code</button>
-          <input type="text" id="editor-keyword" class="input-field" style="margin-left: auto; width: 220px;" placeholder="Focus Keyword..." aria-label="Focus Keyword">
-        </div>
-
-        <!-- Real-time SEO Bar -->
-        <div style="margin-bottom: 1.25rem; background: rgba(0, 0, 0, 0.3); padding: 0.75rem 1rem; border-radius: 10px; border: 1px solid var(--glass-border);">
-          <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 0.85rem;">
-            <span>SEO Health Score: <span id="seo-score-value" style="color: var(--accent-emerald);">0/100</span></span>
-            <span><span id="seo-word-count">0 words</span> • <span id="seo-read-time">1 min read</span></span>
-          </div>
-          <div class="seo-score-bar-bg">
-            <div id="seo-score-bar" class="seo-score-bar-fill"></div>
-          </div>
-          <ul id="seo-feedback-list" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem; list-style: none; display: flex; gap: 1rem; flex-wrap: wrap;"></ul>
-        </div>
-
-        <!-- Workspace Grid -->
-        <div class="editor-workspace">
-          <textarea id="editor-textarea" class="editor-textarea" placeholder="Write your article in Markdown format here..." aria-label="Markdown Input"></textarea>
-          <div id="editor-preview" class="editor-preview" aria-label="Live HTML Preview"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- View 4: Analytics Dashboard -->
-    <section id="view-analytics" class="view-section" aria-label="Analytics Dashboard">
+    <!-- View 4: Interactive Knowledge Graph -->
+    <section id="view-graph" class="view-section" aria-label="Knowledge Graph Visualizer">
       <div class="glass-card">
-        <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 1.5rem;">📊 Content Analytics Dashboard</h2>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem;">
-          <div style="background: rgba(0,0,0,0.3); padding: 1.25rem; border-radius: 14px; border: 1px solid var(--glass-border);">
-            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Published Articles</div>
-            <div id="analytics-total-posts" style="font-size: 2rem; font-weight: 800; color: var(--accent-cyan); margin-top: 0.25rem;">0</div>
+        <div class="graph-header-row">
+          <div>
+            <h2 class="section-heading" style="font-size: 1.6rem;">🕸️ Interactive Knowledge Graph Network</h2>
+            <p class="section-subtext">
+              Notes are connected automatically by shared NLP entities (people, places, concepts) and topic labels. Drag nodes or hover to inspect connections.
+            </p>
           </div>
-          <div style="background: rgba(0,0,0,0.3); padding: 1.25rem; border-radius: 14px; border: 1px solid var(--glass-border);">
-            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Total Reader Views</div>
-            <div id="analytics-total-views" style="font-size: 2rem; font-weight: 800; color: var(--accent-emerald); margin-top: 0.25rem;">0</div>
+          <div class="graph-legend">
+            <span style="color: var(--accent-violet);">● Typing</span>
+            <span style="color: var(--accent-emerald);">● Voice</span>
+            <span style="color: var(--accent-amber);">● Clip</span>
+            <span style="color: var(--accent-blue);">● Bookmark</span>
+            <span style="color: var(--accent-pink);">● PDF</span>
+            <span style="color: #64748b;">● Entity</span>
           </div>
-          <div style="background: rgba(0,0,0,0.3); padding: 1.25rem; border-radius: 14px; border: 1px solid var(--glass-border);">
-            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Community Likes</div>
-            <div id="analytics-total-likes" style="font-size: 2rem; font-weight: 800; color: var(--accent-amber); margin-top: 0.25rem;">0</div>
-          </div>
+        </div>
+
+        <div class="graph-container">
+          <canvas id="graph-canvas" class="graph-canvas"></canvas>
         </div>
       </div>
     </section>
+
+    <!-- View 5: Proactive Resurfacing Engine -->
+    <section id="view-resurfacing" class="view-section" aria-label="Proactive Resurfacing Engine">
+      <div class="glass-card" style="margin-bottom: 1.5rem;">
+        <h2 class="hero-title" style="font-size: 1.8rem; text-align: left;">💡 Daily Proactive Resurfacing ("From your past notes")</h2>
+        <p class="hero-subtitle" style="text-align: left; margin: 0; max-width: 100%;">
+          Once a day, the system analyzes your past 7-day activity and surfaces 3–5 older notes that are semantically relevant to what you're working on right now—preventing saved notes from becoming a dumping ground.
+        </p>
+      </div>
+
+      <div id="resurfacing-grid" class="resurfacing-grid"></div>
+    </section>
+
+    <!-- View 6: Settings & Privacy Console -->
+    <section id="view-settings" class="view-section" aria-label="Settings & Privacy Console">
+      <div class="glass-card settings-card">
+        <h2 class="hero-title" style="font-size: 1.8rem; text-align: left;">⚙️ Settings & System Architecture</h2>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3>🔒 On-Device Privacy Mode</h3>
+            <p>
+              Run voice transcription (whisper.cpp) and embeddings (sentence-transformers) 100% locally. Audio and raw notes never leave your device.
+            </p>
+          </div>
+          <label class="switch-toggle">
+            <input type="checkbox" id="privacy-toggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-item" style="border: none;">
+          <div class="setting-info" style="max-width: 100%;">
+            <h3>🔑 Optional External LLM Connector</h3>
+            <p style="margin-bottom: 1rem;">
+              By default, Second Brain uses its built-in local vector RAG engine. You can optionally supply your OpenAI or Claude API key below for hybrid cloud operation.
+            </p>
+            <input type="password" class="input-field" placeholder="sk-..." style="font-family: var(--font-code);">
+          </div>
+        </div>
+
+      </div>
+    </section>
+
   </main>
 
-  <!-- Full Article Reader Modal -->
-  <div id="article-modal" class="modal-overlay" role="dialog" aria-modal="true">
-    <div class="modal-card">
-      <button id="btn-close-modal" class="btn btn-secondary" style="position: absolute; top: 1.5rem; right: 1.5rem;" aria-label="Close Article">✕ Close</button>
-      <div id="modal-article-content"></div>
-    </div>
+  <!-- Slide-out Note Detail Drawer Modal -->
+  <div id="note-drawer" class="note-drawer">
+    <button id="close-drawer-btn" class="drawer-close-btn">✕</button>
+    <h3 id="drawer-title" class="drawer-title-text">Note Details</h3>
+    <div id="drawer-meta" class="drawer-meta-text"></div>
+    <div id="drawer-body"></div>
   </div>
 
-  <!-- Toast Container -->
-  <div id="toast-container" aria-live="polite"></div>
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
 
-  <!-- Footer -->
-  <footer style="text-align: center; padding: 2.5rem 1rem; border-top: 1px solid var(--glass-border); margin-top: 3rem;">
-    <p>BlogSphere AI — State-of-the-Art AI Content Platform | Built with Glassmorphic Design & Live SEO Engine</p>
-    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">Author: Ankita Priyadarshini Pallai</p>
-  </footer>
-
-  <!-- Scripts -->
+  <!-- JavaScript Modules -->
+  <script src="js/nlp-engine.js"></script>
+  <script src="js/rag-engine.js"></script>
+  <script src="js/voice-engine.js"></script>
+  <script src="js/resurfacing-engine.js"></script>
+  <script src="js/graph-visualizer.js"></script>
   <script src="js/store.js"></script>
-  <script src="js/ai-engine.js"></script>
-  <script src="js/seo-analyzer.js"></script>
-  <script src="js/editor.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

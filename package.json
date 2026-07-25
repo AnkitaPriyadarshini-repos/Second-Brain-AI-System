@@ -1,20 +1,22 @@
 {
-  "name": "blogsphere-ai",
+  "name": "second-brain-ai-system",
   "version": "1.0.0",
-  "description": "BlogSphere AI — State-of-the-Art AI-Powered Blogging & Content Generation Platform",
+  "description": "Second Brain AI System — A personal knowledge system that does not hinder learning (HGM-12)",
   "main": "js/app.js",
   "scripts": {
     "start": "npx serve .",
     "test": "node test/run_tests.js"
   },
   "keywords": [
-    "blogsphere",
-    "ai-blogging",
-    "content-generator",
-    "markdown-editor",
-    "seo-analyzer",
-    "javascript",
-    "blog-platform"
+    "second-brain",
+    "pkm",
+    "rag",
+    "ai",
+    "voice-retrieval",
+    "nlp-auto-tagging",
+    "proactive-resurfacing",
+    "knowledge-graph",
+    "jarvis-voice"
   ],
   "author": "Ankita Priyadarshini Pallai",
   "license": "MIT"

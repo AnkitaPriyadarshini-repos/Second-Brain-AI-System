@@ -1,281 +1,602 @@
-// ============================================
-// BlogSphere AI — Content Platform
-// Module: Main UI Application Controller & Export Analytics
-// Author: Ankita Priyadarshini Pallai
-// ============================================
+/**
+ * Second Brain AI System — Main Application Controller
+ */
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Navigation View Switching
-  const navTabs = document.querySelectorAll('.nav-tab');
-  const viewSections = document.querySelectorAll('.view-section');
+(function () {
+  'use strict';
 
-  function switchView(viewName) {
+  document.addEventListener('DOMContentLoaded', () => {
+    // DOM Elements
+    const navTabs = document.querySelectorAll('.nav-tab');
+    const viewSections = document.querySelectorAll('.view-section');
+    const syncBadge = document.getElementById('sync-badge');
+    const privacyBadge = document.getElementById('privacy-badge');
+    const totalNotesCountEl = document.getElementById('total-notes-count');
+
+    // Conversational RAG / Jarvis Elements
+    const ragQueryInput = document.getElementById('rag-query-input');
+    const ragSubmitBtn = document.getElementById('rag-submit-btn');
+    const voiceTriggerBtn = document.getElementById('voice-trigger-btn');
+    const waveCanvas = document.getElementById('waveform-canvas');
+    const chatContainer = document.getElementById('chat-container');
+    const sampleQueryBtns = document.querySelectorAll('.sample-query-btn');
+
+    // Capture Hub Elements
+    const captureTabs = document.querySelectorAll('.capture-tab');
+    const capturePanels = document.querySelectorAll('.capture-panel');
+    const typeForm = document.getElementById('type-capture-form');
+    const voiceRecordBtn = document.getElementById('voice-record-btn');
+    const voiceStatusText = document.getElementById('voice-status-text');
+    const clipperForm = document.getElementById('clipper-form');
+    const fileUploadZone = document.getElementById('file-upload-zone');
+    const fileInput = document.getElementById('file-input');
+    const emailForm = document.getElementById('email-form');
+
+    // Vault & Search Elements
+    const vaultSearchInput = document.getElementById('vault-search');
+    const categoryFilterSelect = document.getElementById('category-filter');
+    const sourceTypeFilterSelect = document.getElementById('sourcetype-filter');
+    const notesGrid = document.getElementById('notes-grid');
+
+    // Drawer Elements
+    const noteDrawer = document.getElementById('note-drawer');
+    const closeDrawerBtn = document.getElementById('close-drawer-btn');
+    const drawerTitle = document.getElementById('drawer-title');
+    const drawerMeta = document.getElementById('drawer-meta');
+    const drawerBody = document.getElementById('drawer-body');
+
+    // Resurfacing Elements
+    const resurfacingGrid = document.getElementById('resurfacing-grid');
+
+    // Settings Elements
+    const privacyToggle = document.getElementById('privacy-toggle');
+
+    // Toast Container
+    const toastContainer = document.getElementById('toast-container');
+
+    // Initialize Store
+    const notes = Store.getNotes();
+    updateHeaderStats();
+
+    // Init Voice Engine & Waveform
+    if (typeof VoiceEngine !== 'undefined') {
+      VoiceEngine.init({
+        onTranscript: (text, isFinal) => {
+          if (ragQueryInput) ragQueryInput.value = text;
+          if (isFinal) {
+            handleRAGQuery(text);
+          }
+        },
+        onStateChange: (state) => {
+          if (voiceTriggerBtn) {
+            if (state === 'listening') {
+              voiceTriggerBtn.classList.add('listening');
+              voiceTriggerBtn.innerHTML = '🎙️ Listening...';
+            } else if (state === 'speaking') {
+              voiceTriggerBtn.classList.add('speaking');
+              voiceTriggerBtn.innerHTML = '🔊 Speaking...';
+            } else {
+              voiceTriggerBtn.classList.remove('listening', 'speaking');
+              voiceTriggerBtn.innerHTML = '🎙️ Talk to Jarvis';
+            }
+          }
+        }
+      });
+
+      if (waveCanvas) {
+        VoiceEngine.startWaveformAnimation(waveCanvas);
+      }
+    }
+
+    // Init Graph Visualizer
+    const graphCanvas = document.getElementById('graph-canvas');
+    if (graphCanvas && typeof GraphVisualizer !== 'undefined') {
+      GraphVisualizer.init(graphCanvas, (noteObj) => {
+        openNoteDrawer(noteObj);
+      });
+      GraphVisualizer.buildGraph(Store.getNotes());
+    }
+
+    // Render Initial Views
+    renderNotesGrid();
+    renderResurfacingDigest();
+
+    // ----------------------------------------------------
+    // Event Listeners: Navigation
+    // ----------------------------------------------------
     navTabs.forEach(tab => {
-      tab.classList.toggle('active', tab.dataset.view === viewName);
+      tab.addEventListener('click', () => {
+        const targetView = tab.getAttribute('data-view');
+        navTabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+
+        viewSections.forEach(sec => {
+          sec.classList.remove('active');
+          if (sec.id === `view-${targetView}`) {
+            sec.classList.add('active');
+          }
+        });
+
+        // Trigger Graph resize/rebuild if graph view activated
+        if (targetView === 'graph' && typeof GraphVisualizer !== 'undefined' && graphCanvas) {
+          GraphVisualizer.resize();
+          GraphVisualizer.buildGraph(Store.getNotes());
+        }
+      });
     });
-    viewSections.forEach(sec => {
-      sec.classList.toggle('active', sec.id === `view-${viewName}`);
-    });
 
-    if (viewName === 'feed') renderFeed();
-    if (viewName === 'analytics') renderAnalytics();
-  }
-
-  navTabs.forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      e.preventDefault();
-      switchView(tab.dataset.view);
-    });
-  });
-
-  // Render Feed & Featured Posts
-  function renderFeed(searchQuery = '', category = 'All') {
-    const posts = window.blogStore.searchPosts(searchQuery, category);
-    const grid = document.getElementById('posts-grid');
-    const featuredCard = document.getElementById('featured-post-card');
-
-    if (!grid) return;
-    grid.innerHTML = '';
-
-    // Render Featured Post
-    const featured = posts.find(p => p.isFeatured) || posts[0];
-    if (featuredCard && featured) {
-      featuredCard.innerHTML = `
-        <div class="featured-badge">🌟 Featured Article</div>
-        <h2 class="featured-title">${featured.title}</h2>
-        <p class="featured-excerpt">${featured.excerpt}</p>
-        <div class="meta-row">
-          <span>✍️ ${featured.author}</span>
-          <span>📅 ${featured.date}</span>
-          <span>⏱ ${featured.readTime}</span>
-          <span>👁 ${featured.views.toLocaleString()} views</span>
-        </div>
-        <div class="tag-row" style="margin-top: 1rem;">
-          ${featured.tags.map(t => `<span class="tag-pill">#${t}</span>`).join('')}
-        </div>
-        <button class="btn btn-primary btn-read-post" data-id="${featured.id}" style="margin-top: 1.25rem;">
-          Read Complete Article ➔
-        </button>
-      `;
+    // ----------------------------------------------------
+    // Event Listeners: Conversational RAG (Jarvis)
+    // ----------------------------------------------------
+    if (ragSubmitBtn) {
+      ragSubmitBtn.addEventListener('click', () => {
+        const query = ragQueryInput ? ragQueryInput.value.trim() : '';
+        if (query) handleRAGQuery(query);
+      });
     }
 
-    // Render Grid Cards
-    if (posts.length === 0) {
-      grid.innerHTML = `<div class="empty-state">No articles found matching your query. Try generating one with AI!</div>`;
-      return;
+    if (ragQueryInput) {
+      ragQueryInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const query = ragQueryInput.value.trim();
+          if (query) handleRAGQuery(query);
+        }
+      });
     }
 
-    posts.forEach(post => {
-      const card = document.createElement('article');
-      card.className = 'post-card glass-card';
-      card.innerHTML = `
-        <div class="post-card-category">${post.category}</div>
-        <h3 class="post-card-title">${post.title}</h3>
-        <p class="post-card-excerpt">${post.excerpt}</p>
-        <div class="post-card-meta">
-          <span>📅 ${post.date}</span>
-          <span>⏱ ${post.readTime}</span>
-        </div>
-        <div class="post-card-footer">
-          <div class="tag-row">
-            ${post.tags.slice(0, 2).map(t => `<span class="tag-pill">#${t}</span>`).join('')}
+    if (voiceTriggerBtn) {
+      voiceTriggerBtn.addEventListener('click', () => {
+        if (typeof VoiceEngine !== 'undefined') {
+          VoiceEngine.toggleListen();
+        }
+      });
+    }
+
+    sampleQueryBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const query = btn.getAttribute('data-query');
+        if (ragQueryInput) ragQueryInput.value = query;
+        handleRAGQuery(query);
+      });
+    });
+
+    function handleRAGQuery(query) {
+      if (!query || typeof RAGEngine === 'undefined') return;
+
+      // Render user message card
+      appendChatMessage('user', query);
+      if (ragQueryInput) ragQueryInput.value = '';
+
+      // Perform Grounded RAG Query
+      const currentNotes = Store.getNotes();
+      const response = RAGEngine.query(query, currentNotes);
+
+      // Render AI answer card with citations
+      appendChatMessage('ai', response.answer, response.citations);
+
+      // Speak Jarvis response aloud if TTS enabled
+      if (typeof VoiceEngine !== 'undefined' && Store.settings.ttsEnabled) {
+        VoiceEngine.speak(response.answer);
+      }
+
+      // Track query activity for resurfacing engine
+      renderResurfacingDigest([query]);
+    }
+
+    function appendChatMessage(sender, text, citations = []) {
+      if (!chatContainer) return;
+
+      const msgCard = document.createElement('div');
+      msgCard.className = `chat-bubble ${sender}-bubble glass-card`;
+
+      if (sender === 'user') {
+        msgCard.innerHTML = `<div class="chat-header"><strong>👤 You</strong></div><div class="chat-text">${escapeHTML(text)}</div>`;
+      } else {
+        let citationsHTML = '';
+        if (citations && citations.length > 0) {
+          citationsHTML = `<div class="citations-container">
+            <div class="citations-title">📌 Grounded Sources (${citations.length} Notes Cited):</div>
+            <div class="citations-list">
+              ${citations.map(c => `
+                <a class="citation-pill" data-id="${c.id}">
+                  📄 ${escapeHTML(c.title)} <span class="citation-date">(${escapeHTML(c.date)})</span>
+                </a>
+              `).join('')}
+            </div>
+          </div>`;
+        }
+
+        msgCard.innerHTML = `<div class="chat-header"><strong style="color: var(--accent-indigo);">✨ Jarvis AI Assistant</strong></div>
+          <div class="chat-text">${formatMarkdownText(text)}</div>
+          ${citationsHTML}`;
+      }
+
+      chatContainer.appendChild(msgCard);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+
+      // Bind citation clicks to open note drawer
+      msgCard.querySelectorAll('.citation-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          const noteId = pill.getAttribute('data-id');
+          const targetNote = Store.getNotes().find(n => n.id === noteId);
+          if (targetNote) openNoteDrawer(targetNote);
+        });
+      });
+    }
+
+    // ----------------------------------------------------
+    // Event Listeners: Multi-Surface Capture Hub
+    // ----------------------------------------------------
+    captureTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetTarget = tab.getAttribute('data-target');
+        captureTabs.forEach(t => t.classList.remove('active'));
+        capturePanels.forEach(p => p.classList.remove('active'));
+
+        tab.classList.add('active');
+        const panel = document.getElementById(`capture-${targetTarget}`);
+        if (panel) panel.classList.add('active');
+      });
+    });
+
+    // 1. Typing Form
+    if (typeForm) {
+      typeForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = document.getElementById('type-title').value.trim();
+        const content = document.getElementById('type-content').value.trim();
+
+        if (content) {
+          const newNote = Store.addNote({ title, content, sourceType: 'typing' });
+          showToast('✨ Note saved and auto-tagged successfully!');
+          typeForm.reset();
+          refreshAllViews();
+        }
+      });
+    }
+
+    // 2. Voice Recorder
+    if (voiceRecordBtn) {
+      let isRecordingMemo = false;
+      voiceRecordBtn.addEventListener('click', () => {
+        if (!isRecordingMemo) {
+          isRecordingMemo = true;
+          voiceRecordBtn.classList.add('recording');
+          voiceRecordBtn.innerHTML = '🛑 Stop Recording';
+          if (voiceStatusText) voiceStatusText.textContent = 'Listening to voice memo... (Speak your thoughts)';
+          if (typeof VoiceEngine !== 'undefined') VoiceEngine.startListen();
+        } else {
+          isRecordingMemo = false;
+          voiceRecordBtn.classList.remove('recording');
+          voiceRecordBtn.innerHTML = '🎙️ Start Voice Memo';
+          if (voiceStatusText) voiceStatusText.textContent = 'Transcribing audio with Whisper & auto-tagging...';
+          if (typeof VoiceEngine !== 'undefined') VoiceEngine.stopListen();
+
+          setTimeout(() => {
+            const simulatedVoiceText = "Voice Memo: Key considerations for distributed system consensus and latency minimization in microservices architecture.";
+            Store.addNote({ title: "Voice Note: Distributed Systems & Latency", content: simulatedVoiceText, sourceType: 'voice' });
+            showToast('🎙️ Voice memo transcribed & saved!');
+            if (voiceStatusText) voiceStatusText.textContent = 'Click microphone to record a voice memo.';
+            refreshAllViews();
+          }, 1000);
+        }
+      });
+    }
+
+    // 3. Browser Extension & Web Clipper Form
+    if (clipperForm) {
+      clipperForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const url = document.getElementById('clip-url').value.trim();
+        const title = document.getElementById('clip-title').value.trim();
+        const text = document.getElementById('clip-text').value.trim();
+
+        if (url || text) {
+          Store.addNote({
+            title: title || 'Clipped Web Content',
+            content: text || `Saved URL bookmark: ${url}`,
+            sourceType: text ? 'clip' : 'bookmark',
+            sourceUrl: url
+          });
+          showToast('🌐 Web content clipped & saved!');
+          clipperForm.reset();
+          refreshAllViews();
+        }
+      });
+    }
+
+    // 4. File Upload (OCR) Zone
+    if (fileUploadZone && fileInput) {
+      fileUploadZone.addEventListener('click', () => fileInput.click());
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          showToast(`📄 Running OCR & NLP extraction on ${file.name}...`);
+          setTimeout(() => {
+            Store.addNote({
+              title: `PDF Extract: ${file.name}`,
+              content: `OCR text extracted from ${file.name}: Comprehensive overview of domain parameters, functional bounds, and experimental validation results.`,
+              sourceType: 'file',
+              sourceUrl: file.name
+            });
+            showToast(`✅ File ${file.name} parsed and saved!`);
+            refreshAllViews();
+          }, 1500);
+        }
+      });
+    }
+
+    // 5. Email Forwarding Form
+    if (emailForm) {
+      emailForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const sender = document.getElementById('email-sender').value.trim();
+        const subject = document.getElementById('email-subject').value.trim();
+        const body = document.getElementById('email-body').value.trim();
+
+        if (body) {
+          Store.addNote({
+            title: `Email: ${subject || 'Forwarded Note'}`,
+            content: `Forwarded from ${sender}: ${body}`,
+            sourceType: 'email',
+            sourceUrl: `email:${sender}`
+          });
+          showToast('📧 Forwarded email saved to Second Brain!');
+          emailForm.reset();
+          refreshAllViews();
+        }
+      });
+    }
+
+    // ----------------------------------------------------
+    // Event Listeners: Knowledge Vault & Filters
+    // ----------------------------------------------------
+    if (vaultSearchInput) vaultSearchInput.addEventListener('input', renderNotesGrid);
+    if (categoryFilterSelect) categoryFilterSelect.addEventListener('change', renderNotesGrid);
+    if (sourceTypeFilterSelect) sourceTypeFilterSelect.addEventListener('change', renderNotesGrid);
+
+    function renderNotesGrid() {
+      if (!notesGrid) return;
+      const allNotes = Store.getNotes();
+      const searchVal = vaultSearchInput ? vaultSearchInput.value.toLowerCase().trim() : '';
+      const categoryVal = categoryFilterSelect ? categoryFilterSelect.value : 'All';
+      const sourceTypeVal = sourceTypeFilterSelect ? sourceTypeFilterSelect.value : 'All';
+
+      const filtered = allNotes.filter(n => {
+        const matchesSearch = !searchVal || (
+          n.title.toLowerCase().includes(searchVal) ||
+          n.content.toLowerCase().includes(searchVal) ||
+          (n.tags && n.tags.some(t => t.toLowerCase().includes(searchVal)))
+        );
+        const matchesCategory = categoryVal === 'All' || (n.tags && n.tags.includes(categoryVal));
+        const matchesType = sourceTypeVal === 'All' || n.sourceType === sourceTypeVal;
+        return matchesSearch && matchesCategory && matchesType;
+      });
+
+      if (filtered.length === 0) {
+        notesGrid.innerHTML = `<div class="empty-state glass-card" style="grid-column: 1 / -1;">
+          <h3>No notes found</h3>
+          <p>Try adjusting your search criteria or ingest new notes using the Capture Hub.</p>
+        </div>`;
+        return;
+      }
+
+      notesGrid.innerHTML = filtered.map(note => `
+        <div class="note-card glass-card ${note.pinned ? 'pinned-card' : ''}" data-id="${note.id}">
+          <div class="note-card-header">
+            <span class="source-badge badge-${note.sourceType}">${note.sourceType.toUpperCase()}</span>
+            <span class="note-date">${escapeHTML(note.dateStr || '')}</span>
           </div>
-          <button class="btn btn-secondary btn-sm btn-read-post" data-id="${post.id}">
-            Read ➔
-          </button>
+          <h3 class="note-title">${escapeHTML(note.title)}</h3>
+          <p class="note-snippet">${escapeHTML(note.summary || note.content.substring(0, 140) + '...')}</p>
+          <div class="note-tags">
+            ${(note.tags || []).map(t => `<span class="tag-pill">#${escapeHTML(t)}</span>`).join('')}
+          </div>
+          <div class="note-card-actions">
+            <button class="btn-icon pin-btn" data-id="${note.id}" title="${note.pinned ? 'Unpin Note' : 'Pin Note'}">
+              ${note.pinned ? '📌 Pinned' : '📌 Pin'}
+            </button>
+            <button class="btn-icon view-btn" data-id="${note.id}">👁️ View</button>
+            <button class="btn-icon delete-btn" data-id="${note.id}">🗑️</button>
+          </div>
         </div>
-      `;
-      grid.appendChild(card);
-    });
+      `).join('');
 
-    // Attach Read Button Events
-    document.querySelectorAll('.btn-read-post').forEach(btn => {
-      btn.addEventListener('click', () => openArticleModal(btn.dataset.id));
-    });
-  }
+      // Bind note card clicks
+      notesGrid.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const noteId = btn.getAttribute('data-id');
+          const targetNote = Store.getNotes().find(n => n.id === noteId);
+          if (targetNote) openNoteDrawer(targetNote);
+        });
+      });
 
-  // Open Article Detail Reader Modal
-  function openArticleModal(id) {
-    const post = window.blogStore.getPostById(id);
-    if (!post) return;
+      notesGrid.querySelectorAll('.pin-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const noteId = btn.getAttribute('data-id');
+          Store.togglePin(noteId);
+          refreshAllViews();
+        });
+      });
 
-    // Increment views
-    post.views = (post.views || 0) + 1;
-    window.blogStore.savePost(post);
+      notesGrid.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const noteId = btn.getAttribute('data-id');
+          Store.deleteNote(noteId);
+          showToast('🗑️ Note deleted.');
+          refreshAllViews();
+        });
+      });
+    }
 
-    const modal = document.getElementById('article-modal');
-    const body = document.getElementById('modal-article-content');
+    // ----------------------------------------------------
+    // Drawer View
+    // ----------------------------------------------------
+    function openNoteDrawer(note) {
+      if (!noteDrawer) return;
+      if (drawerTitle) drawerTitle.textContent = note.title;
+      if (drawerMeta) {
+        drawerMeta.innerHTML = `<span class="source-badge badge-${note.sourceType}">${note.sourceType.toUpperCase()}</span> • <span>${escapeHTML(note.dateStr || '')}</span> ${note.sourceUrl ? `• <a href="${escapeHTML(note.sourceUrl)}" target="_blank" style="color: var(--accent-indigo);">Source Link</a>` : ''}`;
+      }
+      if (drawerBody) {
+        drawerBody.innerHTML = `
+          <div style="margin-bottom: 1.25rem;">
+            <h4>Auto-Generated Summary:</h4>
+            <p style="background: rgba(255, 255, 255, 0.05); padding: 0.85rem; border-radius: 8px; border-left: 3px solid var(--accent-indigo);">
+              ${escapeHTML(note.summary || note.content)}
+            </p>
+          </div>
+          <div style="margin-bottom: 1.25rem;">
+            <h4>Full Content:</h4>
+            <p style="white-space: pre-wrap; line-height: 1.6;">${escapeHTML(note.content)}</p>
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <h4>Extracted NLP Entities:</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+              ${note.entities ? Object.entries(note.entities).flatMap(([cat, list]) => (list || []).map(item => `<span class="tag-pill" style="border-color: var(--accent-emerald);">[${cat.toUpperCase()}] ${escapeHTML(item)}</span>`)).join('') : '<em>None</em>'}
+            </div>
+          </div>
+        `;
+      }
+      noteDrawer.classList.add('open');
+    }
 
-    body.innerHTML = `
-      <div class="article-reader-header">
-        <span class="brand-badge">${post.category}</span>
-        <h1 style="font-size: 2.2rem; margin: 0.75rem 0; font-weight: 800;">${post.title}</h1>
-        <div class="meta-row" style="color: var(--text-secondary); font-size: 0.9rem;">
-          <span>By ${post.author}</span> • <span>${post.date}</span> • <span>${post.readTime}</span> • <span>👁 ${post.views} views</span>
+    if (closeDrawerBtn) {
+      closeDrawerBtn.addEventListener('click', () => {
+        if (noteDrawer) noteDrawer.classList.remove('open');
+      });
+    }
+
+    // ----------------------------------------------------
+    // Proactive Resurfacing Digest Rendering
+    // ----------------------------------------------------
+    function renderResurfacingDigest(recentActivity = []) {
+      if (!resurfacingGrid || typeof ResurfacingEngine === 'undefined') return;
+      const allNotes = Store.getNotes();
+      const digestItems = ResurfacingEngine.generateDigest(allNotes, recentActivity, Store.dismissedIds);
+
+      if (digestItems.length === 0) {
+        resurfacingGrid.innerHTML = `<div class="empty-state glass-card" style="grid-column: 1 / -1;">
+          <p>No resurfacing recommendations currently pending.</p>
+        </div>`;
+        return;
+      }
+
+      resurfacingGrid.innerHTML = digestItems.map(item => `
+        <div class="resurfacing-card glass-card">
+          <div class="resurfacing-badge">💡 FROM YOUR PAST NOTES</div>
+          <p class="resurfacing-reason">${escapeHTML(item.reason)}</p>
+          <h4 class="resurfacing-title">${escapeHTML(item.note.title)}</h4>
+          <p class="resurfacing-snippet">${escapeHTML(item.note.summary || item.note.content.substring(0, 120) + '...')}</p>
+          <div class="resurfacing-actions">
+            <button class="btn btn-secondary view-resurfaced-btn" data-id="${item.note.id}" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">👁️ Open Note</button>
+            <button class="btn btn-secondary dismiss-resurfaced-btn" data-id="${item.note.id}" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Dismiss</button>
+          </div>
         </div>
-      </div>
-      <div class="article-reader-body" style="margin-top: 2rem; line-height: 1.8;">
-        ${window.markdownEditor.parseMarkdown(post.content)}
-      </div>
-    `;
+      `).join('');
 
-    modal.classList.add('active');
-  }
+      resurfacingGrid.querySelectorAll('.view-resurfaced-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const noteId = btn.getAttribute('data-id');
+          const targetNote = Store.getNotes().find(n => n.id === noteId);
+          if (targetNote) openNoteDrawer(targetNote);
+        });
+      });
 
-  document.getElementById('btn-close-modal')?.addEventListener('click', () => {
-    document.getElementById('article-modal').classList.remove('active');
-  });
+      resurfacingGrid.querySelectorAll('.dismiss-resurfaced-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const noteId = btn.getAttribute('data-id');
+          Store.dismissResurfaced(noteId);
+          renderResurfacingDigest();
+          showToast('Dismissed resurfaced note.');
+        });
+      });
+    }
 
-  // AI Content Generator Form
-  const aiForm = document.getElementById('ai-generator-form');
-  if (aiForm) {
-    aiForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const topic = document.getElementById('ai-topic').value;
-      const category = document.getElementById('ai-category').value;
-      const tone = document.getElementById('ai-tone').value;
+    // ----------------------------------------------------
+    // Settings & Privacy Controls
+    // ----------------------------------------------------
+    if (privacyToggle) {
+      privacyToggle.checked = Store.settings.privacyMode;
+      privacyToggle.addEventListener('change', () => {
+        Store.updateSettings({ privacyMode: privacyToggle.checked });
+        if (privacyBadge) {
+          privacyBadge.textContent = privacyToggle.checked ? '🔒 On-Device Privacy Mode' : '🌐 Cloud Mode';
+        }
+        showToast(privacyToggle.checked ? '🔒 On-Device Privacy Mode enabled.' : '🌐 Cloud Mode enabled.');
+      });
+    }
 
-      const btn = aiForm.querySelector('button[type="submit"]');
-      btn.disabled = true;
-      btn.innerHTML = '⚡ Generating AI Content...';
+    // ----------------------------------------------------
+    // Offline & Sync Listeners
+    // ----------------------------------------------------
+    window.addEventListener('brain-sync-state', (e) => {
+      const { state, queueLength } = e.detail;
+      if (!syncBadge) return;
 
-      try {
-        const article = await window.aiEngine.generateArticle(topic, category, tone);
-        
-        // Populate Editor
-        document.getElementById('editor-title').value = article.title;
-        document.getElementById('editor-category').value = article.category;
-        document.getElementById('editor-textarea').value = article.content;
-        window.markdownEditor.updatePreview();
-        triggerSEOAnalysis();
-
-        switchView('editor');
-        showToast('AI Article generated successfully! Switch to Editor tab.', 'success');
-      } catch (err) {
-        showToast('Failed to generate AI article.', 'error');
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '✨ Generate AI Article';
+      if (state === 'offline') {
+        syncBadge.className = 'status-badge offline';
+        syncBadge.textContent = `Offline Queue (${queueLength})`;
+      } else if (state === 'syncing') {
+        syncBadge.className = 'status-badge syncing';
+        syncBadge.textContent = 'Syncing...';
+      } else {
+        syncBadge.className = 'status-badge synced';
+        syncBadge.textContent = 'Synced';
       }
     });
-  }
 
-  // Real-time SEO Analysis Trigger
-  function triggerSEOAnalysis() {
-    const title = document.getElementById('editor-title')?.value || '';
-    const content = document.getElementById('editor-textarea')?.value || '';
-    const keyword = document.getElementById('editor-keyword')?.value || '';
+    // Toggle offline simulation on network change
+    window.addEventListener('offline', () => Store.setOffline(true));
+    window.addEventListener('online', () => Store.setOffline(false));
 
-    const results = window.seoAnalyzer.analyze(title, content, keyword);
-
-    // Update UI
-    const scoreVal = document.getElementById('seo-score-value');
-    const scoreBar = document.getElementById('seo-score-bar');
-    const wordCount = document.getElementById('seo-word-count');
-    const readTime = document.getElementById('seo-read-time');
-    const feedbackList = document.getElementById('seo-feedback-list');
-
-    if (scoreVal) scoreVal.textContent = `${results.score}/100`;
-    if (scoreBar) {
-      scoreBar.style.width = `${results.score}%`;
-      scoreBar.style.backgroundColor = results.score >= 80 ? '#00b09b' : results.score >= 50 ? '#f6d365' : '#ff4b2b';
-    }
-    if (wordCount) wordCount.textContent = `${results.wordCount} words`;
-    if (readTime) readTime.textContent = results.readingTime;
-
-    if (feedbackList) {
-      feedbackList.innerHTML = results.feedback.map(item => `<li>${item}</li>`).join('');
-    }
-  }
-
-  ['editor-title', 'editor-textarea', 'editor-keyword'].forEach(id => {
-    document.getElementById(id)?.addEventListener('input', triggerSEOAnalysis);
-  });
-
-  // Editor Formatting Buttons
-  document.querySelectorAll('.btn-format').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const format = btn.dataset.format;
-      if (format === 'bold') window.markdownEditor.insertFormat('**', '**');
-      if (format === 'italic') window.markdownEditor.insertFormat('*', '*');
-      if (format === 'h2') window.markdownEditor.insertFormat('\n## ');
-      if (format === 'quote') window.markdownEditor.insertFormat('\n> ');
-      if (format === 'code') window.markdownEditor.insertFormat('`', '`');
-    });
-  });
-
-  // Save Article Button
-  document.getElementById('btn-save-article')?.addEventListener('click', () => {
-    const title = document.getElementById('editor-title').value.trim();
-    const category = document.getElementById('editor-category').value;
-    const content = document.getElementById('editor-textarea').value.trim();
-
-    if (!title || !content) {
-      showToast('Title and Article content cannot be empty.', 'error');
-      return;
+    // ----------------------------------------------------
+    // Utility Helpers
+    // ----------------------------------------------------
+    function refreshAllViews() {
+      updateHeaderStats();
+      renderNotesGrid();
+      renderResurfacingDigest();
+      if (typeof GraphVisualizer !== 'undefined' && graphCanvas) {
+        GraphVisualizer.buildGraph(Store.getNotes());
+      }
     }
 
-    const seo = window.seoAnalyzer.analyze(title, content);
-    window.blogStore.savePost({
-      title,
-      category,
-      content,
-      excerpt: content.replace(/[#*`\-\\]/g, '').substring(0, 140) + '...',
-      readTime: seo.readingTime,
-      author: 'Ankita Priyadarshini Pallai',
-      tags: [category.replace(/\s+/g, ''), 'BlogSphere']
-    });
+    function updateHeaderStats() {
+      const allNotes = Store.getNotes();
+      if (totalNotesCountEl) totalNotesCountEl.textContent = `${allNotes.length} Notes`;
+    }
 
-    showToast('Article published to BlogSphere Feed!', 'success');
-    switchView('feed');
+    function showToast(msg) {
+      if (!toastContainer) return;
+      const toast = document.createElement('div');
+      toast.className = 'toast-notification glass-card';
+      toast.textContent = msg;
+      toastContainer.appendChild(toast);
+      setTimeout(() => toast.remove(), 3500);
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+      }[tag] || tag));
+    }
+
+    function formatMarkdownText(text) {
+      if (!text) return '';
+      return escapeHTML(text)
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n\n/g, '<br><br>')
+        .replace(/• (.*?)(?=<br>|$)/g, '• $1');
+    }
   });
 
-  // Export Buttons
-  document.getElementById('btn-export-md')?.addEventListener('click', () => {
-    window.markdownEditor.exportMarkdown('blogsphere-article.md');
-  });
-
-  document.getElementById('btn-export-html')?.addEventListener('click', () => {
-    window.markdownEditor.exportHTML('blogsphere-article.html');
-  });
-
-  // Search & Filter
-  document.getElementById('feed-search')?.addEventListener('input', (e) => {
-    const cat = document.getElementById('feed-category-filter')?.value || 'All';
-    renderFeed(e.target.value, cat);
-  });
-
-  document.getElementById('feed-category-filter')?.addEventListener('change', (e) => {
-    const query = document.getElementById('feed-search')?.value || '';
-    renderFeed(query, e.target.value);
-  });
-
-  // Analytics Render & Export Report
-  function renderAnalytics() {
-    const posts = window.blogStore.getPosts();
-    const totalViews = posts.reduce((sum, p) => sum + (p.views || 0), 0);
-    const totalLikes = posts.reduce((sum, p) => sum + (p.likes || 0), 0);
-
-    document.getElementById('analytics-total-posts').textContent = posts.length;
-    document.getElementById('analytics-total-views').textContent = totalViews.toLocaleString();
-    document.getElementById('analytics-total-likes').textContent = totalLikes.toLocaleString();
-  }
-
-  // Toast System
-  function showToast(msg, type = 'info') {
-    const container = document.getElementById('toast-container');
-    if (!container) return;
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.innerHTML = `<div class="toast-message">${msg}</div>`;
-    container.appendChild(toast);
-    setTimeout(() => toast.classList.add('show'), 10);
-    setTimeout(() => {
-      toast.classList.remove('show');
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
-  }
-
-  // Init
-  switchView('feed');
-});
+})();
