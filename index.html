@@ -39,7 +39,9 @@
       <button class="nav-tab" data-view="vault" role="tab" aria-selected="false">📚 Vault Explorer</button>
       <button class="nav-tab" data-view="graph" role="tab" aria-selected="false">🕸️ Knowledge Graph</button>
       <button class="nav-tab" data-view="resurfacing" role="tab" aria-selected="false">💡 Resurfacing</button>
-      <button class="nav-tab" data-view="settings" role="tab" aria-selected="false">⚙️ Privacy & System</button>
+      <button class="nav-tab" data-view="flashcards" role="tab" aria-selected="false">🎴 AI Flashcards</button>
+      <button class="nav-tab" data-view="dashboard" role="tab" aria-selected="false">📊 Dashboard</button>
+      <button class="nav-tab" data-view="settings" role="tab" aria-selected="false">⚙️ Privacy & Backup</button>
     </div>
 
     <div class="header-status-bar">
@@ -55,43 +57,25 @@
     <section id="view-jarvis" class="view-section active" aria-label="Conversational Q&A Interface">
       <div class="jarvis-container">
         
-        <div class="jarvis-header-card glass-card">
-          <div class="orb-container">
-            <div class="jarvis-voice-orb" id="jarvis-orb">🎙️</div>
-            <div class="orb-ring orb-ring-1"></div>
-            <div class="orb-ring orb-ring-2"></div>
-          </div>
-          
-          <h1 class="hero-title">Conversational Knowledge Retrieval</h1>
-          <p class="hero-subtitle">
-            Ask questions out loud or via text. Answers are synthesized strictly from your saved notes using RAG semantic retrieval—zero hallucination, with exact source citations.
-          </p>
-
-          <canvas id="waveform-canvas" class="waveform-canvas"></canvas>
-
-          <div class="query-input-bar">
-            <input type="text" id="rag-query-input" class="input-field query-input" placeholder="Ask your Second Brain... (e.g. 'What did I save about deep learning last month?')" aria-label="Query Input">
-            <button id="rag-submit-btn" class="btn btn-primary">✨ Query RAG</button>
-            <button id="voice-trigger-btn" class="btn btn-secondary">🎙️ Voice Assistant</button>
-          </div>
-
-          <div class="sample-queries-container">
-            <span class="sample-label">Try sample queries:</span>
-            <div class="sample-queries-row">
-              <button class="sample-query-btn" data-query="What did I save about deep learning last month?">"What did I save about deep learning last month?"</button>
-              <button class="sample-query-btn" data-query="What were my thoughts on the startup idea I had in January?">"Startup idea I had in January?"</button>
-              <button class="sample-query-btn" data-query="I'm writing about urban planning. What do I know about this?">"Urban planning research notes?"</button>
-              <button class="sample-query-btn" data-query="Remind me what that article said about sleep and memory.">"Article on sleep and memory?"</button>
-            </div>
-          </div>
-        </div>
-
         <div class="glass-card chat-card-wrapper">
-          <div class="chat-card-header">
-            <h2 class="section-heading">💬 Grounded Conversation Stream & Source Citations</h2>
+          
+          <!-- Unified Chat Header -->
+          <div class="chat-card-header" style="flex-wrap: wrap; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.85rem;">
+              <div class="orb-container-sm" style="position: relative; width: 44px; height: 44px;">
+                <div class="jarvis-voice-orb" id="jarvis-orb" style="width: 44px; height: 44px; font-size: 1.25rem; margin: 0;">🎙️</div>
+              </div>
+              <div>
+                <h1 class="hero-title" style="font-size: 1.35rem; margin: 0; text-align: left;">Conversational Knowledge Retrieval</h1>
+                <p class="hero-subtitle" style="margin: 0; font-size: 0.82rem; text-align: left; max-width: 100%;">
+                  Synthesized dynamically from 100+ saved notes using grounded RAG vector search & voice playback
+                </p>
+              </div>
+            </div>
             <span class="rag-indicator">● RAG Vector Engine Active</span>
           </div>
 
+          <!-- Chat Stream Window -->
           <div id="chat-container" class="chat-stream">
             <div class="chat-bubble ai-bubble glass-card">
               <div class="chat-header">
@@ -99,10 +83,33 @@
                 <strong style="color: var(--accent-indigo);">Second Brain AI Assistant</strong>
               </div>
               <div class="chat-text">
-                Hello! I am your Second Brain AI assistant. I have read all 100+ of your saved notes, voice memos, browser clips, and OCR documents. Ask me anything out loud or in text, and I will retrieve the exact answers with source citations.
+                Hello! I am your Second Brain AI assistant. I have indexed all 100+ of your saved notes, voice memos, browser clips, and OCR documents. Ask me anything out loud or in text, and I will retrieve exact grounded answers with source citations.
               </div>
             </div>
           </div>
+
+          <!-- Waveform Canvas -->
+          <canvas id="waveform-canvas" class="waveform-canvas" style="height: 35px; margin: 0.75rem 0 0.5rem 0;"></canvas>
+
+          <!-- Input Bar -->
+          <div class="query-input-bar">
+            <input type="text" id="rag-query-input" class="input-field query-input" placeholder="Ask your Second Brain... (e.g. 'What did I save about deep learning last month?')" aria-label="Query Input">
+            <button id="rag-submit-btn" class="btn btn-primary">✨ Query RAG</button>
+            <button id="voice-trigger-btn" class="btn btn-secondary">🎙️ Voice Assistant</button>
+          </div>
+
+          <!-- Sample Query Pills -->
+          <div class="sample-queries-container" style="margin-top: 0.85rem;">
+            <span class="sample-label">Try sample queries:</span>
+            <div class="sample-queries-row">
+              <button class="sample-query-btn" data-query="What did I save about deep learning last month?">"What did I save about deep learning?"</button>
+              <button class="sample-query-btn" data-query="What were my thoughts on the startup idea I had in January?">"Startup idea in January?"</button>
+              <button class="sample-query-btn" data-query="I'm writing about urban planning. What do I know about this?">"Urban planning notes?"</button>
+              <button class="sample-query-btn" data-query="Remind me what that article said about sleep and memory.">"Article on sleep & memory?"</button>
+              <button class="sample-query-btn" data-query="What distributed consensus protocols did I record?">"Distributed consensus protocols?"</button>
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -266,16 +273,106 @@
       <div id="resurfacing-grid" class="resurfacing-grid"></div>
     </section>
 
-    <!-- View 6: Settings & Privacy Console -->
+    <!-- View 6: AI Flashcards & Spaced Repetition -->
+    <section id="view-flashcards" class="view-section" aria-label="AI Flashcards & Spaced Repetition">
+      <div class="glass-card" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h2 class="hero-title" style="font-size: 1.8rem; text-align: left;">🎴 AI Memory Flashcards (Spaced Repetition)</h2>
+            <p class="hero-subtitle" style="text-align: left; margin: 0; max-width: 100%;">
+              Automatically generated Q&A review cards from your saved notes to boost long-term retention.
+            </p>
+          </div>
+          <div class="flashcard-score-pill">
+            <span id="flashcard-progress-text">Memory Recall: 88%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flashcard-stage-container">
+        <div id="flashcard-card" class="flashcard-3d-card">
+          <div class="flashcard-face flashcard-front">
+            <span class="flashcard-badge" id="fc-category-badge">Artificial Intelligence</span>
+            <h3 id="fc-question" class="fc-question-text">What is the core attention mechanism in Transformers?</h3>
+            <p class="fc-hint-text">💡 Click card or press Space to reveal answer</p>
+          </div>
+          <div class="flashcard-face flashcard-back">
+            <span class="flashcard-badge" style="background: var(--accent-emerald);">Answer Insight</span>
+            <div id="fc-answer" class="fc-answer-text">
+              Transformers use multi-head self-attention: Attention(Q,K,V) = softmax(QK^T / sqrt(d_k)) V to dynamically weigh token relationships.
+            </div>
+            <span id="fc-source-title" class="fc-source-tag">From Note: Deep Learning #1</span>
+          </div>
+        </div>
+
+        <div class="flashcard-controls-row">
+          <button id="fc-rating-hard" class="btn btn-secondary fc-btn-hard">🔴 Hard (Again)</button>
+          <button id="fc-rating-good" class="btn btn-secondary fc-btn-good">🟡 Good (Review)</button>
+          <button id="fc-rating-easy" class="btn btn-primary fc-btn-easy">🟢 Easy (Mastered)</button>
+          <button id="fc-next-btn" class="btn btn-secondary">Next Card ➡️</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 7: Analytics & Knowledge Dashboard -->
+    <section id="view-dashboard" class="view-section" aria-label="Analytics & Knowledge Dashboard">
+      <div class="dashboard-grid">
+        <div class="glass-card stat-card">
+          <div class="stat-icon" style="background: rgba(139, 92, 246, 0.2); color: var(--accent-violet);">📚</div>
+          <div class="stat-info">
+            <span class="stat-label">Total Vault Notes</span>
+            <h3 id="stat-total-notes" class="stat-value">100</h3>
+          </div>
+        </div>
+
+        <div class="glass-card stat-card">
+          <div class="stat-icon" style="background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan);">⚡</div>
+          <div class="stat-info">
+            <span class="stat-label">Ingest Surfaces</span>
+            <h3 id="stat-surfaces-count" class="stat-value">6 Channels</h3>
+          </div>
+        </div>
+
+        <div class="glass-card stat-card">
+          <div class="stat-icon" style="background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald);">🧠</div>
+          <div class="stat-info">
+            <span class="stat-label">Extracted Entities</span>
+            <h3 id="stat-entities-count" class="stat-value">240+</h3>
+          </div>
+        </div>
+
+        <div class="glass-card stat-card">
+          <div class="stat-icon" style="background: rgba(245, 158, 11, 0.2); color: var(--accent-amber);">🎯</div>
+          <div class="stat-info">
+            <span class="stat-label">Recall Score</span>
+            <h3 id="stat-recall-score" class="stat-value">94%</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-sections-row" style="margin-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+        <div class="glass-card">
+          <h3 class="section-heading">📥 Surface Ingest Distribution</h3>
+          <div id="surface-distribution-list" class="distribution-list" style="margin-top: 1rem;"></div>
+        </div>
+
+        <div class="glass-card">
+          <h3 class="section-heading">🏷️ Topic & Entity Cloud</h3>
+          <div id="topic-tag-cloud" class="tag-cloud-box" style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 8: Settings & Backup Console -->
     <section id="view-settings" class="view-section" aria-label="Settings & Privacy Console">
       <div class="glass-card settings-card">
-        <h2 class="hero-title" style="font-size: 1.8rem; text-align: left;">⚙️ Settings & System Architecture</h2>
+        <h2 class="hero-title" style="font-size: 1.8rem; text-align: left;">⚙️ System Settings & Data Vault Management</h2>
 
         <div class="setting-item">
           <div class="setting-info">
             <h3>🔒 On-Device Privacy Mode</h3>
             <p>
-              Run voice transcription (whisper.cpp) and embeddings (sentence-transformers) 100% locally. Audio and raw notes never leave your device.
+              Run voice transcription (whisper.cpp) and embeddings 100% locally. Audio and raw notes never leave your device.
             </p>
           </div>
           <label class="switch-toggle">
@@ -284,13 +381,39 @@
           </label>
         </div>
 
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3>🔊 Voice Readout (TTS)</h3>
+            <p>Read out RAG AI answers automatically when synthesized.</p>
+          </div>
+          <label class="switch-toggle">
+            <input type="checkbox" id="tts-toggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-item" style="flex-direction: column; align-items: flex-start; gap: 1rem;">
+          <div class="setting-info" style="max-width: 100%;">
+            <h3>💾 Export & Backup Data Vault</h3>
+            <p>Export all notes, tags, entities, and RAG session history to a JSON file or import a previous backup.</p>
+          </div>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <button id="export-vault-btn" class="btn btn-secondary">📥 Export Vault JSON</button>
+            <label class="btn btn-secondary" style="cursor: pointer;">
+              📤 Import Vault JSON
+              <input type="file" id="import-vault-input" accept=".json" style="display: none;">
+            </label>
+            <button id="reset-sample-btn" class="btn btn-secondary" style="color: var(--accent-pink); border-color: rgba(236, 72, 153, 0.4);">🔄 Reset 100 Notes Sample</button>
+          </div>
+        </div>
+
         <div class="setting-item" style="border: none;">
           <div class="setting-info" style="max-width: 100%;">
-            <h3>🔑 Optional External LLM Connector</h3>
+            <h3>🔑 External LLM API Key (Optional)</h3>
             <p style="margin-bottom: 1rem;">
-              By default, Second Brain uses its built-in local vector RAG engine. You can optionally supply your OpenAI or Claude API key below for hybrid cloud operation.
+              By default, Second Brain uses its built-in local vector RAG engine. You can optionally supply your Gemini or OpenAI API key below for cloud generation.
             </p>
-            <input type="password" class="input-field" placeholder="sk-..." style="font-family: var(--font-code);">
+            <input type="password" id="api-key-input" class="input-field" placeholder="AIzaSy... or sk-..." style="font-family: var(--font-code);">
           </div>
         </div>
 
@@ -302,7 +425,10 @@
   <!-- Slide-out Note Detail Drawer Modal -->
   <div id="note-drawer" class="note-drawer">
     <button id="close-drawer-btn" class="drawer-close-btn">✕</button>
-    <h3 id="drawer-title" class="drawer-title-text">Note Details</h3>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-right: 2rem;">
+      <h3 id="drawer-title" class="drawer-title-text">Note Details</h3>
+      <button id="enhance-note-btn" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.82rem;">✨ AI Enhance Note</button>
+    </div>
     <div id="drawer-meta" class="drawer-meta-text"></div>
     <div id="drawer-body"></div>
   </div>
@@ -317,7 +443,9 @@
   <script src="js/audio-presets.js"></script>
   <script src="js/resurfacing-engine.js"></script>
   <script src="js/graph-visualizer.js"></script>
+  <script src="js/ai-engine.js"></script>
   <script src="js/store.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
+
