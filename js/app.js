@@ -7,7 +7,7 @@
 (function() {
   'use strict';
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function initApp() {
     // ----------------------------------------------------
     // DOM Element References
     // ----------------------------------------------------
@@ -952,6 +952,21 @@
         .replace(/\n/g, '<br>')
         .replace(/• (.*?)(?=<br>|$)/g, '• $1');
     }
-  });
+
+    // Global helper accessible via inline onclick fallback
+    window.triggerSampleQuery = function(queryText) {
+      if (!queryText) return;
+      const cleanQuery = queryText.replace(/^["']|["']$/g, '');
+      const inputEl = document.getElementById('rag-query-input');
+      if (inputEl) inputEl.value = cleanQuery;
+      handleRAGQuery(cleanQuery);
+    };
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+  } else {
+    initApp();
+  }
 
 })();
