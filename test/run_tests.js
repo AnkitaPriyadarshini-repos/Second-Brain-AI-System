@@ -174,6 +174,89 @@ test('AudioPresets should return valid voice presets', () => {
   assert.strictEqual(brainPreset.rate, 1.05);
 });
 
+// --------------------------------------------------------
+// Test Suite 7: Gemini Color Flow Engine
+// --------------------------------------------------------
+console.log('\nSuite 7: Gemini Dynamic Color Flow Engine');
+
+test('GeminiColorFlowEngine should initialize with theme and speed controls', () => {
+  const GeminiColorFlowEngine = require('../js/gemini-color-flow');
+  GeminiColorFlowEngine.setTheme('gemini-light');
+  assert.strictEqual(GeminiColorFlowEngine.theme, 'gemini-light');
+  assert.strictEqual(GeminiColorFlowEngine.nodes.length, 6);
+
+  GeminiColorFlowEngine.setSpeed('swift');
+  assert.strictEqual(GeminiColorFlowEngine.speedPreset, 'swift');
+  assert.strictEqual(GeminiColorFlowEngine.speedMultiplier, 1.3);
+});
+
+test('GeminiColorFlowEngine should handle reactive state transitions', () => {
+  const GeminiColorFlowEngine = require('../js/gemini-color-flow');
+  GeminiColorFlowEngine.triggerState('thinking', 0);
+  assert.strictEqual(GeminiColorFlowEngine.currentState, 'thinking');
+  assert.strictEqual(GeminiColorFlowEngine.stateIntensity, 3.0);
+});
+
+// --------------------------------------------------------
+// Test Suite 8: Nexus AI Fairy Bot Engine
+// --------------------------------------------------------
+console.log('\nSuite 8: Nexus AI Fairy Bot Engine');
+
+test('NexusBotEngine should manage states and dialogue speech bubbles', () => {
+  const NexusBotEngine = require('../js/nexus-bot');
+  NexusBotEngine.setState('listening');
+  assert.strictEqual(NexusBotEngine.state, 'listening');
+
+  NexusBotEngine.setState('thinking');
+  assert.strictEqual(NexusBotEngine.state, 'thinking');
+});
+
+test('NexusBotEngine should consolidate memos and queries cleanly', () => {
+  const NexusBotEngine = require('../js/nexus-bot');
+  const dummyNotes = [
+    { title: "Kafka Partitioning Note" },
+    { title: "Deep Learning Transformers" }
+  ];
+  NexusBotEngine.consolidateMemos(dummyNotes);
+  assert.strictEqual(NexusBotEngine.recentMemos.length, 2);
+  assert.strictEqual(NexusBotEngine.recentMemos[0].title, "Kafka Partitioning Note");
+});
+
+test('NexusBotEngine should support dual avatar switching between Orb Robot and Fairy Bot', () => {
+  const NexusBotEngine = require('../js/nexus-bot');
+  NexusBotEngine.setAvatar('blue-bot');
+  assert.strictEqual(NexusBotEngine.activeAvatar, 'blue-bot');
+
+  NexusBotEngine.setAvatar('fairy');
+  assert.strictEqual(NexusBotEngine.activeAvatar, 'fairy');
+});
+
+// --------------------------------------------------------
+// Test Suite 9: Developer Telemetry & Engineering Specs HUD
+// --------------------------------------------------------
+console.log('\nSuite 9: Developer Telemetry & Human Engineering HUD');
+
+test('DeveloperHUDEngine should calculate latency telemetry and track system specs', () => {
+  const DeveloperHUDEngine = require('../js/developer-hud');
+  const startTime = performance.now() - 15;
+  const latency = DeveloperHUDEngine.recordQueryLatency(startTime);
+  assert.ok(latency >= 1, 'Latency should be a positive number');
+  assert.strictEqual(DeveloperHUDEngine.telemetry.buildVersion, 'v3.4-prod');
+});
+
+test('DeveloperHUDEngine should inspect raw note vector schema', () => {
+  const DeveloperHUDEngine = require('../js/developer-hud');
+  const dummyNote = {
+    id: "note-101",
+    title: "Distributed Raft Consensus",
+    content: "Raft consensus algorithm uses leader election and log replication across distributed nodes."
+  };
+  const vectorInspection = DeveloperHUDEngine.inspectNoteVector(dummyNote);
+  assert.ok(vectorInspection, 'Vector inspection missing');
+  assert.ok(vectorInspection.tokenCount > 5, 'Token count should be greater than 5');
+  assert.ok(vectorInspection.rawVectorJson.includes('raft'), 'Vector JSON missing key terms');
+});
+
 console.log('\n====================================================');
 console.log(`SUMMARY: ${passCount} / ${totalTests} TESTS PASSED CLEANLY.`);
 console.log('====================================================\n');

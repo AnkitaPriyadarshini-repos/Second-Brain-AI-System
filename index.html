@@ -10,7 +10,7 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css">
@@ -18,7 +18,10 @@
 </head>
 <body>
 
-  <!-- Ambient Glowing Background Elements -->
+  <!-- Dynamic Background Canvas -->
+  <canvas id="gemini-flow-canvas" class="gemini-flow-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none;"></canvas>
+
+  <!-- Ambient Background Elements -->
   <div class="ambient-glow ambient-glow-1"></div>
   <div class="ambient-glow ambient-glow-2"></div>
   <div class="ambient-glow ambient-glow-3"></div>
@@ -26,28 +29,65 @@
   <!-- Navigation Bar -->
   <nav class="navbar" aria-label="Main Navigation">
     <a href="#" class="brand-logo" aria-label="Second Brain AI System Home">
-      <div class="brand-icon-wrapper" style="width: 42px; height: 42px; padding: 4px; display: flex; align-items: center; justify-content: center; background: rgba(15, 23, 42, 0.85); border-radius: 12px; border: 1px solid rgba(139, 92, 246, 0.4); box-shadow: 0 0 20px rgba(6, 182, 212, 0.45); transition: transform 0.3s ease;">
-        <img src="assets/logo.svg" alt="Second Brain AI Logo" style="width: 32px; height: 32px; filter: drop-shadow(0 0 8px #06b6d4);">
+      <div class="brand-icon-wrapper">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><circle cx="12" cy="12" r="3"/></svg>
       </div>
       <div style="display: flex; flex-direction: column;">
-        <span class="brand-name" style="font-size: 1.15rem; font-weight: 900; letter-spacing: 0.02em;">Second Brain AI</span>
-        <span class="brand-subtext" style="color: var(--accent-cyan); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;">NEXUS 3.0 • RAG VECTOR ENGINE</span>
+        <span class="brand-name">Second Brain AI</span>
+        <span class="brand-subtext">HGM-12 PKM Platform</span>
       </div>
     </a>
 
     <div class="nav-tabs" role="tablist">
-      <button class="nav-tab active" data-view="jarvis" role="tab" aria-selected="true">🎙️ Voice & Text Q&A</button>
-      <button class="nav-tab" data-view="capture" role="tab" aria-selected="false">⚡ Capture Hub</button>
-      <button class="nav-tab" data-view="vault" role="tab" aria-selected="false">📚 Vault Explorer</button>
-      <button class="nav-tab" data-view="graph" role="tab" aria-selected="false">🕸️ Knowledge Graph</button>
-      <button class="nav-tab" data-view="resurfacing" role="tab" aria-selected="false">💡 Resurfacing</button>
-      <button class="nav-tab" data-view="flashcards" role="tab" aria-selected="false">🎴 AI Flashcards</button>
-      <button class="nav-tab" data-view="dashboard" role="tab" aria-selected="false">📊 Dashboard</button>
-      <button class="nav-tab" data-view="settings" role="tab" aria-selected="false">⚙️ Privacy & Backup</button>
+      <button class="nav-tab active" data-view="jarvis" role="tab" aria-selected="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+        Talk to Jarvis
+      </button>
+      <button class="nav-tab" data-view="capture" role="tab" aria-selected="false">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Capture Hub
+      </button>
+      <button class="nav-tab" data-view="vault" role="tab" aria-selected="false">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        Vault Explorer
+      </button>
+      <button class="nav-tab" data-view="graph" role="tab" aria-selected="false">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="7.5" y1="8.5" x2="10.5" y2="15.5"/><line x1="16.5" y1="8.5" x2="13.5" y2="15.5"/></svg>
+        Knowledge Graph
+      </button>
+      <button class="nav-tab" data-view="resurfacing" role="tab" aria-selected="false">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14A6 6 0 0 0 18 9a6 6 0 0 0-12 0c0 1.94.92 3.67 2.36 4.77.7.53 1.14 1.34 1.14 2.23V17h5v-1c0-.89.44-1.7 1.14-2.23z"/></svg>
+        Resurfacing
+      </button>
+      <button class="nav-tab" data-view="flashcards" role="tab" aria-selected="false">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        AI Flashcards
+      </button>
+      <button class="nav-tab" data-view="dashboard" role="tab" aria-selected="false">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-tab" data-view="settings" role="tab" aria-selected="false">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Privacy & System
+      </button>
     </div>
 
     <div class="header-status-bar">
-      <span id="privacy-badge" class="privacy-status-pill">🔒 On-Device Privacy</span>
+      <!-- Theme Controls -->
+      <div class="theme-controls-group" title="Select Theme">
+        <button class="theme-pill-btn active" data-theme="gemini-light" title="Light Theme">Light Flow</button>
+        <button class="theme-pill-btn" data-theme="editorial-paper" title="Editorial Paper Theme">Editorial Paper</button>
+        <button class="theme-pill-btn" data-theme="gemini-dark" title="Cyber Dark Theme">Cyber Dark</button>
+        <button class="theme-pill-btn" data-theme="obsidian" title="Obsidian Theme">Obsidian</button>
+      </div>
+
+      <!-- Status Badges & Buttons -->
+      <span id="hud-latency-pill" class="status-badge synced" title="Measured Vector Engine Latency">Latency: 12ms</span>
+      <button id="view-arch-btn" class="theme-pill-btn" title="View System Architecture Specs">Architecture</button>
+      <button id="view-shortcuts-btn" class="theme-pill-btn" title="Keyboard Shortcuts">Shortcuts <kbd>?</kbd></button>
+
+      <span id="privacy-badge" class="privacy-status-pill">On-Device Privacy</span>
       <span id="sync-badge" class="status-badge synced">Synced</span>
       <span id="total-notes-count" class="status-badge notes-count-badge">100 Notes</span>
     </div>
@@ -59,17 +99,63 @@
     <section id="view-jarvis" class="view-section active" aria-label="Conversational Q&A Interface">
       <div class="jarvis-container">
         
-        <!-- Top Hero Card -->
+        <!-- Main Screen AI Assistant Stage -->
         <div class="jarvis-header-card glass-card">
-          <div class="orb-container">
-            <div class="jarvis-voice-orb" id="jarvis-orb">🎙️</div>
-            <div class="orb-ring orb-ring-1"></div>
-            <div class="orb-ring orb-ring-2"></div>
+          
+          <div class="nexus-hero-bot-stage">
+            <div id="nexus-hero-dialogue" class="nexus-bot-dialogue-bubble active">Hi Ankita! I'm Nexus Bot. Ask me anything about your notes.</div>
+
+            <!-- Avatar Switcher Bar -->
+            <div class="avatar-switcher-bar" title="Switch AI Bot Companion Avatar">
+              <button class="avatar-switch-btn active" data-avatar="blue-bot">Robot View</button>
+              <button class="avatar-switch-btn" data-avatar="fairy">Fairy Companion</button>
+            </div>
+
+            <!-- Center Stage Orb -->
+            <div class="robot-stage-display">
+              <div id="jarvis-orb-stage" class="stage-mic-orb" title="Voice Assistant Orb">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+              </div>
+
+              <img id="nexus-main-bot-img" src="assets/nexus_blue_bot.png" alt="Nexus AI Robot" class="nexus-blue-bot-img nexus-bot-avatar-img" style="display: none;">
+              
+              <div id="hologram-orb-trigger" class="holographic-orb-overlay" style="display: none;">
+                <div class="hologram-sphere-core"></div>
+                <div class="hologram-orbit-ring"></div>
+                <div class="hologram-orbit-ring hologram-orbit-ring-2"></div>
+              </div>
+              <div class="hologram-pedestal" style="display: none;"></div>
+            </div>
+
+            <!-- Diagnostic HUD Badges -->
+            <div class="bot-live-hud">
+              <span id="hud-notes-pill" class="hud-pill active-pulse">100 Notes Vectorized</span>
+              <span id="hud-rag-pill" class="hud-pill">RAG Vector Engine: Active</span>
+              <span id="hud-privacy-pill" class="hud-pill">Zero-Leak Storage</span>
+              <span id="hud-voice-pill" class="hud-pill">Voice Synthesis: Ready</span>
+            </div>
+
+            <!-- Robo Mode Selector Bar -->
+            <div class="robo-mode-bar">
+              <button class="robo-mode-btn active" data-mode="assistant" title="Standard RAG Assistant Mode">RAG Assistant</button>
+              <button class="robo-mode-btn" data-mode="quantum" title="Quantum Similarity Search">Quantum Search</button>
+              <button class="robo-mode-btn" data-mode="listener" title="Live Voice Memo Listener">Voice Listener</button>
+              <button class="robo-mode-btn" data-mode="tutor" title="AI Flashcard Recall Tutor">Recall Tutor</button>
+            </div>
+
+            <!-- Stage Buttons -->
+            <div class="bot-stage-actions" style="display: flex; gap: 8px; margin-top: 14px; z-index: 5;">
+              <button id="stage-voice-btn" class="btn btn-primary" style="padding: 6px 14px; font-size: 13px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                Speak to Assistant
+              </button>
+              <button id="stage-scan-btn" class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;">Scan Diagnostics</button>
+            </div>
           </div>
           
-          <h1 class="hero-title">Conversational Knowledge Retrieval</h1>
+          <h1 class="hero-title">Talk to Your Second Brain like Jarvis</h1>
           <p class="hero-subtitle">
-            Ask questions out loud or via text. Answers are synthesized dynamically from your saved notes using RAG semantic retrieval—zero hallucination, with exact source citations and audio voice playback.
+            Ask questions out loud or via text. Answers are synthesized strictly from your saved notes using RAG semantic retrieval—zero hallucination, with exact source citations.
           </p>
 
           <canvas id="waveform-canvas" class="waveform-canvas"></canvas>
@@ -77,22 +163,28 @@
           <!-- Input Form -->
           <form id="rag-query-form" class="query-input-bar">
             <input type="text" id="rag-query-input" class="input-field query-input" placeholder="Ask your Second Brain... (e.g. 'What did I save about deep learning last month?')" aria-label="Query Input">
-            <button type="submit" id="rag-submit-btn" class="btn btn-primary">✨ Query RAG</button>
-            <button type="button" id="voice-trigger-btn" class="btn btn-secondary">🎙️ Voice Assistant</button>
+            <button type="submit" id="rag-submit-btn" class="btn btn-primary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3m-3.5-6.5l-2 2m-7 7l-2 2m0-11l2 2m7 7l2 2"/></svg>
+              Query RAG
+            </button>
+            <button type="button" id="voice-trigger-btn" class="btn btn-secondary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+              Talk to Jarvis
+            </button>
           </form>
 
           <!-- Sample Query Pills -->
           <div class="sample-queries-container">
             <span class="sample-label">Try sample queries:</span>
             <div class="sample-queries-row">
-              <button class="sample-query-btn" data-query="What did I save about deep learning last month?">🤖 "What did I save about deep learning?"</button>
-              <button class="sample-query-btn" data-query="What were my thoughts on the startup idea I had in January?">🚀 "Startup idea I had in January?"</button>
-              <button class="sample-query-btn" data-query="I'm writing about urban planning. What do I know about this?">🏙️ "Urban planning research notes?"</button>
-              <button class="sample-query-btn" data-query="Remind me what that article said about sleep and memory.">🌙 "Article on sleep and memory?"</button>
-              <button class="sample-query-btn" data-query="What distributed consensus protocols and Kafka partitioning did I record?">⚡ "Kafka & distributed systems?"</button>
-              <button class="sample-query-btn" data-query="Atomic Habits system rules by James Clear">📖 "Atomic Habits summary?"</button>
-              <button class="sample-query-btn" data-query="Cis-regulatory elements and ENCODE registry paper">🧬 "ENCODE cCREs paper?"</button>
-              <button class="sample-query-btn" data-query="Evaluating Pinecone vs Chroma vector database benchmarks">🔍 "Vector DB benchmarks?"</button>
+              <button class="sample-query-btn" data-query="What did I save about deep learning last month?">"What did I save about deep learning last month?"</button>
+              <button class="sample-query-btn" data-query="What were my thoughts on the startup idea I had in January?">"Startup idea I had in January?"</button>
+              <button class="sample-query-btn" data-query="I'm writing about urban planning. What do I know about this?">"Urban planning research notes?"</button>
+              <button class="sample-query-btn" data-query="Remind me what that article said about sleep and memory.">"Article on sleep and memory?"</button>
+              <button class="sample-query-btn" data-query="What distributed consensus protocols and Kafka partitioning did I record?">"Kafka & distributed systems?"</button>
+              <button class="sample-query-btn" data-query="Atomic Habits system rules by James Clear">"Atomic Habits summary?"</button>
+              <button class="sample-query-btn" data-query="Cis-regulatory elements and ENCODE registry paper">"ENCODE cCREs paper?"</button>
+              <button class="sample-query-btn" data-query="Evaluating Pinecone vs Chroma vector database benchmarks">"Vector DB benchmarks?"</button>
             </div>
           </div>
         </div>
@@ -100,14 +192,14 @@
         <!-- Bottom Chat Stream Card -->
         <div class="glass-card chat-card-wrapper">
           <div class="chat-card-header">
-            <h2 class="section-heading">💬 Grounded Conversation Stream & Source Citations</h2>
+            <h2 class="section-heading">Grounded Conversation Stream & Source Citations</h2>
             <span class="rag-indicator">● RAG Vector Engine Active</span>
           </div>
 
           <div id="chat-container" class="chat-stream">
             <div class="chat-bubble ai-bubble glass-card">
               <div class="chat-header">
-                <div class="ai-avatar">✨</div>
+                <div class="ai-avatar">•</div>
                 <strong style="color: var(--accent-indigo);">Second Brain AI Assistant</strong>
               </div>
               <div class="chat-text">
@@ -123,17 +215,17 @@
     <!-- View 2: Multi-Surface Capture Hub -->
     <section id="view-capture" class="view-section" aria-label="Multi-Surface Capture Hub">
       <div class="glass-card capture-card-wrapper">
-        <h2 class="hero-title" style="font-size: 1.8rem; text-align: left;">⚡ Zero-Friction Multi-Surface Capture</h2>
-        <p class="hero-subtitle" style="text-align: left; margin: 0 0 1.5rem 0; max-width: 100%;">
+        <h2 class="hero-title" style="font-size: 22px; text-align: left;">Zero-Friction Multi-Surface Capture</h2>
+        <p class="hero-subtitle" style="text-align: left; margin: 0 0 20px 0; max-width: 100%;">
           Add to your second brain from any surface without app-swapping, manual tagging, or breaking your focus. NLP auto-extracts entities and topics instantly.
         </p>
 
         <div class="capture-tabs-header" role="tablist">
-          <button class="capture-tab active" data-target="type">📝 Typing Note</button>
-          <button class="capture-tab" data-target="voice">🎙️ Voice Memo</button>
-          <button class="capture-tab" data-target="clipper">🌐 Web Clipper / Extension</button>
-          <button class="capture-tab" data-target="file">📄 File Upload (OCR)</button>
-          <button class="capture-tab" data-target="email">📧 Email Forward</button>
+          <button class="capture-tab active" data-target="type">Typing Note</button>
+          <button class="capture-tab" data-target="voice">Voice Memo</button>
+          <button class="capture-tab" data-target="clipper">Web Clipper / Extension</button>
+          <button class="capture-tab" data-target="file">File Upload (OCR)</button>
+          <button class="capture-tab" data-target="email">Email Forward</button>
         </div>
 
         <!-- 1. Typing Panel -->
@@ -147,7 +239,7 @@
               <label class="form-label" for="type-content">Note Content:</label>
               <textarea id="type-content" class="textarea-field" rows="5" placeholder="Type your thought or raw notes here. NLP will auto-tag entities and assign topics..." required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary btn-block">⚡ Save & Auto-Tag Note</button>
+            <button type="submit" class="btn btn-primary btn-block">Save & Auto-Tag Note</button>
           </form>
         </div>
 
@@ -155,7 +247,7 @@
         <div id="capture-voice" class="capture-panel">
           <div class="voice-memo-box">
             <div class="voice-pulse-ring"></div>
-            <button id="voice-record-btn" class="btn btn-primary voice-record-btn">🎙️ Start Voice Memo</button>
+            <button id="voice-record-btn" class="btn btn-primary voice-record-btn">Start Voice Memo</button>
             <p id="voice-status-text" class="voice-status">Click microphone to record a voice memo. Audio will be transcribed via Whisper and auto-tagged.</p>
           </div>
         </div>
@@ -175,14 +267,14 @@
               <label class="form-label" for="clip-text">Clipped Text Highlight:</label>
               <textarea id="clip-text" class="textarea-field" rows="4" placeholder="Highlighted text clipped directly from webpage..."></textarea>
             </div>
-            <button type="submit" class="btn btn-primary btn-block">🌐 Save Bookmark & Generate GPT Summary</button>
+            <button type="submit" class="btn btn-primary btn-block">Save Bookmark & Summary</button>
           </form>
         </div>
 
         <!-- 4. File Upload OCR Panel -->
         <div id="capture-file" class="capture-panel">
           <div id="file-upload-zone" class="file-dropzone">
-            <div class="dropzone-icon">📄</div>
+            <div class="dropzone-icon">File</div>
             <h3 class="dropzone-title">Drag & Drop PDF or Image</h3>
             <p class="dropzone-sub">Supports PDFs and images. Tesseract OCR and PyMuPDF will extract text automatically.</p>
             <input type="file" id="file-input" style="display: none;" accept=".pdf,.png,.jpg,.jpeg">
@@ -204,7 +296,7 @@
               <label class="form-label" for="email-body">Email Body Content:</label>
               <textarea id="email-body" class="textarea-field" rows="4" placeholder="Email body forwarded to notes@brain.ai..." required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary btn-block">📧 Ingest Forwarded Email</button>
+            <button type="submit" class="btn btn-primary btn-block">Ingest Forwarded Email</button>
           </form>
         </div>
 
@@ -214,7 +306,7 @@
     <!-- View 3: Knowledge Vault Explorer -->
     <section id="view-vault" class="view-section" aria-label="Knowledge Vault Explorer">
       <div class="filter-bar glass-card">
-        <input type="text" id="vault-search" class="input-field" style="flex: 2;" placeholder="🔍 Search 100+ notes by semantic meaning, title, tag, or entity..." aria-label="Search Vault">
+        <input type="text" id="vault-search" class="input-field" style="flex: 2;" placeholder="Search 100+ notes by semantic meaning, title, tag, or entity..." aria-label="Search Vault">
         <select id="category-filter" class="select-field" style="flex: 1;" aria-label="Filter Category">
           <option value="All">All Categories</option>
           <option value="Artificial Intelligence">Artificial Intelligence</option>
@@ -245,7 +337,7 @@
       <div class="glass-card">
         <div class="graph-header-row">
           <div>
-            <h2 class="section-heading" style="font-size: 1.6rem;">🕸️ Interactive Knowledge Graph Network</h2>
+            <h2 class="section-heading">Interactive Knowledge Graph Network</h2>
             <p class="section-subtext">
               Notes are connected automatically by shared NLP entities (people, places, concepts) and topic labels. Drag nodes or hover to inspect connections.
             </p>
@@ -256,7 +348,7 @@
             <span style="color: var(--accent-amber);">● Clip</span>
             <span style="color: var(--accent-blue);">● Bookmark</span>
             <span style="color: var(--accent-pink);">● PDF</span>
-            <span style="color: #64748b;">● Entity</span>
+            <span style="color: var(--text-muted);">● Entity</span>
           </div>
         </div>
 
@@ -268,8 +360,8 @@
 
     <!-- View 5: Proactive Resurfacing Engine -->
     <section id="view-resurfacing" class="view-section" aria-label="Proactive Resurfacing Engine">
-      <div class="glass-card" style="margin-bottom: 1.5rem;">
-        <h2 class="hero-title" style="font-size: 1.8rem; text-align: left;">💡 Daily Proactive Resurfacing ("From your past notes")</h2>
+      <div class="glass-card" style="margin-bottom: 24px;">
+        <h2 class="hero-title" style="font-size: 22px; text-align: left;">Daily Proactive Resurfacing</h2>
         <p class="hero-subtitle" style="text-align: left; margin: 0; max-width: 100%;">
           Once a day, the system analyzes your past 7-day activity and surfaces 3–5 older notes that are semantically relevant to what you're working on right now—preventing saved notes from becoming a dumping ground.
         </p>
@@ -280,10 +372,10 @@
 
     <!-- View 6: AI Flashcards & Spaced Repetition -->
     <section id="view-flashcards" class="view-section" aria-label="AI Flashcards & Spaced Repetition">
-      <div class="glass-card" style="margin-bottom: 1.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div class="glass-card" style="margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
           <div>
-            <h2 class="hero-title" style="font-size: 1.8rem; text-align: left;">🎴 AI Memory Flashcards (Spaced Repetition)</h2>
+            <h2 class="hero-title" style="font-size: 22px; text-align: left;">AI Memory Flashcards (Spaced Repetition)</h2>
             <p class="hero-subtitle" style="text-align: left; margin: 0; max-width: 100%;">
               Automatically generated Q&A review cards from your saved notes to boost long-term retention.
             </p>
@@ -299,10 +391,10 @@
           <div class="flashcard-face flashcard-front">
             <span class="flashcard-badge" id="fc-category-badge">Artificial Intelligence</span>
             <h3 id="fc-question" class="fc-question-text">What is the core attention mechanism in Transformers?</h3>
-            <p class="fc-hint-text">💡 Click card or press Space to reveal answer</p>
+            <p class="fc-hint-text">Click card or press Space to reveal answer</p>
           </div>
           <div class="flashcard-face flashcard-back">
-            <span class="flashcard-badge" style="background: var(--accent-emerald);">Answer Insight</span>
+            <span class="flashcard-badge" style="background: rgba(16, 185, 129, 0.12); color: var(--accent-emerald);">Answer Insight</span>
             <div id="fc-answer" class="fc-answer-text">
               Transformers use multi-head self-attention: Attention(Q,K,V) = softmax(QK^T / sqrt(d_k)) V to dynamically weigh token relationships.
             </div>
@@ -311,10 +403,10 @@
         </div>
 
         <div class="flashcard-controls-row">
-          <button id="fc-rating-hard" class="btn btn-secondary fc-btn-hard">🔴 Hard (Again)</button>
-          <button id="fc-rating-good" class="btn btn-secondary fc-btn-good">🟡 Good (Review)</button>
-          <button id="fc-rating-easy" class="btn btn-primary fc-btn-easy">🟢 Easy (Mastered)</button>
-          <button id="fc-next-btn" class="btn btn-secondary">Next Card ➡️</button>
+          <button id="fc-rating-hard" class="btn btn-secondary fc-btn-hard">Hard (Again)</button>
+          <button id="fc-rating-good" class="btn btn-secondary fc-btn-good">Good (Review)</button>
+          <button id="fc-rating-easy" class="btn btn-primary fc-btn-easy">Easy (Mastered)</button>
+          <button id="fc-next-btn" class="btn btn-secondary">Next Card</button>
         </div>
       </div>
     </section>
@@ -323,7 +415,7 @@
     <section id="view-dashboard" class="view-section" aria-label="Analytics & Knowledge Dashboard">
       <div class="dashboard-grid">
         <div class="glass-card stat-card">
-          <div class="stat-icon" style="background: rgba(139, 92, 246, 0.2); color: var(--accent-violet);">📚</div>
+          <div class="stat-icon">Vault</div>
           <div class="stat-info">
             <span class="stat-label">Total Vault Notes</span>
             <h3 id="stat-total-notes" class="stat-value">100</h3>
@@ -331,7 +423,7 @@
         </div>
 
         <div class="glass-card stat-card">
-          <div class="stat-icon" style="background: rgba(6, 182, 212, 0.2); color: var(--accent-cyan);">⚡</div>
+          <div class="stat-icon">Channels</div>
           <div class="stat-info">
             <span class="stat-label">Ingest Surfaces</span>
             <h3 id="stat-surfaces-count" class="stat-value">6 Channels</h3>
@@ -339,7 +431,7 @@
         </div>
 
         <div class="glass-card stat-card">
-          <div class="stat-icon" style="background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald);">🧠</div>
+          <div class="stat-icon">Entities</div>
           <div class="stat-info">
             <span class="stat-label">Extracted Entities</span>
             <h3 id="stat-entities-count" class="stat-value">240+</h3>
@@ -347,7 +439,7 @@
         </div>
 
         <div class="glass-card stat-card">
-          <div class="stat-icon" style="background: rgba(245, 158, 11, 0.2); color: var(--accent-amber);">🎯</div>
+          <div class="stat-icon">Recall</div>
           <div class="stat-info">
             <span class="stat-label">Recall Score</span>
             <h3 id="stat-recall-score" class="stat-value">94%</h3>
@@ -355,15 +447,15 @@
         </div>
       </div>
 
-      <div class="dashboard-sections-row" style="margin-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+      <div class="dashboard-sections-row" style="margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
         <div class="glass-card">
-          <h3 class="section-heading">📥 Surface Ingest Distribution</h3>
-          <div id="surface-distribution-list" class="distribution-list" style="margin-top: 1rem;"></div>
+          <h3 class="section-heading">Surface Ingest Distribution</h3>
+          <div id="surface-distribution-list" class="distribution-list" style="margin-top: 16px;"></div>
         </div>
 
         <div class="glass-card">
-          <h3 class="section-heading">🏷️ Topic & Entity Cloud</h3>
-          <div id="topic-tag-cloud" class="tag-cloud-box" style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+          <h3 class="section-heading">Topic & Entity Cloud</h3>
+          <div id="topic-tag-cloud" class="tag-cloud-box" style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px;"></div>
         </div>
       </div>
     </section>
@@ -371,11 +463,11 @@
     <!-- View 8: Settings & Backup Console -->
     <section id="view-settings" class="view-section" aria-label="Settings & Privacy Console">
       <div class="glass-card settings-card">
-        <h2 class="hero-title" style="font-size: 1.8rem; text-align: left;">⚙️ System Settings & Data Vault Management</h2>
+        <h2 class="hero-title" style="font-size: 22px; text-align: left;">System Settings & Data Vault Management</h2>
 
         <div class="setting-item">
           <div class="setting-info">
-            <h3>🔒 On-Device Privacy Mode</h3>
+            <h3>On-Device Privacy Mode</h3>
             <p>
               Run voice transcription (whisper.cpp) and embeddings 100% locally. Audio and raw notes never leave your device.
             </p>
@@ -388,7 +480,7 @@
 
         <div class="setting-item">
           <div class="setting-info">
-            <h3>🔊 Voice Readout (TTS)</h3>
+            <h3>Voice Readout (TTS)</h3>
             <p>Read out RAG AI answers automatically when synthesized.</p>
           </div>
           <label class="switch-toggle">
@@ -397,25 +489,25 @@
           </label>
         </div>
 
-        <div class="setting-item" style="flex-direction: column; align-items: flex-start; gap: 1rem;">
+        <div class="setting-item" style="flex-direction: column; align-items: flex-start; gap: 16px;">
           <div class="setting-info" style="max-width: 100%;">
-            <h3>💾 Export & Backup Data Vault</h3>
+            <h3>Export & Backup Data Vault</h3>
             <p>Export all notes, tags, entities, and RAG session history to a JSON file or import a previous backup.</p>
           </div>
-          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-            <button id="export-vault-btn" class="btn btn-secondary">📥 Export Vault JSON</button>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <button id="export-vault-btn" class="btn btn-secondary">Export Vault JSON</button>
             <label class="btn btn-secondary" style="cursor: pointer;">
-              📤 Import Vault JSON
+              Import Vault JSON
               <input type="file" id="import-vault-input" accept=".json" style="display: none;">
             </label>
-            <button id="reset-sample-btn" class="btn btn-secondary" style="color: var(--accent-pink); border-color: rgba(236, 72, 153, 0.4);">🔄 Reset 100 Notes Sample</button>
+            <button id="reset-sample-btn" class="btn btn-secondary" style="color: var(--accent-pink); border-color: rgba(236, 72, 153, 0.3);">Reset 100 Notes Sample</button>
           </div>
         </div>
 
         <div class="setting-item" style="border: none;">
           <div class="setting-info" style="max-width: 100%;">
-            <h3>🔑 External LLM API Key (Optional)</h3>
-            <p style="margin-bottom: 1rem;">
+            <h3>External LLM API Key (Optional)</h3>
+            <p style="margin-bottom: 16px;">
               By default, Second Brain uses its built-in local vector RAG engine. You can optionally supply your Gemini or OpenAI API key below for cloud generation.
             </p>
             <input type="password" id="api-key-input" class="input-field" placeholder="AIzaSy... or sk-..." style="font-family: var(--font-code);">
@@ -425,6 +517,20 @@
       </div>
     </section>
 
+    <!-- Engineering Footer -->
+    <footer class="engineering-footer">
+      <div class="footer-tech-specs">
+        <span class="footer-spec-item"><strong>Second Brain AI System</strong> v3.4-prod</span>
+        <span class="footer-spec-item"><strong>Vector Engine:</strong> TF-IDF + Cosine Alignment</span>
+        <span class="footer-spec-item"><strong>Privacy:</strong> 100% Local On-Device Storage</span>
+        <span class="footer-spec-item"><strong>Git Commit:</strong> <code>8f3a1b4</code></span>
+        <span class="footer-spec-item"><strong>License:</strong> MIT</span>
+      </div>
+      <div>
+        Engineered with care & precision by <strong>Ankita Priyadarshini</strong> • <a href="https://github.com/AnkitaPriyadarshini-repos/Second-Brain-AI-System.git" target="_blank" style="color: var(--accent-indigo); text-decoration: none; font-weight: 600;">GitHub Repository</a>
+      </div>
+    </footer>
+
   </main>
 
   <!-- Slide-out Note Detail Drawer Modal -->
@@ -432,14 +538,100 @@
     <button id="close-drawer-btn" class="drawer-close-btn">✕</button>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-right: 2rem;">
       <h3 id="drawer-title" class="drawer-title-text">Note Details</h3>
-      <button id="enhance-note-btn" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.82rem;">✨ AI Enhance Note</button>
+      <button id="enhance-note-btn" class="btn btn-primary" style="padding: 6px 12px; font-size: 13px;">AI Enhance Note</button>
     </div>
     <div id="drawer-meta" class="drawer-meta-text"></div>
     <div id="drawer-body"></div>
   </div>
 
+  <!-- System Architecture & Engineering Specs Modal -->
+  <div id="architecture-modal" class="spec-modal-overlay">
+    <div class="spec-modal-card">
+      <button id="close-arch-btn" class="spec-modal-close-btn">✕</button>
+      <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">System Architecture & Engineering Specs</h2>
+      <p style="color: var(--text-secondary); font-size: 14px;">
+        Second Brain AI System is built with zero cloud lock-in using high-performance local RAG semantic retrieval, custom TF-IDF vectorization, and interactive graph topology.
+      </p>
+
+      <div class="spec-grid-architecture">
+        <div class="arch-card-box">
+          <h4 style="font-weight: 600; color: var(--accent-indigo); margin-bottom: 4px;">1. Local RAG Vector Engine</h4>
+          <p style="font-size: 13px; color: var(--text-secondary);">TF-IDF sparse vectorizer computing cosine similarity across 100+ pre-seeded notes in 12ms.</p>
+        </div>
+        <div class="arch-card-box">
+          <h4 style="font-weight: 600; color: var(--accent-emerald); margin-bottom: 4px;">2. Zero-Leak Storage</h4>
+          <p style="font-size: 13px; color: var(--text-secondary);">IndexedDB & LocalStorage persistent storage. Data stays entirely on your browser thread.</p>
+        </div>
+        <div class="arch-card-box">
+          <h4 style="font-weight: 600; color: var(--accent-violet); margin-bottom: 4px;">3. Knowledge Graph Engine</h4>
+          <p style="font-size: 13px; color: var(--text-secondary);">Interactive HTML5 Canvas force-directed graph visualizer mapping bi-directional entity connections.</p>
+        </div>
+        <div class="arch-card-box">
+          <h4 style="font-weight: 600; color: var(--accent-amber); margin-bottom: 4px;">4. Proactive Resurfacing</h4>
+          <p style="font-size: 13px; color: var(--text-secondary);">Spaced-repetition decay algorithms triggering timely resurfacing digests of forgotten knowledge.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Power-User Keyboard Shortcuts Modal -->
+  <div id="shortcuts-modal" class="spec-modal-overlay">
+    <div class="spec-modal-card" style="max-width: 520px;">
+      <button id="close-shortcuts-btn" class="spec-modal-close-btn">✕</button>
+      <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Power-User Keyboard Shortcuts</h2>
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 20px;">
+        Navigate your Second Brain effortlessly with built-in keyboard hotkeys:
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+          <span>Focus RAG Search Bar</span>
+          <span><kbd>Ctrl</kbd> + <kbd>K</kbd></span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+          <span>Open Shortcuts Help</span>
+          <span><kbd>Shift</kbd> + <kbd>?</kbd></span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+          <span>Close Drawers & Modals</span>
+          <span><kbd>Esc</kbd></span>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 4px;">
+          <span>Toggle Voice Assistant</span>
+          <span><kbd>Click Mic</kbd></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>
+
+  <!-- Floating AI Assistant Widget -->
+  <div id="nexus-bot-widget" class="nexus-bot-widget">
+    <div id="nexus-bot-widget-header" class="nexus-bot-widget-header">
+      <div class="nexus-bot-widget-identity">
+        <div class="nexus-mini-avatar-wrapper">
+          <img src="assets/nexus_bot.png" alt="Nexus AI Companion" class="nexus-mini-avatar-img nexus-bot-avatar-img">
+        </div>
+        <div class="nexus-bot-title-text">
+          <span>Nexus AI Assistant</span>
+          <span class="nexus-bot-subtitle-text">● Live Companion</span>
+        </div>
+      </div>
+      <button id="nexus-bot-toggle-btn" class="nexus-bot-toggle-btn" title="Minimize/Expand Console">–</button>
+    </div>
+    <div id="nexus-bot-widget-body" class="nexus-bot-widget-body">
+      <div id="nexus-bot-dialogue" class="nexus-bot-dialogue">
+        Hi! I'm Nexus, your AI assistant. Ask me anything or capture notes on the fly.
+      </div>
+      <div class="nexus-bot-quick-bar">
+        <input type="text" id="nexus-bot-quick-input" class="input-field nexus-bot-quick-input" placeholder="Ask or capture memo...">
+        <button id="nexus-bot-quick-submit" class="btn btn-primary nexus-bot-quick-btn">Send</button>
+      </div>
+      <div id="nexus-bot-consolidated-feed"></div>
+    </div>
+  </div>
 
   <!-- JavaScript Modules -->
   <script src="js/nlp-engine.js"></script>
@@ -450,7 +642,9 @@
   <script src="js/graph-visualizer.js"></script>
   <script src="js/ai-engine.js"></script>
   <script src="js/store.js"></script>
+  <script src="js/gemini-color-flow.js"></script>
+  <script src="js/nexus-bot.js"></script>
+  <script src="js/developer-hud.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
-

@@ -1,181 +1,97 @@
 /**
- * Second Brain AI System — RAG Engine
- * Grounded Retrieval-Augmented Generation & Multi-Turn Conversational Interface
+ * Second Brain AI System — RAG (Retrieval-Augmented Generation) Engine
+ * Custom local vector search with TF-IDF cosine similarity, grounded citation extraction, and AI synthesis
  */
 
 (function (global) {
   'use strict';
 
-  let NLPEngineRef = null;
-
-  function getNLP() {
-    if (NLPEngineRef) return NLPEngineRef;
-    if (typeof require !== 'undefined') {
-      try {
-        NLPEngineRef = require('./nlp-engine');
-      } catch (e) {
-        NLPEngineRef = global.NLPEngine;
-      }
-    } else {
-      NLPEngineRef = global.NLPEngine;
-    }
-    return NLPEngineRef;
-  }
-
   const RAGEngine = {
-    // Current session conversation history
     sessionHistory: [],
 
-    /**
-     * Resets the conversation session memory
-     */
     resetSession: function () {
       this.sessionHistory = [];
     },
 
     /**
-     * Performs semantic vector search across notes
-     * @param {string} query 
-     * @param {Array} notes Array of note objects
-     * @param {number} topK Number of top matches to retrieve
-     * @returns {Array<{note: Object, score: number}>}
+     * Executes RAG Query against local note vault
      */
-    retrieveRelevantNotes: function (query, notes, topK = 5) {
-      const nlp = getNLP();
-      if (!query || !notes || notes.length === 0) return [];
+    query: function (queryText, notes, options = {}) {
+      if (!queryText || !Array.isArray(notes) || notes.length === 0) {
+        const fallbackRes = {
+          answer: "Please enter a valid search query to retrieve grounded insights from your Second Brain.",
+          citations: [],
+          isGrounded: false,
+          isGeneralKnowledge: false
+        };
+        return fallbackRes;
+      }
 
-      const queryVec = nlp.createTFVector(query);
-      const queryTokens = nlp.tokenize(query);
-      const queryLower = query.toLowerCase();
+      // Check multi-turn follow-up
+      let effectiveQuery = queryText;
+      const isFollowUp = /(this topic|that|what else|more about|tell me more|on this)/i.test(queryText);
+      if (isFollowUp && this.sessionHistory.length > 0) {
+        const lastQuery = this.sessionHistory[this.sessionHistory.length - 1].query;
+        effectiveQuery = `${lastQuery} ${queryText}`;
+      }
 
+      let nlp = typeof NLPEngine !== 'undefined' ? NLPEngine : null;
+      if (!nlp && typeof global !== 'undefined' && global.NLPEngine) nlp = global.NLPEngine;
+      if (!nlp && typeof require === 'function') {
+        try { nlp = require('./nlp-engine'); } catch (e) {}
+      }
+
+      const qTokens = effectiveQuery.toLowerCase().split(/\W+/).filter(t => t.length > 2);
+      const queryVector = nlp ? nlp.createTFVector(effectiveQuery) : null;
+
+      // Calculate semantic similarity scores & keyword matches for all notes
       const scoredNotes = notes.map(note => {
-        // Compute content vector similarity
-        const noteText = `${note.title} ${note.summary || ''} ${note.content} ${(note.tags || []).join(' ')} ${(note.entities ? Object.values(note.entities).flat().join(' ') : '')}`;
-        const noteVec = nlp.createTFVector(noteText);
-        let score = nlp.cosineSimilarity(queryVec, noteVec);
+        const fullText = `${note.title} ${note.summary || ''} ${note.content} ${(note.tags || []).join(' ')}`;
+        const noteVector = nlp ? nlp.createTFVector(fullText) : null;
+        let simScore = (nlp && queryVector && noteVector) ? nlp.cosineSimilarity(queryVector, noteVector) : 0;
+        
+        const fullTextLower = fullText.toLowerCase();
+        let keywordMatches = 0;
+        qTokens.forEach(token => {
+          if (fullTextLower.includes(token)) keywordMatches++;
+        });
 
-        const titleLower = note.title.toLowerCase();
-        const contentLower = (note.content || '').toLowerCase();
-
-        // Title token match boost
-        for (const token of queryTokens) {
-          if (titleLower.includes(token)) {
-            score += 0.20;
-          }
-          if (note.tags && note.tags.some(t => t.toLowerCase().includes(token))) {
-            score += 0.12;
-          }
-          if (contentLower.includes(token)) {
-            score += 0.05;
-          }
-        }
-
-        // Exact phrase matching boost
-        if (queryTokens.length > 1 && contentLower.includes(queryLower)) {
-          score += 0.35;
-        }
-        if (queryTokens.length > 1 && titleLower.includes(queryLower)) {
-          score += 0.45;
-        }
-
-        // Entity matching boost
-        if (note.entities) {
-          const allEntities = Object.values(note.entities).flat().map(e => String(e).toLowerCase());
-          for (const token of queryTokens) {
-            if (allEntities.some(ent => ent.includes(token))) {
-              score += 0.15;
-            }
-          }
-        }
-
-        // Date keyword boosting (e.g., "January", "last month", "2026")
-        const dateKeywords = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december', 'last month', 'yesterday'];
-        for (const dateKw of dateKeywords) {
-          if (queryLower.includes(dateKw)) {
-            if (note.dateStr && note.dateStr.toLowerCase().includes(dateKw)) {
-              score += 0.25;
-            }
-          }
-        }
-
-        return { note, score };
+        const combinedScore = simScore + (keywordMatches * 0.1);
+        return { note, score: combinedScore, keywordMatches };
       });
 
-      // Sort descending by score
-      scoredNotes.sort((a, b) => b.score - a.score);
+      // Filter and sort matching notes
+      let matches = scoredNotes
+        .filter(item => item.score > 0.01 || item.keywordMatches > 0)
+        .sort((a, b) => b.score - a.score);
 
-      // Filter notes with positive relevance score
-      return scoredNotes.filter(item => item.score > 0.01).slice(0, topK);
-    },
-
-    /**
-     * Synthesizes a grounded response based on retrieved notes & AI knowledge engine
-     * @param {string} query 
-     * @param {Array} notes All available notes
-     * @returns {{answer: string, citations: Array, retrievedNotes: Array, isGrounded: boolean, isGeneralKnowledge: boolean}}
-     */
-    query: function (query, notes) {
-      const nlp = getNLP();
-      const trimmedQuery = query.trim();
-      
-      // Handle follow-up query resolution if history exists
-      let augmentedQuery = trimmedQuery;
-      if (this.sessionHistory.length > 0 && (
-          trimmedQuery.toLowerCase().startsWith('what else') ||
-          trimmedQuery.toLowerCase().includes('tell me more') ||
-          trimmedQuery.toLowerCase().includes('elaborate') ||
-          trimmedQuery.toLowerCase().includes('more details') ||
-          trimmedQuery.toLowerCase().startsWith('explain')
-        )) {
-        const lastQuery = this.sessionHistory[this.sessionHistory.length - 1].query;
-        augmentedQuery = `${lastQuery} ${trimmedQuery}`;
+      if (matches.length === 0 && notes.length > 0) {
+        matches = scoredNotes.sort((a, b) => b.score - a.score).slice(0, 2);
       }
 
-      const results = this.retrieveRelevantNotes(augmentedQuery, notes, 5);
+      let response;
+      if (matches.length > 0 && matches[0].score > 0) {
+        const retrievedNotes = matches.slice(0, 4).map(m => m.note);
+        const synthesizedAnswer = this.synthesizeDynamicAnswer(effectiveQuery, retrievedNotes);
 
-      if (results.length === 0) {
-        // AI Fallback Synthesis when no specific saved notes match
-        const synthesizedAIAnswer = this.generateFallbackAISynthesis(trimmedQuery);
-        
-        const responseObj = {
-          query: trimmedQuery,
-          answer: synthesizedAIAnswer,
-          citations: [],
-          retrievedNotes: [],
-          isGrounded: false,
-          isGeneralKnowledge: true,
-          timestamp: new Date().toISOString()
+        response = {
+          answer: synthesizedAnswer,
+          citations: retrievedNotes,
+          isGrounded: true,
+          isGeneralKnowledge: false
         };
-
-        this.sessionHistory.push(responseObj);
-        return responseObj;
+      } else {
+        // Fallback: AI General Knowledge Synthesis
+        response = {
+          answer: this.generateFallbackAISynthesis(effectiveQuery),
+          citations: [],
+          isGrounded: false,
+          isGeneralKnowledge: true
+        };
       }
 
-      // Build answer from top results with explicit citations
-      const retrievedNotes = results.map(r => r.note);
-      const citations = results.map(r => ({
-        id: r.note.id,
-        title: r.note.title,
-        date: r.note.dateStr || 'Saved Note',
-        sourceType: r.note.sourceType,
-        summary: r.note.summary || r.note.content.substring(0, 120) + '...'
-      }));
-
-      // Dynamic Intelligent Answer Synthesis
-      const synthesisText = this.synthesizeDynamicAnswer(trimmedQuery, retrievedNotes);
-
-      const responseObj = {
-        query: trimmedQuery,
-        answer: synthesisText,
-        citations: citations,
-        retrievedNotes: retrievedNotes,
-        isGrounded: true,
-        isGeneralKnowledge: false,
-        timestamp: new Date().toISOString()
-      };
-
-      this.sessionHistory.push(responseObj);
-      return responseObj;
+      this.sessionHistory.push({ query: queryText, response });
+      return response;
     },
 
     /**
@@ -185,7 +101,7 @@
       if (retrievedNotes.length === 0) return '';
 
       const topNote = retrievedNotes[0];
-      let synthesis = `### 🧠 Grounded Insight from Your Second Brain\n\n`;
+      let synthesis = `### Grounded Insight from Your Second Brain\n\n`;
 
       if (retrievedNotes.length === 1) {
         synthesis += `Based on your note **"${topNote.title}"** (${topNote.dateStr}):\n\n`;
@@ -207,7 +123,7 @@
         });
       }
 
-      synthesis += `\n---\n#### 💡 Actionable Takeaways:\n`;
+      synthesis += `\n---\n#### Actionable Takeaways:\n`;
       synthesis += `• **Core Concept**: ${topNote.summary || topNote.title}\n`;
       synthesis += `• **Surfaces Ingested**: Surfaced across ${[...new Set(retrievedNotes.map(n => n.sourceType))].join(', ')} captures.\n`;
       synthesis += `• **Next Steps**: You can click any cited note pill below to open its full view or edit its contents.`;
@@ -224,13 +140,13 @@
       // Handle greetings and conversational prompts
       const greetings = ['hi', 'hii', 'hiii', 'hello', 'hey', 'heyy', 'greetings', 'good morning', 'good afternoon', 'good evening', 'who are you', 'what can you do', 'help', 'how are you', 'what is this'];
       if (greetings.some(g => qLower === g || qLower.startsWith(g + ' ') || qLower.startsWith(g + '!'))) {
-        return `### 👋 Hello! Welcome to your Second Brain AI
+        return `### Hello! Welcome to your Second Brain AI
 
 I am your personal AI knowledge assistant, indexing **100+ saved notes**, voice memos, web clips, and research documents.
 
-#### 💡 How I can help you:
+#### How I can help you:
 • **Ask Questions**: Type or speak any question about your notes (e.g. *"What did I save about deep learning?"* or *"Startup idea in January"*).
-• **Voice Q&A**: Click the **🎙️ Voice Assistant** button to talk out loud!
+• **Voice Q&A**: Click the **Voice Assistant** button to talk out loud!
 • **Grounded Answers**: I retrieve exact answers from your notes with clickable source citations.
 • **AI Synthesizer**: If a topic isn't in your notes yet, I can synthesize an answer and let you save it as a new note.
 
@@ -254,10 +170,10 @@ What would you like to explore today?`;
         bodyText = `Here is an intelligent overview regarding "${query}": Personal Knowledge Management (PKM) enables you to offload mental storage so you can focus on creative synthesis. Capture raw ideas, tag key concepts, and use RAG semantic search to retrieve them instantly.`;
       }
 
-      let res = `### 🌐 ${topicHeading}\n\n`;
+      let res = `### ${topicHeading}\n\n`;
       res += `${bodyText}\n\n`;
-      res += `> 📌 *Note: No existing notes in your local vault explicitly contained this exact query. Synthesized via Second Brain built-in AI Knowledge Engine.*\n\n`;
-      res += `⚡ **Would you like to save this response as a new note in your Second Brain?** Use the **"⚡ Save to Vault"** button below!`;
+      res += `> *Note: No existing notes in your local vault explicitly contained this exact query. Synthesized via Second Brain built-in AI Knowledge Engine.*\n\n`;
+      res += `**Would you like to save this response as a new note in your Second Brain?** Use the **"Save to Vault"** button below!`;
 
       return res;
     }
@@ -270,6 +186,4 @@ What would you like to explore today?`;
     global.RAGEngine = RAGEngine;
   }
 
-})(typeof window !== 'undefined' ? window : globalThis);
-
-
+})(typeof window !== 'undefined' ? window : this);

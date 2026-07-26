@@ -1,27 +1,32 @@
-/**
- * Second Brain AI System — Main Application Controller
- */
+/* 
+  Second Brain AI System — Client App Controller
+  Implements multi-view navigation, RAG Q&A, Capture Hub forms,
+  Vault grid, Flashcard recall, and Dashboard analytics.
+*/
 
-(function () {
+(function() {
   'use strict';
 
   document.addEventListener('DOMContentLoaded', () => {
-    // DOM Elements
+    // ----------------------------------------------------
+    // DOM Element References
+    // ----------------------------------------------------
     const navTabs = document.querySelectorAll('.nav-tab');
     const viewSections = document.querySelectorAll('.view-section');
+
     const syncBadge = document.getElementById('sync-badge');
     const privacyBadge = document.getElementById('privacy-badge');
     const totalNotesCountEl = document.getElementById('total-notes-count');
 
-    // Conversational RAG Elements
+    // Conversational Q&A (Jarvis) Elements
     const ragQueryInput = document.getElementById('rag-query-input');
     const ragSubmitBtn = document.getElementById('rag-submit-btn');
     const voiceTriggerBtn = document.getElementById('voice-trigger-btn');
     const waveCanvas = document.getElementById('waveform-canvas');
     const chatContainer = document.getElementById('chat-container');
-    const sampleQueryBtns = document.querySelectorAll('.sample-query-btn');
 
     // Capture Hub Elements
+    const sampleQueryBtns = document.querySelectorAll('.sample-query-btn');
     const captureTabs = document.querySelectorAll('.capture-tab');
     const capturePanels = document.querySelectorAll('.capture-panel');
     const typeForm = document.getElementById('type-capture-form');
@@ -32,7 +37,7 @@
     const fileInput = document.getElementById('file-input');
     const emailForm = document.getElementById('email-form');
 
-    // Vault & Search Elements
+    // Knowledge Vault Elements
     const vaultSearchInput = document.getElementById('vault-search');
     const categoryFilterSelect = document.getElementById('category-filter');
     const sourceTypeFilterSelect = document.getElementById('sourcetype-filter');
@@ -45,26 +50,20 @@
     const drawerMeta = document.getElementById('drawer-meta');
     const drawerBody = document.getElementById('drawer-body');
     const enhanceNoteBtn = document.getElementById('enhance-note-btn');
-    let currentOpenedNote = null;
-
-    // Resurfacing Elements
-    const resurfacingGrid = document.getElementById('resurfacing-grid');
 
     // Flashcard Elements
+    const flashcardProgressText = document.getElementById('flashcard-progress-text');
     const flashcardCard = document.getElementById('flashcard-card');
     const fcCategoryBadge = document.getElementById('fc-category-badge');
     const fcQuestion = document.getElementById('fc-question');
     const fcAnswer = document.getElementById('fc-answer');
     const fcSourceTitle = document.getElementById('fc-source-title');
-    const fcNextBtn = document.getElementById('fc-next-btn');
     const fcRatingHard = document.getElementById('fc-rating-hard');
     const fcRatingGood = document.getElementById('fc-rating-good');
     const fcRatingEasy = document.getElementById('fc-rating-easy');
-    const flashcardProgressText = document.getElementById('flashcard-progress-text');
-    let activeFlashcards = [];
-    let currentFlashcardIdx = 0;
+    const fcNextBtn = document.getElementById('fc-next-btn');
 
-    // Dashboard Elements
+    // Analytics Dashboard Elements
     const statTotalNotes = document.getElementById('stat-total-notes');
     const statSurfacesCount = document.getElementById('stat-surfaces-count');
     const statEntitiesCount = document.getElementById('stat-entities-count');
@@ -72,40 +71,82 @@
     const surfaceDistributionList = document.getElementById('surface-distribution-list');
     const topicTagCloud = document.getElementById('topic-tag-cloud');
 
+    // Proactive Resurfacing Elements
+    const resurfacingGrid = document.getElementById('resurfacing-grid');
+
     // Settings Elements
     const privacyToggle = document.getElementById('privacy-toggle');
     const ttsToggle = document.getElementById('tts-toggle');
+    const apiKeyInput = document.getElementById('api-key-input');
     const exportVaultBtn = document.getElementById('export-vault-btn');
     const importVaultInput = document.getElementById('import-vault-input');
     const resetSampleBtn = document.getElementById('reset-sample-btn');
-    const apiKeyInput = document.getElementById('api-key-input');
+
+    // Theme Switcher Elements
+    const themePillBtns = document.querySelectorAll('.theme-pill-btn');
 
     // Toast Container
     const toastContainer = document.getElementById('toast-container');
 
-    // Initialize Store
+    // State Variables
+    let activeFlashcards = [];
+    let currentFlashcardIdx = 0;
+    let currentOpenedNote = null;
+
+    // ----------------------------------------------------
+    // Core System Initialization
+    // ----------------------------------------------------
+    Store.init();
     updateHeaderStats();
 
-    // Init Voice Engine & Waveform
+    // Theme Switcher Initialization
+    const savedTheme = Store.settings.theme || 'gemini-light';
+    applyTheme(savedTheme);
+
+    themePillBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const theme = btn.getAttribute('data-theme');
+        if (theme) {
+          applyTheme(theme);
+          Store.updateSettings({ theme });
+        }
+      });
+    });
+
+    function applyTheme(themeName) {
+      document.documentElement.setAttribute('data-theme', themeName);
+      themePillBtns.forEach(b => {
+        if (b.getAttribute('data-theme') === themeName) {
+          b.classList.add('active');
+        } else {
+          b.classList.remove('active');
+        }
+      });
+      if (typeof GeminiColorFlowEngine !== 'undefined') {
+        GeminiColorFlowEngine.setThemePalette(themeName);
+      }
+    }
+
+    // Init Voice Engine Callback
     if (typeof VoiceEngine !== 'undefined') {
       VoiceEngine.init({
-        onTranscript: (text, isFinal) => {
-          if (ragQueryInput) ragQueryInput.value = text;
-          if (isFinal) {
-            handleRAGQuery(text);
-          }
-        },
         onStateChange: (state) => {
+          if (typeof GeminiColorFlowEngine !== 'undefined') {
+            GeminiColorFlowEngine.triggerState(state);
+          }
+          if (typeof NexusBotEngine !== 'undefined') {
+            NexusBotEngine.setState(state);
+          }
           if (voiceTriggerBtn) {
             if (state === 'listening') {
               voiceTriggerBtn.classList.add('listening');
-              voiceTriggerBtn.innerHTML = '🎙️ Listening...';
+              voiceTriggerBtn.innerHTML = 'Listening...';
             } else if (state === 'speaking') {
               voiceTriggerBtn.classList.add('speaking');
-              voiceTriggerBtn.innerHTML = '🔊 Speaking...';
+              voiceTriggerBtn.innerHTML = 'Speaking...';
             } else {
               voiceTriggerBtn.classList.remove('listening', 'speaking');
-              voiceTriggerBtn.innerHTML = '🎙️ Voice Assistant';
+              voiceTriggerBtn.innerHTML = 'Voice Assistant';
             }
           }
         }
@@ -207,11 +248,22 @@
     function handleRAGQuery(query) {
       if (!query || typeof RAGEngine === 'undefined') return;
 
+      const queryStartTimeMs = typeof performance !== 'undefined' ? performance.now() : Date.now();
+
+      if (typeof GeminiColorFlowEngine !== 'undefined') {
+        GeminiColorFlowEngine.triggerState('thinking', 4000);
+      }
+
+      if (typeof NexusBotEngine !== 'undefined') {
+        NexusBotEngine.setState('thinking');
+        NexusBotEngine.speak(`Searching 100+ notes for "${query.substring(0, 30)}..."`, 4000);
+      }
+
       // Render user message card immediately
       appendChatMessage('user', query);
       if (ragQueryInput) ragQueryInput.value = '';
 
-      // Set UI controls & Cards to Gemini color-changing processing state
+      // Set UI controls
       const submitBtn = document.getElementById('rag-submit-btn');
       const jarvisOrb = document.getElementById('jarvis-orb');
       const headerCard = document.querySelector('.jarvis-header-card');
@@ -219,22 +271,17 @@
 
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '✨ Synthesizing...';
-        submitBtn.classList.add('gemini-processing');
+        submitBtn.innerHTML = 'Synthesizing...';
       }
 
-      if (jarvisOrb) jarvisOrb.classList.add('gemini-processing');
-      if (headerCard) headerCard.classList.add('gemini-processing-border');
-      if (chatWrapper) chatWrapper.classList.add('gemini-processing-border');
-
-      // Render Gemini Thinking indicator card in chat stream
+      // Render Thinking indicator card in chat stream
       const thinkingCard = document.createElement('div');
       thinkingCard.className = 'chat-bubble ai-bubble thinking-bubble glass-card';
       thinkingCard.id = 'gemini-thinking-card';
       thinkingCard.innerHTML = `
         <div class="chat-header">
-          <div class="ai-avatar gemini-avatar-flow">✨</div>
-          <strong class="gemini-text-flow">Gemini RAG Vector Engine...</strong>
+          <div class="ai-avatar">•</div>
+          <strong>Vector RAG Engine...</strong>
         </div>
         <div class="thinking-status-content">
           <div class="gemini-spinner"></div>
@@ -251,27 +298,26 @@
         chatWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
 
-      // Simulate dynamic color-shifting backend synthesis delay (~800ms)
+      // Simulate backend synthesis delay (~800ms)
       setTimeout(() => {
         // Remove thinking card
         if (thinkingCard && thinkingCard.parentNode) {
           thinkingCard.remove();
         }
 
-        // Restore button, orb, and card border states
+        // Restore button state
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.innerHTML = '✨ Query RAG';
-          submitBtn.classList.remove('gemini-processing');
+          submitBtn.innerHTML = 'Search Notes';
         }
-
-        if (jarvisOrb) jarvisOrb.classList.remove('gemini-processing');
-        if (headerCard) headerCard.classList.remove('gemini-processing-border');
-        if (chatWrapper) chatWrapper.classList.remove('gemini-processing-border');
 
         // Perform Grounded RAG Query
         const currentNotes = Store.getNotes();
         const response = RAGEngine.query(query, currentNotes);
+
+        if (typeof DeveloperHUDEngine !== 'undefined') {
+          DeveloperHUDEngine.recordQueryLatency(queryStartTimeMs);
+        }
 
         // Render final AI answer card with citations
         appendChatMessage('ai', response.answer, response.citations, response.isGeneralKnowledge, query);
@@ -293,16 +339,16 @@
       msgCard.className = `chat-bubble ${sender}-bubble glass-card`;
 
       if (sender === 'user') {
-        msgCard.innerHTML = `<div class="chat-header"><strong>👤 You</strong></div><div class="chat-text">${escapeHTML(text)}</div>`;
+        msgCard.innerHTML = `<div class="chat-header"><strong>You</strong></div><div class="chat-text">${escapeHTML(text)}</div>`;
       } else {
         let citationsHTML = '';
         if (citations && citations.length > 0) {
           citationsHTML = `<div class="citations-container">
-            <div class="citations-title">📌 Grounded Sources (${citations.length} Notes Cited):</div>
+            <div class="citations-title">Grounded Sources (${citations.length} Notes Cited):</div>
             <div class="citations-list">
               ${citations.map(c => `
                 <a class="citation-pill" data-id="${c.id}">
-                  📄 ${escapeHTML(c.title)} <span class="citation-date">(${escapeHTML(c.date)})</span>
+                  ${escapeHTML(c.title)} <span class="citation-date">(${escapeHTML(c.date)})</span>
                 </a>
               `).join('')}
             </div>
@@ -310,13 +356,13 @@
         }
 
         const actionsHTML = `<div class="chat-actions-bar">
-          <button class="chat-action-btn speak-btn" title="Listen to AI answer">🔊 Read Aloud</button>
-          <button class="chat-action-btn copy-btn" title="Copy answer">📋 Copy Text</button>
-          ${isGeneralKnowledge ? `<button class="chat-action-btn save-answer-btn" title="Save answer to Second Brain">⚡ Save to Vault</button>` : ''}
+          <button class="chat-action-btn speak-btn" title="Listen to AI answer">Read Aloud</button>
+          <button class="chat-action-btn copy-btn" title="Copy answer">Copy Text</button>
+          ${isGeneralKnowledge ? `<button class="chat-action-btn save-answer-btn" title="Save answer to Second Brain">Save to Vault</button>` : ''}
         </div>`;
 
         msgCard.innerHTML = `<div class="chat-header">
-          <div class="ai-avatar">✨</div>
+          <div class="ai-avatar">•</div>
           <strong style="color: var(--accent-indigo);">Second Brain AI Assistant</strong>
         </div>
         <div class="chat-text">${formatMarkdownText(text)}</div>
@@ -351,7 +397,7 @@
       if (copyBtn) {
         copyBtn.addEventListener('click', () => {
           navigator.clipboard.writeText(text);
-          showToast('📋 Answer copied to clipboard!');
+          showToast('Answer copied to clipboard.');
         });
       }
 
@@ -364,7 +410,7 @@
             content: text.replace(/###|####|>|\*/g, ''),
             sourceType: 'typing'
           });
-          showToast('⚡ Saved answer as a new note in your Second Brain!');
+          showToast('Saved answer as a new note in your Second Brain.');
           refreshAllViews();
         });
       }
@@ -394,7 +440,7 @@
 
         if (content) {
           Store.addNote({ title, content, sourceType: 'typing' });
-          showToast('✨ Note saved and auto-tagged successfully!');
+          showToast('Note saved and auto-tagged successfully.');
           typeForm.reset();
           refreshAllViews();
         }
@@ -408,20 +454,20 @@
         if (!isRecordingMemo) {
           isRecordingMemo = true;
           voiceRecordBtn.classList.add('recording');
-          voiceRecordBtn.innerHTML = '🛑 Stop Recording';
+          voiceRecordBtn.innerHTML = 'Stop Recording';
           if (voiceStatusText) voiceStatusText.textContent = 'Listening to voice memo... (Speak your thoughts)';
           if (typeof VoiceEngine !== 'undefined') VoiceEngine.startListen();
         } else {
           isRecordingMemo = false;
           voiceRecordBtn.classList.remove('recording');
-          voiceRecordBtn.innerHTML = '🎙️ Start Voice Memo';
+          voiceRecordBtn.innerHTML = 'Start Voice Memo';
           if (voiceStatusText) voiceStatusText.textContent = 'Transcribing audio with Whisper & auto-tagging...';
           if (typeof VoiceEngine !== 'undefined') VoiceEngine.stopListen();
 
           setTimeout(() => {
             const simulatedVoiceText = "Voice Memo: Key considerations for distributed system consensus and latency minimization in microservices architecture.";
             Store.addNote({ title: "Voice Note: Distributed Systems & Latency", content: simulatedVoiceText, sourceType: 'voice' });
-            showToast('🎙️ Voice memo transcribed & saved!');
+            showToast('Voice memo transcribed & saved.');
             if (voiceStatusText) voiceStatusText.textContent = 'Click microphone to record a voice memo.';
             refreshAllViews();
           }, 1000);
@@ -444,7 +490,7 @@
             sourceType: text ? 'clip' : 'bookmark',
             sourceUrl: url
           });
-          showToast('🌐 Web content clipped & saved!');
+          showToast('Web content clipped & saved.');
           clipperForm.reset();
           refreshAllViews();
         }
@@ -457,7 +503,7 @@
       fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
-          showToast(`📄 Running OCR & NLP extraction on ${file.name}...`);
+          showToast(`Running OCR & NLP extraction on ${file.name}...`);
           setTimeout(() => {
             Store.addNote({
               title: `PDF Extract: ${file.name}`,
@@ -465,7 +511,7 @@
               sourceType: 'file',
               sourceUrl: file.name
             });
-            showToast(`✅ File ${file.name} parsed and saved!`);
+            showToast(`File ${file.name} parsed and saved.`);
             refreshAllViews();
           }, 1200);
         }
@@ -487,7 +533,7 @@
             sourceType: 'email',
             sourceUrl: `email:${sender}`
           });
-          showToast('📧 Forwarded email saved to Second Brain!');
+          showToast('Forwarded email saved to Second Brain.');
           emailForm.reset();
           refreshAllViews();
         }
@@ -540,10 +586,10 @@
           </div>
           <div class="note-card-actions">
             <button class="btn-icon pin-btn" data-id="${note.id}" title="${note.pinned ? 'Unpin Note' : 'Pin Note'}">
-              ${note.pinned ? '📌 Pinned' : '📌 Pin'}
+              ${note.pinned ? 'Pinned' : 'Pin'}
             </button>
-            <button class="btn-icon view-btn" data-id="${note.id}">👁️ View</button>
-            <button class="btn-icon delete-btn" data-id="${note.id}">🗑️</button>
+            <button class="btn-icon view-btn" data-id="${note.id}">View</button>
+            <button class="btn-icon delete-btn" data-id="${note.id}">Delete</button>
           </div>
         </div>
       `).join('');
@@ -572,7 +618,7 @@
           e.stopPropagation();
           const noteId = btn.getAttribute('data-id');
           Store.deleteNote(noteId);
-          showToast('🗑️ Note deleted.');
+          showToast('Note deleted.');
           refreshAllViews();
         });
       });
@@ -590,19 +636,19 @@
       }
       if (drawerBody) {
         drawerBody.innerHTML = `
-          <div style="margin-bottom: 1.25rem;">
-            <h4 style="color: var(--accent-cyan); margin-bottom: 0.4rem;">Distilled Summary:</h4>
-            <p style="background: rgba(255, 255, 255, 0.05); padding: 0.85rem; border-radius: 8px; border-left: 3px solid var(--accent-indigo);">
+          <div style="margin-bottom: 20px;">
+            <h4 style="color: var(--accent-indigo); margin-bottom: 6px;">Distilled Summary:</h4>
+            <p style="background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 6px; border-left: 3px solid var(--accent-indigo);">
               ${escapeHTML(note.summary || note.content)}
             </p>
           </div>
-          <div style="margin-bottom: 1.25rem;">
-            <h4 style="color: var(--text-primary); margin-bottom: 0.4rem;">Full Note Content:</h4>
-            <p style="white-space: pre-wrap; line-height: 1.6;">${formatMarkdownText(note.content)}</p>
+          <div style="margin-bottom: 20px;">
+            <h4 style="color: var(--text-primary); margin-bottom: 6px;">Full Note Content:</h4>
+            <p style="white-space: pre-wrap; line-height: 1.5;">${formatMarkdownText(note.content)}</p>
           </div>
-          <div style="margin-bottom: 1rem;">
-            <h4 style="color: var(--accent-violet); margin-bottom: 0.4rem;">Extracted Entities & Tags:</h4>
-            <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+          <div style="margin-bottom: 16px;">
+            <h4 style="color: var(--accent-violet); margin-bottom: 6px;">Extracted Entities & Tags:</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
               ${(note.tags || []).map(t => `<span class="tag-pill" style="border-color: var(--accent-indigo);">#${escapeHTML(t)}</span>`).join('')}
               ${note.entities ? Object.entries(note.entities).flatMap(([cat, list]) => (list || []).map(item => `<span class="tag-pill" style="border-color: var(--accent-emerald);">[${cat.toUpperCase()}] ${escapeHTML(item)}</span>`)).join('') : ''}
             </div>
@@ -624,7 +670,7 @@
         const enhancedContent = aiEngine.enhanceNote(currentOpenedNote.title, currentOpenedNote.content);
         currentOpenedNote.content = enhancedContent;
         Store.saveNotes();
-        showToast('✨ Note enhanced with AI takeaways and action items!');
+        showToast('Note enhanced with AI takeaways and action items.');
         openNoteDrawer(currentOpenedNote);
         refreshAllViews();
       });
@@ -669,7 +715,7 @@
     [fcRatingHard, fcRatingGood, fcRatingEasy].forEach(btn => {
       if (btn) {
         btn.addEventListener('click', () => {
-          showToast('🎯 Flashcard recall score updated!');
+          showToast('Flashcard recall score updated.');
           currentFlashcardIdx++;
           renderCurrentFlashcard();
         });
@@ -690,13 +736,13 @@
 
       if (surfaceDistributionList) {
         surfaceDistributionList.innerHTML = Object.entries(stats.surfaceCounts).map(([type, count]) => `
-          <div style="margin-bottom: 0.8rem;">
-            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
+          <div style="margin-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
               <span>${type.toUpperCase()}</span>
               <span>${count} notes (${Math.round((count / stats.totalNotes) * 100)}%)</span>
             </div>
-            <div style="height: 8px; background: rgba(255, 255, 255, 0.08); border-radius: 4px; overflow: hidden;">
-              <div style="height: 100%; width: ${(count / stats.totalNotes) * 100}%; background: linear-gradient(90deg, var(--accent-indigo), var(--accent-cyan)); border-radius: 4px;"></div>
+            <div style="height: 6px; background: rgba(255, 255, 255, 0.06); border-radius: 3px; overflow: hidden;">
+              <div style="height: 100%; width: ${(count / stats.totalNotes) * 100}%; background: var(--accent-indigo); border-radius: 3px;"></div>
             </div>
           </div>
         `).join('');
@@ -704,7 +750,7 @@
 
       if (topicTagCloud) {
         topicTagCloud.innerHTML = Object.entries(stats.tagDistribution).map(([tag, count]) => `
-          <span class="tag-pill" style="border-color: var(--accent-violet); font-size: 0.85rem; padding: 0.3rem 0.75rem;">
+          <span class="tag-pill" style="border-color: var(--border-color); font-size: 12px; padding: 4px 10px;">
             #${tag} (${count})
           </span>
         `).join('');
@@ -728,13 +774,13 @@
 
       resurfacingGrid.innerHTML = digestItems.map(item => `
         <div class="resurfacing-card glass-card">
-          <div class="resurfacing-badge">💡 FROM YOUR PAST NOTES</div>
+          <div class="resurfacing-badge">FROM YOUR PAST NOTES</div>
           <p class="resurfacing-reason">${escapeHTML(item.reason)}</p>
           <h4 class="resurfacing-title">${escapeHTML(item.note.title)}</h4>
           <p class="resurfacing-snippet">${escapeHTML(item.note.summary || item.note.content.substring(0, 120) + '...')}</p>
           <div class="resurfacing-actions">
-            <button class="btn btn-secondary view-resurfaced-btn" data-id="${item.note.id}" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">👁️ Open Note</button>
-            <button class="btn btn-secondary dismiss-resurfaced-btn" data-id="${item.note.id}" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">Dismiss</button>
+            <button class="btn btn-secondary view-resurfaced-btn" data-id="${item.note.id}" style="padding: 6px 12px; font-size: 13px;">Open Note</button>
+            <button class="btn btn-secondary dismiss-resurfaced-btn" data-id="${item.note.id}" style="padding: 6px 12px; font-size: 13px;">Dismiss</button>
           </div>
         </div>
       `).join('');
@@ -765,9 +811,9 @@
       privacyToggle.addEventListener('change', () => {
         Store.updateSettings({ privacyMode: privacyToggle.checked });
         if (privacyBadge) {
-          privacyBadge.textContent = privacyToggle.checked ? '🔒 On-Device Privacy Mode' : '🌐 Cloud Mode';
+          privacyBadge.textContent = privacyToggle.checked ? 'On-Device Privacy Mode' : 'Cloud Mode';
         }
-        showToast(privacyToggle.checked ? '🔒 On-Device Privacy Mode enabled.' : '🌐 Cloud Mode enabled.');
+        showToast(privacyToggle.checked ? 'On-Device Privacy Mode enabled.' : 'Cloud Mode enabled.');
       });
     }
 
@@ -775,7 +821,7 @@
       ttsToggle.checked = Store.settings.ttsEnabled;
       ttsToggle.addEventListener('change', () => {
         Store.updateSettings({ ttsEnabled: ttsToggle.checked });
-        showToast(ttsToggle.checked ? '🔊 Voice readout enabled.' : '🔇 Voice readout disabled.');
+        showToast(ttsToggle.checked ? 'Voice readout enabled.' : 'Voice readout disabled.');
       });
     }
 
@@ -783,7 +829,7 @@
       apiKeyInput.value = Store.settings.apiKey || '';
       apiKeyInput.addEventListener('change', () => {
         Store.updateSettings({ apiKey: apiKeyInput.value.trim() });
-        showToast('🔑 API key saved securely!');
+        showToast('API key saved securely.');
       });
     }
 
@@ -796,7 +842,7 @@
         document.body.appendChild(dlAnchor);
         dlAnchor.click();
         dlAnchor.remove();
-        showToast('📥 Vault exported as JSON!');
+        showToast('Vault exported as JSON.');
       });
     }
 
@@ -811,11 +857,11 @@
               if (Array.isArray(importedNotes)) {
                 Store.notes = importedNotes;
                 Store.saveNotes();
-                showToast(`📤 Imported ${importedNotes.length} notes successfully!`);
+                showToast(`Imported ${importedNotes.length} notes successfully.`);
                 refreshAllViews();
               }
             } catch (err) {
-              showToast('❌ Invalid JSON vault file.');
+              showToast('Invalid JSON vault file.');
             }
           };
           reader.readAsText(file);
@@ -828,7 +874,7 @@
         if (confirm('Reset vault data to 100 sample notes?')) {
           localStorage.removeItem('second_brain_notes_v2');
           Store.init();
-          showToast('🔄 Reset vault to 100 pre-seeded notes.');
+          showToast('Reset vault to 100 pre-seeded notes.');
           refreshAllViews();
         }
       });
@@ -895,15 +941,14 @@
     function formatMarkdownText(text) {
       if (!text) return '';
       return escapeHTML(text)
-        .replace(/### (.*?)(?=<br>|\n|$)/g, '<h3 style="color: var(--accent-indigo); margin: 0.5rem 0;">$1</h3>')
-        .replace(/#### (.*?)(?=<br>|\n|$)/g, '<h4 style="color: var(--accent-cyan); margin: 0.4rem 0;">$1</h4>')
+        .replace(/### (.*?)(?=<br>|\n|$)/g, '<h3 style="color: var(--accent-indigo); margin: 8px 0 4px;">$1</h3>')
+        .replace(/#### (.*?)(?=<br>|\n|$)/g, '<h4 style="color: var(--text-primary); margin: 6px 0 4px;">$1</h4>')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/`([^`]+)`/g, '<code style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-family: var(--font-code); font-size: 0.85em;">$1</code>')
+        .replace(/`([^`]+)`/g, '<code style="background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; font-family: var(--font-code); font-size: 0.85em;">$1</code>')
         .replace(/\n\n/g, '<br><br>')
         .replace(/• (.*?)(?=<br>|$)/g, '• $1');
     }
   });
 
 })();
-

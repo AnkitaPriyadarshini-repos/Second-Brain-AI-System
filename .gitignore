@@ -13,3 +13,9 @@ npm-debug.log*
 .vscode/
 .idea/
 Thumbs.db
+
+# Sub projects & Caches
+trippa-stayFinder-major-project/
+__pycache__/
+*.pyc
+
