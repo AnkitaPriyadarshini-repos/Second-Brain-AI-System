@@ -114,7 +114,10 @@
     });
 
     function applyTheme(themeName) {
-      document.documentElement.setAttribute('data-theme', themeName);
+      const root = document.documentElement || document.body || (typeof document !== 'undefined' ? document.querySelector('html') : null);
+      if (root && typeof root.setAttribute === 'function') {
+        root.setAttribute('data-theme', themeName);
+      }
       themePillBtns.forEach(b => {
         if (b.getAttribute('data-theme') === themeName) {
           b.classList.add('active');
@@ -235,6 +238,7 @@
     }
 
     document.addEventListener('click', (e) => {
+      if (!e || !e.target) return;
       const btn = e.target.closest('.sample-query-btn');
       if (btn) {
         e.preventDefault();
@@ -893,25 +897,32 @@
     // ----------------------------------------------------
     // Offline & Sync Listeners
     // ----------------------------------------------------
-    window.addEventListener('brain-sync-state', (e) => {
-      const { state, queueLength } = e.detail;
-      if (!syncBadge) return;
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+      window.addEventListener('brain-sync-state', (e) => {
+        if (!e || !e.detail) return;
+        const { state, queueLength } = e.detail;
+        if (!syncBadge) return;
 
-      if (state === 'offline') {
-        syncBadge.className = 'status-badge offline';
-        syncBadge.textContent = `Offline Queue (${queueLength})`;
-      } else if (state === 'syncing') {
-        syncBadge.className = 'status-badge syncing';
-        syncBadge.textContent = 'Syncing...';
-      } else {
-        syncBadge.className = 'status-badge synced';
-        syncBadge.textContent = 'Synced';
-      }
-    });
+        if (state === 'offline') {
+          syncBadge.className = 'status-badge offline';
+          syncBadge.textContent = `Offline Queue (${queueLength})`;
+        } else if (state === 'syncing') {
+          syncBadge.className = 'status-badge syncing';
+          syncBadge.textContent = 'Syncing...';
+        } else {
+          syncBadge.className = 'status-badge online';
+          syncBadge.textContent = '100% Synced (Local-First)';
+        }
+      });
 
-    // Toggle offline simulation on network change
-    window.addEventListener('offline', () => Store.setOffline(true));
-    window.addEventListener('online', () => Store.setOffline(false));
+      window.addEventListener('online', () => {
+        if (typeof Store !== 'undefined' && Store.processOfflineQueue) Store.processOfflineQueue();
+      });
+
+      window.addEventListener('offline', () => {
+        if (typeof Store !== 'undefined' && Store.notifyListeners) Store.notifyListeners();
+      });
+    }
 
     // ----------------------------------------------------
     // Utility Helpers
