@@ -13,8 +13,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/style.css?v=4.0">
-  <link rel="stylesheet" href="css/responsive.css?v=4.0">
+  <link rel="stylesheet" href="css/style.css?v=5.0">
+  <link rel="stylesheet" href="css/responsive.css?v=5.0">
 </head>
 <body>
 
@@ -571,24 +571,24 @@
       </div>
       <div class="nexus-bot-quick-bar">
         <input type="text" id="nexus-bot-quick-input" class="input-field nexus-bot-quick-input" placeholder="Ask Yellow Robot or capture memo...">
-        <button id="nexus-bot-quick-submit" class="btn btn-primary nexus-bot-quick-btn">Send</button>
+        <button id="nexus-bot-quick-submit" class="btn btn-primary nexus-bot-quick-btn" onclick="const val = document.getElementById('nexus-bot-quick-input').value; if(val){ window.triggerSampleQuery(val); document.getElementById('nexus-bot-quick-input').value = ''; }">Send</button>
       </div>
       <div id="nexus-bot-consolidated-feed"></div>
     </div>
   </div>
 
   <!-- JavaScript Modules -->
-  <script src="js/nlp-engine.js?v=4.0"></script>
-  <script src="js/store.js?v=4.0"></script>
-  <script src="js/rag-engine.js?v=4.0"></script>
-  <script src="js/voice-engine.js?v=4.0"></script>
-  <script src="js/audio-presets.js?v=4.0"></script>
-  <script src="js/resurfacing-engine.js?v=4.0"></script>
-  <script src="js/graph-visualizer.js?v=4.0"></script>
-  <script src="js/ai-engine.js?v=4.0"></script>
-  <script src="js/gemini-color-flow.js?v=4.0"></script>
-  <script src="js/nexus-bot.js?v=4.0"></script>
-  <script src="js/developer-hud.js?v=4.0"></script>
-  <script src="js/app.js?v=4.0"></script>
+  <script src="js/nlp-engine.js?v=5.0"></script>
+  <script src="js/store.js?v=5.0"></script>
+  <script src="js/rag-engine.js?v=5.0"></script>
+  <script src="js/voice-engine.js?v=5.0"></script>
+  <script src="js/audio-presets.js?v=5.0"></script>
+  <script src="js/resurfacing-engine.js?v=5.0"></script>
+  <script src="js/graph-visualizer.js?v=5.0"></script>
+  <script src="js/ai-engine.js?v=5.0"></script>
+  <script src="js/gemini-color-flow.js?v=5.0"></script>
+  <script src="js/nexus-bot.js?v=5.0"></script>
+  <script src="js/developer-hud.js?v=5.0"></script>
+  <script src="js/app.js?v=5.0"></script>
 </body>
 </html>
