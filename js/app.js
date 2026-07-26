@@ -190,12 +190,15 @@
       });
     }
 
-    sampleQueryBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.sample-query-btn');
+      if (btn) {
         const query = btn.getAttribute('data-query');
-        if (ragQueryInput) ragQueryInput.value = query;
-        handleRAGQuery(query);
-      });
+        if (query) {
+          if (ragQueryInput) ragQueryInput.value = query;
+          handleRAGQuery(query);
+        }
+      }
     });
 
     function handleRAGQuery(query) {
