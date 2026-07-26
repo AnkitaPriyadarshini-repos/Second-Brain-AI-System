@@ -87,9 +87,13 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
         Dashboard
       </button>
+      <button class="nav-tab" data-view="agents" role="tab" aria-selected="false">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><rect x="4" y="8" width="16" height="12" rx="2"/><circle cx="9" cy="13" r="1.5"/><circle cx="15" cy="13" r="1.5"/><path d="M9 17h6"/></svg>
+        AI Agents Fleet
+      </button>
       <button class="nav-tab" data-view="settings" role="tab" aria-selected="false">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        Privacy & System
+        Privacy &amp; System
       </button>
     </div>
   </nav>
@@ -436,6 +440,92 @@
       </div>
     </section>
 
+    <!-- View 7: AI Working Agents Fleet Hub -->
+    <section id="view-agents" class="view-section" aria-label="AI Working Agents Fleet Hub">
+      <div class="glass-card" style="margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h2 class="section-heading" style="display: flex; align-items: center; gap: 10px;">
+              <span>🤖 Specialized AI Working Agents Fleet</span>
+              <span class="status-badge online">● 6 AGENTS ACTIVE</span>
+            </h2>
+            <p class="section-subtext">
+              Autonomous on-device AI working agents that continuously process, summarize, quiz, connect, and resurface your personal knowledge base.
+            </p>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 20px;">
+          
+          <!-- Agent 1: Summarizer -->
+          <div class="glass-card agent-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--accent-indigo);">⚡ Summarizer &amp; Action Agent</h3>
+              <span id="agent-status-summarizer" class="status-badge online">● ONLINE / READY</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+              Executive Key Takeaways &amp; Action Items Distiller. Automatically converts long notes into executive digests.
+            </p>
+            <button id="run-agent-summarizer" class="btn btn-primary" style="width: 100%; font-size: 12px;">⚡ Run Executive Distiller</button>
+            <div id="agent-console-summarizer"></div>
+          </div>
+
+          <!-- Agent 2: Recall Quizmaster -->
+          <div class="glass-card agent-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--accent-emerald);">🧠 Quiz &amp; Memory Tutor Agent</h3>
+              <span id="agent-status-tutor" class="status-badge online">● ONLINE / READY</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+              Active Recall Quiz Generator. Synthesizes interactive Q&amp;A cards from saved notes to test retention.
+            </p>
+            <button id="run-agent-tutor" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #10b981, #3b82f6);">🧠 Generate Quiz Question</button>
+            <div id="agent-console-tutor"></div>
+          </div>
+
+          <!-- Agent 3: Graph Topology -->
+          <div class="glass-card agent-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--accent-violet);">🕸️ Graph Topology Agent</h3>
+              <span id="agent-status-topology" class="status-badge online">● ONLINE / READY</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+              Entity Relationship &amp; Discrepancy Mapper. Discovers hidden bi-directional concept links across notes.
+            </p>
+            <button id="run-agent-topology" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #8b5cf6, #ec4899);">🕸️ Map Entity Connections</button>
+            <div id="agent-console-topology"></div>
+          </div>
+
+          <!-- Agent 4: Proactive Resurfacing -->
+          <div class="glass-card agent-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--accent-amber);">🔮 Proactive Resurfacing Agent</h3>
+              <span id="agent-status-resurfacing" class="status-badge online">● ONLINE / READY</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+              Memory Discovery Engine. Surfaces forgotten notes matching your current task context and query history.
+            </p>
+            <button id="run-agent-resurfacing" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #f59e0b, #ef4444);">🔮 Resurface Key Notes</button>
+            <div id="agent-console-resurfacing"></div>
+          </div>
+
+          <!-- Agent 5: Vector Diagnostics -->
+          <div class="glass-card agent-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--accent-pink);">🔍 Vector Diagnostics Agent</h3>
+              <span id="agent-status-diagnostics" class="status-badge online">● ONLINE / READY</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+              Telemetry &amp; Matrix Auditor. Measures sparse vector matrix density, query latency, and memory footprint.
+            </p>
+            <button id="run-agent-diagnostics" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #ec4899, #6366f1);">🔍 Run Telemetry Audit</button>
+            <div id="agent-console-diagnostics"></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
     <!-- View 8: Settings & Backup Console -->
     <section id="view-settings" class="view-section" aria-label="Settings & Privacy Console">
       <div class="glass-card settings-card">
@@ -664,6 +754,7 @@
   <script src="js/gemini-color-flow.js?v=6.0"></script>
   <script src="js/nexus-bot.js?v=6.0"></script>
   <script src="js/developer-hud.js?v=6.0"></script>
+  <script src="js/ai-agents.js?v=6.0"></script>
   <script src="js/app.js?v=6.0"></script>
 </body>
 </html>
