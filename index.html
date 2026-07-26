@@ -57,25 +57,51 @@
     <section id="view-jarvis" class="view-section active" aria-label="Conversational Q&A Interface">
       <div class="jarvis-container">
         
-        <div class="glass-card chat-card-wrapper">
+        <!-- Top Hero Card -->
+        <div class="jarvis-header-card glass-card">
+          <div class="orb-container">
+            <div class="jarvis-voice-orb" id="jarvis-orb">🎙️</div>
+            <div class="orb-ring orb-ring-1"></div>
+            <div class="orb-ring orb-ring-2"></div>
+          </div>
           
-          <!-- Unified Chat Header -->
-          <div class="chat-card-header" style="flex-wrap: wrap; gap: 1rem;">
-            <div style="display: flex; align-items: center; gap: 0.85rem;">
-              <div class="orb-container-sm" style="position: relative; width: 44px; height: 44px;">
-                <div class="jarvis-voice-orb" id="jarvis-orb" style="width: 44px; height: 44px; font-size: 1.25rem; margin: 0;">🎙️</div>
-              </div>
-              <div>
-                <h1 class="hero-title" style="font-size: 1.35rem; margin: 0; text-align: left;">Conversational Knowledge Retrieval</h1>
-                <p class="hero-subtitle" style="margin: 0; font-size: 0.82rem; text-align: left; max-width: 100%;">
-                  Synthesized dynamically from 100+ saved notes using grounded RAG vector search & voice playback
-                </p>
-              </div>
+          <h1 class="hero-title">Conversational Knowledge Retrieval</h1>
+          <p class="hero-subtitle">
+            Ask questions out loud or via text. Answers are synthesized dynamically from your saved notes using RAG semantic retrieval—zero hallucination, with exact source citations and audio voice playback.
+          </p>
+
+          <canvas id="waveform-canvas" class="waveform-canvas"></canvas>
+
+          <!-- Input Form -->
+          <form id="rag-query-form" class="query-input-bar">
+            <input type="text" id="rag-query-input" class="input-field query-input" placeholder="Ask your Second Brain... (e.g. 'What did I save about deep learning last month?')" aria-label="Query Input">
+            <button type="submit" id="rag-submit-btn" class="btn btn-primary">✨ Query RAG</button>
+            <button type="button" id="voice-trigger-btn" class="btn btn-secondary">🎙️ Voice Assistant</button>
+          </form>
+
+          <!-- Sample Query Pills -->
+          <div class="sample-queries-container">
+            <span class="sample-label">Try sample queries:</span>
+            <div class="sample-queries-row">
+              <button class="sample-query-btn" data-query="What did I save about deep learning last month?">🤖 "What did I save about deep learning?"</button>
+              <button class="sample-query-btn" data-query="What were my thoughts on the startup idea I had in January?">🚀 "Startup idea I had in January?"</button>
+              <button class="sample-query-btn" data-query="I'm writing about urban planning. What do I know about this?">🏙️ "Urban planning research notes?"</button>
+              <button class="sample-query-btn" data-query="Remind me what that article said about sleep and memory.">🌙 "Article on sleep and memory?"</button>
+              <button class="sample-query-btn" data-query="What distributed consensus protocols and Kafka partitioning did I record?">⚡ "Kafka & distributed systems?"</button>
+              <button class="sample-query-btn" data-query="Atomic Habits system rules by James Clear">📖 "Atomic Habits summary?"</button>
+              <button class="sample-query-btn" data-query="Cis-regulatory elements and ENCODE registry paper">🧬 "ENCODE cCREs paper?"</button>
+              <button class="sample-query-btn" data-query="Evaluating Pinecone vs Chroma vector database benchmarks">🔍 "Vector DB benchmarks?"</button>
             </div>
+          </div>
+        </div>
+
+        <!-- Bottom Chat Stream Card -->
+        <div class="glass-card chat-card-wrapper">
+          <div class="chat-card-header">
+            <h2 class="section-heading">💬 Grounded Conversation Stream & Source Citations</h2>
             <span class="rag-indicator">● RAG Vector Engine Active</span>
           </div>
 
-          <!-- Chat Stream Window -->
           <div id="chat-container" class="chat-stream">
             <div class="chat-bubble ai-bubble glass-card">
               <div class="chat-header">
@@ -87,32 +113,6 @@
               </div>
             </div>
           </div>
-
-          <!-- Waveform Canvas -->
-          <canvas id="waveform-canvas" class="waveform-canvas" style="height: 35px; margin: 0.75rem 0 0.5rem 0;"></canvas>
-
-          <!-- Input Form -->
-          <form id="rag-query-form" class="query-input-bar">
-            <input type="text" id="rag-query-input" class="input-field query-input" placeholder="Ask your Second Brain... (e.g. 'What did I save about deep learning last month?')" aria-label="Query Input">
-            <button type="submit" id="rag-submit-btn" class="btn btn-primary">✨ Query RAG</button>
-            <button type="button" id="voice-trigger-btn" class="btn btn-secondary">🎙️ Voice Assistant</button>
-          </form>
-
-          <!-- Sample Query Pills -->
-          <div class="sample-queries-container" style="margin-top: 0.85rem;">
-            <span class="sample-label">⚡ Click any sample query below to instantly synthesize answers:</span>
-            <div class="sample-queries-row">
-              <button class="sample-query-btn" data-query="What did I save about deep learning last month?">🤖 "Deep learning notes?"</button>
-              <button class="sample-query-btn" data-query="What were my thoughts on the startup idea I had in January?">🚀 "Startup idea in January?"</button>
-              <button class="sample-query-btn" data-query="I'm writing about urban planning. What do I know about this?">🏙️ "Urban planning 15-min cities?"</button>
-              <button class="sample-query-btn" data-query="Remind me what that article said about sleep and memory.">🌙 "Sleep & memory research?"</button>
-              <button class="sample-query-btn" data-query="What distributed consensus protocols and Kafka partitioning did I record?">⚡ "Kafka & distributed systems?"</button>
-              <button class="sample-query-btn" data-query="Atomic Habits system rules by James Clear">📖 "Atomic Habits summary?"</button>
-              <button class="sample-query-btn" data-query="Cis-regulatory elements and ENCODE registry paper">🧬 "ENCODE cCREs paper?"</button>
-              <button class="sample-query-btn" data-query="Evaluating Pinecone vs Chroma vector database benchmarks">🔍 "Vector DB benchmarks?"</button>
-            </div>
-          </div>
-
         </div>
 
       </div>
