@@ -19,3 +19,4 @@ trippa-stayFinder-major-project/
 __pycache__/
 *.pyc
 
+.vercel
