@@ -243,6 +243,7 @@
       if (chatContainer) {
         chatContainer.appendChild(thinkingCard);
         chatContainer.scrollTop = chatContainer.scrollHeight;
+        chatContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
 
       // Simulate dynamic color-shifting backend synthesis delay (~800ms)
