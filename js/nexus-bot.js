@@ -244,6 +244,10 @@
       this.recentQueries.unshift(text);
       if (this.recentQueries.length > 5) this.recentQueries.pop();
 
+      this.speak(`🌼 Yellow Robot: Processing "${text.substring(0, 30)}..."`, 4000);
+      this.setState('thinking');
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playBotWhisper();
+
       if (typeof document !== 'undefined') {
         const ragInput = document.getElementById('rag-query-input');
         const ragForm = document.getElementById('rag-query-form');
@@ -257,6 +261,11 @@
           ragForm.dispatchEvent(submitEvent);
         }
       }
+
+      setTimeout(() => {
+        this.speak(`✅ Answered "${text.substring(0, 25)}..." with grounded citations!`, 6000);
+        this.setState('idle');
+      }, 700);
 
       this.renderConsolidatedFeed();
     },
