@@ -237,10 +237,13 @@
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('.sample-query-btn');
       if (btn) {
-        const query = btn.getAttribute('data-query');
+        e.preventDefault();
+        e.stopPropagation();
+        const query = btn.getAttribute('data-query') || btn.innerText;
         if (query) {
-          if (ragQueryInput) ragQueryInput.value = query;
-          handleRAGQuery(query);
+          const cleanQuery = query.replace(/^["']|["']$/g, '');
+          if (ragQueryInput) ragQueryInput.value = cleanQuery;
+          handleRAGQuery(cleanQuery);
         }
       }
     });
@@ -372,6 +375,9 @@
 
       chatContainer.appendChild(msgCard);
       chatContainer.scrollTop = chatContainer.scrollHeight;
+      setTimeout(() => {
+        msgCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 50);
 
       // Bind citation clicks to open note drawer
       msgCard.querySelectorAll('.citation-pill').forEach(pill => {
@@ -941,12 +947,12 @@
     function formatMarkdownText(text) {
       if (!text) return '';
       return escapeHTML(text)
-        .replace(/### (.*?)(?=<br>|\n|$)/g, '<h3 style="color: var(--accent-indigo); margin: 8px 0 4px;">$1</h3>')
-        .replace(/#### (.*?)(?=<br>|\n|$)/g, '<h4 style="color: var(--text-primary); margin: 6px 0 4px;">$1</h4>')
+        .replace(/### (.*?)(?=<br>|\n|$)/g, '<h3 style="color: var(--accent-indigo); margin: 12px 0 6px;">$1</h3>')
+        .replace(/#### (.*?)(?=<br>|\n|$)/g, '<h4 style="color: var(--text-primary); margin: 10px 0 4px;">$1</h4>')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
         .replace(/`([^`]+)`/g, '<code style="background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; font-family: var(--font-code); font-size: 0.85em;">$1</code>')
-        .replace(/\n\n/g, '<br><br>')
+        .replace(/\n/g, '<br>')
         .replace(/• (.*?)(?=<br>|$)/g, '• $1');
     }
   });
