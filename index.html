@@ -156,6 +156,21 @@
             <span class="rag-indicator">● RAG Vector Engine Active</span>
           </div>
 
+          <!-- Real-Time Backend Processing & Telemetry Display -->
+          <div id="backend-telemetry-card" class="backend-telemetry-card" style="display: none; margin-bottom: 16px; padding: 12px 16px; background: rgba(99, 102, 241, 0.08); border-radius: var(--radius-sm); border: 1px solid rgba(99, 102, 241, 0.25);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 12px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="background: var(--accent-indigo); color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-family: var(--font-code);">BACKEND MATH</span>
+                <span id="telemetry-matched-title" style="color: var(--text-primary); font-weight: 600;">Top Match: Deep Learning #1</span>
+              </div>
+              <div style="display: flex; gap: 12px; font-family: var(--font-code);">
+                <span id="telemetry-similarity-score" style="color: var(--accent-emerald); font-weight: 600;">Cosine Similarity: 0.948 (94.8%)</span>
+                <span id="telemetry-latency" style="color: var(--accent-amber); font-weight: 600;">Latency: 8ms</span>
+              </div>
+            </div>
+            <div id="telemetry-terms-cloud" style="margin-top: 8px; font-size: 11px; color: var(--text-secondary); display: flex; flex-wrap: wrap; gap: 6px;"></div>
+          </div>
+
           <div id="chat-container" class="chat-stream">
             <div class="chat-bubble ai-bubble glass-card">
               <div class="chat-header">
@@ -287,6 +302,7 @@
           <option value="file">File OCR (PDF)</option>
           <option value="email">Email Forward</option>
         </select>
+        <button id="reindex-vault-btn" class="btn btn-secondary" style="padding: 8px 14px; font-size: 13px; white-space: nowrap;" title="Re-calculate TF-IDF Vectors across all notes">⚡ Re-Index Vectors</button>
       </div>
 
       <div id="notes-grid" class="posts-grid"></div>
