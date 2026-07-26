@@ -249,7 +249,10 @@
     });
 
     function handleRAGQuery(query) {
-      if (!query || typeof RAGEngine === 'undefined') return;
+      if (!query) return;
+
+      let rag = typeof RAGEngine !== 'undefined' ? RAGEngine : (typeof window !== 'undefined' ? window.RAGEngine : null);
+      if (!rag) return;
 
       const queryStartTimeMs = typeof performance !== 'undefined' ? performance.now() : Date.now();
 
@@ -268,8 +271,6 @@
 
       // Set UI controls
       const submitBtn = document.getElementById('rag-submit-btn');
-      const jarvisOrb = document.getElementById('jarvis-orb');
-      const headerCard = document.querySelector('.jarvis-header-card');
       const chatWrapper = document.querySelector('.chat-card-wrapper');
 
       if (submitBtn) {
@@ -298,25 +299,21 @@
       }
 
       if (chatWrapper) {
-        chatWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        chatWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
-      // Simulate backend synthesis delay (~800ms)
       setTimeout(() => {
-        // Remove thinking card
         if (thinkingCard && thinkingCard.parentNode) {
           thinkingCard.remove();
         }
 
-        // Restore button state
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.innerHTML = '✨ Query RAG';
         }
 
-        // Perform Grounded RAG Query
-        const currentNotes = Store.getNotes();
-        const response = RAGEngine.query(query, currentNotes);
+        const currentNotes = (typeof Store !== 'undefined' && Store.getNotes) ? Store.getNotes() : [];
+        const response = rag.query(query, currentNotes);
 
         if (typeof DeveloperHUDEngine !== 'undefined') {
           DeveloperHUDEngine.recordQueryLatency(queryStartTimeMs);
@@ -326,13 +323,13 @@
         appendChatMessage('ai', response.answer, response.citations, response.isGeneralKnowledge, query);
 
         // Speak response aloud if TTS enabled
-        if (typeof VoiceEngine !== 'undefined' && Store.settings.ttsEnabled) {
+        if (typeof VoiceEngine !== 'undefined' && typeof Store !== 'undefined' && Store.settings && Store.settings.ttsEnabled) {
           VoiceEngine.speak(response.answer);
         }
 
         // Track query activity for resurfacing engine
         renderResurfacingDigest([query]);
-      }, 850);
+      }, 600);
     }
 
     function appendChatMessage(sender, text, citations = [], isGeneralKnowledge = false, queryStr = '') {
@@ -351,7 +348,7 @@
             <div class="citations-list">
               ${citations.map(c => `
                 <a class="citation-pill" data-id="${c.id}">
-                  ${escapeHTML(c.title)} <span class="citation-date">(${escapeHTML(c.date)})</span>
+                  ${escapeHTML(c.title)} <span class="citation-date">(${escapeHTML(c.dateStr || c.date || '')})</span>
                 </a>
               `).join('')}
             </div>
