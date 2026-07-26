@@ -368,6 +368,11 @@
         <div class="chat-text">${formatMarkdownText(text)}</div>
         ${citationsHTML}
         ${actionsHTML}`;
+
+        if (typeof NexusBotEngine !== 'undefined' && NexusBotEngine.speak) {
+          const summarySnippet = text.replace(/###|####|>|\*|`/g, '').trim().substring(0, 160);
+          NexusBotEngine.speak(`🌼 ${summarySnippet}...`, 8000);
+        }
       }
 
       chatContainer.appendChild(msgCard);
@@ -957,6 +962,9 @@
     window.triggerSampleQuery = function(queryText) {
       if (!queryText) return;
       const cleanQuery = queryText.replace(/^["']|["']$/g, '');
+      if (typeof activateView === 'function') {
+        activateView('jarvis');
+      }
       const inputEl = document.getElementById('rag-query-input');
       if (inputEl) inputEl.value = cleanQuery;
       handleRAGQuery(cleanQuery);
