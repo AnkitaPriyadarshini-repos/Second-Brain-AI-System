@@ -155,6 +155,7 @@
     notes: [],
     dismissedIds: [],
     settings: {
+      theme: 'gemini-light',
       privacyMode: true, // Default privacy mode on-device as requested in PDF page 7
       ttsEnabled: true,
       apiKey: ''
