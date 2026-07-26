@@ -163,14 +163,23 @@ body {
 /* Navigation Bar */
 .navbar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 24px;
+  flex-direction: column;
+  padding: 10px 24px 8px;
   background: var(--bg-dark);
   border-bottom: 1px solid var(--border-color);
   position: sticky;
   top: 0;
   z-index: 100;
+  gap: 8px;
+  width: 100%;
+}
+
+.navbar-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: 16px;
 }
 
 .brand-logo {
@@ -179,6 +188,7 @@ body {
   gap: 12px;
   text-decoration: none;
   color: var(--text-primary);
+  flex-shrink: 0;
 }
 
 .brand-icon-wrapper {
@@ -215,10 +225,18 @@ body {
   padding: 4px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  width: 100%;
+}
+
+.nav-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 [data-theme="gemini-light"] .nav-tabs {
-  background: rgba(0, 0, 0, 0.03);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .nav-tab {
