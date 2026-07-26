@@ -267,7 +267,7 @@
 
       // Render user message card immediately
       appendChatMessage('user', query);
-      if (ragQueryInput) ragQueryInput.value = '';
+      if (ragQueryInput) ragQueryInput.value = query;
 
       // Set UI controls
       const submitBtn = document.getElementById('rag-submit-btn');
