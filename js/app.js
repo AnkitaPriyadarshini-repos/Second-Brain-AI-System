@@ -138,6 +138,26 @@
 
     window.activateView = activateView;
 
+    // Header Status Bar Interactive Pill Bindings
+    const privacyBadge = document.getElementById('privacy-badge');
+    const totalNotesCountBadge = document.getElementById('total-notes-count');
+
+    if (privacyBadge) {
+      privacyBadge.style.cursor = 'pointer';
+      privacyBadge.addEventListener('click', () => {
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+        showToast('🔒 100% Local Privacy: All notes and TF-IDF vector embeddings stay strictly on-device.');
+      });
+    }
+
+    if (totalNotesCountBadge) {
+      totalNotesCountBadge.style.cursor = 'pointer';
+      totalNotesCountBadge.addEventListener('click', () => {
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+        activateView('vault');
+      });
+    }
+
     // Theme Switcher Initialization
     const savedTheme = Store.settings.theme || 'gemini-light';
     applyTheme(savedTheme);
