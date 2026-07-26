@@ -26,7 +26,7 @@
 
       this.bindEvents();
       this.setState('idle');
-      this.speak("Hi Ankita! I'm Nexus Bot. Ask me anything about your notes.", 6000);
+      this.speak("Hi Ankita! I'm your friendly Yellow Robot helper 🌼. Ask me anything about your notes.", 6000);
     },
 
     setRoboMode: function (mode) {
@@ -79,7 +79,10 @@
       });
 
       if (mainImg) {
-        if (avatarType === 'fairy') {
+        if (avatarType === 'yellow-bot') {
+          mainImg.src = 'assets/nexus_yellow_bot.png';
+          this.speak("Switched to Yellow Robot helper avatar 🌼.", 3000);
+        } else if (avatarType === 'fairy') {
           mainImg.src = 'assets/nexus_bot.png';
           this.speak("Switched to Nexus Fairy Bot avatar.", 3000);
         } else {
