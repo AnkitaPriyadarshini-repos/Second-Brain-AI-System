@@ -211,9 +211,11 @@
       appendChatMessage('user', query);
       if (ragQueryInput) ragQueryInput.value = '';
 
-      // Set UI controls to Gemini color-changing processing state
+      // Set UI controls & Cards to Gemini color-changing processing state
       const submitBtn = document.getElementById('rag-submit-btn');
       const jarvisOrb = document.getElementById('jarvis-orb');
+      const headerCard = document.querySelector('.jarvis-header-card');
+      const chatWrapper = document.querySelector('.chat-card-wrapper');
 
       if (submitBtn) {
         submitBtn.disabled = true;
@@ -221,9 +223,9 @@
         submitBtn.classList.add('gemini-processing');
       }
 
-      if (jarvisOrb) {
-        jarvisOrb.classList.add('gemini-processing');
-      }
+      if (jarvisOrb) jarvisOrb.classList.add('gemini-processing');
+      if (headerCard) headerCard.classList.add('gemini-processing-border');
+      if (chatWrapper) chatWrapper.classList.add('gemini-processing-border');
 
       // Render Gemini Thinking indicator card in chat stream
       const thinkingCard = document.createElement('div');
@@ -243,7 +245,10 @@
       if (chatContainer) {
         chatContainer.appendChild(thinkingCard);
         chatContainer.scrollTop = chatContainer.scrollHeight;
-        chatContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      if (chatWrapper) {
+        chatWrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
 
       // Simulate dynamic color-shifting backend synthesis delay (~800ms)
@@ -253,16 +258,16 @@
           thinkingCard.remove();
         }
 
-        // Restore button and orb states
+        // Restore button, orb, and card border states
         if (submitBtn) {
           submitBtn.disabled = false;
           submitBtn.innerHTML = '✨ Query RAG';
           submitBtn.classList.remove('gemini-processing');
         }
 
-        if (jarvisOrb) {
-          jarvisOrb.classList.remove('gemini-processing');
-        }
+        if (jarvisOrb) jarvisOrb.classList.remove('gemini-processing');
+        if (headerCard) headerCard.classList.remove('gemini-processing-border');
+        if (chatWrapper) chatWrapper.classList.remove('gemini-processing-border');
 
         // Perform Grounded RAG Query
         const currentNotes = Store.getNotes();
