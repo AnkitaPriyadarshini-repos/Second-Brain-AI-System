@@ -1143,30 +1143,39 @@ input:checked + .slider:before {
 /* 🌟 Gemini Color Changing Processing Feature */
 @keyframes geminiGradientFlow {
   0% { background-position: 0% 50%; filter: hue-rotate(0deg); }
+  25% { background-position: 50% 100%; filter: hue-rotate(90deg); }
   50% { background-position: 100% 50%; filter: hue-rotate(180deg); }
+  75% { background-position: 50% 0%; filter: hue-rotate(270deg); }
   100% { background-position: 0% 50%; filter: hue-rotate(360deg); }
 }
 
 @keyframes geminiGlowPulse {
-  0% { box-shadow: 0 0 20px #06b6d4, 0 0 35px rgba(6, 182, 212, 0.4); }
-  33% { box-shadow: 0 0 25px #8b5cf6, 0 0 45px rgba(139, 92, 246, 0.5); }
-  66% { box-shadow: 0 0 25px #ec4899, 0 0 45px rgba(236, 72, 153, 0.5); }
-  100% { box-shadow: 0 0 20px #06b6d4, 0 0 35px rgba(6, 182, 212, 0.4); }
+  0% { box-shadow: 0 0 25px #06b6d4, 0 0 50px rgba(6, 182, 212, 0.6); }
+  33% { box-shadow: 0 0 30px #8b5cf6, 0 0 60px rgba(139, 92, 246, 0.7); }
+  66% { box-shadow: 0 0 30px #ec4899, 0 0 60px rgba(236, 72, 153, 0.7); }
+  100% { box-shadow: 0 0 25px #06b6d4, 0 0 50px rgba(6, 182, 212, 0.6); }
 }
 
 .gemini-processing {
-  animation: geminiGradientFlow 3s ease infinite, geminiGlowPulse 2.2s infinite linear !important;
-  background: linear-gradient(270deg, #06b6d4, #8b5cf6, #ec4899, #f59e0b, #10b981, #06b6d4) !important;
-  background-size: 400% 400% !important;
-  color: #fff !important;
+  animation: geminiGradientFlow 1.8s linear infinite, geminiGlowPulse 1.2s infinite ease-in-out !important;
+  background: linear-gradient(270deg, #06b6d4, #3b82f6, #8b5cf6, #ec4899, #f59e0b, #10b981, #06b6d4) !important;
+  background-size: 600% 600% !important;
+  color: #ffffff !important;
+}
+
+.gemini-processing-border {
+  border: 2px solid transparent !important;
+  border-image: linear-gradient(90deg, #06b6d4, #8b5cf6, #ec4899, #f59e0b, #10b981) 1 !important;
+  box-shadow: 0 0 35px rgba(139, 92, 246, 0.45) !important;
+  animation: geminiGlowPulse 1.5s infinite ease-in-out !important;
 }
 
 .thinking-bubble {
-  border-left: 4px solid transparent !important;
+  border-left: 5px solid transparent !important;
   border-image: linear-gradient(180deg, #06b6d4, #8b5cf6, #ec4899) 1 !important;
-  background: rgba(15, 23, 42, 0.95);
-  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.25);
-  animation: geminiGlowPulse 2s infinite ease-in-out;
+  background: rgba(15, 23, 42, 0.96) !important;
+  box-shadow: 0 12px 40px rgba(139, 92, 246, 0.4) !important;
+  animation: geminiGlowPulse 1.5s infinite ease-in-out;
 }
 
 .gemini-text-flow {
@@ -1174,7 +1183,7 @@ input:checked + .slider:before {
   background-size: 300% 300%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: geminiGradientFlow 3s ease infinite;
+  animation: geminiGradientFlow 2s linear infinite;
   font-weight: 800;
 }
 
