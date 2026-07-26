@@ -9,16 +9,35 @@
 
   function getNLP() {
     if (NLPEngineRef) return NLPEngineRef;
+    if (typeof NLPEngine !== 'undefined') {
+      NLPEngineRef = NLPEngine;
+      return NLPEngineRef;
+    }
+    if (typeof window !== 'undefined' && window.NLPEngine) {
+      NLPEngineRef = window.NLPEngine;
+      return NLPEngineRef;
+    }
+    if (typeof global !== 'undefined' && global.NLPEngine) {
+      NLPEngineRef = global.NLPEngine;
+      return NLPEngineRef;
+    }
+    if (typeof globalThis !== 'undefined' && globalThis.NLPEngine) {
+      NLPEngineRef = globalThis.NLPEngine;
+      return NLPEngineRef;
+    }
     if (typeof require !== 'undefined') {
       try {
         NLPEngineRef = require('./nlp-engine');
-      } catch (e) {
-        NLPEngineRef = global.NLPEngine;
-      }
-    } else {
-      NLPEngineRef = global.NLPEngine;
+        return NLPEngineRef;
+      } catch (e) {}
     }
-    return NLPEngineRef;
+    return {
+      extractEntities: (text) => ({ dates: [], tech: [], concepts: [] }),
+      classifyTopics: (title, content) => ['General'],
+      generateSummary: (text) => text ? (text.length > 100 ? text.substring(0, 100) + '...' : text) : '',
+      createTFVector: () => ({}),
+      cosineSimilarity: () => 0.5
+    };
   }
 
   const STORAGE_KEY = 'second_brain_notes_v2';
@@ -309,8 +328,9 @@
   // Export module
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = Store;
-  } else {
-    global.Store = Store;
   }
+  if (typeof window !== 'undefined') window.Store = Store;
+  if (typeof global !== 'undefined') global.Store = Store;
+  if (typeof globalThis !== 'undefined') globalThis.Store = Store;
 
-})(typeof window !== 'undefined' ? window : globalThis);
+})(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));
