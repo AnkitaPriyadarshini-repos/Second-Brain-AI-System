@@ -136,17 +136,18 @@
      */
     generateFallbackAISynthesis: function (query) {
       const qLower = query.toLowerCase().trim();
+      const qClean = qLower.replace(/[!?.,;:~`@#$%^&*()_+\-=[\]{}|\\/]/g, '').trim();
 
       // Handle greetings and conversational prompts
-      const greetings = ['hi', 'hii', 'hiii', 'hello', 'hey', 'heyy', 'greetings', 'good morning', 'good afternoon', 'good evening', 'who are you', 'what can you do', 'help', 'how are you', 'what is this'];
-      if (greetings.some(g => qLower === g || qLower.startsWith(g + ' ') || qLower.startsWith(g + '!'))) {
-        return `### Hello! Welcome to your Second Brain AI
+      const greetings = ['hi', 'hii', 'hiii', 'hello', 'hey', 'heyy', 'greetings', 'good morning', 'good afternoon', 'good evening', 'who are you', 'what can you do', 'help', 'how are you', 'what is this', 'yo', 'sup'];
+      if (greetings.some(g => qClean === g || qClean.startsWith(g + ' '))) {
+        return `### Hello! Welcome to your Second Brain AI 🌼
 
 I am your personal AI knowledge assistant, indexing **100+ saved notes**, voice memos, web clips, and research documents.
 
 #### How I can help you:
 • **Ask Questions**: Type or speak any question about your notes (e.g. *"What did I save about deep learning?"* or *"Startup idea in January"*).
-• **Voice Q&A**: Click the **Voice Assistant** button to talk out loud!
+• **Voice Q&A**: Click the **Talk to Jarvis** button to speak out loud!
 • **Grounded Answers**: I retrieve exact answers from your notes with clickable source citations.
 • **AI Synthesizer**: If a topic isn't in your notes yet, I can synthesize an answer and let you save it as a new note.
 
