@@ -61,6 +61,28 @@
     init: function () {
       if (typeof window === 'undefined') return;
       this.bindAgentButtons();
+      this.bindModalEvents();
+    },
+
+    bindModalEvents: function () {
+      if (typeof document === 'undefined') return;
+
+      const viewAgentsBtn = document.getElementById('view-agents-btn');
+      const closeAgentsBtn = document.getElementById('close-agents-btn');
+      const agentsModalEl = document.getElementById('ai-agents-modal');
+
+      if (viewAgentsBtn && agentsModalEl) {
+        viewAgentsBtn.addEventListener('click', () => {
+          agentsModalEl.classList.add('active');
+          if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+        });
+      }
+
+      if (closeAgentsBtn && agentsModalEl) {
+        closeAgentsBtn.addEventListener('click', () => {
+          agentsModalEl.classList.remove('active');
+        });
+      }
     },
 
     bindAgentButtons: function () {
@@ -72,11 +94,21 @@
       const runResurfacingBtn = document.getElementById('run-agent-resurfacing');
       const runDiagnosticsBtn = document.getElementById('run-agent-diagnostics');
 
+      const modalRunSummarizer = document.getElementById('modal-run-summarizer');
+      const modalRunTutor = document.getElementById('modal-run-tutor');
+      const modalRunTopology = document.getElementById('modal-run-topology');
+      const modalRunDiagnostics = document.getElementById('modal-run-diagnostics');
+
       if (runSummarizerBtn) runSummarizerBtn.addEventListener('click', () => this.runSummarizerAgent());
       if (runTutorBtn) runTutorBtn.addEventListener('click', () => this.runTutorAgent());
       if (runTopologyBtn) runTopologyBtn.addEventListener('click', () => this.runTopologyAgent());
       if (runResurfacingBtn) runResurfacingBtn.addEventListener('click', () => this.runResurfacingAgent());
       if (runDiagnosticsBtn) runDiagnosticsBtn.addEventListener('click', () => this.runDiagnosticsAgent());
+
+      if (modalRunSummarizer) modalRunSummarizer.addEventListener('click', () => this.runSummarizerAgent());
+      if (modalRunTutor) modalRunTutor.addEventListener('click', () => this.runTutorAgent());
+      if (modalRunTopology) modalRunTopology.addEventListener('click', () => this.runTopologyAgent());
+      if (modalRunDiagnostics) modalRunDiagnostics.addEventListener('click', () => this.runDiagnosticsAgent());
     },
 
     runSummarizerAgent: function () {
@@ -251,28 +283,34 @@
 
     setAgentBusy: function (id, msg) {
       if (typeof document === 'undefined') return;
-      const statusEl = document.getElementById(`agent-status-${id}`);
-      if (statusEl) {
-        statusEl.className = 'status-badge syncing';
-        statusEl.textContent = `● BUSY: ${msg}`;
-      }
+      ['agent-status-', 'modal-agent-status-'].forEach(prefix => {
+        const statusEl = document.getElementById(`${prefix}${id}`);
+        if (statusEl) {
+          statusEl.className = 'status-badge syncing';
+          statusEl.textContent = `● BUSY: ${msg}`;
+        }
+      });
     },
 
     setAgentReady: function (id) {
       if (typeof document === 'undefined') return;
-      const statusEl = document.getElementById(`agent-status-${id}`);
-      if (statusEl) {
-        statusEl.className = 'status-badge online';
-        statusEl.textContent = '● ONLINE / READY';
-      }
+      ['agent-status-', 'modal-agent-status-'].forEach(prefix => {
+        const statusEl = document.getElementById(`${prefix}${id}`);
+        if (statusEl) {
+          statusEl.className = 'status-badge online';
+          statusEl.textContent = '● ONLINE / READY';
+        }
+      });
     },
 
     updateAgentConsole: function (id, html) {
       if (typeof document === 'undefined') return;
-      const consoleEl = document.getElementById(`agent-console-${id}`);
-      if (consoleEl) {
-        consoleEl.innerHTML = html;
-      }
+      ['agent-console-', 'modal-agent-console-'].forEach(prefix => {
+        const consoleEl = document.getElementById(`${prefix}${id}`);
+        if (consoleEl) {
+          consoleEl.innerHTML = html;
+        }
+      });
     },
 
     escapeHTML: function (str) {

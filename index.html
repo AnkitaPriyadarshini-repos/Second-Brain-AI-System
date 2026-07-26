@@ -51,6 +51,7 @@
         </div>
 
         <button id="pwa-install-btn" class="status-badge" style="cursor: pointer; background: rgba(236, 72, 153, 0.15); color: var(--accent-pink); border: 1px solid rgba(236, 72, 153, 0.3);" title="Install Second Brain as Native App">📲 Install App</button>
+        <button id="view-agents-btn" class="status-badge" style="cursor: pointer; background: rgba(139, 92, 246, 0.15); color: var(--accent-violet); border: 1px solid rgba(139, 92, 246, 0.3);" title="View AI Helper Agents Fleet">🤖 AI Agents</button>
         <button id="view-arch-btn" class="status-badge" style="cursor: pointer; background: rgba(99, 102, 241, 0.15); color: var(--accent-indigo); border: 1px solid rgba(99, 102, 241, 0.3);" title="View System Architecture Specs">⚙️ Specs</button>
         <button id="view-shortcuts-btn" class="status-badge" style="cursor: pointer; background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3);" title="View Keyboard Shortcuts">⌨️ Hotkeys</button>
         <span id="privacy-badge" class="privacy-status-pill">🔒 Local Privacy</span>
@@ -611,6 +612,70 @@
     </div>
     <div id="drawer-meta" class="drawer-meta-text"></div>
     <div id="drawer-body"></div>
+  </div>
+
+  <!-- AI Helper Agents Fleet Modal -->
+  <div id="ai-agents-modal" class="spec-modal-overlay">
+    <div class="spec-modal-card" style="max-width: 760px;">
+      <button id="close-agents-btn" class="spec-modal-close-btn">✕</button>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h2 style="font-size: 20px; font-weight: 700; color: var(--accent-indigo); display: flex; align-items: center; gap: 8px;">
+          <span>🤖 AI Helper Agents Fleet</span>
+          <span class="status-badge online">● 6 ACTIVE AGENTS</span>
+        </h2>
+      </div>
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 20px;">
+        Autonomous on-device AI working agents assisting with executive note distillation, active recall quizmastering, graph topology mapping, memory resurfacing, and vector telemetry auditing.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px;">
+        
+        <!-- Summarizer Agent Card -->
+        <div class="glass-card agent-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <h4 style="font-weight: 700; color: var(--accent-indigo);">⚡ Executive Summarizer Agent</h4>
+            <span id="modal-agent-status-summarizer" class="status-badge online">● ONLINE</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Distills long notes into executive summaries &amp; action items.</p>
+          <button id="modal-run-summarizer" class="btn btn-primary" style="width: 100%; font-size: 12px;">⚡ Run Executive Distiller</button>
+          <div id="modal-agent-console-summarizer"></div>
+        </div>
+
+        <!-- Quizmaster Agent Card -->
+        <div class="glass-card agent-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <h4 style="font-weight: 700; color: var(--accent-emerald);">🧠 Quiz &amp; Tutor Agent</h4>
+            <span id="modal-agent-status-tutor" class="status-badge online">● ONLINE</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Synthesizes interactive Q&amp;A recall cards from saved notes.</p>
+          <button id="modal-run-tutor" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #10b981, #3b82f6);">🧠 Generate Quiz Card</button>
+          <div id="modal-agent-console-tutor"></div>
+        </div>
+
+        <!-- Graph Topology Agent Card -->
+        <div class="glass-card agent-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <h4 style="font-weight: 700; color: var(--accent-violet);">🕸️ Graph Topology Agent</h4>
+            <span id="modal-agent-status-topology" class="status-badge online">● ONLINE</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Discovers hidden bi-directional entity connections.</p>
+          <button id="modal-run-topology" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #8b5cf6, #ec4899);">🕸️ Map Entity Connections</button>
+          <div id="modal-agent-console-topology"></div>
+        </div>
+
+        <!-- Vector Diagnostics Agent Card -->
+        <div class="glass-card agent-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <h4 style="font-weight: 700; color: var(--accent-pink);">🔍 Vector Telemetry Agent</h4>
+            <span id="modal-agent-status-diagnostics" class="status-badge online">● ONLINE</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Measures matrix density, latency, and memory footprint.</p>
+          <button id="modal-run-diagnostics" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #ec4899, #6366f1);">🔍 Run Telemetry Audit</button>
+          <div id="modal-agent-console-diagnostics"></div>
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <!-- System Architecture & Engineering Specs Modal -->
