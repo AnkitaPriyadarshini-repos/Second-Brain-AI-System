@@ -48,6 +48,8 @@
           <button class="theme-pill-btn" data-theme="obsidian" title="Obsidian Theme">Obsidian</button>
         </div>
 
+        <button id="view-arch-btn" class="status-badge" style="cursor: pointer; background: rgba(99, 102, 241, 0.15); color: var(--accent-indigo); border: 1px solid rgba(99, 102, 241, 0.3);" title="View System Architecture Specs">⚙️ Specs</button>
+        <button id="view-shortcuts-btn" class="status-badge" style="cursor: pointer; background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3);" title="View Keyboard Shortcuts">⌨️ Hotkeys</button>
         <span id="privacy-badge" class="privacy-status-pill">🔒 Local Privacy</span>
         <span id="total-notes-count" class="status-badge notes-count-badge">100 Notes</span>
       </div>
@@ -107,7 +109,7 @@
           <!-- Input Form -->
           <form id="rag-query-form" class="query-input-bar">
             <input type="text" id="rag-query-input" class="input-field query-input" placeholder="Ask your Second Brain... (e.g. 'What did I save about deep learning last month?')" aria-label="Query Input">
-            <button type="button" id="rag-submit-btn" class="btn btn-primary" onclick="window.triggerSampleQuery(document.getElementById('rag-query-input').value)">
+            <button type="submit" id="rag-submit-btn" class="btn btn-primary">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3m-3.5-6.5l-2 2m-7 7l-2 2m0-11l2 2m7 7l2 2"/></svg>
               Query RAG
             </button>
@@ -116,6 +118,17 @@
               Talk to Jarvis
             </button>
           </form>
+
+          <!-- Deliberate RAG Progress & Diagnostic Feedback Bar -->
+          <div id="rag-progress-bar-container" class="rag-progress-bar-container" style="display: none; margin-top: 14px; padding: 10px 14px; background: rgba(255, 255, 255, 0.04); border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.2);">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; color: var(--accent-indigo); font-weight: 600;">
+              <span id="rag-progress-status-text">⚡ RAG Vector Engine: Searching 100+ notes & computing cosine similarity...</span>
+              <span id="rag-progress-percentage">0%</span>
+            </div>
+            <div style="height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden;">
+              <div id="rag-progress-fill" style="height: 100%; width: 0%; background: linear-gradient(90deg, #6366f1, #10b981, #ec4899); transition: width 0.15s ease-out; border-radius: 3px;"></div>
+            </div>
+          </div>
 
           <!-- Sample Query Pills -->
           <div class="sample-queries-container">
@@ -569,9 +582,19 @@
       <div id="nexus-bot-dialogue" class="nexus-bot-dialogue">
         Hi Ankita! I'm your Yellow Robot helper 🌼. Ask me anything about your notes or capture new memos on the fly.
       </div>
+      
+      <!-- Robo Mode Bar -->
+      <div class="robo-mode-bar" style="display: flex; gap: 4px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 4px;">
+        <button class="robo-mode-btn active" data-mode="assistant" title="Assistant Mode">Assistant</button>
+        <button class="robo-mode-btn" data-mode="quantum" title="Quantum Fast Search">Quantum</button>
+        <button class="robo-mode-btn" data-mode="listener" title="Live Voice Listener">Listener</button>
+        <button class="robo-mode-btn" data-mode="tutor" title="AI Flashcard Tutor">Tutor</button>
+        <button id="stage-scan-btn" class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px; white-space: nowrap;" title="Run Vector Diagnostics">Diagnostic Scan</button>
+      </div>
+
       <div class="nexus-bot-quick-bar">
         <input type="text" id="nexus-bot-quick-input" class="input-field nexus-bot-quick-input" placeholder="Ask Yellow Robot or capture memo...">
-        <button id="nexus-bot-quick-submit" class="btn btn-primary nexus-bot-quick-btn" onclick="const val = document.getElementById('nexus-bot-quick-input').value; if(val){ window.triggerSampleQuery(val); document.getElementById('nexus-bot-quick-input').value = ''; }">Send</button>
+        <button id="nexus-bot-quick-submit" class="btn btn-primary nexus-bot-quick-btn">Send</button>
       </div>
       <div id="nexus-bot-consolidated-feed"></div>
     </div>
