@@ -12,9 +12,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  <!-- Stylesheets -->
+  <!-- Stylesheets & App Manifest -->
   <link rel="stylesheet" href="css/style.css?v=6.0">
   <link rel="stylesheet" href="css/responsive.css?v=6.0">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6366f1">
 </head>
 <body>
 
@@ -48,6 +50,7 @@
           <button class="theme-pill-btn" data-theme="obsidian" title="Obsidian Theme">Obsidian</button>
         </div>
 
+        <button id="pwa-install-btn" class="status-badge" style="cursor: pointer; background: rgba(236, 72, 153, 0.15); color: var(--accent-pink); border: 1px solid rgba(236, 72, 153, 0.3);" title="Install Second Brain as Native App">📲 Install App</button>
         <button id="view-arch-btn" class="status-badge" style="cursor: pointer; background: rgba(99, 102, 241, 0.15); color: var(--accent-indigo); border: 1px solid rgba(99, 102, 241, 0.3);" title="View System Architecture Specs">⚙️ Specs</button>
         <button id="view-shortcuts-btn" class="status-badge" style="cursor: pointer; background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3);" title="View Keyboard Shortcuts">⌨️ Hotkeys</button>
         <span id="privacy-badge" class="privacy-status-pill">🔒 Local Privacy</span>
@@ -493,9 +496,12 @@
   <!-- Slide-out Note Detail Drawer Modal -->
   <div id="note-drawer" class="note-drawer">
     <button id="close-drawer-btn" class="drawer-close-btn">✕</button>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-right: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-right: 2rem; flex-wrap: wrap; gap: 8px;">
       <h3 id="drawer-title" class="drawer-title-text">Note Details</h3>
-      <button id="enhance-note-btn" class="btn btn-primary" style="padding: 6px 12px; font-size: 13px;">AI Enhance Note</button>
+      <div style="display: flex; gap: 8px;">
+        <button id="edit-note-btn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">✏️ Edit Note</button>
+        <button id="enhance-note-btn" class="btn btn-primary" style="padding: 6px 12px; font-size: 13px;">AI Enhance Note</button>
+      </div>
     </div>
     <div id="drawer-meta" class="drawer-meta-text"></div>
     <div id="drawer-body"></div>
@@ -600,12 +606,42 @@
     </div>
   </div>
 
+  <!-- Floating Action Button (+ New Note) -->
+  <button id="fab-quick-note-btn" class="fab-quick-note-btn" title="Quick Capture Note (+)">+</button>
+
+  <!-- Quick Capture Note Modal -->
+  <div id="quick-note-modal" class="spec-modal-overlay">
+    <div class="spec-modal-card" style="max-width: 560px;">
+      <button id="close-quick-note-btn" class="spec-modal-close-btn">✕</button>
+      <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">⚡ Quick Capture Note</h2>
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px;">
+        Capture a thought instantly from anywhere in your Second Brain. Entity extraction & summary indexing run automatically.
+      </p>
+
+      <form id="fab-quick-note-form">
+        <div class="form-group">
+          <label class="form-label" for="fab-note-title">Title:</label>
+          <input type="text" id="fab-note-title" class="input-field" placeholder="e.g. Real-Time Vector Indexing Optimization" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="fab-note-content">Thought / Notes Content:</label>
+          <textarea id="fab-note-content" class="textarea-field" rows="5" placeholder="Type your notes or research summary here..." required></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
+          <button type="button" id="cancel-quick-note-btn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save to Brain</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- JavaScript Modules -->
   <script src="js/nlp-engine.js?v=6.0"></script>
   <script src="js/store.js?v=6.0"></script>
   <script src="js/rag-engine.js?v=6.0"></script>
   <script src="js/voice-engine.js?v=6.0"></script>
   <script src="js/audio-presets.js?v=6.0"></script>
+  <script src="js/sound-engine.js?v=6.0"></script>
   <script src="js/resurfacing-engine.js?v=6.0"></script>
   <script src="js/graph-visualizer.js?v=6.0"></script>
   <script src="js/ai-engine.js?v=6.0"></script>
