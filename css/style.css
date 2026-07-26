@@ -1192,6 +1192,11 @@ input:checked + .slider:before {
 }
 
 /* Gemini Brand Logo Badge */
+.brand-logo:hover .brand-icon-wrapper {
+  transform: scale(1.08) rotate(4deg);
+  box-shadow: 0 0 30px rgba(6, 182, 212, 0.7), 0 0 50px rgba(236, 72, 153, 0.5) !important;
+}
+
 .brand-name {
   background: linear-gradient(135deg, #06b6d4, #8b5cf6, #ec4899) !important;
   background-size: 200% 200% !important;
