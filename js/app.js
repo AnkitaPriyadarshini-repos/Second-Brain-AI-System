@@ -563,23 +563,57 @@
       });
     }
 
-    // 4. File Upload (OCR) Zone
+    // 4. File Upload (OCR & Real Text Reader) Zone
     if (fileUploadZone && fileInput) {
-      fileUploadZone.addEventListener('click', () => fileInput.click());
+      fileUploadZone.addEventListener('click', () => {
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+        fileInput.click();
+      });
+
       fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
-        if (file) {
-          showToast(`Running OCR & NLP extraction on ${file.name}...`);
-          setTimeout(() => {
-            Store.addNote({
-              title: `PDF Extract: ${file.name}`,
-              content: `OCR text extracted from ${file.name}: Comprehensive overview of domain parameters, functional bounds, and experimental validation results.`,
+        if (!file) return;
+
+        showToast(`Reading and parsing ${file.name}...`);
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playBotWhisper();
+
+        const isTextFile = file.name.match(/\.(txt|md|markdown|json|csv|html|js|py)$/i);
+
+        if (isTextFile) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            const rawText = event.target.result || '';
+            const newNote = Store.addNote({
+              title: file.name.replace(/\.[^/.]+$/, ""),
+              content: rawText,
               sourceType: 'file',
               sourceUrl: file.name
             });
-            showToast(`File ${file.name} parsed and saved.`);
+            showToast(`Parsed and saved ${file.name} to Vault (${rawText.length} characters).`);
+            if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
+            fileInput.value = '';
             refreshAllViews();
-          }, 1200);
+            if (newNote) openNoteDrawer(newNote);
+          };
+          reader.onerror = () => {
+            showToast(`Could not read text content from ${file.name}.`);
+          };
+          reader.readAsText(file);
+        } else {
+          // Fallback simulation for binary/image/pdf OCR
+          setTimeout(() => {
+            const newNote = Store.addNote({
+              title: `PDF/Image: ${file.name}`,
+              content: `Extracted content from ${file.name}: Comprehensive overview of parameters, functional bounds, and experimental validation results (${(file.size / 1024).toFixed(1)} KB).`,
+              sourceType: 'file',
+              sourceUrl: file.name
+            });
+            showToast(`File ${file.name} ingested & saved.`);
+            if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
+            fileInput.value = '';
+            refreshAllViews();
+            if (newNote) openNoteDrawer(newNote);
+          }, 800);
         }
       });
     }
@@ -691,37 +725,106 @@
     }
 
     // ----------------------------------------------------
-    // Drawer View & AI Note Enhancer
+    // Drawer View & Inline Note Editor & AI Enhancer
     // ----------------------------------------------------
+    const editNoteBtn = document.getElementById('edit-note-btn');
+    let isEditingDrawerNote = false;
+
     function openNoteDrawer(note) {
       if (!noteDrawer) return;
       currentOpenedNote = note;
+      isEditingDrawerNote = false;
+      if (editNoteBtn) editNoteBtn.textContent = '✏️ Edit Note';
       if (drawerTitle) drawerTitle.textContent = note.title;
       if (drawerMeta) {
         drawerMeta.innerHTML = `<span class="source-badge badge-${note.sourceType}">${note.sourceType.toUpperCase()}</span> • <span>${escapeHTML(note.dateStr || '')}</span> ${note.sourceUrl ? `• <a href="${escapeHTML(note.sourceUrl)}" target="_blank" style="color: var(--accent-indigo);">Source Link</a>` : ''}`;
       }
-      if (drawerBody) {
-        drawerBody.innerHTML = `
-          <div style="margin-bottom: 20px;">
-            <h4 style="color: var(--accent-indigo); margin-bottom: 6px;">Distilled Summary:</h4>
-            <p style="background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 6px; border-left: 3px solid var(--accent-indigo);">
-              ${escapeHTML(note.summary || note.content)}
-            </p>
-          </div>
-          <div style="margin-bottom: 20px;">
-            <h4 style="color: var(--text-primary); margin-bottom: 6px;">Full Note Content:</h4>
-            <p style="white-space: pre-wrap; line-height: 1.5;">${formatMarkdownText(note.content)}</p>
-          </div>
-          <div style="margin-bottom: 16px;">
-            <h4 style="color: var(--accent-violet); margin-bottom: 6px;">Extracted Entities & Tags:</h4>
-            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-              ${(note.tags || []).map(t => `<span class="tag-pill" style="border-color: var(--accent-indigo);">#${escapeHTML(t)}</span>`).join('')}
-              ${note.entities ? Object.entries(note.entities).flatMap(([cat, list]) => (list || []).map(item => `<span class="tag-pill" style="border-color: var(--accent-emerald);">[${cat.toUpperCase()}] ${escapeHTML(item)}</span>`)).join('') : ''}
-            </div>
-          </div>
-        `;
-      }
+      renderDrawerBodyView(note);
       noteDrawer.classList.add('open');
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+    }
+
+    function renderDrawerBodyView(note) {
+      if (!drawerBody) return;
+      drawerBody.innerHTML = `
+        <div style="margin-bottom: 20px;">
+          <h4 style="color: var(--accent-indigo); margin-bottom: 6px;">Distilled Summary:</h4>
+          <p style="background: rgba(255, 255, 255, 0.03); padding: 12px; border-radius: 6px; border-left: 3px solid var(--accent-indigo);">
+            ${escapeHTML(note.summary || note.content)}
+          </p>
+        </div>
+        <div style="margin-bottom: 20px;">
+          <h4 style="color: var(--text-primary); margin-bottom: 6px;">Full Note Content:</h4>
+          <p style="white-space: pre-wrap; line-height: 1.5;">${formatMarkdownText(note.content)}</p>
+        </div>
+        <div style="margin-bottom: 16px;">
+          <h4 style="color: var(--accent-violet); margin-bottom: 6px;">Extracted Entities & Tags:</h4>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            ${(note.tags || []).map(t => `<span class="tag-pill" style="border-color: var(--accent-indigo);">#${escapeHTML(t)}</span>`).join('')}
+            ${note.entities ? Object.entries(note.entities).flatMap(([cat, list]) => (list || []).map(item => `<span class="tag-pill" style="border-color: var(--accent-emerald);">[${cat.toUpperCase()}] ${escapeHTML(item)}</span>`)).join('') : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    if (editNoteBtn) {
+      editNoteBtn.addEventListener('click', () => {
+        if (!currentOpenedNote || !drawerBody) return;
+        isEditingDrawerNote = !isEditingDrawerNote;
+
+        if (isEditingDrawerNote) {
+          editNoteBtn.textContent = '👁️ View Note';
+          drawerBody.innerHTML = `
+            <form id="drawer-edit-form" style="display: flex; flex-direction: column; gap: 14px;">
+              <div class="form-group">
+                <label class="form-label">Note Title:</label>
+                <input type="text" id="edit-drawer-title-input" class="input-field" value="${escapeHTML(currentOpenedNote.title)}" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Content:</label>
+                <textarea id="edit-drawer-content-textarea" class="textarea-field" rows="8" required>${escapeHTML(currentOpenedNote.content)}</textarea>
+              </div>
+              <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+              </div>
+            </form>
+          `;
+
+          const editForm = document.getElementById('drawer-edit-form');
+          if (editForm) {
+            editForm.addEventListener('submit', (e) => {
+              e.preventDefault();
+              const newTitle = document.getElementById('edit-drawer-title-input').value.trim();
+              const newContent = document.getElementById('edit-drawer-content-textarea').value.trim();
+
+              if (newTitle && newContent) {
+                currentOpenedNote.title = newTitle;
+                currentOpenedNote.content = newContent;
+
+                if (typeof NLPEngine !== 'undefined') {
+                  const entities = NLPEngine.extractEntities(newContent);
+                  currentOpenedNote.entities = entities;
+                  const autoTags = NLPEngine.assignTopics(newContent, entities);
+                  currentOpenedNote.tags = autoTags;
+                  currentOpenedNote.summary = NLPEngine.summarize(newContent);
+                }
+
+                Store.saveNotes();
+                showToast('Note updated and re-indexed successfully.');
+                if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
+                isEditingDrawerNote = false;
+                editNoteBtn.textContent = '✏️ Edit Note';
+                if (drawerTitle) drawerTitle.textContent = currentOpenedNote.title;
+                renderDrawerBodyView(currentOpenedNote);
+                refreshAllViews();
+              }
+            });
+          }
+        } else {
+          editNoteBtn.textContent = '✏️ Edit Note';
+          renderDrawerBodyView(currentOpenedNote);
+        }
+      });
     }
 
     if (closeDrawerBtn) {
@@ -737,6 +840,7 @@
         currentOpenedNote.content = enhancedContent;
         Store.saveNotes();
         showToast('Note enhanced with AI takeaways and action items.');
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
         openNoteDrawer(currentOpenedNote);
         refreshAllViews();
       });
@@ -1022,6 +1126,93 @@
         .replace(/\n/g, '<br>')
         .replace(/• (.*?)(?=<br>|$)/g, '• $1');
     }
+
+    // ----------------------------------------------------
+    // FAB Quick Capture Note Modal Controller
+    // ----------------------------------------------------
+    const fabBtn = document.getElementById('fab-quick-note-btn');
+    const quickNoteModal = document.getElementById('quick-note-modal');
+    const closeQuickNoteBtn = document.getElementById('close-quick-note-btn');
+    const cancelQuickNoteBtn = document.getElementById('cancel-quick-note-btn');
+    const fabForm = document.getElementById('fab-quick-note-form');
+
+    if (fabBtn && quickNoteModal) {
+      fabBtn.addEventListener('click', () => {
+        quickNoteModal.classList.add('active');
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+      });
+    }
+
+    function closeQuickNoteModal() {
+      if (quickNoteModal) quickNoteModal.classList.remove('active');
+    }
+
+    if (closeQuickNoteBtn) closeQuickNoteBtn.addEventListener('click', closeQuickNoteModal);
+    if (cancelQuickNoteBtn) cancelQuickNoteBtn.addEventListener('click', closeQuickNoteModal);
+
+    if (fabForm) {
+      fabForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = document.getElementById('fab-note-title').value.trim();
+        const content = document.getElementById('fab-note-content').value.trim();
+
+        if (title && content) {
+          const newNote = Store.addNote({ title, content, sourceType: 'typing' });
+          showToast('Quick note saved and auto-indexed.');
+          if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
+          fabForm.reset();
+          closeQuickNoteModal();
+          refreshAllViews();
+          if (newNote) openNoteDrawer(newNote);
+        }
+      });
+    }
+
+    // ----------------------------------------------------
+    // Progressive Web App (PWA) & Service Worker Registration
+    // ----------------------------------------------------
+    let deferredPWAInstallPrompt = null;
+    const pwaInstallBtn = document.getElementById('pwa-install-btn');
+
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then(() => {
+          console.log('Second Brain PWA Service Worker Registered Successfully.');
+        }).catch(err => {
+          console.warn('Service Worker registration skipped:', err);
+        });
+      });
+
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPWAInstallPrompt = e;
+        if (pwaInstallBtn) pwaInstallBtn.style.display = 'inline-flex';
+      });
+    }
+
+    if (pwaInstallBtn) {
+      pwaInstallBtn.addEventListener('click', async () => {
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+        if (deferredPWAInstallPrompt) {
+          deferredPWAInstallPrompt.prompt();
+          const { outcome } = await deferredPWAInstallPrompt.userChoice;
+          if (outcome === 'accepted') {
+            showToast('Thank you for installing Second Brain AI System!');
+          }
+          deferredPWAInstallPrompt = null;
+        } else {
+          showToast('App is ready for desktop/mobile. Add to Home Screen via browser menu 📲');
+        }
+      });
+    }
+
+    // Universal UI Click Sound Feedback
+    document.addEventListener('click', (e) => {
+      if (!e || !e.target) return;
+      if (e.target.closest('button, .nav-tab, .sample-query-btn, .tag-pill, .citation-pill, .card')) {
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+      }
+    });
 
     // Global helper accessible via inline onclick fallback
     window.triggerSampleQuery = function(queryText) {
