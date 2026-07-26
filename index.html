@@ -91,12 +91,12 @@
           <!-- Waveform Canvas -->
           <canvas id="waveform-canvas" class="waveform-canvas" style="height: 35px; margin: 0.75rem 0 0.5rem 0;"></canvas>
 
-          <!-- Input Bar -->
-          <div class="query-input-bar">
+          <!-- Input Form -->
+          <form id="rag-query-form" class="query-input-bar">
             <input type="text" id="rag-query-input" class="input-field query-input" placeholder="Ask your Second Brain... (e.g. 'What did I save about deep learning last month?')" aria-label="Query Input">
-            <button id="rag-submit-btn" class="btn btn-primary">✨ Query RAG</button>
-            <button id="voice-trigger-btn" class="btn btn-secondary">🎙️ Voice Assistant</button>
-          </div>
+            <button type="submit" id="rag-submit-btn" class="btn btn-primary">✨ Query RAG</button>
+            <button type="button" id="voice-trigger-btn" class="btn btn-secondary">🎙️ Voice Assistant</button>
+          </form>
 
           <!-- Sample Query Pills -->
           <div class="sample-queries-container" style="margin-top: 0.85rem;">

@@ -164,10 +164,12 @@
     });
 
     // ----------------------------------------------------
-    // Event Listeners: Conversational RAG Q&A
+    // Event Listeners: Conversational RAG Q&A Form & Enter Key
     // ----------------------------------------------------
-    if (ragSubmitBtn) {
-      ragSubmitBtn.addEventListener('click', () => {
+    const ragQueryForm = document.getElementById('rag-query-form');
+    if (ragQueryForm) {
+      ragQueryForm.addEventListener('submit', (e) => {
+        e.preventDefault();
         const query = ragQueryInput ? ragQueryInput.value.trim() : '';
         if (query) handleRAGQuery(query);
       });
@@ -175,7 +177,8 @@
 
     if (ragQueryInput) {
       ragQueryInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' || e.keyCode === 13) {
+          e.preventDefault();
           const query = ragQueryInput.value.trim();
           if (query) handleRAGQuery(query);
         }
