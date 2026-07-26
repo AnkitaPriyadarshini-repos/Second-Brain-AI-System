@@ -74,21 +74,15 @@
     </div>
 
     <div class="header-status-bar">
-      <!-- Theme Controls -->
+      <!-- Theme Controls Segment -->
       <div class="theme-controls-group" title="Select Theme">
-        <button class="theme-pill-btn active" data-theme="gemini-light" title="Light Theme">Light Flow</button>
-        <button class="theme-pill-btn" data-theme="editorial-paper" title="Editorial Paper Theme">Editorial Paper</button>
-        <button class="theme-pill-btn" data-theme="gemini-dark" title="Cyber Dark Theme">Cyber Dark</button>
+        <button class="theme-pill-btn active" data-theme="gemini-light" title="Light Theme">Light</button>
+        <button class="theme-pill-btn" data-theme="editorial-paper" title="Editorial Paper Theme">Paper</button>
+        <button class="theme-pill-btn" data-theme="gemini-dark" title="Cyber Dark Theme">Dark</button>
         <button class="theme-pill-btn" data-theme="obsidian" title="Obsidian Theme">Obsidian</button>
       </div>
 
-      <!-- Status Badges & Buttons -->
-      <span id="hud-latency-pill" class="status-badge synced" title="Measured Vector Engine Latency">Latency: 12ms</span>
-      <button id="view-arch-btn" class="hud-btn" title="View System Architecture Specs">Architecture</button>
-      <button id="view-shortcuts-btn" class="hud-btn" title="Keyboard Shortcuts">Shortcuts <kbd>?</kbd></button>
-
-      <span id="privacy-badge" class="privacy-status-pill">On-Device Privacy</span>
-      <span id="sync-badge" class="status-badge synced">Synced</span>
+      <span id="privacy-badge" class="privacy-status-pill">🔒 Local Privacy</span>
       <span id="total-notes-count" class="status-badge notes-count-badge">100 Notes</span>
     </div>
   </nav>
@@ -102,55 +96,6 @@
         <!-- Main Screen AI Assistant Stage -->
         <div class="jarvis-header-card glass-card">
           
-          <div class="nexus-hero-bot-stage">
-            <div id="nexus-hero-dialogue" class="nexus-bot-dialogue-bubble active">Hi Ankita! I'm Nexus Bot. Ask me anything about your notes.</div>
-
-            <!-- Avatar Switcher Bar -->
-            <div class="avatar-switcher-bar" title="Switch AI Bot Companion Avatar">
-              <button class="avatar-switch-btn active" data-avatar="blue-bot">Robot View</button>
-              <button class="avatar-switch-btn" data-avatar="fairy">Fairy Companion</button>
-            </div>
-
-            <!-- Center Stage Orb -->
-            <div class="robot-stage-display">
-              <div id="jarvis-orb-stage" class="stage-mic-orb" title="Voice Assistant Orb">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-              </div>
-
-              <img id="nexus-main-bot-img" src="assets/nexus_blue_bot.png" alt="Nexus AI Robot" class="nexus-blue-bot-img nexus-bot-avatar-img" style="display: none;">
-              
-              <div id="hologram-orb-trigger" class="holographic-orb-overlay" style="display: none;">
-                <div class="hologram-sphere-core"></div>
-                <div class="hologram-orbit-ring"></div>
-                <div class="hologram-orbit-ring hologram-orbit-ring-2"></div>
-              </div>
-              <div class="hologram-pedestal" style="display: none;"></div>
-            </div>
-
-            <!-- Diagnostic HUD Badges -->
-            <div class="bot-live-hud">
-              <span id="hud-notes-pill" class="hud-pill active-pulse">100 Notes Vectorized</span>
-              <span id="hud-rag-pill" class="hud-pill">RAG Vector Engine: Active</span>
-              <span id="hud-privacy-pill" class="hud-pill">Zero-Leak Storage</span>
-              <span id="hud-voice-pill" class="hud-pill">Voice Synthesis: Ready</span>
-            </div>
-
-            <!-- Robo Mode Selector Bar -->
-            <div class="robo-mode-bar">
-              <button class="robo-mode-btn active" data-mode="assistant" title="Standard RAG Assistant Mode">RAG Assistant</button>
-              <button class="robo-mode-btn" data-mode="quantum" title="Quantum Similarity Search">Quantum Search</button>
-              <button class="robo-mode-btn" data-mode="listener" title="Live Voice Memo Listener">Voice Listener</button>
-              <button class="robo-mode-btn" data-mode="tutor" title="AI Flashcard Recall Tutor">Recall Tutor</button>
-            </div>
-
-            <!-- Stage Buttons -->
-            <div class="bot-stage-actions" style="display: flex; gap: 8px; margin-top: 14px; z-index: 5;">
-              <button id="stage-voice-btn" class="btn btn-primary" style="padding: 6px 14px; font-size: 13px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-                Speak to Assistant
-              </button>
-              <button id="stage-scan-btn" class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;">Scan Diagnostics</button>
-            </div>
           </div>
           
           <h1 class="hero-title">Talk to Your Second Brain like Jarvis</h1>
