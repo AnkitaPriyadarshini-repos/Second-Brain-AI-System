@@ -109,6 +109,9 @@
     if (typeof DeveloperHUDEngine !== 'undefined' && DeveloperHUDEngine.init) {
       DeveloperHUDEngine.init();
     }
+    if (typeof AIAgentFleetEngine !== 'undefined' && AIAgentFleetEngine.init) {
+      AIAgentFleetEngine.init();
+    }
 
     // Navigation View Activation Helper
     function activateView(targetView) {
