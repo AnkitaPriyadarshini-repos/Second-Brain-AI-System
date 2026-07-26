@@ -99,6 +99,42 @@
     Store.init();
     updateHeaderStats();
 
+    // Initialize Subsystem Engines
+    if (typeof GeminiColorFlowEngine !== 'undefined' && GeminiColorFlowEngine.init) {
+      GeminiColorFlowEngine.init('#gemini-flow-canvas');
+    }
+    if (typeof NexusBotEngine !== 'undefined' && NexusBotEngine.init) {
+      NexusBotEngine.init();
+    }
+    if (typeof DeveloperHUDEngine !== 'undefined' && DeveloperHUDEngine.init) {
+      DeveloperHUDEngine.init();
+    }
+
+    // Navigation View Activation Helper
+    function activateView(targetView) {
+      navTabs.forEach(t => {
+        const isTarget = t.getAttribute('data-view') === targetView;
+        t.classList.toggle('active', isTarget);
+        t.setAttribute('aria-selected', isTarget ? 'true' : 'false');
+      });
+
+      viewSections.forEach(sec => {
+        const isTarget = sec.id === `view-${targetView}`;
+        sec.classList.toggle('active', isTarget);
+      });
+
+      if (targetView === 'graph' && typeof GraphVisualizer !== 'undefined' && graphCanvas) {
+        GraphVisualizer.resize();
+        GraphVisualizer.buildGraph(Store.getNotes());
+      } else if (targetView === 'flashcards') {
+        initFlashcards();
+      } else if (targetView === 'dashboard') {
+        renderDashboard();
+      }
+    }
+
+    window.activateView = activateView;
+
     // Theme Switcher Initialization
     const savedTheme = Store.settings.theme || 'gemini-light';
     applyTheme(savedTheme);
@@ -133,6 +169,11 @@
     // Init Voice Engine Callback
     if (typeof VoiceEngine !== 'undefined') {
       VoiceEngine.init({
+        onTranscript: (text, isFinal) => {
+          if (isFinal && text) {
+            window.triggerSampleQuery(text);
+          }
+        },
         onStateChange: (state) => {
           if (typeof GeminiColorFlowEngine !== 'undefined') {
             GeminiColorFlowEngine.triggerState(state);
@@ -181,29 +222,7 @@
     navTabs.forEach(tab => {
       tab.addEventListener('click', () => {
         const targetView = tab.getAttribute('data-view');
-        navTabs.forEach(t => {
-          t.classList.remove('active');
-          t.setAttribute('aria-selected', 'false');
-        });
-        tab.classList.add('active');
-        tab.setAttribute('aria-selected', 'true');
-
-        viewSections.forEach(sec => {
-          sec.classList.remove('active');
-          if (sec.id === `view-${targetView}`) {
-            sec.classList.add('active');
-          }
-        });
-
-        // Specific view initializations
-        if (targetView === 'graph' && typeof GraphVisualizer !== 'undefined' && graphCanvas) {
-          GraphVisualizer.resize();
-          GraphVisualizer.buildGraph(Store.getNotes());
-        } else if (targetView === 'flashcards') {
-          initFlashcards();
-        } else if (targetView === 'dashboard') {
-          renderDashboard();
-        }
+        activateView(targetView);
       });
     });
 
@@ -260,6 +279,19 @@
 
       const queryStartTimeMs = typeof performance !== 'undefined' ? performance.now() : Date.now();
 
+      // RAG Progress Bar Elements
+      const progressBarContainer = document.getElementById('rag-progress-bar-container');
+      const progressStatusText = document.getElementById('rag-progress-status-text');
+      const progressPercentage = document.getElementById('rag-progress-percentage');
+      const progressFill = document.getElementById('rag-progress-fill');
+
+      if (progressBarContainer && progressFill && progressPercentage && progressStatusText) {
+        progressBarContainer.style.display = 'block';
+        progressFill.style.width = '15%';
+        progressPercentage.textContent = '15%';
+        progressStatusText.textContent = `⚡ RAG Vector Engine: Tokenizing "${query.substring(0, 25)}..."`;
+      }
+
       if (typeof GeminiColorFlowEngine !== 'undefined') {
         GeminiColorFlowEngine.triggerState('thinking', 4000);
       }
@@ -281,6 +313,15 @@
         submitBtn.disabled = true;
         submitBtn.innerHTML = 'Synthesizing...';
       }
+
+      // Progress animation update
+      setTimeout(() => {
+        if (progressFill && progressPercentage && progressStatusText) {
+          progressFill.style.width = '65%';
+          progressPercentage.textContent = '65%';
+          progressStatusText.textContent = `🧠 Computing TF-IDF Cosine Alignments & Extracting Citations...`;
+        }
+      }, 200);
 
       // Render Thinking indicator card in chat stream
       const thinkingCard = document.createElement('div');
@@ -308,6 +349,12 @@
       }
 
       setTimeout(() => {
+        if (progressFill && progressPercentage && progressStatusText) {
+          progressFill.style.width = '100%';
+          progressPercentage.textContent = '100%';
+          progressStatusText.textContent = `✅ Grounded RAG Answer Synthesized!`;
+        }
+
         if (thinkingCard && thinkingCard.parentNode) {
           thinkingCard.remove();
         }
@@ -334,6 +381,11 @@
 
         // Track query activity for resurfacing engine
         renderResurfacingDigest([query]);
+
+        // Hide progress bar after complete
+        setTimeout(() => {
+          if (progressBarContainer) progressBarContainer.style.display = 'none';
+        }, 1200);
       }, 600);
     }
 
