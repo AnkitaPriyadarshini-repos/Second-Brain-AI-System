@@ -241,6 +241,20 @@
       });
     }
 
+    const modelSelectBtns = document.querySelectorAll('.model-select-btn');
+    modelSelectBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        modelSelectBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const selectedModel = btn.getAttribute('data-model');
+        if (typeof RAGEngine !== 'undefined' && RAGEngine.setModel) {
+          RAGEngine.setModel(selectedModel);
+        }
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+        showToast(`AI Model Active: ${btn.innerText}`);
+      });
+    });
+
     if (ragQueryInput) {
       ragQueryInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.keyCode === 13) {
@@ -441,9 +455,9 @@
         }
 
         const actionsHTML = `<div class="chat-actions-bar">
-          <button class="chat-action-btn speak-btn" title="Listen to AI answer">Read Aloud</button>
-          <button class="chat-action-btn copy-btn" title="Copy answer">Copy Text</button>
-          ${isGeneralKnowledge ? `<button class="chat-action-btn save-answer-btn" title="Save answer to Second Brain">Save to Vault</button>` : ''}
+          <button class="chat-action-btn speak-btn" title="Listen to AI answer">🔊 Read Aloud</button>
+          <button class="chat-action-btn copy-btn" title="Copy answer">📋 Copy Text</button>
+          <button class="chat-action-btn save-answer-btn" title="Save answer directly to Second Brain Vault">➕ Save to Vault</button>
         </div>`;
 
         msgCard.innerHTML = `<div class="chat-header">
@@ -490,6 +504,7 @@
       if (copyBtn) {
         copyBtn.addEventListener('click', () => {
           navigator.clipboard.writeText(text);
+          if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
           showToast('Answer copied to clipboard.');
         });
       }
@@ -498,12 +513,18 @@
       const saveBtn = msgCard.querySelector('.save-answer-btn');
       if (saveBtn) {
         saveBtn.addEventListener('click', () => {
+          const cleanTitle = queryStr ? `AI Answer: ${queryStr}` : 'AI Generative Knowledge Note';
           const newNote = Store.addNote({
-            title: `AI Knowledge: ${queryStr || 'Synthesized Answer'}`,
+            title: cleanTitle,
             content: text.replace(/###|####|>|\*/g, ''),
             sourceType: 'typing'
           });
-          showToast('Saved answer as a new note in your Second Brain.');
+          if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
+          showToast('Saved AI answer as a new note in your Second Brain.');
+          refreshAllViews();
+          if (newNote) openNoteDrawer(newNote);
+        });
+      }
           refreshAllViews();
         });
       }
