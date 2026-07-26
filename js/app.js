@@ -293,9 +293,10 @@
         </div>
       `;
 
-      if (chatContainer) {
-        chatContainer.appendChild(thinkingCard);
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+      const targetContainer = document.getElementById('chat-container') || chatContainer || document.querySelector('.chat-card-wrapper');
+      if (targetContainer) {
+        targetContainer.appendChild(thinkingCard);
+        targetContainer.scrollTop = targetContainer.scrollHeight;
       }
 
       if (chatWrapper) {
@@ -309,7 +310,7 @@
 
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.innerHTML = '✨ Query RAG';
+          submitBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3m-3.5-6.5l-2 2m-7 7l-2 2m0-11l2 2m7 7l2 2"/></svg> Query RAG`;
         }
 
         const currentNotes = (typeof Store !== 'undefined' && Store.getNotes) ? Store.getNotes() : [];
@@ -333,7 +334,8 @@
     }
 
     function appendChatMessage(sender, text, citations = [], isGeneralKnowledge = false, queryStr = '') {
-      if (!chatContainer) return;
+      const targetContainer = document.getElementById('chat-container') || chatContainer || document.querySelector('.chat-card-wrapper');
+      if (!targetContainer) return;
 
       const msgCard = document.createElement('div');
       msgCard.className = `chat-bubble ${sender}-bubble glass-card`;
