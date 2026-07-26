@@ -240,6 +240,7 @@
     },
 
     handleQuickCaptureOrQuery: function (text) {
+      if (!text) return;
       this.recentQueries.unshift(text);
       if (this.recentQueries.length > 5) this.recentQueries.pop();
 
@@ -247,8 +248,11 @@
         const ragInput = document.getElementById('rag-query-input');
         const ragForm = document.getElementById('rag-query-form');
 
-        if (ragInput && ragForm) {
-          ragInput.value = text;
+        if (ragInput) ragInput.value = text;
+
+        if (typeof window !== 'undefined' && typeof window.triggerSampleQuery === 'function') {
+          window.triggerSampleQuery(text);
+        } else if (ragForm) {
           const submitEvent = new Event('submit', { cancelable: true, bubbles: true });
           ragForm.dispatchEvent(submitEvent);
         }
