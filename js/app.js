@@ -146,7 +146,7 @@
               voiceTriggerBtn.innerHTML = 'Speaking...';
             } else {
               voiceTriggerBtn.classList.remove('listening', 'speaking');
-              voiceTriggerBtn.innerHTML = 'Voice Assistant';
+              voiceTriggerBtn.innerHTML = '🎙️ Talk to Jarvis';
             }
           }
         }
@@ -308,7 +308,7 @@
         // Restore button state
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.innerHTML = 'Search Notes';
+          submitBtn.innerHTML = '✨ Query RAG';
         }
 
         // Perform Grounded RAG Query
