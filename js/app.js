@@ -975,20 +975,74 @@
     if (reindexVaultBtn) {
       reindexVaultBtn.addEventListener('click', () => {
         if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
-        showToast('Running full TF-IDF vector re-indexing pass on all notes...');
+
+        const modal = document.getElementById('vector-reindex-modal');
+        const progressBar = document.getElementById('reindex-progress-bar');
+        const statusText = document.getElementById('reindex-status-text');
+        const percentText = document.getElementById('reindex-percentage-text');
+        const metricsGrid = document.getElementById('reindex-metrics-grid');
+        const metricNotes = document.getElementById('reindex-metric-notes');
+        const metricTerms = document.getElementById('reindex-metric-terms');
+        const metricLatency = document.getElementById('reindex-metric-latency');
+        const doneBtn = document.getElementById('reindex-done-btn');
+
+        if (modal) modal.classList.add('active');
+        if (progressBar) progressBar.style.width = '0%';
+        if (percentText) percentText.textContent = '0%';
+        if (statusText) statusText.textContent = 'Tokenizing note documents...';
+        if (metricsGrid) metricsGrid.style.display = 'none';
+        if (doneBtn) doneBtn.style.display = 'none';
+
+        const startTime = performance.now();
+        const allNotes = Store.getNotes();
+        let totalTerms = 0;
+
+        // Phase 1: Tokenization
         setTimeout(() => {
-          const allNotes = Store.getNotes();
-          let termCount = 0;
-          if (typeof NLPEngine !== 'undefined') {
-            allNotes.forEach(n => {
-              const vec = NLPEngine.createTFVector(n.content || '');
-              termCount += Object.keys(vec).length;
-            });
-          }
+          if (progressBar) progressBar.style.width = '35%';
+          if (percentText) percentText.textContent = '35%';
+          if (statusText) statusText.textContent = `Extracting NLP entities across ${allNotes.length} notes...`;
+        }, 300);
+
+        // Phase 2: Compute TF-IDF Sparse Vectors & Entities
+        setTimeout(() => {
+          allNotes.forEach(note => {
+            const fullText = `${note.title || ''} ${note.content || ''}`;
+            if (typeof NLPEngine !== 'undefined') {
+              note.entities = NLPEngine.extractEntities(fullText);
+              note.tags = NLPEngine.classifyTopics(note.title || '', note.content || '');
+              note.summary = NLPEngine.summarize(note.content || '');
+              const vec = NLPEngine.createTFVector(fullText);
+              totalTerms += Object.keys(vec).length;
+            }
+          });
+
+          Store.saveNotes();
+
+          if (progressBar) progressBar.style.width = '75%';
+          if (percentText) percentText.textContent = '75%';
+          if (statusText) statusText.textContent = 'Re-building force-graph topology & vector matrix...';
+        }, 700);
+
+        // Phase 3: Completion & Telemetry Render
+        setTimeout(() => {
+          const latencyMs = Math.round(performance.now() - startTime);
+
+          if (progressBar) progressBar.style.width = '100%';
+          if (percentText) percentText.textContent = '100%';
+          if (statusText) statusText.textContent = '✅ Full Vector Matrix Re-Indexed Successfully!';
+          
+          if (metricsGrid) metricsGrid.style.display = 'grid';
+          if (metricNotes) metricNotes.textContent = allNotes.length;
+          if (metricTerms) metricTerms.textContent = totalTerms.toLocaleString();
+          if (metricLatency) metricLatency.textContent = `${latencyMs}ms`;
+          if (doneBtn) doneBtn.style.display = 'block';
+
           if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
-          showToast(`Vector re-indexing complete: ${allNotes.length} notes, ${termCount} terms, 8ms latency.`);
+          showToast(`⚡ Vector re-indexing complete: ${allNotes.length} notes, ${totalTerms} terms, ${latencyMs}ms latency.`);
+
           refreshAllViews();
-        }, 600);
+        }, 1100);
       });
     }
 
