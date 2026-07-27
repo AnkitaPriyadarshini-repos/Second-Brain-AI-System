@@ -139,9 +139,6 @@
     window.activateView = activateView;
 
     // Header Status Bar Interactive Pill Bindings
-    const privacyBadge = document.getElementById('privacy-badge');
-    const totalNotesCountBadge = document.getElementById('total-notes-count');
-
     if (privacyBadge) {
       privacyBadge.style.cursor = 'pointer';
       privacyBadge.addEventListener('click', () => {
@@ -150,9 +147,9 @@
       });
     }
 
-    if (totalNotesCountBadge) {
-      totalNotesCountBadge.style.cursor = 'pointer';
-      totalNotesCountBadge.addEventListener('click', () => {
+    if (totalNotesCountEl) {
+      totalNotesCountEl.style.cursor = 'pointer';
+      totalNotesCountEl.addEventListener('click', () => {
         if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
         activateView('vault');
       });
@@ -302,6 +299,7 @@
         const query = btn.getAttribute('data-query') || btn.innerText;
         if (query) {
           const cleanQuery = query.replace(/^["']|["']$/g, '');
+          if (typeof activateView === 'function') activateView('jarvis');
           if (ragQueryInput) ragQueryInput.value = cleanQuery;
           handleRAGQuery(cleanQuery);
         }
@@ -543,9 +541,6 @@
           showToast('Saved AI answer as a new note in your Second Brain.');
           refreshAllViews();
           if (newNote) openNoteDrawer(newNote);
-        });
-      }
-          refreshAllViews();
         });
       }
     }
