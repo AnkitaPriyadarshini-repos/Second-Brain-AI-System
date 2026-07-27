@@ -2219,5 +2219,101 @@ kbd {
   border-radius: 4px;
 }
 
+/* Hero Main Screen Robo Helper Companion */
+.main-hero-robo-banner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding: 18px 24px;
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: var(--radius-md);
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="gemini-light"] .main-hero-robo-banner {
+  background: rgba(99, 102, 241, 0.04);
+  border-color: rgba(99, 102, 241, 0.18);
+}
+
+.hero-robo-avatar-container {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  min-width: 76px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(99, 102, 241, 0.25));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(245, 158, 11, 0.45);
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.3);
+}
+
+.hero-robo-img {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
+}
+
+.float-animation {
+  animation: roboFloat 3.5s ease-in-out infinite;
+}
+
+@keyframes roboFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+
+.hero-robo-pulse-ring {
+  position: absolute;
+  top: -4px; left: -4px; right: -4px; bottom: -4px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent-amber);
+  opacity: 0;
+  animation: roboPulse 2.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+@keyframes roboPulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  100% { transform: scale(1.25); opacity: 0; }
+}
+
+.hero-robo-content {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.hero-robo-header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.hero-robo-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(99, 102, 241, 0.18));
+  color: var(--accent-amber);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.hero-robo-status-text {
+  font-size: 12px;
+  color: var(--accent-emerald);
+  font-weight: 600;
+}
+
+
 
 
