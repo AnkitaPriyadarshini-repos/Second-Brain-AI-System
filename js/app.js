@@ -1355,16 +1355,86 @@
     window.renderNotebookSources = renderNotebookSources;
     renderNotebookSources();
 
+    let podcastIsPlaying = false;
+    let podcastTimerInterval = null;
+    let podcastEqInterval = null;
+    let podcastCurrentSeconds = 0;
+    const podcastTotalSeconds = 84; // 01:24
+
     window.playAudioOverviewPodcast = function() {
       const btn = document.getElementById('podcast-play-btn');
-      if (btn) btn.textContent = '🔊 Synthesizing Podcast Audio...';
-      if (typeof VoiceEngine !== 'undefined' && VoiceEngine.speak) {
-        VoiceEngine.speak("Welcome to Juno AI Audio Overview! In today's deep-dive, Host Alex and Host Sarah analyze your research sources on deep learning, neural architectures, and distributed systems.");
+      const statusBadge = document.getElementById('podcast-status-badge');
+      const currentTimeEl = document.getElementById('podcast-current-time');
+      const eqBars = document.querySelectorAll('#podcast-waveform .eq-bar');
+
+      if (podcastIsPlaying) {
+        // Pause podcast
+        podcastIsPlaying = false;
+        if (btn) btn.innerHTML = '<span>▶</span> <span>Play Audio Overview</span>';
+        if (statusBadge) {
+          statusBadge.textContent = '● Paused';
+          statusBadge.style.color = '#f59e0b';
+        }
+        if (podcastTimerInterval) clearInterval(podcastTimerInterval);
+        if (podcastEqInterval) clearInterval(podcastEqInterval);
+        if (typeof window.speechSynthesis !== 'undefined') window.speechSynthesis.pause();
+        if (typeof showToast === 'function') showToast('Podcast Audio Paused ⏸');
+        return;
       }
-      if (typeof showToast === 'function') showToast('Playing Juno AI Deep-Dive Podcast Audio Overview!');
-      setTimeout(() => {
-        if (btn) btn.textContent = '▶ Play Audio Overview';
-      }, 7000);
+
+      // Resume or Start playing
+      podcastIsPlaying = true;
+      if (btn) btn.innerHTML = '<span>⏸</span> <span>Pause Audio Podcast</span>';
+      if (statusBadge) {
+        statusBadge.textContent = '● Playing Podcast';
+        statusBadge.style.color = '#10b981';
+      }
+
+      if (typeof showToast === 'function') showToast('Playing Juno AI Deep-Dive Podcast Audio Overview! 🎙️');
+
+      // Speech Synthesis Audio Playback
+      if (typeof VoiceEngine !== 'undefined' && VoiceEngine.speak) {
+        if (window.speechSynthesis && window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        } else {
+          VoiceEngine.speak("Welcome to Juno AI Deep-Dive Podcast! Today, Host Alex and Host Sarah analyze your research notes on deep learning, neural networks, and distributed systems.");
+        }
+      } else if (typeof SoundEngine !== 'undefined' && SoundEngine.playBeep) {
+        SoundEngine.playBeep(440, 'sine', 0.5);
+      }
+
+      // Timer Countdown Loop
+      if (podcastTimerInterval) clearInterval(podcastTimerInterval);
+      podcastTimerInterval = setInterval(() => {
+        if (!podcastIsPlaying) return;
+        podcastCurrentSeconds++;
+        if (podcastCurrentSeconds >= podcastTotalSeconds) {
+          podcastCurrentSeconds = 0;
+          podcastIsPlaying = false;
+          if (btn) btn.innerHTML = '<span>▶</span> <span>Play Audio Overview</span>';
+          if (statusBadge) {
+            statusBadge.textContent = '● Ready';
+            statusBadge.style.color = '#10b981';
+          }
+          if (podcastTimerInterval) clearInterval(podcastTimerInterval);
+          if (podcastEqInterval) clearInterval(podcastEqInterval);
+          return;
+        }
+
+        const mins = String(Math.floor(podcastCurrentSeconds / 60)).padStart(2, '0');
+        const secs = String(podcastCurrentSeconds % 60).padStart(2, '0');
+        if (currentTimeEl) currentTimeEl.textContent = `${mins}:${secs}`;
+      }, 1000);
+
+      // Waveform Equalizer Animation Loop
+      if (podcastEqInterval) clearInterval(podcastEqInterval);
+      podcastEqInterval = setInterval(() => {
+        if (!podcastIsPlaying) return;
+        eqBars.forEach(bar => {
+          const randomHeight = Math.floor(Math.random() * 20) + 6;
+          bar.style.height = `${randomHeight}px`;
+        });
+      }, 150);
     };
 
     // ----------------------------------------------------
