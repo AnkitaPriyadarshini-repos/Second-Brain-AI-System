@@ -645,14 +645,45 @@
       </div>
     </footer>
 
-  </main>
+<section id="view-dashboard" class="view-section" aria-label="Analytics & Knowledge Dashboard">
+      <!-- Quick Action Buttons Row -->
+      <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+        <button class="btn btn-primary" onclick="window.openModal('quick-note-modal')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          + Quick Capture Note
+        </button>
+        <button class="btn btn-secondary" onclick="window.activateView('jarvis')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+          Talk to Jarvis AI
+        </button>
+        <button class="btn btn-secondary" onclick="window.activateView('flashcards')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          Active Recall Flashcards
+        </button>
+        <button class="btn btn-secondary" onclick="window.activateView('graph')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="7.5" y1="8.5" x2="10.5" y2="15.5"/><line x1="16.5" y1="8.5" x2="13.5" y2="15.5"/></svg>
+          Inspect Knowledge Graph
+        </button>
+      </div>
 
-  <!-- Slide-out Note Detail Drawer Modal -->
-  <div id="note-drawer" class="note-drawer">
-    <button id="close-drawer-btn" class="drawer-close-btn">✕</button>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-right: 2rem; flex-wrap: wrap; gap: 8px;">
-      <h3 id="drawer-title" class="drawer-title-text">Note Details</h3>
-<div class="glass-card stat-card">
+      <div class="dashboard-grid">
+        <div class="glass-card stat-card">
+          <div class="stat-icon">Vault</div>
+          <div class="stat-info">
+            <span class="stat-label">Total Vault Notes</span>
+            <h3 id="stat-total-notes" class="stat-value">100</h3>
+          </div>
+        </div>
+
+        <div class="glass-card stat-card">
+          <div class="stat-icon">Channels</div>
+          <div class="stat-info">
+            <span class="stat-label">Ingest Surfaces</span>
+            <h3 id="stat-surfaces-count" class="stat-value">6 Channels</h3>
+          </div>
+        </div>
+
+        <div class="glass-card stat-card">
           <div class="stat-icon">Entities</div>
           <div class="stat-info">
             <span class="stat-label">Extracted Entities</span>
@@ -676,8 +707,21 @@
         </div>
 
         <div class="glass-card">
-          <h3 class="section-heading">Topic & Entity Cloud</h3>
+          <h3 class="section-heading">Topic &amp; Entity Cloud</h3>
           <div id="topic-tag-cloud" class="tag-cloud-box" style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px;"></div>
+        </div>
+      </div>
+
+      <!-- Live Recent Notes & Pinned Documents Widget -->
+      <div class="dashboard-sections-row" style="margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div class="glass-card">
+          <h3 class="section-heading">Recent Notes &amp; Captures</h3>
+          <div id="dashboard-recent-notes" style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+
+        <div class="glass-card">
+          <h3 class="section-heading">Pinned Knowledge Documents</h3>
+          <div id="dashboard-pinned-notes" style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px;"></div>
         </div>
       </div>
     </section>
@@ -1079,19 +1123,19 @@
   </div>
 
   <!-- JavaScript Modules -->
-  <script src="js/nlp-engine.js?v=12.0"></script>
-  <script src="js/store.js?v=12.0"></script>
-  <script src="js/rag-engine.js?v=12.0"></script>
-  <script src="js/voice-engine.js?v=12.0"></script>
-  <script src="js/audio-presets.js?v=12.0"></script>
-  <script src="js/sound-engine.js?v=12.0"></script>
-  <script src="js/resurfacing-engine.js?v=12.0"></script>
-  <script src="js/graph-visualizer.js?v=12.0"></script>
-  <script src="js/ai-engine.js?v=12.0"></script>
-  <script src="js/gemini-color-flow.js?v=12.0"></script>
-  <script src="js/nexus-bot.js?v=12.0"></script>
-  <script src="js/developer-hud.js?v=12.0"></script>
-  <script src="js/ai-agents.js?v=12.0"></script>
-  <script src="js/app.js?v=12.0"></script>
+  <script src="js/nlp-engine.js?v=13.0"></script>
+  <script src="js/store.js?v=13.0"></script>
+  <script src="js/rag-engine.js?v=13.0"></script>
+  <script src="js/voice-engine.js?v=13.0"></script>
+  <script src="js/audio-presets.js?v=13.0"></script>
+  <script src="js/sound-engine.js?v=13.0"></script>
+  <script src="js/resurfacing-engine.js?v=13.0"></script>
+  <script src="js/graph-visualizer.js?v=13.0"></script>
+  <script src="js/ai-engine.js?v=13.0"></script>
+  <script src="js/gemini-color-flow.js?v=13.0"></script>
+  <script src="js/nexus-bot.js?v=13.0"></script>
+  <script src="js/developer-hud.js?v=13.0"></script>
+  <script src="js/ai-agents.js?v=13.0"></script>
+  <script src="js/app.js?v=13.0"></script>
 </body>
 </html>
