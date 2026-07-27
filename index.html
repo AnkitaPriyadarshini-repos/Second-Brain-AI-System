@@ -93,70 +93,21 @@
         </div>
         <button class="theme-pill-btn" style="padding: 2px 8px; font-size: 11px; background: rgba(245, 158, 11, 0.15); color: #d97706; border-color: rgba(245, 158, 11, 0.3);" onclick="window.applyTheme(document.documentElement.getAttribute('data-theme') === 'sunflower-yellow' ? 'gemini-dark' : 'sunflower-yellow')">Theme</button>
       </div>
-    </aside>
-
-    <!-- Main Canvas Area -->
+    </aside>    <!-- Main Canvas Area -->
     <div class="app-main-canvas">
-
-      <!-- Top Action Bar with Themes & Modal Badges -->
-      <header class="top-action-bar" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; background: rgba(245, 158, 11, 0.05); border-bottom: 1px solid rgba(245, 158, 11, 0.15); margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-        <!-- Theme Toggle Pills -->
-        <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card); padding: 4px; border-radius: 20px; border: 1px solid var(--border-color);">
-          <button class="theme-pill-btn active" style="padding: 3px 10px; font-size: 11px; border-radius: 14px;" onclick="window.applyTheme('sunflower-yellow')">☀️ Yellow</button>
-          <button class="theme-pill-btn" style="padding: 3px 10px; font-size: 11px; border-radius: 14px;" onclick="window.applyTheme('gemini-light')">Light</button>
-          <button class="theme-pill-btn" style="padding: 3px 10px; font-size: 11px; border-radius: 14px;" onclick="window.applyTheme('editorial-paper')">Paper</button>
-          <button class="theme-pill-btn" style="padding: 3px 10px; font-size: 11px; border-radius: 14px;" onclick="window.applyTheme('gemini-dark')">Dark</button>
-        </div>
-
-        <!-- Action Badges -->
-        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-          <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 11.5px; border-radius: 16px; background: rgba(245, 158, 11, 0.15); color: #d97706; border-color: rgba(245, 158, 11, 0.3); font-weight: 700;" onclick="window.activateView('agents')">
-            🤖 AI Agents Fleet
-          </button>
-          <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 11.5px; border-radius: 16px;" onclick="window.openModal('architecture-modal')">
-            ⚙️ Specs
-          </button>
-          <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 11.5px; border-radius: 16px;" onclick="window.openModal('shortcuts-modal')">
-            ⌨️ Hotkeys
-          </button>
-          <button id="pwa-install-btn" class="btn btn-secondary" style="padding: 4px 12px; font-size: 11.5px; border-radius: 16px;" onclick="window.triggerPWAInstall()">
-            📲 Install App
-          </button>
-          <span style="font-size: 11px; color: var(--accent-emerald); font-weight: 700; background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 16px; border: 1px solid rgba(16, 185, 129, 0.2);">
-            🔒 Local Privacy Active
-          </span>
-        </div>
-      </header>
-
-        <!-- View 1: Juno AI — Future Neural RAG Architecture Studio -->
-        <section id="view-jarvis" class="view-section active" aria-label="Juno AI Studio Interface">
-          <div class="notebook-workspace-grid">
+      <!-- Main Studio View: Juno AI — Clean Workspace Interface -->
+      <section id="view-jarvis" class="view-section active" aria-label="Juno AI Studio Interface">
+        <div class="notebook-workspace-grid" style="grid-template-columns: 1fr 300px; gap: 24px;">
+          
+          <!-- Center Column: Clean Chat & Prompt Studio -->
+          <div class="notebook-chat-panel">
             
-            <!-- Left Column: Grounded Sources Panel -->
-            <aside class="notebook-sources-panel">
-              <div class="sources-header">
-                <span class="sources-title">Sources (100)</span>
-                <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="window.activateView('capture'); window.setCaptureTab('file');">+ Add Source</button>
+            <!-- Clean Hero Banner with Single Yellow Robot Mascot -->
+            <div class="main-hero-robo-banner glass-card" style="padding: 22px 26px; border-radius: 20px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(251, 191, 36, 0.08)); border: 1.5px solid rgba(245, 158, 11, 0.35); box-shadow: 0 10px 30px -5px rgba(245, 158, 11, 0.2); display: flex; align-items: center; gap: 24px; margin-bottom: 20px;">
+              <div class="hero-robo-avatar-container" style="width: 80px; height: 80px; min-width: 80px; min-height: 80px; position: relative; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                <img src="assets/nexus_yellow_bot.png" alt="Yellow Robot Copilot 🌼" class="hero-robo-img float-animation" style="width: 80px; height: 80px; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(245, 158, 11, 0.45)); cursor: pointer;" onclick="if(window.NexusBotEngine &amp;&amp; window.NexusBotEngine.speak){ window.NexusBotEngine.speak('Hi Ankita! I am your Yellow Robot thinking partner 🌼', 5000); }">
+                <span class="hero-robo-pulse-ring" style="position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px; border-radius: 50%; border: 2.5px solid #f59e0b; animation: floatAnim 2.5s infinite; opacity: 0.7; pointer-events: none;"></span>
               </div>
-              <div style="font-size: 11px; color: var(--accent-indigo); font-weight: 600; display: flex; align-items: center; gap: 4px; margin-bottom: 8px;">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                <span>Grounded on 100 sources</span>
-              </div>
-              <div id="notebook-sources-list" class="sources-list">
-                <!-- Populated via JavaScript renderNotebookSources() -->
-              </div>
-            </aside>
-
-            <!-- Center Column: Futuristic 3D Robot Copilot & AskFlow Prompt Studio -->
-            <div class="notebook-chat-panel">
-                        <!-- Single Iconic Yellow Robot Hero Banner: Perfect Golden Yellow Theme -->
-              <div class="main-hero-robo-banner glass-card" style="padding: 22px 26px; border-radius: 20px; background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(251, 191, 36, 0.08), rgba(99, 102, 241, 0.06)); border: 1.5px solid rgba(245, 158, 11, 0.35); box-shadow: 0 10px 30px -5px rgba(245, 158, 11, 0.2); display: flex; align-items: center; gap: 24px;">
-                
-                <!-- Single High-Res Yellow Robot Avatar -->
-                <div class="hero-robo-avatar-container" style="width: 88px; height: 88px; min-width: 88px; min-height: 88px; position: relative; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
-                  <img src="assets/nexus_yellow_bot.png" alt="Yellow Robot Copilot 🌼" class="hero-robo-img float-animation" style="width: 88px; height: 88px; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(245, 158, 11, 0.45)); cursor: pointer;" onclick="if(window.NexusBotEngine &amp;&amp; window.NexusBotEngine.speak){ window.NexusBotEngine.speak('Hi Ankita! I am your Yellow Robot thinking partner 🌼', 5000); }">
-                  <span class="hero-robo-pulse-ring" style="position: absolute; top: -4px; left: -4px; right: -4px; bottom: -4px; border-radius: 50%; border: 2.5px solid #f59e0b; animation: floatAnim 2.5s infinite; opacity: 0.7; pointer-events: none;"></span>
-                </div>
 
                 <div class="hero-robo-content" style="display: flex; flex-direction: column; text-align: left; flex: 1;">
                   <div class="hero-robo-header-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap;">
@@ -1241,19 +1192,19 @@
   </nav>
 
   <!-- JavaScript Modules -->
-  <script src="js/nlp-engine.js?v=31.0"></script>
-  <script src="js/store.js?v=31.0"></script>
-  <script src="js/rag-engine.js?v=31.0"></script>
-  <script src="js/voice-engine.js?v=31.0"></script>
-  <script src="js/audio-presets.js?v=31.0"></script>
-  <script src="js/sound-engine.js?v=31.0"></script>
-  <script src="js/resurfacing-engine.js?v=31.0"></script>
-  <script src="js/graph-visualizer.js?v=31.0"></script>
-  <script src="js/ai-engine.js?v=31.0"></script>
-  <script src="js/gemini-color-flow.js?v=31.0"></script>
-  <script src="js/nexus-bot.js?v=31.0"></script>
-  <script src="js/developer-hud.js?v=31.0"></script>
-  <script src="js/ai-agents.js?v=31.0"></script>
-  <script src="js/app.js?v=31.0"></script>
+  <script src="js/nlp-engine.js?v=32.0"></script>
+  <script src="js/store.js?v=32.0"></script>
+  <script src="js/rag-engine.js?v=32.0"></script>
+  <script src="js/voice-engine.js?v=32.0"></script>
+  <script src="js/audio-presets.js?v=32.0"></script>
+  <script src="js/sound-engine.js?v=32.0"></script>
+  <script src="js/resurfacing-engine.js?v=32.0"></script>
+  <script src="js/graph-visualizer.js?v=32.0"></script>
+  <script src="js/ai-engine.js?v=32.0"></script>
+  <script src="js/gemini-color-flow.js?v=32.0"></script>
+  <script src="js/nexus-bot.js?v=32.0"></script>
+  <script src="js/developer-hud.js?v=32.0"></script>
+  <script src="js/ai-agents.js?v=32.0"></script>
+  <script src="js/app.js?v=32.0"></script>
 </body>
 </html>
