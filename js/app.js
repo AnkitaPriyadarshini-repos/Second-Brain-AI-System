@@ -137,6 +137,78 @@
     }
 
     window.activateView = activateView;
+    window.applyTheme = applyTheme;
+    window.openModal = function(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) modal.classList.add('active');
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+    };
+    window.closeModal = function(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) modal.classList.remove('active');
+    };
+    window.triggerSampleQuery = function(queryText) {
+      if (!queryText) return;
+      const cleanQuery = queryText.replace(/^["']|["']$/g, '');
+      window.activateView('jarvis');
+      const inputEl = document.getElementById('rag-query-input');
+      if (inputEl) inputEl.value = cleanQuery;
+      if (typeof handleRAGQuery === 'function') handleRAGQuery(cleanQuery);
+    };
+    window.submitRAGQuery = function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const inputEl = document.getElementById('rag-query-input');
+      const query = inputEl ? inputEl.value.trim() : '';
+      if (query && typeof handleRAGQuery === 'function') handleRAGQuery(query);
+    };
+    window.toggleVoiceListen = function() {
+      if (typeof VoiceEngine !== 'undefined' && VoiceEngine.toggleListen) {
+        VoiceEngine.toggleListen();
+      }
+    };
+    window.setCaptureTab = function(targetTarget) {
+      const captureTabs = document.querySelectorAll('.capture-tab');
+      const capturePanels = document.querySelectorAll('.capture-panel');
+      captureTabs.forEach(t => t.classList.toggle('active', t.getAttribute('data-target') === targetTarget));
+      capturePanels.forEach(p => p.classList.toggle('active', p.id === `capture-${targetTarget}`));
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+    };
+    window.runAgent = function(agentId) {
+      if (typeof AIAgentFleetEngine !== 'undefined') {
+        if (agentId === 'summarizer') AIAgentFleetEngine.runSummarizerAgent();
+        else if (agentId === 'tutor') AIAgentFleetEngine.runTutorAgent();
+        else if (agentId === 'topology') AIAgentFleetEngine.runTopologyAgent();
+        else if (agentId === 'resurfacing') AIAgentFleetEngine.runResurfacingAgent();
+        else if (agentId === 'diagnostics') AIAgentFleetEngine.runDiagnosticsAgent();
+      }
+    };
+    window.toggleNexusWidget = function() {
+      const widget = document.getElementById('nexus-bot-widget');
+      const toggleBtn = document.getElementById('nexus-bot-toggle-btn');
+      if (widget) {
+        widget.classList.toggle('minimized');
+        if (toggleBtn) {
+          toggleBtn.textContent = widget.classList.contains('minimized') ? '+' : '–';
+        }
+      }
+    };
+    window.setNexusMode = function(mode) {
+      if (typeof NexusBotEngine !== 'undefined' && NexusBotEngine.setRoboMode) {
+        NexusBotEngine.setRoboMode(mode);
+      }
+    };
+    window.runNexusScan = function() {
+      if (typeof NexusBotEngine !== 'undefined' && NexusBotEngine.runDiagnostics) {
+        NexusBotEngine.runDiagnostics();
+      }
+    };
+    window.sendNexusQuickQuery = function() {
+      const input = document.getElementById('nexus-bot-quick-input');
+      if (input && input.value.trim() && typeof NexusBotEngine !== 'undefined') {
+        NexusBotEngine.handleQuickCaptureOrQuery(input.value.trim());
+        input.value = '';
+      }
+    };
 
     // Brand Logo Click Binding
     const brandLogo = document.querySelector('.brand-logo');
@@ -347,6 +419,8 @@
 
     function handleRAGQuery(query) {
       if (!query) return;
+
+      window.handleRAGQuery = handleRAGQuery;
 
       let rag = typeof RAGEngine !== 'undefined' ? RAGEngine : (typeof window !== 'undefined' ? window.RAGEngine : null);
       if (!rag) return;
