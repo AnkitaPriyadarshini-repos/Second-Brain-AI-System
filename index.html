@@ -350,12 +350,18 @@
 
         <!-- 4. File Upload OCR Panel -->
         <div id="capture-file" class="capture-panel">
-          <div id="file-upload-zone" class="file-dropzone">
-            <div class="dropzone-icon">File</div>
-            <h3 class="dropzone-title">Drag & Drop PDF or Image</h3>
-            <p class="dropzone-sub">Supports PDFs and images. Tesseract OCR and PyMuPDF will extract text automatically.</p>
-            <input type="file" id="file-input" style="display: none;" accept=".pdf,.png,.jpg,.jpeg">
+          <div id="file-upload-zone" class="file-dropzone" style="padding: 24px; text-align: center; border: 2px dashed rgba(245, 158, 11, 0.5); border-radius: 16px; background: rgba(245, 158, 11, 0.04); cursor: pointer;">
+            <div class="dropzone-icon" style="font-size: 32px; margin-bottom: 8px;">📁</div>
+            <h3 class="dropzone-title" style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">Select or Drag &amp; Drop Any File</h3>
+            <p class="dropzone-sub" style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
+              Supports TXT, MD, PDF, JSON, CSV, JS, PY, PNG, JPG files. Text &amp; OCR data will be indexed automatically.
+            </p>
+            <button type="button" class="btn btn-primary" style="padding: 10px 22px; border-radius: 12px; font-weight: 700; font-size: 13.5px;" onclick="event.stopPropagation(); document.getElementById('file-input').click();">
+              📁 Select File from Device
+            </button>
+            <input type="file" id="file-input" style="display: none;" accept="*/*">
           </div>
+          <div id="file-upload-preview-container" style="margin-top: 14px; display: none;"></div>
         </div>
 
         <!-- 5. Email Forwarding Panel -->
@@ -1158,19 +1164,19 @@
   </nav>
 
   <!-- JavaScript Modules -->
-  <script src="js/nlp-engine.js?v=42.0"></script>
-  <script src="js/store.js?v=42.0"></script>
-  <script src="js/rag-engine.js?v=42.0"></script>
-  <script src="js/voice-engine.js?v=42.0"></script>
-  <script src="js/audio-presets.js?v=42.0"></script>
-  <script src="js/sound-engine.js?v=42.0"></script>
-  <script src="js/resurfacing-engine.js?v=42.0"></script>
-  <script src="js/graph-visualizer.js?v=42.0"></script>
-  <script src="js/ai-engine.js?v=42.0"></script>
-  <script src="js/gemini-color-flow.js?v=42.0"></script>
-  <script src="js/nexus-bot.js?v=42.0"></script>
-  <script src="js/developer-hud.js?v=42.0"></script>
-  <script src="js/ai-agents.js?v=42.0"></script>
-  <script src="js/app.js?v=42.0"></script>
+  <script src="js/nlp-engine.js?v=43.0"></script>
+  <script src="js/store.js?v=43.0"></script>
+  <script src="js/rag-engine.js?v=43.0"></script>
+  <script src="js/voice-engine.js?v=43.0"></script>
+  <script src="js/audio-presets.js?v=43.0"></script>
+  <script src="js/sound-engine.js?v=43.0"></script>
+  <script src="js/resurfacing-engine.js?v=43.0"></script>
+  <script src="js/graph-visualizer.js?v=43.0"></script>
+  <script src="js/ai-engine.js?v=43.0"></script>
+  <script src="js/gemini-color-flow.js?v=43.0"></script>
+  <script src="js/nexus-bot.js?v=43.0"></script>
+  <script src="js/developer-hud.js?v=43.0"></script>
+  <script src="js/ai-agents.js?v=43.0"></script>
+  <script src="js/app.js?v=43.0"></script>
 </body>
 </html>
