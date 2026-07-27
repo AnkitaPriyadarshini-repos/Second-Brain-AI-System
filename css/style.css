@@ -19,11 +19,11 @@
   --text-muted: #854d0e;
 }
 
-.sidebar-brand,
-.sidebar-brand:hover,
-.sidebar-brand:focus,
-.sidebar-brand span {
+a, a:hover, a:visited, a:focus, a:active,
+.sidebar-brand, .sidebar-brand:hover, .sidebar-brand:focus, .sidebar-brand span {
   text-decoration: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
   outline: none !important;
 }
   
