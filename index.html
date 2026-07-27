@@ -39,14 +39,26 @@
     <aside class="app-sidebar">
       <div>
         <div class="sidebar-brand" style="text-decoration: none !important; display: flex; align-items: center; gap: 12px; margin-bottom: 24px; cursor: pointer; user-select: none;" onclick="window.activateView('jarvis'); return false;">
-          <div class="brand-icon-wrapper" style="background: linear-gradient(135deg, #1e293b, #0f172a); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3); border: 1.5px solid rgba(245, 158, 11, 0.4); flex-shrink: 0;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="#facc15" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.8));">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          <div class="brand-icon-wrapper" style="background: linear-gradient(135deg, #0f172a, #1e293b); width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35); border: 1.5px solid rgba(251, 191, 36, 0.5); flex-shrink: 0; transition: transform 0.2s ease;">
+            <svg width="26" height="26" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.85));">
+              <defs>
+                <radialGradient id="junoMoonGrad" cx="35%" cy="30%" r="70%">
+                  <stop offset="0%" stop-color="#fffbeb" />
+                  <stop offset="35%" stop-color="#fef08a" />
+                  <stop offset="70%" stop-color="#facc15" />
+                  <stop offset="100%" stop-color="#d97706" />
+                </radialGradient>
+              </defs>
+              <path d="M27.5 16.8A12.5 12.5 0 1 1 14.5 4a9.8 9.8 0 0 0 13 12.8z" fill="url(#junoMoonGrad)" stroke="#f59e0b" stroke-width="0.75" />
+              <circle cx="13" cy="12" r="1.8" fill="#d97706" opacity="0.3" />
+              <circle cx="17" cy="18" r="1.4" fill="#d97706" opacity="0.25" />
+              <circle cx="10" cy="19" r="1.1" fill="#b45309" opacity="0.25" />
+              <circle cx="16" cy="8.5" r="1.0" fill="#d97706" opacity="0.2" />
             </svg>
           </div>
           <div style="display: flex; flex-direction: column;">
-            <span style="font-weight: 800; font-size: 16.5px; color: var(--text-primary); text-decoration: none !important; border: none !important; line-height: 1.2;">Juno AI</span>
-            <span style="font-size: 11px; color: #d97706; font-weight: 700; text-decoration: none !important; border: none !important; margin-top: 2px;">Natural Moon Partner</span>
+            <span style="font-weight: 800; font-size: 17px; color: var(--text-primary); text-decoration: none !important; border: none !important; line-height: 1.2;">Juno AI</span>
+            <span style="font-size: 11px; color: #d97706; font-weight: 700; text-decoration: none !important; border: none !important; margin-top: 2px;">Natural Moon Partner 🌙</span>
           </div>
         </div>
 
@@ -1164,19 +1176,19 @@
   </nav>
 
   <!-- JavaScript Modules -->
-  <script src="js/nlp-engine.js?v=44.0"></script>
-  <script src="js/store.js?v=44.0"></script>
-  <script src="js/rag-engine.js?v=44.0"></script>
-  <script src="js/voice-engine.js?v=44.0"></script>
-  <script src="js/audio-presets.js?v=44.0"></script>
-  <script src="js/sound-engine.js?v=44.0"></script>
-  <script src="js/resurfacing-engine.js?v=44.0"></script>
-  <script src="js/graph-visualizer.js?v=44.0"></script>
-  <script src="js/ai-engine.js?v=44.0"></script>
-  <script src="js/gemini-color-flow.js?v=44.0"></script>
-  <script src="js/nexus-bot.js?v=44.0"></script>
-  <script src="js/developer-hud.js?v=44.0"></script>
-  <script src="js/ai-agents.js?v=44.0"></script>
-  <script src="js/app.js?v=44.0"></script>
+  <script src="js/nlp-engine.js?v=45.0"></script>
+  <script src="js/store.js?v=45.0"></script>
+  <script src="js/rag-engine.js?v=45.0"></script>
+  <script src="js/voice-engine.js?v=45.0"></script>
+  <script src="js/audio-presets.js?v=45.0"></script>
+  <script src="js/sound-engine.js?v=45.0"></script>
+  <script src="js/resurfacing-engine.js?v=45.0"></script>
+  <script src="js/graph-visualizer.js?v=45.0"></script>
+  <script src="js/ai-engine.js?v=45.0"></script>
+  <script src="js/gemini-color-flow.js?v=45.0"></script>
+  <script src="js/nexus-bot.js?v=45.0"></script>
+  <script src="js/developer-hud.js?v=45.0"></script>
+  <script src="js/ai-agents.js?v=45.0"></script>
+  <script src="js/app.js?v=45.0"></script>
 </body>
 </html>
