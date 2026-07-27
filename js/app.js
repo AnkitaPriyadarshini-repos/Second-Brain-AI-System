@@ -139,8 +139,10 @@
       });
 
       if (targetView === 'graph' && typeof GraphVisualizer !== 'undefined' && graphCanvas) {
-        GraphVisualizer.resize();
-        GraphVisualizer.buildGraph(Store.getNotes());
+        setTimeout(() => {
+          GraphVisualizer.resize();
+          GraphVisualizer.buildGraph(Store.getNotes());
+        }, 50);
       } else if (targetView === 'flashcards') {
         initFlashcards();
       } else if (targetView === 'dashboard') {
@@ -150,6 +152,19 @@
 
     window.activateView = activateView;
     window.applyTheme = applyTheme;
+    window.filterKnowledgeGraph = function(val) {
+      if (typeof GraphVisualizer !== 'undefined') GraphVisualizer.applyFilter(val);
+    };
+    window.zoomKnowledgeGraph = function(factor) {
+      if (typeof GraphVisualizer !== 'undefined') GraphVisualizer.zoom(factor);
+    };
+    window.resetKnowledgeGraph = function() {
+      if (typeof GraphVisualizer !== 'undefined') {
+        GraphVisualizer.resetTransform();
+        GraphVisualizer.resize();
+        GraphVisualizer.buildGraph(Store.getNotes());
+      }
+    };
     window.openModal = function(modalId) {
       const modal = document.getElementById(modalId);
       if (modal) modal.classList.add('active');

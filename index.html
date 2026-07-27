@@ -473,26 +473,47 @@
 
     <!-- View 4: Interactive Knowledge Graph -->
     <section id="view-graph" class="view-section" aria-label="Knowledge Graph Visualizer">
-      <div class="glass-card">
-        <div class="graph-header-row">
+      <div class="glass-card" style="padding: 24px; border-radius: 20px;">
+        <div class="graph-header-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 18px;">
           <div>
-            <h2 class="section-heading">Interactive Knowledge Graph Network</h2>
-            <p class="section-subtext">
-              Notes are connected automatically by shared NLP entities (people, places, concepts) and topic labels. Drag nodes or hover to inspect connections.
+            <h2 class="section-heading" style="margin-bottom: 4px;">🧠 Interactive Knowledge Graph Network</h2>
+            <p class="section-subtext" style="margin-bottom: 0;">
+              Notes are connected automatically by shared NLP entities &amp; topic clusters. Click any node to open details, or drag to explore network topology.
             </p>
           </div>
-          <div class="graph-legend">
-            <span style="color: var(--accent-violet);">● Typing</span>
-            <span style="color: var(--accent-emerald);">● Voice</span>
-            <span style="color: var(--accent-amber);">● Clip</span>
-            <span style="color: var(--accent-blue);">● Bookmark</span>
-            <span style="color: var(--accent-pink);">● PDF</span>
-            <span style="color: var(--text-muted);">● Entity</span>
+          <div class="graph-legend" style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; font-weight: 600;">
+            <span style="color: #8b5cf6;">● Typing Note</span>
+            <span style="color: #10b981;">● Voice Memo</span>
+            <span style="color: #f59e0b;">● Web Clip</span>
+            <span style="color: #3b82f6;">● Bookmark</span>
+            <span style="color: #ec4899;">● File OCR</span>
+            <span style="color: #64748b;">● Entity Node</span>
           </div>
         </div>
 
-        <div class="graph-container">
-          <canvas id="graph-canvas" class="graph-canvas"></canvas>
+        <!-- Graph Controls Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; padding: 10px 16px; background: rgba(0,0,0,0.03); border-radius: 12px; border: 1px solid var(--border-color);">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span id="graph-node-count-badge" class="status-badge online">● Loading Graph...</span>
+            <select id="graph-filter-select" class="input-field" style="padding: 4px 10px; font-size: 12px; height: 32px; width: auto;" onchange="window.filterKnowledgeGraph(this.value)">
+              <option value="all">Filter: All Nodes &amp; Entities</option>
+              <option value="notes">Notes Only</option>
+              <option value="entities">Entities Only</option>
+              <option value="voice">Voice Memos</option>
+              <option value="clip">Web Clips</option>
+              <option value="file">File OCR</option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px; height: 32px;" onclick="window.zoomKnowledgeGraph(1.2)" title="Zoom In">🔍 Zoom +</button>
+            <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px; height: 32px;" onclick="window.zoomKnowledgeGraph(0.8)" title="Zoom Out">🔍 Zoom -</button>
+            <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px; height: 32px;" onclick="window.resetKnowledgeGraph()" title="Reset Network Position">🔄 Reset Topology</button>
+          </div>
+        </div>
+
+        <div class="graph-container" style="position: relative; width: 100%; height: 600px; min-height: 500px; border-radius: 16px; overflow: hidden; background: var(--bg-card); border: 1.5px solid var(--border-color); box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);">
+          <canvas id="graph-canvas" class="graph-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
         </div>
       </div>
     </section>
