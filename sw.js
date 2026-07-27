@@ -1,6 +1,6 @@
 /* Second Brain AI System — Service Worker for Offline PWA Support */
 
-const CACHE_NAME = 'second-brain-cache-v33.0';
+const CACHE_NAME = 'second-brain-cache-v34.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

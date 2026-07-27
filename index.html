@@ -110,18 +110,13 @@
               </div>
 
                 <div class="hero-robo-content" style="display: flex; flex-direction: column; text-align: left; flex: 1;">
-                  <div class="hero-robo-header-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap;">
-                    <span class="hero-robo-badge" style="font-size: 10.5px; font-weight: 800; padding: 3px 12px; border-radius: 20px; background: linear-gradient(90deg, #f59e0b, #d97706); color: #ffffff; text-transform: uppercase; letter-spacing: 0.08em; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.35);">🌼 JUNO AI — YELLOW ROBOT COPILOT</span>
-                    <span style="font-size: 11px; color: #d97706; font-weight: 700; display: flex; align-items: center; gap: 4px;">
-                      <span style="width: 6px; height: 6px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 8px #f59e0b;"></span>
-                      Golden Yellow Theme Active
-                    </span>
+                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <span style="font-size: 10px; font-weight: 800; padding: 2px 10px; border-radius: 20px; background: #f59e0b; color: #ffffff; text-transform: uppercase; letter-spacing: 0.06em;">🌼 JUNO AI COPILOT</span>
+                    <span style="font-size: 11px; color: #d97706; font-weight: 700;">● Grounded on 100+ Sources</span>
                   </div>
-                  <h1 class="hero-title" style="font-size: 24px; font-weight: 900; color: var(--text-primary); margin: 2px 0 6px 0; letter-spacing: -0.02em;">
-                    Good day, Ankita 👋 <span style="font-size: 14px; font-weight: 600; color: #d97706; margin-left: 8px;">• Yellow Robot Online</span>
-                  </h1>
+                  <h1 class="hero-title" style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 2px 0 4px 0;">Good day, Ankita 👋</h1>
                   <p class="hero-subtitle" style="font-size: 13.5px; color: var(--text-secondary); margin: 0; line-height: 1.45;">
-                    Your single iconic Yellow Robot Thinking Partner. Ask questions, recall notes, or generate audio podcast overviews grounded in 100+ sources.
+                    What would you like to ask Juno today?
                   </p>
                 </div>
               </div>
@@ -130,22 +125,22 @@
               <div class="prompt-cards-grid">
                 <div class="prompt-card-item" onclick="window.triggerSampleQuery('What did I save about deep learning last month?')">
                   <div class="prompt-card-icon">💡</div>
-                  <div class="prompt-card-text">Summarize my notes on deep learning &amp; neural models.</div>
+                  <div class="prompt-card-text" style="font-weight: 600;">Deep Learning Notes</div>
                 </div>
                 <div class="prompt-card-item" onclick="window.triggerSampleQuery('Startup idea I had in January?')">
                   <div class="prompt-card-icon">🚀</div>
-                  <div class="prompt-card-text">Recall my startup ideas &amp; product plans from January.</div>
+                  <div class="prompt-card-text" style="font-weight: 600;">Startup Ideas</div>
                 </div>
                 <div class="prompt-card-item" onclick="window.triggerSampleQuery('Article on sleep and memory?')">
                   <div class="prompt-card-icon">🧠</div>
-                  <div class="prompt-card-text">Synthesize research on sleep, memory &amp; learning.</div>
+                  <div class="prompt-card-text" style="font-weight: 600;">Sleep &amp; Memory</div>
                 </div>
               </div>
 
               <!-- Centered Prompt Input Box -->
               <div style="width: 100%; margin-bottom: 24px;">
                 <form id="rag-query-form" class="enterprise-prompt-container" onsubmit="window.submitRAGQuery(event); return false;">
-                  <textarea id="rag-query-input" class="prompt-textarea" placeholder="Ask Juno AI anything... ✨ (e.g. 'What did I save about deep learning last month?')" aria-label="Query Input" rows="2"></textarea>
+                  <textarea id="rag-query-input" class="prompt-textarea" placeholder="Ask Juno anything... ✨" aria-label="Query Input" rows="2"></textarea>
                   
                   <div class="prompt-toolbar">
                     <div class="prompt-actions-left">
@@ -155,13 +150,13 @@
                       </button>
                       <button type="button" id="voice-trigger-btn" class="btn-prompt-action" title="Voice Input" onclick="window.toggleVoiceListen()">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-                        <span>Voice Input</span>
+                        <span>Voice</span>
                       </button>
                     </div>
 
                     <div class="prompt-actions-right">
                       <span class="kbd-badge" title="Press Ctrl + Enter to submit">Ctrl ↵</span>
-                      <button type="submit" id="rag-submit-btn" class="btn btn-primary" style="padding: 8px 20px; border-radius: var(--radius-md);" onclick="window.submitRAGQuery(event)">
+                      <button type="submit" id="rag-submit-btn" class="btn btn-primary" style="padding: 8px 20px; border-radius: var(--radius-md); font-weight: 700;" onclick="window.submitRAGQuery(event)">
                         Ask Juno ✨
                       </button>
                     </div>
@@ -169,19 +164,18 @@
                 </form>
 
                 <!-- Deliberate RAG Progress & Diagnostic Feedback Bar -->
-                <div id="rag-progress-bar-container" class="rag-progress-bar-container" style="display: none; margin-top: 14px; padding: 10px 14px; background: rgba(99, 102, 241, 0.06); border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.2);">
-                  <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; color: var(--accent-indigo); font-weight: 600;">
-                    <span id="rag-progress-status-text">⚡ Juno AI Engine: Searching grounded sources &amp; computing vector similarity...</span>
+                <div id="rag-progress-bar-container" class="rag-progress-bar-container" style="display: none; margin-top: 14px; padding: 10px 14px; background: rgba(245, 158, 11, 0.08); border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.25);">
+                  <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; color: #d97706; font-weight: 600;">
+                    <span id="rag-progress-status-text">⚡ Juno AI: Searching grounded sources...</span>
                     <span id="rag-progress-percentage">0%</span>
                   </div>
                   <div style="height: 6px; background: rgba(0, 0, 0, 0.08); border-radius: 3px; overflow: hidden;">
-                    <div id="rag-progress-fill" style="height: 100%; width: 0%; background: linear-gradient(90deg, #6366f1, #10b981, #ec4899); transition: width 0.15s ease-out; border-radius: 3px;"></div>
+                    <div id="rag-progress-fill" style="height: 100%; width: 0%; background: linear-gradient(90deg, #f59e0b, #10b981); transition: width 0.15s ease-out; border-radius: 3px;"></div>
                   </div>
                 </div>
 
                 <!-- Sample Query Pills -->
-                <div class="sample-queries-container">
-                  <span class="sample-label">Suggested research prompts:</span>
+                <div class="sample-queries-container" style="margin-top: 12px;">
                   <div class="sample-queries-row">
                     <button class="sample-query-btn" data-query="Deep learning notes" onclick="window.triggerSampleQuery('What did I save about deep learning last month?')">Deep learning notes</button>
                     <button class="sample-query-btn" data-query="Startup ideas" onclick="window.triggerSampleQuery('Startup idea I had in January?')">Startup ideas</button>
@@ -1192,19 +1186,19 @@
   </nav>
 
   <!-- JavaScript Modules -->
-  <script src="js/nlp-engine.js?v=33.0"></script>
-  <script src="js/store.js?v=33.0"></script>
-  <script src="js/rag-engine.js?v=33.0"></script>
-  <script src="js/voice-engine.js?v=33.0"></script>
-  <script src="js/audio-presets.js?v=33.0"></script>
-  <script src="js/sound-engine.js?v=33.0"></script>
-  <script src="js/resurfacing-engine.js?v=33.0"></script>
-  <script src="js/graph-visualizer.js?v=33.0"></script>
-  <script src="js/ai-engine.js?v=33.0"></script>
-  <script src="js/gemini-color-flow.js?v=33.0"></script>
-  <script src="js/nexus-bot.js?v=33.0"></script>
-  <script src="js/developer-hud.js?v=33.0"></script>
-  <script src="js/ai-agents.js?v=33.0"></script>
-  <script src="js/app.js?v=33.0"></script>
+  <script src="js/nlp-engine.js?v=34.0"></script>
+  <script src="js/store.js?v=34.0"></script>
+  <script src="js/rag-engine.js?v=34.0"></script>
+  <script src="js/voice-engine.js?v=34.0"></script>
+  <script src="js/audio-presets.js?v=34.0"></script>
+  <script src="js/sound-engine.js?v=34.0"></script>
+  <script src="js/resurfacing-engine.js?v=34.0"></script>
+  <script src="js/graph-visualizer.js?v=34.0"></script>
+  <script src="js/ai-engine.js?v=34.0"></script>
+  <script src="js/gemini-color-flow.js?v=34.0"></script>
+  <script src="js/nexus-bot.js?v=34.0"></script>
+  <script src="js/developer-hud.js?v=34.0"></script>
+  <script src="js/ai-agents.js?v=34.0"></script>
+  <script src="js/app.js?v=34.0"></script>
 </body>
 </html>
