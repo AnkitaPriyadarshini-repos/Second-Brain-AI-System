@@ -1267,6 +1267,49 @@
     </div>
   </div>
 
+  <!-- Vector Re-Indexing Progress Modal -->
+  <div id="vector-reindex-modal" class="spec-modal-overlay">
+    <div class="spec-modal-card" style="max-width: 580px; text-align: center;">
+      <button class="spec-modal-close-btn" onclick="window.closeModal('vector-reindex-modal')">✕</button>
+      <h2 style="font-size: 20px; font-weight: 700; color: var(--accent-amber); margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span>⚡ On-Device TF-IDF Vector Re-Indexing</span>
+      </h2>
+      <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 20px;">
+        Re-computing sparse term frequency matrices, cosine similarity alignments, and NLP entity tags across all vault notes.
+      </p>
+
+      <div style="margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 6px;">
+          <span id="reindex-status-text" style="color: var(--text-primary);">Tokenizing note documents...</span>
+          <span id="reindex-percentage-text" style="color: var(--accent-amber);">0%</span>
+        </div>
+        <div style="height: 10px; background: rgba(255, 255, 255, 0.08); border-radius: 5px; overflow: hidden; border: 1px solid var(--border-color);">
+          <div id="reindex-progress-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #f59e0b, #fbbf24); border-radius: 5px; transition: width 0.2s linear;"></div>
+        </div>
+      </div>
+
+      <!-- Live Inspection Metrics Grid -->
+      <div id="reindex-metrics-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; display: none;">
+        <div class="glass-card" style="padding: 12px; border-radius: 10px;">
+          <div style="font-size: 11px; color: var(--text-muted);">Indexed Notes</div>
+          <div id="reindex-metric-notes" style="font-size: 18px; font-weight: 800; color: var(--text-primary);">0</div>
+        </div>
+        <div class="glass-card" style="padding: 12px; border-radius: 10px;">
+          <div style="font-size: 11px; color: var(--text-muted);">TF-IDF Terms</div>
+          <div id="reindex-metric-terms" style="font-size: 18px; font-weight: 800; color: var(--accent-amber);">0</div>
+        </div>
+        <div class="glass-card" style="padding: 12px; border-radius: 10px;">
+          <div style="font-size: 11px; color: var(--text-muted);">Compute Latency</div>
+          <div id="reindex-metric-latency" style="font-size: 18px; font-weight: 800; color: var(--accent-emerald);">0ms</div>
+        </div>
+      </div>
+
+      <button id="reindex-done-btn" class="btn btn-primary" style="width: 100%; display: none;" onclick="window.closeModal('vector-reindex-modal')">
+        ✅ Indexing Complete &amp; Saved
+      </button>
+    </div>
+  </div>
+
   <!-- JavaScript Modules -->
   <script src="js/nlp-engine.js?v=51.0"></script>
   <script src="js/store.js?v=51.0"></script>
