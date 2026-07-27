@@ -1347,9 +1347,9 @@
       const btn = document.getElementById('podcast-play-btn');
       if (btn) btn.textContent = '🔊 Synthesizing Podcast Audio...';
       if (typeof VoiceEngine !== 'undefined' && VoiceEngine.speak) {
-        VoiceEngine.speak("Welcome to Gemini Notebook Audio Overview! In today's deep-dive, Host Alex and Host Sarah analyze your research sources on deep learning, neural architectures, and distributed systems.");
+        VoiceEngine.speak("Welcome to Juno AI Audio Overview! In today's deep-dive, Host Alex and Host Sarah analyze your research sources on deep learning, neural architectures, and distributed systems.");
       }
-      if (typeof showToast === 'function') showToast('Playing Gemini Notebook Deep-Dive Podcast Audio Overview!');
+      if (typeof showToast === 'function') showToast('Playing Juno AI Deep-Dive Podcast Audio Overview!');
       setTimeout(() => {
         if (btn) btn.textContent = '▶ Play Audio Overview';
       }, 7000);
