@@ -26,7 +26,9 @@
 
       this.bindEvents();
       this.setState('idle');
-      this.speak("Hi Ankita! I'm your friendly Yellow Robot helper 🌼. Ask me anything about your notes.", 6000);
+      if (this.widgetEl) {
+        this.widgetEl.classList.add('minimized');
+      }
     },
 
     setRoboMode: function (mode) {
