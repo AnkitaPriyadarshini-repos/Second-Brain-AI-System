@@ -92,13 +92,23 @@
 
         <!-- View 1: Juno AI — AskFlow Centered Studio Interface -->
         <section id="view-jarvis" class="view-section active" aria-label="Juno AI Studio Interface">
-          
-          <!-- AskFlow Centered Greeting Stage -->
-          <div class="centered-hero-stage">
-            <span class="hero-wave-icon">👋</span>
-            <h1 style="font-size: 28px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">Good day, Ankita</h1>
-            <p style="font-size: 16px; color: var(--text-secondary);">What are you thinking about today?</p>
-          </div>
+                <!-- Hero Yellow Robot Companion Stage -->
+          <div class="main-hero-robo-banner glass-card" style="max-width: 860px; margin: 0 auto 24px auto; padding: 20px 24px; border-radius: 18px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(236, 72, 153, 0.06)); border: 1.5px solid rgba(99, 102, 241, 0.2); display: flex; align-items: center; gap: 20px;">
+            <div class="hero-robo-avatar-container" style="position: relative; flex-shrink: 0;">
+              <img src="assets/nexus_yellow_bot.png" alt="Juno Yellow Robot Companion 🌼" class="hero-robo-img float-animation" style="width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(99, 102, 241, 0.3)); cursor: pointer;" onclick="if(window.NexusBotEngine &amp;&amp; window.NexusBotEngine.speak){ window.NexusBotEngine.speak('Hi Ankita! I am your Yellow Robot thinking partner 🌼', 5000); }">
+              <span class="hero-robo-pulse-ring" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; border: 2px solid var(--accent-indigo); animation: floatAnim 2.5s infinite; opacity: 0.6; pointer-events: none;"></span>
+            </div>
+            <div class="hero-robo-content" style="display: flex; flex-direction: column; text-align: left; flex: 1;">
+              <div class="hero-robo-header-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <span class="hero-robo-badge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px; background: rgba(99, 102, 241, 0.15); color: var(--accent-indigo); text-transform: uppercase; letter-spacing: 0.05em;">🌼 JUNO AI ROBOT PARTNER</span>
+                <span class="hero-robo-status-text" style="font-size: 11px; color: var(--accent-emerald); font-weight: 600;">● Active &amp; Ready</span>
+              </div>
+              <h1 class="hero-title" style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 2px 0 4px 0;">Good day, Ankita 👋</h1>
+              <p class="hero-subtitle" style="font-size: 13.5px; color: var(--text-secondary); margin: 0; line-height: 1.45;">
+                I'm your Yellow Robot Thinking Partner. Ask me questions or synthesize insights grounded in your 100+ research sources!
+              </p>
+            </div>
+          </div>   </div>
 
           <!-- AskFlow 3-Card Prompt Suggestions Grid -->
           <div class="prompt-cards-grid">
@@ -1166,19 +1176,19 @@
   </nav>
 
   <!-- JavaScript Modules -->
-  <script src="js/nlp-engine.js?v=23.0"></script>
-  <script src="js/store.js?v=23.0"></script>
-  <script src="js/rag-engine.js?v=23.0"></script>
-  <script src="js/voice-engine.js?v=23.0"></script>
-  <script src="js/audio-presets.js?v=23.0"></script>
-  <script src="js/sound-engine.js?v=23.0"></script>
-  <script src="js/resurfacing-engine.js?v=23.0"></script>
-  <script src="js/graph-visualizer.js?v=23.0"></script>
-  <script src="js/ai-engine.js?v=23.0"></script>
-  <script src="js/gemini-color-flow.js?v=23.0"></script>
-  <script src="js/nexus-bot.js?v=23.0"></script>
-  <script src="js/developer-hud.js?v=23.0"></script>
-  <script src="js/ai-agents.js?v=23.0"></script>
-  <script src="js/app.js?v=23.0"></script>
+  <script src="js/nlp-engine.js?v=24.0"></script>
+  <script src="js/store.js?v=24.0"></script>
+  <script src="js/rag-engine.js?v=24.0"></script>
+  <script src="js/voice-engine.js?v=24.0"></script>
+  <script src="js/audio-presets.js?v=24.0"></script>
+  <script src="js/sound-engine.js?v=24.0"></script>
+  <script src="js/resurfacing-engine.js?v=24.0"></script>
+  <script src="js/graph-visualizer.js?v=24.0"></script>
+  <script src="js/ai-engine.js?v=24.0"></script>
+  <script src="js/gemini-color-flow.js?v=24.0"></script>
+  <script src="js/nexus-bot.js?v=24.0"></script>
+  <script src="js/developer-hud.js?v=24.0"></script>
+  <script src="js/ai-agents.js?v=24.0"></script>
+  <script src="js/app.js?v=24.0"></script>
 </body>
 </html>
