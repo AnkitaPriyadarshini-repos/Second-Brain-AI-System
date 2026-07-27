@@ -9,258 +9,205 @@
   }
 }
 
+/* ---------------------------------------------------- */
+/* Second Brain AI System — Responsive Mobile Engine   */
+/* Inspired by AskFlow Desktop & Ronas IT Mobile AI     */
+/* ---------------------------------------------------- */
+
 @media (max-width: 900px) {
+  /* Hide Desktop Sidebar */
   .app-sidebar {
     display: none !important;
   }
 
+  /* Full Width Main Canvas */
   .app-main-canvas {
     margin-left: 0 !important;
-    padding: 16px 12px 70px 12px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    padding: 12px 14px 76px 14px !important;
+    box-sizing: border-box !important;
   }
 
+  /* Ronas IT Bottom Fixed Navigation Bar */
   .bottom-mobile-nav {
     display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 60px !important;
+    background: var(--bg-card) !important;
+    border-top: 1px solid var(--border-color) !important;
+    z-index: 99999 !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    padding: 4px 8px !important;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1) !important;
   }
 
-  .prompt-cards-grid {
-    grid-template-columns: 1fr !important;
+  [data-theme="gemini-light"] .bottom-mobile-nav {
+    background: #ffffff !important;
+    border-color: #cbd5e1 !important;
   }
 
-  .navbar {
-    padding: 8px 12px 6px;
-    gap: 6px;
-  }
-  
-  .navbar-top-row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
-
-  .header-status-bar {
-    display: flex;
-    overflow-x: auto;
-    max-width: 100%;
-    scrollbar-width: none;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 2px;
-  }
-
-  .header-status-bar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .nav-tabs {
-    width: 100%;
-    overflow-x: auto;
-    justify-content: flex-start;
-    padding: 4px;
-    -webkit-overflow-scrolling: touch;
-    white-space: nowrap;
-  }
-
-  /* Single Column Mobile & Tablet Layout for Juno AI */
-  .notebook-workspace-grid {
+  .mobile-nav-btn {
+    flex: 1 !important;
     display: flex !important;
     flex-direction: column !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    gap: 16px !important;
+    align-items: center !important;
+    gap: 3px !important;
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-secondary) !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    padding: 6px 0 !important;
   }
 
-  .notebook-chat-panel {
-    order: 1 !important;
-    width: 100% !important;
+  .mobile-nav-btn.active {
+    color: var(--accent-indigo) !important;
+    font-weight: 700 !important;
   }
 
-  .notebook-sources-panel {
-    order: 2 !important;
-    position: static !important;
-    width: 100% !important;
-    max-height: 280px !important;
+  .mobile-nav-btn.active svg {
+    stroke: var(--accent-indigo) !important;
   }
 
-  .notebook-studio-panel {
-    order: 3 !important;
-    position: static !important;
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    grid-template-columns: none !important;
-  }
-  
-  .graph-container {
-    height: 380px;
-  }
-
-  .note-drawer {
-    width: 100%;
-    right: -100%;
-  }
-}
-
-@media (max-width: 768px) {
-  main {
-    padding: 0 8px;
-    margin: 8px auto;
-  }
-
+  /* AskFlow Hero Stage Mobile */
   .centered-hero-stage {
-    margin: 16px auto 16px auto !important;
-    padding: 0 8px !important;
+    margin: 12px auto 16px auto !important;
+    padding: 0 4px !important;
   }
 
   .centered-hero-stage h1 {
     font-size: 22px !important;
+    line-height: 1.3 !important;
+    margin-bottom: 4px !important;
   }
 
   .centered-hero-stage p {
-    font-size: 14px !important;
+    font-size: 13.5px !important;
   }
 
+  .hero-wave-icon {
+    font-size: 26px !important;
+    margin-bottom: 4px !important;
+  }
+
+  /* Prompt Cards Grid Mobile Stacking (Ronas IT Style) */
   .prompt-cards-grid {
-    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column !important;
     gap: 10px !important;
     margin-bottom: 20px !important;
+    width: 100% !important;
   }
 
   .prompt-card-item {
-    padding: 14px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 12px 14px !important;
+    border-radius: 12px !important;
     min-height: auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
-  /* Responsive Hero Robo Banner */
-  .main-hero-robo-banner {
-    flex-direction: column;
-    text-align: center;
-    padding: 14px;
-    gap: 10px;
+  .prompt-card-icon {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    border-radius: 8px !important;
+    font-size: 16px !important;
   }
 
-  .hero-robo-content {
-    align-items: center;
-    text-align: center;
-  }
-
-  .hero-robo-header-row {
-    justify-content: center;
-  }
-
-  .hero-title {
-    font-size: 20px !important;
-  }
-
-  .hero-subtitle {
+  .prompt-card-text {
     font-size: 13px !important;
+    line-height: 1.35 !important;
   }
 
-  /* Enterprise Prompt Box Mobile Formatting */
+  /* Enterprise Prompt Box Mobile */
   .enterprise-prompt-container {
-    padding: 12px 12px 8px 12px;
+    border-radius: 14px !important;
+    padding: 10px 12px 8px 12px !important;
+  }
+
+  .prompt-textarea {
+    font-size: 15px !important;
+    min-height: 44px !important;
   }
 
   .prompt-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 8px !important;
   }
 
   .prompt-actions-left {
-    justify-content: flex-start;
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 2px;
+    gap: 6px !important;
   }
 
-  .prompt-actions-right {
-    justify-content: space-between;
-    width: 100%;
+  .btn-prompt-action {
+    padding: 5px 10px !important;
+    font-size: 11px !important;
   }
 
-  .prompt-actions-right #rag-submit-btn {
-    flex: 1;
-    justify-content: center;
+  /* Header Bar on Mobile */
+  .navbar-top-row {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
   }
 
-  /* AI Status Pill Bar Mobile Responsive */
-  .ai-status-pill-bar {
-    justify-content: center;
-    font-size: 10px;
-    gap: 6px 8px;
-    padding: 6px 10px;
+  .header-status-bar {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
   }
 
-  /* Dashboard & Grid Column Stacking */
-  .posts-grid, .resurfacing-grid, .dashboard-sections-row {
-    grid-template-columns: 1fr !important;
-    gap: 14px !important;
-  }
-
-  .filter-bar {
-    flex-direction: column;
-  }
-
+  /* Chat Stream Bubble Mobile Formatting */
   .chat-bubble {
-    max-width: 98%;
+    max-width: 98% !important;
+    padding: 12px 14px !important;
+    border-radius: 14px !important;
   }
 
-  .sample-queries-row {
-    flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .sample-query-btn {
-    white-space: nowrap;
-    font-size: 12px;
-    padding: 6px 12px;
-  }
-
+  /* Floating Robot Mascot Mobile Positioning */
   .nexus-bot-widget {
     position: fixed !important;
     bottom: 72px !important;
     right: 12px !important;
     max-width: 280px !important;
-    z-index: 999 !important;
+    z-index: 9999 !important;
   }
 }
 
 @media (max-width: 480px) {
-  .header-status-bar {
-    gap: 4px;
+  .centered-hero-stage h1 {
+    font-size: 20px !important;
   }
 
-  .nav-tabs {
-    gap: 4px;
-    padding: 4px 6px;
+  .centered-hero-stage p {
+    font-size: 13px !important;
   }
 
-  .nav-tab {
-    font-size: 12px;
-    padding: 6px 10px;
-    white-space: nowrap;
-  }
-
-  .robot-stage-display {
-    width: 120px;
-    height: 120px;
-  }
-
-  .nexus-blue-bot-img {
-    width: 100px;
-    height: 100px;
+  .prompt-card-item {
+    padding: 10px 12px !important;
   }
 
   .spec-modal-card {
-    padding: 16px;
-    margin: 10px;
-    max-height: 90vh;
-    overflow-y: auto;
+    padding: 14px !important;
+    margin: 8px !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
   }
 }
+
 
 
 
