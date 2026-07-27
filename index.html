@@ -31,7 +31,7 @@
   <!-- Navigation Bar -->
   <nav class="navbar" aria-label="Main Navigation">
     <div class="navbar-top-row">
-      <a href="#" class="brand-logo" aria-label="Second Brain AI System Home">
+      <a href="#" class="brand-logo" aria-label="Second Brain AI System Home" onclick="window.activateView('jarvis'); return false;">
         <div class="brand-icon-wrapper">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><circle cx="12" cy="12" r="3"/></svg>
         </div>
@@ -44,55 +44,55 @@
       <div class="header-status-bar">
         <!-- Theme Controls Segment -->
         <div class="theme-controls-group" title="Select Theme">
-          <button class="theme-pill-btn active" data-theme="gemini-light" title="Light Theme">Light</button>
-          <button class="theme-pill-btn" data-theme="editorial-paper" title="Editorial Paper Theme">Paper</button>
-          <button class="theme-pill-btn" data-theme="gemini-dark" title="Cyber Dark Theme">Dark</button>
-          <button class="theme-pill-btn" data-theme="obsidian" title="Obsidian Theme">Obsidian</button>
+          <button class="theme-pill-btn active" data-theme="gemini-light" title="Light Theme" onclick="window.applyTheme('gemini-light')">Light</button>
+          <button class="theme-pill-btn" data-theme="editorial-paper" title="Editorial Paper Theme" onclick="window.applyTheme('editorial-paper')">Paper</button>
+          <button class="theme-pill-btn" data-theme="gemini-dark" title="Cyber Dark Theme" onclick="window.applyTheme('gemini-dark')">Dark</button>
+          <button class="theme-pill-btn" data-theme="obsidian" title="Obsidian Theme" onclick="window.applyTheme('obsidian')">Obsidian</button>
         </div>
 
         <button id="pwa-install-btn" class="status-badge" style="cursor: pointer; background: rgba(236, 72, 153, 0.15); color: var(--accent-pink); border: 1px solid rgba(236, 72, 153, 0.3);" title="Install Second Brain as Native App">📲 Install App</button>
-        <button id="view-agents-btn" class="status-badge" style="cursor: pointer; background: rgba(139, 92, 246, 0.15); color: var(--accent-violet); border: 1px solid rgba(139, 92, 246, 0.3);" title="View AI Helper Agents Fleet">🤖 AI Agents</button>
-        <button id="view-arch-btn" class="status-badge" style="cursor: pointer; background: rgba(99, 102, 241, 0.15); color: var(--accent-indigo); border: 1px solid rgba(99, 102, 241, 0.3);" title="View System Architecture Specs">⚙️ Specs</button>
-        <button id="view-shortcuts-btn" class="status-badge" style="cursor: pointer; background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3);" title="View Keyboard Shortcuts">⌨️ Hotkeys</button>
+        <button id="view-agents-btn" class="status-badge" style="cursor: pointer; background: rgba(139, 92, 246, 0.15); color: var(--accent-violet); border: 1px solid rgba(139, 92, 246, 0.3);" title="View AI Helper Agents Fleet" onclick="window.openModal('ai-agents-modal')">🤖 AI Agents</button>
+        <button id="view-arch-btn" class="status-badge" style="cursor: pointer; background: rgba(99, 102, 241, 0.15); color: var(--accent-indigo); border: 1px solid rgba(99, 102, 241, 0.3);" title="View System Architecture Specs" onclick="window.openModal('architecture-modal')">⚙️ Specs</button>
+        <button id="view-shortcuts-btn" class="status-badge" style="cursor: pointer; background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3);" title="View Keyboard Shortcuts" onclick="window.openModal('shortcuts-modal')">⌨️ Hotkeys</button>
         <span id="privacy-badge" class="privacy-status-pill">🔒 Local Privacy</span>
-        <span id="total-notes-count" class="status-badge notes-count-badge">100 Notes</span>
+        <span id="total-notes-count" class="status-badge notes-count-badge" onclick="window.activateView('vault')">100 Notes</span>
       </div>
     </div>
 
     <div class="nav-tabs" role="tablist">
-      <button class="nav-tab active" data-view="jarvis" role="tab" aria-selected="true">
+      <button class="nav-tab active" data-view="jarvis" role="tab" aria-selected="true" onclick="window.activateView('jarvis')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
         Talk to Jarvis
       </button>
-      <button class="nav-tab" data-view="capture" role="tab" aria-selected="false">
+      <button class="nav-tab" data-view="capture" role="tab" aria-selected="false" onclick="window.activateView('capture')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Capture Hub
       </button>
-      <button class="nav-tab" data-view="vault" role="tab" aria-selected="false">
+      <button class="nav-tab" data-view="vault" role="tab" aria-selected="false" onclick="window.activateView('vault')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
         Vault Explorer
       </button>
-      <button class="nav-tab" data-view="graph" role="tab" aria-selected="false">
+      <button class="nav-tab" data-view="graph" role="tab" aria-selected="false" onclick="window.activateView('graph')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="7.5" y1="8.5" x2="10.5" y2="15.5"/><line x1="16.5" y1="8.5" x2="13.5" y2="15.5"/></svg>
         Knowledge Graph
       </button>
-      <button class="nav-tab" data-view="resurfacing" role="tab" aria-selected="false">
+      <button class="nav-tab" data-view="resurfacing" role="tab" aria-selected="false" onclick="window.activateView('resurfacing')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14A6 6 0 0 0 18 9a6 6 0 0 0-12 0c0 1.94.92 3.67 2.36 4.77.7.53 1.14 1.34 1.14 2.23V17h5v-1c0-.89.44-1.7 1.14-2.23z"/></svg>
         Resurfacing
       </button>
-      <button class="nav-tab" data-view="flashcards" role="tab" aria-selected="false">
+      <button class="nav-tab" data-view="flashcards" role="tab" aria-selected="false" onclick="window.activateView('flashcards')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
         AI Flashcards
       </button>
-      <button class="nav-tab" data-view="dashboard" role="tab" aria-selected="false">
+      <button class="nav-tab" data-view="dashboard" role="tab" aria-selected="false" onclick="window.activateView('dashboard')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
         Dashboard
       </button>
-      <button class="nav-tab" data-view="agents" role="tab" aria-selected="false">
+      <button class="nav-tab" data-view="agents" role="tab" aria-selected="false" onclick="window.activateView('agents')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2 2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><rect x="4" y="8" width="16" height="12" rx="2"/><circle cx="9" cy="13" r="1.5"/><circle cx="15" cy="13" r="1.5"/><path d="M9 17h6"/></svg>
         AI Agents Fleet
       </button>
-      <button class="nav-tab" data-view="settings" role="tab" aria-selected="false">
+      <button class="nav-tab" data-view="settings" role="tab" aria-selected="false" onclick="window.activateView('settings')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         Privacy &amp; System
       </button>
@@ -115,13 +115,13 @@
           <canvas id="waveform-canvas" class="waveform-canvas"></canvas>
 
           <!-- Input Form -->
-          <form id="rag-query-form" class="query-input-bar">
+          <form id="rag-query-form" class="query-input-bar" onsubmit="window.submitRAGQuery(event); return false;">
             <input type="text" id="rag-query-input" class="input-field query-input" placeholder="Ask your Second Brain... (e.g. 'What did I save about deep learning last month?')" aria-label="Query Input">
-            <button type="submit" id="rag-submit-btn" class="btn btn-primary">
+            <button type="submit" id="rag-submit-btn" class="btn btn-primary" onclick="window.submitRAGQuery(event)">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3m-3.5-6.5l-2 2m-7 7l-2 2m0-11l2 2m7 7l2 2"/></svg>
               Query RAG
             </button>
-            <button type="button" id="voice-trigger-btn" class="btn btn-secondary">
+            <button type="button" id="voice-trigger-btn" class="btn btn-secondary" onclick="window.toggleVoiceListen()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
               Talk to Jarvis
             </button>
@@ -142,14 +142,14 @@
           <div class="sample-queries-container">
             <span class="sample-label">Try sample queries:</span>
             <div class="sample-queries-row">
-              <button class="sample-query-btn" data-query="What did I save about deep learning last month?">What did I save about deep learning last month?</button>
-              <button class="sample-query-btn" data-query="Startup idea I had in January?">Startup idea I had in January?</button>
-              <button class="sample-query-btn" data-query="Urban planning research notes?">Urban planning research notes?</button>
-              <button class="sample-query-btn" data-query="Article on sleep and memory?">Article on sleep and memory?</button>
-              <button class="sample-query-btn" data-query="Kafka &amp; distributed systems?">Kafka &amp; distributed systems?</button>
-              <button class="sample-query-btn" data-query="Atomic Habits summary?">Atomic Habits summary?</button>
-              <button class="sample-query-btn" data-query="ENCODE cCREs paper?">ENCODE cCREs paper?</button>
-              <button class="sample-query-btn" data-query="Vector DB benchmarks?">Vector DB benchmarks?</button>
+              <button class="sample-query-btn" data-query="What did I save about deep learning last month?" onclick="window.triggerSampleQuery('What did I save about deep learning last month?')">What did I save about deep learning last month?</button>
+              <button class="sample-query-btn" data-query="Startup idea I had in January?" onclick="window.triggerSampleQuery('Startup idea I had in January?')">Startup idea I had in January?</button>
+              <button class="sample-query-btn" data-query="Urban planning research notes?" onclick="window.triggerSampleQuery('Urban planning research notes?')">Urban planning research notes?</button>
+              <button class="sample-query-btn" data-query="Article on sleep and memory?" onclick="window.triggerSampleQuery('Article on sleep and memory?')">Article on sleep and memory?</button>
+              <button class="sample-query-btn" data-query="Kafka &amp; distributed systems?" onclick="window.triggerSampleQuery('Kafka &amp; distributed systems?')">Kafka &amp; distributed systems?</button>
+              <button class="sample-query-btn" data-query="Atomic Habits summary?" onclick="window.triggerSampleQuery('Atomic Habits summary?')">Atomic Habits summary?</button>
+              <button class="sample-query-btn" data-query="ENCODE cCREs paper?" onclick="window.triggerSampleQuery('ENCODE cCREs paper?')">ENCODE cCREs paper?</button>
+              <button class="sample-query-btn" data-query="Vector DB benchmarks?" onclick="window.triggerSampleQuery('Vector DB benchmarks?')">Vector DB benchmarks?</button>
             </div>
           </div>
         </div>
@@ -201,11 +201,11 @@
         </p>
 
         <div class="capture-tabs-header" role="tablist">
-          <button class="capture-tab active" data-target="type">Typing Note</button>
-          <button class="capture-tab" data-target="voice">Voice Memo</button>
-          <button class="capture-tab" data-target="clipper">Web Clipper / Extension</button>
-          <button class="capture-tab" data-target="file">File Upload (OCR)</button>
-          <button class="capture-tab" data-target="email">Email Forward</button>
+          <button class="capture-tab active" data-target="type" onclick="window.setCaptureTab('type')">Typing Note</button>
+          <button class="capture-tab" data-target="voice" onclick="window.setCaptureTab('voice')">Voice Memo</button>
+          <button class="capture-tab" data-target="clipper" onclick="window.setCaptureTab('clipper')">Web Clipper / Extension</button>
+          <button class="capture-tab" data-target="file" onclick="window.setCaptureTab('file')">File Upload (OCR)</button>
+          <button class="capture-tab" data-target="email" onclick="window.setCaptureTab('email')">Email Forward</button>
         </div>
 
         <!-- 1. Typing Panel -->
@@ -605,6 +605,200 @@
     <button id="close-drawer-btn" class="drawer-close-btn">✕</button>
     <div style="display: flex; justify-content: space-between; align-items: center; margin-right: 2rem; flex-wrap: wrap; gap: 8px;">
       <h3 id="drawer-title" class="drawer-title-text">Note Details</h3>
+<div class="glass-card stat-card">
+          <div class="stat-icon">Entities</div>
+          <div class="stat-info">
+            <span class="stat-label">Extracted Entities</span>
+            <h3 id="stat-entities-count" class="stat-value">240+</h3>
+          </div>
+        </div>
+
+        <div class="glass-card stat-card">
+          <div class="stat-icon">Recall</div>
+          <div class="stat-info">
+            <span class="stat-label">Recall Score</span>
+            <h3 id="stat-recall-score" class="stat-value">94%</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-sections-row" style="margin-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div class="glass-card">
+          <h3 class="section-heading">Surface Ingest Distribution</h3>
+          <div id="surface-distribution-list" class="distribution-list" style="margin-top: 16px;"></div>
+        </div>
+
+        <div class="glass-card">
+          <h3 class="section-heading">Topic & Entity Cloud</h3>
+          <div id="topic-tag-cloud" class="tag-cloud-box" style="margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- View 7: AI Working Agents Fleet Hub -->
+    <section id="view-agents" class="view-section" aria-label="AI Working Agents Fleet Hub">
+      <div class="glass-card" style="margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h2 class="section-heading" style="display: flex; align-items: center; gap: 10px;">
+              <span>🤖 Specialized AI Working Agents Fleet</span>
+              <span class="status-badge online">● 6 AGENTS ACTIVE</span>
+            </h2>
+            <p class="section-subtext">
+              Autonomous on-device AI working agents that continuously process, summarize, quiz, connect, and resurface your personal knowledge base.
+            </p>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 20px;">
+          
+          <!-- Agent 1: Summarizer -->
+          <div class="glass-card agent-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--accent-indigo);">⚡ Summarizer &amp; Action Agent</h3>
+              <span id="agent-status-summarizer" class="status-badge online">● ONLINE / READY</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+              Executive Key Takeaways &amp; Action Items Distiller. Automatically converts long notes into executive digests.
+            </p>
+            <button id="run-agent-summarizer" class="btn btn-primary" style="width: 100%; font-size: 12px;">⚡ Run Executive Distiller</button>
+            <div id="agent-console-summarizer"></div>
+          </div>
+
+          <!-- Agent 2: Recall Quizmaster -->
+          <div class="glass-card agent-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--accent-emerald);">🧠 Quiz &amp; Memory Tutor Agent</h3>
+              <span id="agent-status-tutor" class="status-badge online">● ONLINE / READY</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+              Active Recall Quiz Generator. Synthesizes interactive Q&amp;A cards from saved notes to test retention.
+            </p>
+            <button id="run-agent-tutor" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #10b981, #3b82f6);">🧠 Generate Quiz Question</button>
+            <div id="agent-console-tutor"></div>
+          </div>
+
+          <!-- Agent 3: Graph Topology -->
+          <div class="glass-card agent-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--accent-violet);">🕸️ Graph Topology Agent</h3>
+              <span id="agent-status-topology" class="status-badge online">● ONLINE / READY</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+              Entity Relationship &amp; Discrepancy Mapper. Discovers hidden bi-directional concept links across notes.
+            </p>
+            <button id="run-agent-topology" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #8b5cf6, #ec4899);">🕸️ Map Entity Connections</button>
+            <div id="agent-console-topology"></div>
+          </div>
+
+          <!-- Agent 4: Proactive Resurfacing -->
+          <div class="glass-card agent-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--accent-amber);">🔮 Proactive Resurfacing Agent</h3>
+              <span id="agent-status-resurfacing" class="status-badge online">● ONLINE / READY</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+              Memory Discovery Engine. Surfaces forgotten notes matching your current task context and query history.
+            </p>
+            <button id="run-agent-resurfacing" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #f59e0b, #ef4444);">🔮 Resurface Key Notes</button>
+            <div id="agent-console-resurfacing"></div>
+          </div>
+
+          <!-- Agent 5: Vector Diagnostics -->
+          <div class="glass-card agent-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--accent-pink);">🔍 Vector Diagnostics Agent</h3>
+              <span id="agent-status-diagnostics" class="status-badge online">● ONLINE / READY</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+              Telemetry &amp; Matrix Auditor. Measures sparse vector matrix density, query latency, and memory footprint.
+            </p>
+            <button id="run-agent-diagnostics" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #ec4899, #6366f1);">🔍 Run Telemetry Audit</button>
+            <div id="agent-console-diagnostics"></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- View 8: Settings & Backup Console -->
+    <section id="view-settings" class="view-section" aria-label="Settings & Privacy Console">
+      <div class="glass-card settings-card">
+        <h2 class="hero-title" style="font-size: 22px; text-align: left;">System Settings & Data Vault Management</h2>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3>On-Device Privacy Mode</h3>
+            <p>
+              Run voice transcription (whisper.cpp) and embeddings 100% locally. Audio and raw notes never leave your device.
+            </p>
+          </div>
+          <label class="switch-toggle">
+            <input type="checkbox" id="privacy-toggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3>Voice Readout (TTS)</h3>
+            <p>Read out RAG AI answers automatically when synthesized.</p>
+          </div>
+          <label class="switch-toggle">
+            <input type="checkbox" id="tts-toggle" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-item" style="flex-direction: column; align-items: flex-start; gap: 16px;">
+          <div class="setting-info" style="max-width: 100%;">
+            <h3>Export & Backup Data Vault</h3>
+            <p>Export all notes, tags, entities, and RAG session history to a JSON file or import a previous backup.</p>
+          </div>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <button id="export-vault-btn" class="btn btn-secondary">Export Vault JSON</button>
+            <label class="btn btn-secondary" style="cursor: pointer;">
+              Import Vault JSON
+              <input type="file" id="import-vault-input" accept=".json" style="display: none;">
+            </label>
+            <button id="reset-sample-btn" class="btn btn-secondary" style="color: var(--accent-pink); border-color: rgba(236, 72, 153, 0.3);">Reset 100 Notes Sample</button>
+          </div>
+        </div>
+
+        <div class="setting-item" style="border: none;">
+          <div class="setting-info" style="max-width: 100%;">
+            <h3>External LLM API Key (Optional)</h3>
+            <p style="margin-bottom: 16px;">
+              By default, Second Brain uses its built-in local vector RAG engine. You can optionally supply your Gemini or OpenAI API key below for cloud generation.
+            </p>
+            <input type="password" id="api-key-input" class="input-field" placeholder="AIzaSy... or sk-..." style="font-family: var(--font-code);">
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Engineering Footer -->
+    <footer class="engineering-footer">
+      <div class="footer-tech-specs">
+        <span class="footer-spec-item"><strong>Second Brain AI System</strong> v3.4-prod</span>
+        <span class="footer-spec-item"><strong>Vector Engine:</strong> TF-IDF + Cosine Alignment</span>
+        <span class="footer-spec-item"><strong>Privacy:</strong> 100% Local On-Device Storage</span>
+        <span class="footer-spec-item"><strong>Git Commit:</strong> <code>8f3a1b4</code></span>
+        <span class="footer-spec-item"><strong>License:</strong> MIT</span>
+      </div>
+      <div>
+        Engineered with care & precision by <strong>Ankita Priyadarshini</strong> • <a href="https://github.com/AnkitaPriyadarshini-repos/Second-Brain-AI-System.git" target="_blank" style="color: var(--accent-indigo); text-decoration: none; font-weight: 600;">GitHub Repository</a>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- Slide-out Note Detail Drawer Modal -->
+  <div id="note-drawer" class="note-drawer">
+    <button id="close-drawer-btn" class="drawer-close-btn">✕</button>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-right: 2rem; flex-wrap: wrap; gap: 8px;">
+      <h3 id="drawer-title" class="drawer-title-text">Note Details</h3>
       <div style="display: flex; gap: 8px;">
         <button id="edit-note-btn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 13px;">✏️ Edit Note</button>
         <button id="enhance-note-btn" class="btn btn-primary" style="padding: 6px 12px; font-size: 13px;">AI Enhance Note</button>
@@ -617,7 +811,7 @@
   <!-- AI Helper Agents Fleet Modal -->
   <div id="ai-agents-modal" class="spec-modal-overlay">
     <div class="spec-modal-card" style="max-width: 760px;">
-      <button id="close-agents-btn" class="spec-modal-close-btn">✕</button>
+      <button id="close-agents-btn" class="spec-modal-close-btn" onclick="window.closeModal('ai-agents-modal')">✕</button>
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <h2 style="font-size: 20px; font-weight: 700; color: var(--accent-indigo); display: flex; align-items: center; gap: 8px;">
           <span>🤖 AI Helper Agents Fleet</span>
@@ -637,7 +831,7 @@
             <span id="modal-agent-status-summarizer" class="status-badge online">● ONLINE</span>
           </div>
           <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Distills long notes into executive summaries &amp; action items.</p>
-          <button id="modal-run-summarizer" class="btn btn-primary" style="width: 100%; font-size: 12px;">⚡ Run Executive Distiller</button>
+          <button id="modal-run-summarizer" class="btn btn-primary" style="width: 100%; font-size: 12px;" onclick="window.runAgent('summarizer')">⚡ Run Executive Distiller</button>
           <div id="modal-agent-console-summarizer"></div>
         </div>
 
@@ -648,7 +842,7 @@
             <span id="modal-agent-status-tutor" class="status-badge online">● ONLINE</span>
           </div>
           <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Synthesizes interactive Q&amp;A recall cards from saved notes.</p>
-          <button id="modal-run-tutor" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #10b981, #3b82f6);">🧠 Generate Quiz Card</button>
+          <button id="modal-run-tutor" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #10b981, #3b82f6);" onclick="window.runAgent('tutor')">🧠 Generate Quiz Card</button>
           <div id="modal-agent-console-tutor"></div>
         </div>
 
@@ -659,7 +853,7 @@
             <span id="modal-agent-status-topology" class="status-badge online">● ONLINE</span>
           </div>
           <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Discovers hidden bi-directional entity connections.</p>
-          <button id="modal-run-topology" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #8b5cf6, #ec4899);">🕸️ Map Entity Connections</button>
+          <button id="modal-run-topology" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #8b5cf6, #ec4899);" onclick="window.runAgent('topology')">🕸️ Map Entity Connections</button>
           <div id="modal-agent-console-topology"></div>
         </div>
 
@@ -670,7 +864,7 @@
             <span id="modal-agent-status-diagnostics" class="status-badge online">● ONLINE</span>
           </div>
           <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Measures matrix density, latency, and memory footprint.</p>
-          <button id="modal-run-diagnostics" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #ec4899, #6366f1);">🔍 Run Telemetry Audit</button>
+          <button id="modal-run-diagnostics" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #ec4899, #6366f1);" onclick="window.runAgent('diagnostics')">🔍 Run Telemetry Audit</button>
           <div id="modal-agent-console-diagnostics"></div>
         </div>
 
@@ -681,7 +875,7 @@
   <!-- System Architecture & Engineering Specs Modal -->
   <div id="architecture-modal" class="spec-modal-overlay">
     <div class="spec-modal-card">
-      <button id="close-arch-btn" class="spec-modal-close-btn">✕</button>
+      <button id="close-arch-btn" class="spec-modal-close-btn" onclick="window.closeModal('architecture-modal')">✕</button>
       <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">System Architecture & Engineering Specs</h2>
       <p style="color: var(--text-secondary); font-size: 14px;">
         Second Brain AI System is built with zero cloud lock-in using high-performance local RAG semantic retrieval, custom TF-IDF vectorization, and interactive graph topology.
@@ -711,7 +905,7 @@
   <!-- Power-User Keyboard Shortcuts Modal -->
   <div id="shortcuts-modal" class="spec-modal-overlay">
     <div class="spec-modal-card" style="max-width: 520px;">
-      <button id="close-shortcuts-btn" class="spec-modal-close-btn">✕</button>
+      <button id="close-shortcuts-btn" class="spec-modal-close-btn" onclick="window.closeModal('shortcuts-modal')">✕</button>
       <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Power-User Keyboard Shortcuts</h2>
       <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 20px;">
         Navigate your Second Brain effortlessly with built-in keyboard hotkeys:
@@ -753,7 +947,7 @@
           <span class="nexus-bot-subtitle-text">● Ready to help</span>
         </div>
       </div>
-      <button id="nexus-bot-toggle-btn" class="nexus-bot-toggle-btn" title="Minimize/Expand Console">–</button>
+      <button id="nexus-bot-toggle-btn" class="nexus-bot-toggle-btn" title="Minimize/Expand Console" onclick="window.toggleNexusWidget()">–</button>
     </div>
     <div id="nexus-bot-widget-body" class="nexus-bot-widget-body">
       <div id="nexus-bot-dialogue" class="nexus-bot-dialogue">
@@ -762,24 +956,24 @@
       
       <!-- Robo Mode Bar -->
       <div class="robo-mode-bar" style="display: flex; gap: 4px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 4px;">
-        <button class="robo-mode-btn active" data-mode="assistant" title="Assistant Mode">Assistant</button>
-        <button class="robo-mode-btn" data-mode="quantum" title="Quantum Fast Search">Quantum</button>
-        <button class="robo-mode-btn" data-mode="listener" title="Live Voice Listener">Listener</button>
-        <button class="robo-mode-btn" data-mode="tutor" title="AI Flashcard Tutor">Tutor</button>
-        <button id="stage-scan-btn" class="robo-mode-btn" style="white-space: nowrap;" title="Run Vector Diagnostics">Diagnostic Scan</button>
+        <button class="robo-mode-btn active" data-mode="assistant" title="Assistant Mode" onclick="window.setNexusMode('assistant')">Assistant</button>
+        <button class="robo-mode-btn" data-mode="quantum" title="Quantum Fast Search" onclick="window.setNexusMode('quantum')">Quantum</button>
+        <button class="robo-mode-btn" data-mode="listener" title="Live Voice Listener" onclick="window.setNexusMode('listener')">Listener</button>
+        <button class="robo-mode-btn" data-mode="tutor" title="AI Flashcard Tutor" onclick="window.setNexusMode('tutor')">Tutor</button>
+        <button id="stage-scan-btn" class="robo-mode-btn" style="white-space: nowrap;" title="Run Vector Diagnostics" onclick="window.runNexusScan()">Diagnostic Scan</button>
       </div>
 
       <div class="nexus-bot-quick-bar">
         <input type="text" id="nexus-bot-quick-input" class="input-field nexus-bot-quick-input" placeholder="Ask Yellow Robot or capture memo...">
-        <button id="nexus-bot-quick-submit" class="btn btn-primary nexus-bot-quick-btn">Send</button>
+        <button id="nexus-bot-quick-submit" class="btn btn-primary nexus-bot-quick-btn" onclick="window.sendNexusQuickQuery()">Send</button>
       </div>
       <div id="nexus-bot-consolidated-feed"></div>
     </div>
   </div>
-  <!-- Quick Capture Note Modal -->
+  <!-- Quick Capture Note Modal -->
   <div id="quick-note-modal" class="spec-modal-overlay">
     <div class="spec-modal-card" style="max-width: 560px;">
-      <button id="close-quick-note-btn" class="spec-modal-close-btn">✕</button>
+      <button id="close-quick-note-btn" class="spec-modal-close-btn" onclick="window.closeModal('quick-note-modal')">✕</button>
       <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">⚡ Quick Capture Note</h2>
       <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 16px;">
         Capture a thought instantly from anywhere in your Second Brain. Entity extraction & summary indexing run automatically.
@@ -795,7 +989,7 @@
           <textarea id="fab-note-content" class="textarea-field" rows="5" placeholder="Type your notes or research summary here..." required></textarea>
         </div>
         <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
-          <button type="button" id="cancel-quick-note-btn" class="btn btn-secondary">Cancel</button>
+          <button type="button" id="cancel-quick-note-btn" class="btn btn-secondary" onclick="window.closeModal('quick-note-modal')">Cancel</button>
           <button type="submit" class="btn btn-primary">Save to Brain</button>
         </div>
       </form>
@@ -803,19 +997,19 @@
   </div>
 
   <!-- JavaScript Modules -->
-  <script src="js/nlp-engine.js?v=7.0"></script>
-  <script src="js/store.js?v=7.0"></script>
-  <script src="js/rag-engine.js?v=7.0"></script>
-  <script src="js/voice-engine.js?v=7.0"></script>
-  <script src="js/audio-presets.js?v=7.0"></script>
-  <script src="js/sound-engine.js?v=7.0"></script>
-  <script src="js/resurfacing-engine.js?v=7.0"></script>
-  <script src="js/graph-visualizer.js?v=7.0"></script>
-  <script src="js/ai-engine.js?v=7.0"></script>
-  <script src="js/gemini-color-flow.js?v=7.0"></script>
-  <script src="js/nexus-bot.js?v=7.0"></script>
-  <script src="js/developer-hud.js?v=7.0"></script>
-  <script src="js/ai-agents.js?v=7.0"></script>
-  <script src="js/app.js?v=7.0"></script>
+  <script src="js/nlp-engine.js?v=8.0"></script>
+  <script src="js/store.js?v=8.0"></script>
+  <script src="js/rag-engine.js?v=8.0"></script>
+  <script src="js/voice-engine.js?v=8.0"></script>
+  <script src="js/audio-presets.js?v=8.0"></script>
+  <script src="js/sound-engine.js?v=8.0"></script>
+  <script src="js/resurfacing-engine.js?v=8.0"></script>
+  <script src="js/graph-visualizer.js?v=8.0"></script>
+  <script src="js/ai-engine.js?v=8.0"></script>
+  <script src="js/gemini-color-flow.js?v=8.0"></script>
+  <script src="js/nexus-bot.js?v=8.0"></script>
+  <script src="js/developer-hud.js?v=8.0"></script>
+  <script src="js/ai-agents.js?v=8.0"></script>
+  <script src="js/app.js?v=8.0"></script>
 </body>
 </html>
