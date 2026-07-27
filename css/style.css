@@ -5,31 +5,31 @@
 
 :root {
   /* Neutral Palette */
-  --bg-dark: #09090b;
-  --bg-card: #121318;
-  --bg-card-hover: #181920;
-  --bg-card-active: #1e1f29;
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-highlight: rgba(255, 255, 255, 0.16);
-  --border-accent: rgba(99, 102, 241, 0.4);
+  --bg-dark: #fefce8;
+  --bg-card: #ffffff;
+  --bg-card-hover: #fef08a;
+  --bg-card-active: #fde047;
+  --border-color: #fde047;
+  --border-highlight: #eab308;
+  --border-accent: rgba(245, 158, 11, 0.4);
   
   /* Typography Colors */
-  --text-primary: #f4f4f5;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
+  --text-primary: #422006;
+  --text-secondary: #713f12;
+  --text-muted: #854d0e;
   
-  /* Restrained Accent Palette */
-  --accent-primary: #6366f1;
-  --accent-primary-hover: #4f46e5;
-  --accent-primary-light: rgba(99, 102, 241, 0.12);
+  /* Pure Golden Yellow Accent Palette */
+  --accent-primary: #f59e0b;
+  --accent-primary-hover: #d97706;
+  --accent-primary-light: rgba(245, 158, 11, 0.15);
   
-  --accent-indigo: #6366f1;
-  --accent-violet: #8b5cf6;
+  --accent-indigo: #f59e0b;
+  --accent-violet: #d97706;
   --accent-emerald: #10b981;
   --accent-amber: #f59e0b;
-  --accent-pink: #ec4899;
-  --accent-blue: #3b82f6;
-  --accent-cyan: #06b6d4;
+  --accent-pink: #f59e0b;
+  --accent-blue: #f59e0b;
+  --accent-cyan: #eab308;
 
   /* Typography Stack */
   --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", sans-serif;
@@ -42,15 +42,17 @@
   --radius-full: 9999px;
   
   /* Shadows & Transitions */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-  --shadow-card: 0 4px 16px -2px rgba(0, 0, 0, 0.3);
-  --shadow-glow: 0 4px 20px 0 rgba(99, 102, 241, 0.2);
+  --shadow-sm: 0 1px 2px 0 rgba(245, 158, 11, 0.2);
+  --shadow-card: 0 4px 16px -2px rgba(245, 158, 11, 0.15);
+  --shadow-glow: 0 4px 20px 0 rgba(245, 158, 11, 0.25);
   --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Golden Yellow Theme Variant — Sunflower & Warm Gold */
 [data-theme="sunflower-yellow"],
-[data-theme="gemini-yellow"] {
+[data-theme="gemini-yellow"],
+[data-theme="gemini-light"],
+[data-theme="editorial-paper"] {
   --bg-dark: #fefce8;
   --bg-card: #ffffff;
   --bg-card-hover: #fef08a;
@@ -63,8 +65,8 @@
   --text-secondary: #713f12;
   --text-muted: #854d0e;
   
-  --accent-primary: #d97706;
-  --accent-primary-hover: #b45309;
+  --accent-primary: #f59e0b;
+  --accent-primary-hover: #d97706;
   --accent-primary-light: rgba(245, 158, 11, 0.15);
   
   --accent-amber: #f59e0b;
@@ -74,41 +76,15 @@
   --shadow-glow: 0 4px 25px 0 rgba(245, 158, 11, 0.25);
 }
 
-/* Light Theme Variants */
-[data-theme="gemini-light"],
-[data-theme="editorial-paper"] {
-  --bg-dark: #f8fafc;
-  --bg-card: #ffffff;
-  --bg-card-hover: #f1f5f9;
-  --bg-card-active: #e2e8f0;
-  --border-color: #cbd5e1;
-  --border-highlight: #94a3b8;
-  --border-accent: rgba(79, 70, 229, 0.4);
-  
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
-  
-  --accent-primary: #4f46e5;
-  --accent-primary-hover: #4338ca;
-  --accent-primary-light: rgba(79, 70, 229, 0.08);
-  
-  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-  --shadow-glow: 0 4px 20px 0 rgba(79, 70, 229, 0.12);
-}
-
-[data-theme="gemini-dark"] {
-  --bg-dark: #09090b;
-  --bg-card: #121318;
-  --bg-card-hover: #181920;
-  --border-color: rgba(255, 255, 255, 0.08);
-}
-
+[data-theme="gemini-dark"],
 [data-theme="obsidian"] {
-  --bg-dark: #050507;
-  --bg-card: #0d0e12;
-  --bg-card-hover: #14151b;
-  --border-color: rgba(255, 255, 255, 0.06);
+  --bg-dark: #1c1917;
+  --bg-card: #292524;
+  --bg-card-hover: #44403c;
+  --border-color: #78350f;
+  --text-primary: #fef3c7;
+  --text-secondary: #fde68a;
+  --accent-primary: #f59e0b;
 }
 
 * {
@@ -142,14 +118,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Subtle Neutral Background Overlay */
+/* Subtle Golden Yellow Background Overlay */
 .ambient-glow {
   position: fixed;
   border-radius: 50%;
   filter: blur(140px);
   pointer-events: none;
   z-index: -1;
-  opacity: 0.15;
+  opacity: 0.25;
 }
 
 .ambient-glow-1 {
@@ -157,7 +133,7 @@ body {
   height: 600px;
   top: -150px;
   left: -100px;
-  background: radial-gradient(circle, var(--accent-indigo), transparent 70%);
+  background: radial-gradient(circle, #f59e0b, transparent 70%);
 }
 
 .ambient-glow-2 {
@@ -165,7 +141,7 @@ body {
   height: 500px;
   bottom: -150px;
   right: -100px;
-  background: radial-gradient(circle, var(--accent-blue), transparent 70%);
+  background: radial-gradient(circle, #fbbf24, transparent 70%);
 }
 
 .ambient-glow-3 {
