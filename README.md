@@ -1,8 +1,9 @@
 # 🧠 Second Brain AI System (HGM-12)
 
+[![Live Web App](https://img.shields.io/badge/Vercel-Live%20Deployment-indigo?logo=vercel)](https://second-brain-ai-system.vercel.app)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-brightgreen?logo=github)](https://ankitapriyadarshini-repos.github.io/Second-Brain-AI-System/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Tests: 10/10 Passed](https://img.shields.io/badge/Tests-10%2F10%20Passed-emerald)](test/run_tests.js)
+[![Tests: 18/18 Passed](https://img.shields.io/badge/Tests-18%2F18%20Passed-emerald)](test/run_tests.js)
 
 > **A personal knowledge system that does not hinder learning.**  
 > *Zero-Friction Multi-Surface Capture • Grounded Conversational RAG ("Talk to Jarvis") • Proactive Resurfacing • Interactive Knowledge Graph Network*
@@ -11,7 +12,8 @@
 
 ## 🌐 Live Application & Demo Links
 
-- 🚀 **Live Web Application**: [https://second-brain-ai-app.vercel.app](https://second-brain-ai-app.vercel.app)
+- 🚀 **Primary Live Web Application**: [https://second-brain-ai-system.vercel.app](https://second-brain-ai-system.vercel.app)
+- 📡 **Secondary Vercel Mirror**: [https://second-brain-ai-app.vercel.app](https://second-brain-ai-app.vercel.app)
 - 📡 **GitHub Pages Live Demo**: [https://ankitapriyadarshini-repos.github.io/Second-Brain-AI-System/](https://ankitapriyadarshini-repos.github.io/Second-Brain-AI-System/)
 
 ---
