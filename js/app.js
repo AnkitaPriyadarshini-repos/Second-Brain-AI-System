@@ -1375,8 +1375,8 @@
           statusBadge.textContent = '● Paused';
           statusBadge.style.color = '#f59e0b';
         }
+        eqBars.forEach(bar => bar.classList.remove('active'));
         if (podcastTimerInterval) clearInterval(podcastTimerInterval);
-        if (podcastEqInterval) clearInterval(podcastEqInterval);
         if (typeof window.speechSynthesis !== 'undefined') window.speechSynthesis.pause();
         if (typeof showToast === 'function') showToast('Podcast Audio Paused ⏸');
         return;
@@ -1389,6 +1389,7 @@
         statusBadge.textContent = '● Playing Podcast';
         statusBadge.style.color = '#10b981';
       }
+      eqBars.forEach(bar => bar.classList.add('active'));
 
       if (typeof showToast === 'function') showToast('Playing Juno AI Deep-Dive Podcast Audio Overview! 🎙️');
 
@@ -1416,8 +1417,8 @@
             statusBadge.textContent = '● Ready';
             statusBadge.style.color = '#10b981';
           }
+          eqBars.forEach(bar => bar.classList.remove('active'));
           if (podcastTimerInterval) clearInterval(podcastTimerInterval);
-          if (podcastEqInterval) clearInterval(podcastEqInterval);
           return;
         }
 
@@ -1425,16 +1426,6 @@
         const secs = String(podcastCurrentSeconds % 60).padStart(2, '0');
         if (currentTimeEl) currentTimeEl.textContent = `${mins}:${secs}`;
       }, 1000);
-
-      // Waveform Equalizer Animation Loop
-      if (podcastEqInterval) clearInterval(podcastEqInterval);
-      podcastEqInterval = setInterval(() => {
-        if (!podcastIsPlaying) return;
-        eqBars.forEach(bar => {
-          const randomHeight = Math.floor(Math.random() * 20) + 6;
-          bar.style.height = `${randomHeight}px`;
-        });
-      }, 150);
     };
 
     // ----------------------------------------------------
