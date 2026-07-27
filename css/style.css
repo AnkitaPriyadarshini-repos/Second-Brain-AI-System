@@ -2447,6 +2447,130 @@ kbd {
   box-shadow: 0 0 6px var(--accent-emerald);
 }
 
+/* ---------------------------------------------------- */
+/* Gemini Notebook — 3-Panel Studio Layout Styles       */
+/* ---------------------------------------------------- */
+.notebook-workspace-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr 310px;
+  gap: 20px;
+  align-items: start;
+}
+
+/* Left Sources Panel */
+.notebook-sources-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  max-height: calc(100vh - 120px);
+  position: sticky;
+  top: 80px;
+  overflow-y: auto;
+}
+
+[data-theme="gemini-light"] .notebook-sources-panel {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+.sources-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.sources-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sources-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  max-height: 480px;
+}
+
+.source-item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.02);
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+[data-theme="gemini-light"] .source-item-row {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.source-item-row:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+  background: rgba(99, 102, 241, 0.04);
+}
+
+/* Right Studio Panel & Audio Overview */
+.notebook-studio-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 80px;
+}
+
+.audio-overview-card {
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(236, 72, 153, 0.08));
+  border: 1.5px solid rgba(99, 102, 241, 0.3);
+  border-radius: 16px;
+}
+
+.podcast-badge {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--accent-indigo);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.podcast-hosts-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.podcast-host-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--accent-indigo);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 12px;
+  border: 2px solid #fff;
+}
+
+
 
 
 
