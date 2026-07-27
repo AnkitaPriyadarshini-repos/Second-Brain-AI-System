@@ -257,6 +257,44 @@ test('DeveloperHUDEngine should inspect raw note vector schema', () => {
   assert.ok(vectorInspection.rawVectorJson.includes('raft'), 'Vector JSON missing key terms');
 });
 
+// --------------------------------------------------------
+// Test Suite 10: Goal & Milestone Management Engine
+// --------------------------------------------------------
+console.log('\nSuite 10: Goal & Milestone Management Engine');
+
+test('Store should manage default learning goals', () => {
+  const goals = Store.getGoals();
+  assert.ok(goals.length >= 3, `Expected at least 3 default goals, got ${goals.length}`);
+  assert.ok(goals[0].id, 'Goal missing id');
+  assert.ok(goals[0].title, 'Goal missing title');
+  assert.ok(typeof goals[0].progress === 'number', 'Goal progress should be a number');
+});
+
+test('Store.addGoal should create a new goal with linked tags', () => {
+  const newGoal = Store.addGoal({
+    title: 'Master Quantum Computing Fundamentals',
+    category: 'Physics & Computing',
+    targetDate: '2027-01-15',
+    description: 'Study qubits, superposition, quantum gates, and Shor algorithm.',
+    linkedTags: ['Quantum', 'Physics', 'Qubits']
+  });
+  assert.ok(newGoal.id.startsWith('goal-'), 'Goal id format incorrect');
+  assert.strictEqual(newGoal.title, 'Master Quantum Computing Fundamentals');
+  assert.strictEqual(newGoal.progress, 0);
+
+  const updatedGoals = Store.getGoals();
+  assert.strictEqual(updatedGoals[0].id, newGoal.id);
+});
+
+test('Store.updateGoalProgress should update progress percentage accurately', () => {
+  const goals = Store.getGoals();
+  const targetId = goals[0].id;
+  Store.updateGoalProgress(targetId, 90);
+
+  const updated = Store.getGoals().find(g => g.id === targetId);
+  assert.strictEqual(updated.progress, 90);
+});
+
 console.log('\n====================================================');
 console.log(`SUMMARY: ${passCount} / ${totalTests} TESTS PASSED CLEANLY.`);
 console.log('====================================================\n');
