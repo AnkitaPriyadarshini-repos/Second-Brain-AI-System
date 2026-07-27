@@ -2,27 +2,33 @@
   Second Brain AI System — Responsive Breakpoints & Mobile Optimization
 */
 
-@media (max-width: 1200px) {
+@media (max-width: 1100px) {
   .notebook-workspace-grid {
     grid-template-columns: 240px 1fr 260px;
     gap: 16px;
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
   .navbar {
     padding: 8px 12px 6px;
     gap: 6px;
   }
   
   .navbar-top-row {
+    flex-direction: column;
+    align-items: stretch;
     gap: 8px;
   }
 
   .header-status-bar {
+    display: flex;
     overflow-x: auto;
     max-width: 100%;
     scrollbar-width: none;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
   }
 
   .header-status-bar::-webkit-scrollbar {
@@ -35,24 +41,41 @@
     justify-content: flex-start;
     padding: 4px;
     -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
   }
 
-  /* 2-Column Responsive Tablet Layout for Gemini Notebook */
+  /* Single Column Mobile & Tablet Layout for Juno AI */
   .notebook-workspace-grid {
-    grid-template-columns: 240px 1fr;
-    gap: 16px;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 16px !important;
+  }
+
+  .notebook-chat-panel {
+    order: 1 !important;
+    width: 100% !important;
+  }
+
+  .notebook-sources-panel {
+    order: 2 !important;
+    position: static !important;
+    width: 100% !important;
+    max-height: 280px !important;
   }
 
   .notebook-studio-panel {
-    grid-column: 1 / -1;
-    position: static;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    order: 3 !important;
+    position: static !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
   }
   
   .graph-container {
-    height: 440px;
+    height: 380px;
   }
 
   .note-drawer {
@@ -63,34 +86,16 @@
 
 @media (max-width: 768px) {
   main {
-    padding: 0 12px;
-    margin: 12px auto;
-  }
-
-  /* Single Column Responsive Mobile Layout for Gemini Notebook */
-  .notebook-workspace-grid {
-    grid-template-columns: 1fr !important;
-    gap: 16px !important;
-  }
-
-  .notebook-sources-panel {
-    position: static !important;
-    max-height: 260px !important;
-    width: 100% !important;
-  }
-
-  .notebook-studio-panel {
-    grid-template-columns: 1fr !important;
-    position: static !important;
-    width: 100% !important;
+    padding: 0 10px;
+    margin: 10px auto;
   }
 
   /* Responsive Hero Robo Banner */
   .main-hero-robo-banner {
     flex-direction: column;
     text-align: center;
-    padding: 16px;
-    gap: 12px;
+    padding: 14px;
+    gap: 10px;
   }
 
   .hero-robo-content {
@@ -157,11 +162,7 @@
   }
 
   .chat-bubble {
-    max-width: 95%;
-  }
-
-  .graph-container {
-    height: 360px;
+    max-width: 98%;
   }
 
   .sample-queries-row {
@@ -176,12 +177,19 @@
     font-size: 12px;
     padding: 6px 12px;
   }
+
+  .nexus-bot-widget {
+    position: fixed !important;
+    bottom: 12px !important;
+    right: 12px !important;
+    max-width: 280px !important;
+    z-index: 999 !important;
+  }
 }
 
 @media (max-width: 480px) {
   .header-status-bar {
-    gap: 6px;
-    flex-wrap: wrap;
+    gap: 4px;
   }
 
   .nav-tabs {
@@ -195,20 +203,14 @@
     white-space: nowrap;
   }
 
-  .nexus-bot-widget {
-    width: calc(100vw - 24px);
-    right: 12px;
-    bottom: 12px;
-  }
-
   .robot-stage-display {
-    width: 140px;
-    height: 140px;
+    width: 120px;
+    height: 120px;
   }
 
   .nexus-blue-bot-img {
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
   }
 
   .spec-modal-card {
@@ -218,4 +220,5 @@
     overflow-y: auto;
   }
 }
+
 
