@@ -2314,6 +2314,140 @@ kbd {
   font-weight: 600;
 }
 
+/* ChatGPT & Claude Style Focal Point Prompt Box */
+.enterprise-prompt-container {
+  position: relative;
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  padding: 14px 16px 10px 16px;
+  transition: all 0.2s ease-in-out;
+  margin-bottom: 16px;
+}
+
+[data-theme="gemini-light"] .enterprise-prompt-container {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+}
+
+.enterprise-prompt-container:focus-within {
+  border-color: var(--accent-indigo);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.22), 0 8px 30px -4px rgba(99, 102, 241, 0.15);
+}
+
+.prompt-textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 15px;
+  resize: none;
+  min-height: 48px;
+  max-height: 160px;
+  line-height: 1.5;
+}
+
+.prompt-textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.prompt-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="gemini-light"] .prompt-toolbar {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+.prompt-actions-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.prompt-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-prompt-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+[data-theme="gemini-light"] .btn-prompt-action {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.btn-prompt-action:hover {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--accent-indigo);
+  border-color: rgba(99, 102, 241, 0.35);
+}
+
+.kbd-badge {
+  font-family: var(--font-code);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+/* Integrated AI Status Pill Bar */
+.ai-status-pill-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 6px 14px;
+  background: rgba(99, 102, 241, 0.05);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.ai-status-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ai-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-emerald);
+  box-shadow: 0 0 6px var(--accent-emerald);
+}
+
+
 
 
 

@@ -161,6 +161,16 @@
       const query = inputEl ? inputEl.value.trim() : '';
       if (query && typeof handleRAGQuery === 'function') handleRAGQuery(query);
     };
+
+    const ragQueryInputEl = document.getElementById('rag-query-input');
+    if (ragQueryInputEl) {
+      ragQueryInputEl.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+          e.preventDefault();
+          window.submitRAGQuery(e);
+        }
+      });
+    }
     window.toggleVoiceListen = function() {
       if (typeof VoiceEngine !== 'undefined' && VoiceEngine.toggleListen) {
         VoiceEngine.toggleListen();
