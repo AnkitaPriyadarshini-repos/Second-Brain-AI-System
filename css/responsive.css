@@ -10,6 +10,23 @@
 }
 
 @media (max-width: 900px) {
+  .app-sidebar {
+    display: none !important;
+  }
+
+  .app-main-canvas {
+    margin-left: 0 !important;
+    padding: 16px 12px 70px 12px !important;
+  }
+
+  .bottom-mobile-nav {
+    display: flex !important;
+  }
+
+  .prompt-cards-grid {
+    grid-template-columns: 1fr !important;
+  }
+
   .navbar {
     padding: 8px 12px 6px;
     gap: 6px;
