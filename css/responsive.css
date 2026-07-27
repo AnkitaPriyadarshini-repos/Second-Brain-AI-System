@@ -29,6 +29,20 @@
     box-sizing: border-box !important;
   }
 
+  /* Collapse Workspace Grid on Mobile Devices */
+  .notebook-workspace-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    width: 100% !important;
+  }
+
+  .notebook-studio-panel {
+    position: static !important;
+    max-height: none !important;
+    width: 100% !important;
+  }
+
   /* Ronas IT Bottom Fixed Navigation Bar */
   .bottom-mobile-nav {
     display: flex !important;
@@ -39,16 +53,18 @@
     height: 60px !important;
     background: var(--bg-card) !important;
     border-top: 1px solid var(--border-color) !important;
-    z-index: 99999 !important;
+    z-index: 999999 !important;
     justify-content: space-around !important;
     align-items: center !important;
     padding: 4px 8px !important;
     box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1) !important;
+    backdrop-filter: blur(12px) !important;
   }
 
+  [data-theme="sunflower-yellow"] .bottom-mobile-nav,
   [data-theme="gemini-light"] .bottom-mobile-nav {
-    background: #ffffff !important;
-    border-color: #cbd5e1 !important;
+    background: rgba(254, 252, 232, 0.94) !important;
+    border-color: #fde047 !important;
   }
 
   .mobile-nav-btn {
@@ -56,44 +72,33 @@
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
+    justify-content: center !important;
     gap: 3px !important;
     background: transparent !important;
     border: none !important;
     color: var(--text-secondary) !important;
     font-size: 11px !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
     cursor: pointer !important;
     padding: 6px 0 !important;
+    min-height: 44px !important; /* Touch target accessibility */
+    touch-action: manipulation !important;
   }
 
   .mobile-nav-btn.active {
-    color: var(--accent-indigo) !important;
-    font-weight: 700 !important;
+    color: #d97706 !important;
+    font-weight: 800 !important;
   }
 
   .mobile-nav-btn.active svg {
-    stroke: var(--accent-indigo) !important;
+    stroke: #f59e0b !important;
   }
 
-  /* AskFlow Hero Stage Mobile */
-  .centered-hero-stage {
-    margin: 12px auto 16px auto !important;
-    padding: 0 4px !important;
-  }
-
-  .centered-hero-stage h1 {
-    font-size: 22px !important;
-    line-height: 1.3 !important;
-    margin-bottom: 4px !important;
-  }
-
-  .centered-hero-stage p {
-    font-size: 13.5px !important;
-  }
-
-  .hero-wave-icon {
-    font-size: 26px !important;
-    margin-bottom: 4px !important;
+  /* Hero Banner Mobile Adjustments */
+  .main-hero-robo-banner {
+    flex-direction: row !important;
+    padding: 16px 18px !important;
+    gap: 14px !important;
   }
 
   /* Prompt Cards Grid Mobile Stacking (Ronas IT Style) */
@@ -112,9 +117,10 @@
     gap: 12px !important;
     padding: 12px 14px !important;
     border-radius: 12px !important;
-    min-height: auto !important;
+    min-height: 44px !important;
     width: 100% !important;
     box-sizing: border-box !important;
+    touch-action: manipulation !important;
   }
 
   .prompt-card-icon {
@@ -153,21 +159,9 @@
   }
 
   .btn-prompt-action {
-    padding: 5px 10px !important;
-    font-size: 11px !important;
-  }
-
-  /* Header Bar on Mobile */
-  .navbar-top-row {
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-  }
-
-  .header-status-bar {
-    display: flex !important;
-    align-items: center !important;
-    gap: 6px !important;
+    padding: 6px 12px !important;
+    font-size: 11.5px !important;
+    min-height: 36px !important;
   }
 
   /* Chat Stream Bubble Mobile Formatting */
@@ -187,15 +181,24 @@
   }
 }
 
+/* Mobile Landscape Orientation Rule (< 500px height) */
+@media (max-height: 500px) and (orientation: landscape) {
+  .app-main-canvas {
+    padding-bottom: 70px !important;
+  }
+  .main-hero-robo-banner {
+    padding: 12px 16px !important;
+  }
+  .hero-robo-avatar-container,
+  .hero-robo-img {
+    width: 48px !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+  }
+}
+
 @media (max-width: 480px) {
-  .centered-hero-stage h1 {
-    font-size: 20px !important;
-  }
-
-  .centered-hero-stage p {
-    font-size: 13px !important;
-  }
-
   .prompt-card-item {
     padding: 10px 12px !important;
   }
