@@ -2929,6 +2929,61 @@ kbd {
   transform: translateY(-1px);
 }
 
+/* Real-Time Microphone Record Button & Waveform FX */
+.mic-record-btn {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 24px -4px rgba(245, 158, 11, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  z-index: 2;
+}
+
+.mic-record-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 12px 30px -2px rgba(245, 158, 11, 0.6);
+}
+
+.mic-record-btn.recording {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  box-shadow: 0 8px 30px rgba(239, 68, 68, 0.6) !important;
+  animation: micPulseBtn 1.2s infinite alternate;
+}
+
+.mic-pulse-ring {
+  position: absolute;
+  width: 94px;
+  height: 94px;
+  border-radius: 50%;
+  border: 2px solid #f59e0b;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.mic-record-btn.recording ~ .mic-pulse-ring,
+.mic-pulse-ring.active {
+  animation: micPulseRing 1.5s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+@keyframes micPulseBtn {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.12); }
+}
+
+@keyframes micPulseRing {
+  0% { transform: scale(0.9); opacity: 0.85; }
+  100% { transform: scale(1.85); opacity: 0; }
+}
+
 
 
 

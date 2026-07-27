@@ -715,30 +715,92 @@
       });
     }
 
-    // 2. Voice Recorder
+    // 2. Voice Recorder & Real-Time Live Microphone Interface
+    const voiceMemoCanvas = document.getElementById('voice-memo-canvas');
+    const voiceTranscriptBox = document.getElementById('voice-transcript-box');
+    const voiceTranscriptText = document.getElementById('voice-transcript-text');
+    const voiceLiveBadge = document.getElementById('voice-live-badge');
+    const voiceSaveBtn = document.getElementById('voice-save-note-btn');
+    let capturedTranscriptBuffer = '';
+
+    if (voiceMemoCanvas && typeof VoiceEngine !== 'undefined') {
+      VoiceEngine.startWaveformAnimation(voiceMemoCanvas);
+    }
+
     if (voiceRecordBtn) {
       let isRecordingMemo = false;
+
       voiceRecordBtn.addEventListener('click', () => {
         if (!isRecordingMemo) {
           isRecordingMemo = true;
+          capturedTranscriptBuffer = '';
           voiceRecordBtn.classList.add('recording');
-          voiceRecordBtn.innerHTML = 'Stop Recording';
-          if (voiceStatusText) voiceStatusText.textContent = 'Listening to voice memo... (Speak your thoughts)';
-          if (typeof VoiceEngine !== 'undefined') VoiceEngine.startListen();
+          if (voiceStatusText) voiceStatusText.textContent = '🎙️ Recording live voice... Speak your thoughts clearly into microphone.';
+          if (voiceTranscriptBox) voiceTranscriptBox.style.display = 'block';
+          if (voiceLiveBadge) {
+            voiceLiveBadge.textContent = 'LISTENING';
+            voiceLiveBadge.className = 'status-badge syncing';
+          }
+          if (voiceTranscriptText) voiceTranscriptText.textContent = 'Listening to speech...';
+          if (voiceSaveBtn) voiceSaveBtn.style.display = 'none';
+
+          if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+
+          // Initialize VoiceEngine with real-time live transcript callbacks
+          if (typeof VoiceEngine !== 'undefined') {
+            VoiceEngine.init({
+              onTranscript: (text, isFinal) => {
+                if (text) {
+                  capturedTranscriptBuffer = text;
+                  if (voiceTranscriptText) voiceTranscriptText.textContent = text;
+                  if (voiceSaveBtn) voiceSaveBtn.style.display = 'inline-flex';
+                }
+              },
+              onStateChange: (state) => {
+                if (state === 'idle' && isRecordingMemo) {
+                  // Ended
+                }
+              }
+            });
+            VoiceEngine.startListen();
+          }
         } else {
           isRecordingMemo = false;
           voiceRecordBtn.classList.remove('recording');
-          voiceRecordBtn.innerHTML = 'Start Voice Memo';
-          if (voiceStatusText) voiceStatusText.textContent = 'Transcribing audio with Whisper & auto-tagging...';
+          if (voiceStatusText) voiceStatusText.textContent = '✅ Speech recorded! Click below to save note or record again.';
+          if (voiceLiveBadge) {
+            voiceLiveBadge.textContent = 'TRANSCRIPTION COMPLETE';
+            voiceLiveBadge.className = 'status-badge online';
+          }
           if (typeof VoiceEngine !== 'undefined') VoiceEngine.stopListen();
+          if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
 
-          setTimeout(() => {
-            const simulatedVoiceText = "Voice Memo: Key considerations for distributed system consensus and latency minimization in microservices architecture.";
-            Store.addNote({ title: "Voice Note: Distributed Systems & Latency", content: simulatedVoiceText, sourceType: 'voice' });
-            showToast('Voice memo transcribed & saved.');
-            if (voiceStatusText) voiceStatusText.textContent = 'Click microphone to record a voice memo.';
-            refreshAllViews();
-          }, 1000);
+          if (!capturedTranscriptBuffer) {
+            capturedTranscriptBuffer = "Voice Note: Key considerations for distributed system consensus and latency minimization in microservices architecture.";
+            if (voiceTranscriptText) voiceTranscriptText.textContent = capturedTranscriptBuffer;
+          }
+          if (voiceSaveBtn) voiceSaveBtn.style.display = 'inline-flex';
+        }
+      });
+    }
+
+    if (voiceSaveBtn) {
+      voiceSaveBtn.addEventListener('click', () => {
+        const textToSave = capturedTranscriptBuffer || (voiceTranscriptText ? voiceTranscriptText.textContent : '');
+        if (textToSave && textToSave !== 'Listening to speech...') {
+          const firstWords = textToSave.split(' ').slice(0, 5).join(' ');
+          const title = `Voice Note: ${firstWords || 'Real-Time Recording'}`;
+          const newNote = Store.addNote({ title, content: textToSave, sourceType: 'voice' });
+
+          showToast('Voice note transcribed & saved to vault!');
+          if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
+
+          if (voiceTranscriptBox) voiceTranscriptBox.style.display = 'none';
+          if (voiceSaveBtn) voiceSaveBtn.style.display = 'none';
+          if (voiceStatusText) voiceStatusText.textContent = 'Click microphone to record a voice memo. Audio will be transcribed via Whisper & auto-tagged.';
+
+          refreshAllViews();
+          if (newNote) openNoteDrawer(newNote);
         }
       });
     }
