@@ -2,6 +2,13 @@
   Second Brain AI System — Responsive Breakpoints & Mobile Optimization
 */
 
+@media (max-width: 1200px) {
+  .notebook-workspace-grid {
+    grid-template-columns: 240px 1fr 260px;
+    gap: 16px;
+  }
+}
+
 @media (max-width: 1024px) {
   .navbar {
     padding: 8px 12px 6px;
@@ -29,6 +36,20 @@
     padding: 4px;
     -webkit-overflow-scrolling: touch;
   }
+
+  /* 2-Column Responsive Tablet Layout for Gemini Notebook */
+  .notebook-workspace-grid {
+    grid-template-columns: 240px 1fr;
+    gap: 16px;
+  }
+
+  .notebook-studio-panel {
+    grid-column: 1 / -1;
+    position: static;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
   
   .graph-container {
     height: 440px;
@@ -44,6 +65,24 @@
   main {
     padding: 0 12px;
     margin: 12px auto;
+  }
+
+  /* Single Column Responsive Mobile Layout for Gemini Notebook */
+  .notebook-workspace-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .notebook-sources-panel {
+    position: static !important;
+    max-height: 260px !important;
+    width: 100% !important;
+  }
+
+  .notebook-studio-panel {
+    grid-template-columns: 1fr !important;
+    position: static !important;
+    width: 100% !important;
   }
 
   /* Responsive Hero Robo Banner */
