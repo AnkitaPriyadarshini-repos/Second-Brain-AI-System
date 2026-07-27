@@ -19,29 +19,28 @@
 
     nodes: [],
 
-    // Color palettes for different themes
+    // Color palettes for different themes tailored for Juno AI Yellow Moon aesthetic
     palettes: {
       'gemini-light': [
-        { r: 167, g: 243, b: 208, a: 0.75 }, // Mint Green (#a7f3d0)
-        { r: 165, g: 243, b: 252, a: 0.80 }, // Cyan Aqua (#a5f3fc)
-        { r: 147, g: 197, b: 253, a: 0.70 }, // Soft Sky Blue (#93c5fd)
-        { r: 221, g: 214, b: 254, a: 0.65 }, // Lavender Violet (#ddd6fe)
-        { r: 252, g: 231, b: 243, a: 0.60 }, // Soft Rose (#fce7f3)
-        { r: 110, g: 231, b: 183, a: 0.70 }  // Soft Emerald (#6ee7b7)
+        { r: 245, g: 158, b: 11,  a: 0.35 }, // Warm Golden Sunflower (#f59e0b)
+        { r: 251, g: 191, b: 36,  a: 0.40 }, // Radiant Amber Glow (#fbbf24)
+        { r: 254, g: 240, b: 138, a: 0.45 }, // Soft Honey Sunlight (#fef08a)
+        { r: 217, g: 119, b: 6,   a: 0.25 }, // Deep Warm Gold (#d97706)
+        { r: 253, g: 230, b: 138, a: 0.35 }, // Pale Gold Sunshine (#fde68a)
+        { r: 250, g: 204, b: 21,  a: 0.30 }  // Vibrant Yellow Spark (#facc15)
       ],
       'gemini-dark': [
-        { r: 6,   g: 182, b: 212, a: 0.45 }, // Cyan Neon
-        { r: 99,  g: 102, b: 241, a: 0.50 }, // Indigo Glow
-        { r: 139, g: 92,  b: 246, a: 0.45 }, // Violet Aura
-        { r: 16,  g: 185, b: 129, a: 0.40 }, // Emerald Spark
-        { r: 236, g: 72,  b: 153, a: 0.35 }, // Pink Pulsar
-        { r: 59,  g: 130, b: 246, a: 0.40 }  // Deep Blue
+        { r: 245, g: 158, b: 11,  a: 0.35 }, // Golden Moon Glow
+        { r: 217, g: 119, b: 6,   a: 0.40 }, // Warm Amber Core
+        { r: 234, g: 179, b: 8,   a: 0.30 }, // Royal Yellow Aura
+        { r: 30,  g: 41,  b: 59,  a: 0.50 }, // Slate Obsidian Shadow
+        { r: 250, g: 204, b: 21,  a: 0.25 }  // Moonlight Spark
       ],
       'obsidian': [
-        { r: 30,  g: 41,  b: 59,  a: 0.30 },
-        { r: 79,  g: 70,  b: 229, a: 0.25 },
-        { r: 124, g: 58,  b: 237, a: 0.25 },
-        { r: 15,  g: 23,  b: 42,  a: 0.40 }
+        { r: 245, g: 158, b: 11,  a: 0.25 },
+        { r: 30,  g: 41,  b: 59,  a: 0.60 },
+        { r: 15,  g: 23,  b: 42,  a: 0.80 },
+        { r: 217, g: 119, b: 6,   a: 0.30 }
       ]
     },
 
@@ -202,9 +201,9 @@
 
       // Base background color depending on theme
       if (this.theme === 'gemini-light') {
-        ctx.fillStyle = '#f8fafc';
+        ctx.fillStyle = '#fffdf7';
       } else if (this.theme === 'gemini-dark') {
-        ctx.fillStyle = '#070a12';
+        ctx.fillStyle = '#0f172a';
       } else {
         ctx.fillStyle = '#04060a';
       }
@@ -213,7 +212,7 @@
       // Render blended floating radial gradient nodes
       const maxDim = Math.max(width, height);
 
-      ctx.globalCompositeOperation = this.theme === 'gemini-light' ? 'multiply' : 'screen';
+      ctx.globalCompositeOperation = this.theme === 'gemini-light' ? 'source-over' : 'screen';
 
       this.nodes.forEach((node, i) => {
         const sineOffsetX = Math.sin(this.time + node.phase) * 0.22 * maxDim;
