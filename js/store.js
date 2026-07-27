@@ -43,6 +43,42 @@
   const STORAGE_KEY = 'second_brain_notes_v2';
   const DISMISSED_KEY = 'second_brain_dismissed_v2';
   const SETTINGS_KEY = 'second_brain_settings_v2';
+  const GOALS_KEY = 'second_brain_goals_v2';
+
+  function generateDefaultGoals() {
+    return [
+      {
+        id: 'goal-1',
+        title: 'Master Deep Learning & AI Architecture',
+        category: 'Artificial Intelligence',
+        targetDate: '2026-12-31',
+        progress: 75,
+        targetCount: 20,
+        linkedTags: ['AI', 'Deep Learning', 'Neural Networks', 'LLM'],
+        description: 'Comprehensive study of transformer self-attention, sparse vector embeddings, and on-device model quantization.'
+      },
+      {
+        id: 'goal-2',
+        title: 'Build High-Performance Distributed Systems',
+        category: 'Software Engineering',
+        targetDate: '2026-10-15',
+        progress: 60,
+        targetCount: 15,
+        linkedTags: ['Distributed Systems', 'Kafka', 'Microservices', 'Database'],
+        description: 'Design fault-tolerant event streams, consensus protocols (Raft/Paxos), and sub-50ms latency query pipelines.'
+      },
+      {
+        id: 'goal-3',
+        title: 'Optimize Memory Retention & Spaced Repetition',
+        category: 'Cognitive Science',
+        targetDate: '2026-09-01',
+        progress: 85,
+        targetCount: 25,
+        linkedTags: ['Cognition', 'Memory', 'Neuroscience', 'Learning'],
+        description: 'Apply SuperMemo-2 algorithms and proactive note resurfacing to maximize long-term knowledge retention.'
+      }
+    ];
+  }
 
   // Generator for 100 high-quality pre-seeded realistic personal notes
   function generate100PreSeededNotes() {
@@ -162,6 +198,7 @@
     },
     isOffline: false,
     offlineQueue: [],
+    goals: [],
     listeners: [],
 
     /**
@@ -213,17 +250,66 @@
       if (savedSettings) {
         try { this.settings = { ...this.settings, ...JSON.parse(savedSettings) }; } catch (e) { }
       }
+
+      const savedGoals = this._getItem(GOALS_KEY);
+      if (savedGoals) {
+        try {
+          const parsed = JSON.parse(savedGoals);
+          this.goals = (Array.isArray(parsed) && parsed.length > 0) ? parsed : generateDefaultGoals();
+        } catch (e) { this.goals = generateDefaultGoals(); }
+      } else {
+        this.goals = generateDefaultGoals();
+        this._setItem(GOALS_KEY, JSON.stringify(this.goals));
+      }
     },
 
     saveNotes: function () {
       this._setItem(STORAGE_KEY, JSON.stringify(this.notes));
       this._setItem(DISMISSED_KEY, JSON.stringify(this.dismissedIds));
       this._setItem(SETTINGS_KEY, JSON.stringify(this.settings));
+      this._setItem(GOALS_KEY, JSON.stringify(this.goals));
       this.notifyListeners();
     },
 
     getNotes: function () {
       return this.notes;
+    },
+
+    getGoals: function () {
+      if (!this.goals || this.goals.length === 0) {
+        this.goals = generateDefaultGoals();
+        this._setItem(GOALS_KEY, JSON.stringify(this.goals));
+      }
+      return this.goals || [];
+    },
+
+    addGoal: function ({ title, category = 'General', targetDate = '', description = '', linkedTags = [] }) {
+      const newGoal = {
+        id: `goal-${Date.now()}`,
+        title: title || 'New Goal',
+        category,
+        targetDate: targetDate || '2026-12-31',
+        progress: 0,
+        targetCount: 10,
+        linkedTags: Array.isArray(linkedTags) ? linkedTags : ['General'],
+        description
+      };
+      this.goals.unshift(newGoal);
+      this.saveNotes();
+      return newGoal;
+    },
+
+    updateGoalProgress: function (id, progressVal) {
+      const goal = this.goals.find(g => g.id === id);
+      if (goal) {
+        goal.progress = Math.min(100, Math.max(0, parseInt(progressVal, 10) || 0));
+        this.saveNotes();
+      }
+    },
+
+    deleteGoal: function (id) {
+      this.goals = this.goals.filter(g => g.id !== id);
+      this.saveNotes();
     },
 
     /**

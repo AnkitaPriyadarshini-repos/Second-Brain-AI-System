@@ -1497,10 +1497,108 @@
       renderResurfacingDigest();
       initFlashcards();
       renderDashboard();
+      renderGoals();
       if (typeof GraphVisualizer !== 'undefined' && graphCanvas) {
         GraphVisualizer.buildGraph(Store.getNotes());
       }
     }
+
+    function renderGoals() {
+      const goalsGrid = document.getElementById('goals-grid');
+      if (!goalsGrid || typeof Store === 'undefined') return;
+
+      const goals = Store.getGoals();
+      if (goals.length === 0) {
+        goalsGrid.innerHTML = `
+          <div class="empty-state glass-card" style="grid-column: 1 / -1;">
+            <h3>No Active Goals Set</h3>
+            <p>Define your first learning target to link notes and track progress.</p>
+          </div>
+        `;
+        return;
+      }
+
+      goalsGrid.innerHTML = goals.map(goal => `
+        <div class="glass-card" style="padding: 20px; border-radius: 16px; border: 1.5px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 14px;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span class="status-badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706; font-size: 11px;">${escapeHTML(goal.category)}</span>
+              <span style="font-size: 11px; color: var(--text-muted);">Target: ${escapeHTML(goal.targetDate)}</span>
+            </div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">🎯 ${escapeHTML(goal.title)}</h3>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px;">${escapeHTML(goal.description)}</p>
+            
+            <div style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px;">
+                <span>Progress Milestone</span>
+                <span style="color: var(--accent-amber);">${goal.progress}%</span>
+              </div>
+              <div style="height: 8px; background: rgba(255, 255, 255, 0.06); border-radius: 4px; overflow: hidden;">
+                <div style="height: 100%; width: ${goal.progress}%; background: linear-gradient(90deg, #f59e0b, #fbbf24); border-radius: 4px; transition: width 0.4s ease;"></div>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+              ${(goal.linkedTags || []).map(t => `<span class="tag-pill" style="font-size: 11px;">#${escapeHTML(t)}</span>`).join('')}
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; pt: 10px; border-top: 1px solid var(--border-color);">
+            <div style="display: flex; gap: 6px;">
+              <button class="btn btn-secondary" style="font-size: 11px; padding: 4px 10px;" onclick="window.updateGoalProgressPrompt('${goal.id}', ${goal.progress})">⚡ Update %</button>
+              <button class="btn btn-secondary" style="font-size: 11px; padding: 4px 8px; color: #ef4444;" onclick="window.deleteGoalById('${goal.id}')">Delete</button>
+            </div>
+            <button class="btn btn-primary" style="font-size: 11px; padding: 4px 10px;" onclick="window.triggerSampleQuery('Show notes related to ${escapeHTML(goal.title)}')">🔍 RAG Search Notes</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.openGoalModal = function() {
+      const modal = document.getElementById('create-goal-modal');
+      if (modal) modal.classList.add('active');
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+    };
+
+    window.updateGoalProgressPrompt = function(id, currentProgress) {
+      const newProgress = prompt('Enter new progress percentage (0 - 100):', currentProgress);
+      if (newProgress !== null) {
+        Store.updateGoalProgress(id, newProgress);
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
+        showToast('Goal progress milestone updated.');
+        refreshAllViews();
+      }
+    };
+
+    window.deleteGoalById = function(id) {
+      if (confirm('Delete this goal milestone?')) {
+        Store.deleteGoal(id);
+        showToast('Goal deleted.');
+        refreshAllViews();
+      }
+    };
+
+    const createGoalForm = document.getElementById('create-goal-form');
+    if (createGoalForm) {
+      createGoalForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const title = document.getElementById('goal-title-input').value.trim();
+        const category = document.getElementById('goal-category-select').value;
+        const targetDate = document.getElementById('goal-date-input').value;
+        const description = document.getElementById('goal-description-textarea').value.trim();
+
+        if (title) {
+          Store.addGoal({ title, category, targetDate, description });
+          if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
+          showToast('Goal milestone defined & saved!');
+          createGoalForm.reset();
+          window.closeModal('create-goal-modal');
+          refreshAllViews();
+        }
+      });
+    }
+
+    renderGoals();
 
     function updateHeaderStats() {
       const allNotes = Store.getNotes();

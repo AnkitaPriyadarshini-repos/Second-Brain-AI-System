@@ -19,4 +19,13 @@ trippa-stayFinder-major-project/
 __pycache__/
 *.pyc
 
+# Local helper scripts
+check_*.py
+inspect_*.py
+unlock_*.py
+trigger_*.py
+submit_*.py
+enable_discussions.py
+scratch/
+
 .vercel
