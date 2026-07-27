@@ -115,6 +115,8 @@
 
     // Navigation View Activation Helper
     function activateView(targetView) {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+
       navTabs.forEach(t => {
         const isTarget = t.getAttribute('data-view') === targetView;
         t.classList.toggle('active', isTarget);
@@ -138,6 +140,8 @@
         sec.classList.toggle('active', isTarget);
       });
 
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
       if (targetView === 'graph' && typeof GraphVisualizer !== 'undefined' && graphCanvas) {
         setTimeout(() => {
           GraphVisualizer.resize();
@@ -147,6 +151,8 @@
         initFlashcards();
       } else if (targetView === 'dashboard') {
         renderDashboard();
+      } else if (targetView === 'goals') {
+        renderGoals();
       }
     }
 
