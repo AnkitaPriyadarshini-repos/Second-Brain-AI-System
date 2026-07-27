@@ -2,6 +2,11 @@
   "name": "second-brain-ai-system",
   "version": "1.0.0",
   "description": "Second Brain AI System — A personal knowledge system that does not hinder learning (HGM-12)",
+  "homepage": "https://second-brain-ai-system.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AnkitaPriyadarshini-repos/Second-Brain-AI-System.git"
+  },
   "main": "js/app.js",
   "scripts": {
     "start": "npx serve .",
