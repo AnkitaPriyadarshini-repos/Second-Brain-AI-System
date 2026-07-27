@@ -120,12 +120,12 @@
             </div>
             <div class="hero-robo-content">
               <div class="hero-robo-header-row">
-                <span class="hero-robo-badge">🌼 MAIN AI ROBOT ASSISTANT</span>
-                <span class="hero-robo-status-text">● Ready to assist in real-time</span>
+                <span class="hero-robo-badge">🌼 YELLOW ROBOT AI</span>
+                <span class="hero-robo-status-text">● Ready to help</span>
               </div>
-              <h1 class="hero-title" style="margin: 4px 0 6px 0;">Talk to Your Second Brain like Jarvis</h1>
+              <h1 class="hero-title" style="margin: 4px 0 2px 0;">Talk to Jarvis</h1>
               <p class="hero-subtitle" style="margin-bottom: 0;">
-                Hi Ankita! 🌼 Ask me anything about your 100+ saved notes, thoughts, or research.
+                Ask your Second Brain anything.
               </p>
             </div>
           </div>
@@ -134,7 +134,7 @@
 
           <!-- Input Form -->
           <form id="rag-query-form" class="query-input-bar" onsubmit="window.submitRAGQuery(event); return false;">
-            <input type="text" id="rag-query-input" class="input-field query-input" placeholder="Ask your Second Brain... (e.g. 'What did I save about deep learning last month?')" aria-label="Query Input">
+            <input type="text" id="rag-query-input" class="input-field query-input" placeholder="Ask your Second Brain..." aria-label="Query Input">
             <button type="submit" id="rag-submit-btn" class="btn btn-primary" onclick="window.submitRAGQuery(event)">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3m-3.5-6.5l-2 2m-7 7l-2 2m0-11l2 2m7 7l2 2"/></svg>
               Query RAG
@@ -158,16 +158,12 @@
 
           <!-- Sample Query Pills -->
           <div class="sample-queries-container">
-            <span class="sample-label">Try sample queries:</span>
+            <span class="sample-label">Try queries:</span>
             <div class="sample-queries-row">
-              <button class="sample-query-btn" data-query="What did I save about deep learning last month?" onclick="window.triggerSampleQuery('What did I save about deep learning last month?')">What did I save about deep learning last month?</button>
-              <button class="sample-query-btn" data-query="Startup idea I had in January?" onclick="window.triggerSampleQuery('Startup idea I had in January?')">Startup idea I had in January?</button>
-              <button class="sample-query-btn" data-query="Urban planning research notes?" onclick="window.triggerSampleQuery('Urban planning research notes?')">Urban planning research notes?</button>
-              <button class="sample-query-btn" data-query="Article on sleep and memory?" onclick="window.triggerSampleQuery('Article on sleep and memory?')">Article on sleep and memory?</button>
-              <button class="sample-query-btn" data-query="Kafka &amp; distributed systems?" onclick="window.triggerSampleQuery('Kafka &amp; distributed systems?')">Kafka &amp; distributed systems?</button>
-              <button class="sample-query-btn" data-query="Atomic Habits summary?" onclick="window.triggerSampleQuery('Atomic Habits summary?')">Atomic Habits summary?</button>
-              <button class="sample-query-btn" data-query="ENCODE cCREs paper?" onclick="window.triggerSampleQuery('ENCODE cCREs paper?')">ENCODE cCREs paper?</button>
-              <button class="sample-query-btn" data-query="Vector DB benchmarks?" onclick="window.triggerSampleQuery('Vector DB benchmarks?')">Vector DB benchmarks?</button>
+              <button class="sample-query-btn" data-query="Deep learning notes" onclick="window.triggerSampleQuery('What did I save about deep learning last month?')">Deep learning notes</button>
+              <button class="sample-query-btn" data-query="Startup ideas" onclick="window.triggerSampleQuery('Startup idea I had in January?')">Startup ideas</button>
+              <button class="sample-query-btn" data-query="Sleep &amp; memory" onclick="window.triggerSampleQuery('Article on sleep and memory?')">Sleep &amp; memory</button>
+              <button class="sample-query-btn" data-query="Kafka systems" onclick="window.triggerSampleQuery('Kafka &amp; distributed systems?')">Kafka systems</button>
             </div>
           </div>
         </div>
@@ -175,8 +171,8 @@
         <!-- Bottom Chat Stream Card -->
         <div class="glass-card chat-card-wrapper">
           <div class="chat-card-header">
-            <h2 class="section-heading">Conversation & Citations</h2>
-            <span class="rag-indicator">● RAG Vector Engine Active</span>
+            <h2 class="section-heading">Conversation</h2>
+            <span class="rag-indicator">● RAG Active</span>
           </div>
 
           <!-- Real-Time Backend Processing & Telemetry Display -->
@@ -201,7 +197,7 @@
                 <strong style="color: var(--accent-indigo);">Second Brain AI Assistant</strong>
               </div>
               <div class="chat-text">
-                👋 Hi! I'm your Second Brain AI assistant. Ask me anything about your 100+ saved notes for grounded answers with citations!
+                👋 Hi Ankita! How can I help you today?
               </div>
             </div>
           </div>
@@ -1050,19 +1046,19 @@
   </div>
 
   <!-- JavaScript Modules -->
-  <script src="js/nlp-engine.js?v=10.0"></script>
-  <script src="js/store.js?v=10.0"></script>
-  <script src="js/rag-engine.js?v=10.0"></script>
-  <script src="js/voice-engine.js?v=10.0"></script>
-  <script src="js/audio-presets.js?v=10.0"></script>
-  <script src="js/sound-engine.js?v=10.0"></script>
-  <script src="js/resurfacing-engine.js?v=10.0"></script>
-  <script src="js/graph-visualizer.js?v=10.0"></script>
-  <script src="js/ai-engine.js?v=10.0"></script>
-  <script src="js/gemini-color-flow.js?v=10.0"></script>
-  <script src="js/nexus-bot.js?v=10.0"></script>
-  <script src="js/developer-hud.js?v=10.0"></script>
-  <script src="js/ai-agents.js?v=10.0"></script>
-  <script src="js/app.js?v=10.0"></script>
+  <script src="js/nlp-engine.js?v=11.0"></script>
+  <script src="js/store.js?v=11.0"></script>
+  <script src="js/rag-engine.js?v=11.0"></script>
+  <script src="js/voice-engine.js?v=11.0"></script>
+  <script src="js/audio-presets.js?v=11.0"></script>
+  <script src="js/sound-engine.js?v=11.0"></script>
+  <script src="js/resurfacing-engine.js?v=11.0"></script>
+  <script src="js/graph-visualizer.js?v=11.0"></script>
+  <script src="js/ai-engine.js?v=11.0"></script>
+  <script src="js/gemini-color-flow.js?v=11.0"></script>
+  <script src="js/nexus-bot.js?v=11.0"></script>
+  <script src="js/developer-hud.js?v=11.0"></script>
+  <script src="js/ai-agents.js?v=11.0"></script>
+  <script src="js/app.js?v=11.0"></script>
 </body>
 </html>
