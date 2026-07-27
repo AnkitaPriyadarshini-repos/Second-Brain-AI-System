@@ -91,6 +91,7 @@
     // State Variables
     let activeFlashcards = [];
     let currentFlashcardIdx = 0;
+    let fcStreakCount = 12;
     let currentOpenedNote = null;
 
     // ----------------------------------------------------
@@ -148,7 +149,9 @@
         }
       });
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
 
       if (targetView === 'graph' && typeof GraphVisualizer !== 'undefined') {
         setTimeout(() => {
@@ -280,7 +283,7 @@
     }
 
     // Header Status Bar Interactive Pill Bindings
-    if (privacyBadge) {
+    if (privacyBadge && privacyBadge.style) {
       privacyBadge.style.cursor = 'pointer';
       privacyBadge.addEventListener('click', () => {
         if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
@@ -288,7 +291,7 @@
       });
     }
 
-    if (totalNotesCountEl) {
+    if (totalNotesCountEl && totalNotesCountEl.style) {
       totalNotesCountEl.style.cursor = 'pointer';
       totalNotesCountEl.addEventListener('click', () => {
         if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
@@ -1280,8 +1283,6 @@
     // ----------------------------------------------------
     // Flashcard Controller & Spaced Repetition Engine
     // ----------------------------------------------------
-    let fcStreakCount = 12;
-
     function initFlashcards() {
       if (typeof aiEngine === 'undefined') return;
       activeFlashcards = aiEngine.generateFlashcards(Store.getNotes());
@@ -1410,7 +1411,8 @@
         } else if (e.key === 'ArrowRight' && fcNextBtn) {
           fcNextBtn.click();
         }
-      });
+      }
+    });
 
     // ----------------------------------------------------
     // Dashboard Controller
