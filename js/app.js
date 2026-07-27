@@ -138,6 +138,17 @@
 
     window.activateView = activateView;
 
+    // Brand Logo Click Binding
+    const brandLogo = document.querySelector('.brand-logo');
+    if (brandLogo) {
+      brandLogo.addEventListener('click', (e) => {
+        e.preventDefault();
+        activateView('jarvis');
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
     // Header Status Bar Interactive Pill Bindings
     if (privacyBadge) {
       privacyBadge.style.cursor = 'pointer';
@@ -152,6 +163,34 @@
       totalNotesCountEl.addEventListener('click', () => {
         if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
         activateView('vault');
+      });
+    }
+
+    // Header Spec & Agent Modal Badges
+    const viewAgentsBtn = document.getElementById('view-agents-btn');
+    if (viewAgentsBtn) {
+      viewAgentsBtn.addEventListener('click', () => {
+        const modal = document.getElementById('ai-agents-modal');
+        if (modal) modal.classList.add('active');
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+      });
+    }
+
+    const viewArchBtn = document.getElementById('view-arch-btn');
+    if (viewArchBtn) {
+      viewArchBtn.addEventListener('click', () => {
+        const modal = document.getElementById('architecture-modal');
+        if (modal) modal.classList.add('active');
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+      });
+    }
+
+    const viewShortcutsBtn = document.getElementById('view-shortcuts-btn');
+    if (viewShortcutsBtn) {
+      viewShortcutsBtn.addEventListener('click', () => {
+        const modal = document.getElementById('shortcuts-modal');
+        if (modal) modal.classList.add('active');
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
       });
     }
 
