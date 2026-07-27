@@ -147,6 +147,10 @@
       const modal = document.getElementById(modalId);
       if (modal) modal.classList.remove('active');
     };
+    window.openNoteDrawerById = function(noteId) {
+      const targetNote = Store.getNotes().find(n => n.id === noteId);
+      if (targetNote && typeof openDrawer === 'function') openDrawer(targetNote);
+    };
     window.triggerSampleQuery = function(queryText) {
       if (!queryText) return;
       const cleanQuery = queryText.replace(/^["']|["']$/g, '');
@@ -1131,6 +1135,36 @@
             #${tag} (${count})
           </span>
         `).join('');
+      }
+
+      const recentNotesEl = document.getElementById('dashboard-recent-notes');
+      const pinnedNotesEl = document.getElementById('dashboard-pinned-notes');
+      const allNotes = Store.getNotes();
+
+      if (recentNotesEl) {
+        const recent = allNotes.slice(0, 4);
+        recentNotesEl.innerHTML = recent.map(n => `
+          <div style="padding: 10px 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="window.openNoteDrawerById('${n.id}')">
+            <div>
+              <div style="font-weight: 600; font-size: 13px; color: var(--text-primary);">${escapeHTML(n.title)}</div>
+              <div style="font-size: 11px; color: var(--text-muted);">${escapeHTML(n.dateStr || '')} • ${escapeHTML(n.sourceType || 'type')}</div>
+            </div>
+            <span style="font-size: 11px; color: var(--accent-indigo); font-weight: 600;">View →</span>
+          </div>
+        `).join('');
+      }
+
+      if (pinnedNotesEl) {
+        const pinned = allNotes.filter(n => n.pinned).slice(0, 4);
+        pinnedNotesEl.innerHTML = pinned.length ? pinned.map(n => `
+          <div style="padding: 10px 12px; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="window.openNoteDrawerById('${n.id}')">
+            <div>
+              <div style="font-weight: 600; font-size: 13px; color: var(--text-primary);">📌 ${escapeHTML(n.title)}</div>
+              <div style="font-size: 11px; color: var(--text-muted);">${escapeHTML(n.dateStr || '')}</div>
+            </div>
+            <span style="font-size: 11px; color: var(--accent-amber); font-weight: 600;">Pinned</span>
+          </div>
+        `).join('') : '<div style="font-size: 12px; color: var(--text-muted); padding: 8px;">No pinned documents. Pin key notes in Vault Explorer to feature them here.</div>';
       }
     }
 
