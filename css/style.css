@@ -412,11 +412,11 @@ main {
 }
 
 .view-section {
-  display: none;
+  display: none !important;
 }
 
 .view-section.active {
-  display: block;
+  display: block !important;
   animation: fadeIn 0.2s ease-out;
 }
 

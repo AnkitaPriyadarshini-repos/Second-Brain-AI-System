@@ -117,7 +117,8 @@
     function activateView(targetView) {
       if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
 
-      navTabs.forEach(t => {
+      const allNavTabs = document.querySelectorAll('.nav-tab');
+      allNavTabs.forEach(t => {
         const isTarget = t.getAttribute('data-view') === targetView;
         t.classList.toggle('active', isTarget);
         t.setAttribute('aria-selected', isTarget ? 'true' : 'false');
@@ -135,17 +136,27 @@
         btn.classList.toggle('active', isTarget);
       });
 
-      viewSections.forEach(sec => {
+      const allViewSections = document.querySelectorAll('.view-section');
+      allViewSections.forEach(sec => {
         const isTarget = sec.id === `view-${targetView}`;
-        sec.classList.toggle('active', isTarget);
+        if (isTarget) {
+          sec.style.display = 'block';
+          sec.classList.add('active');
+        } else {
+          sec.style.display = 'none';
+          sec.classList.remove('active');
+        }
       });
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      if (targetView === 'graph' && typeof GraphVisualizer !== 'undefined' && graphCanvas) {
+      if (targetView === 'graph' && typeof GraphVisualizer !== 'undefined') {
         setTimeout(() => {
-          GraphVisualizer.resize();
-          GraphVisualizer.buildGraph(Store.getNotes());
+          const graphCanvas = document.getElementById('graph-canvas');
+          if (graphCanvas) {
+            GraphVisualizer.resize();
+            GraphVisualizer.buildGraph(Store.getNotes());
+          }
         }, 50);
       } else if (targetView === 'flashcards') {
         initFlashcards();
