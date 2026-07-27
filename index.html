@@ -36,13 +36,13 @@
   <!-- Navigation Bar -->
   <nav class="navbar" aria-label="Main Navigation">
     <div class="navbar-top-row">
-      <a href="#" class="brand-logo" aria-label="Second Brain AI System Home" onclick="window.activateView('jarvis'); return false;">
-        <div class="brand-icon-wrapper">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><circle cx="12" cy="12" r="3"/></svg>
+      <a href="#" class="brand-logo" aria-label="Gemini Notebook Home" onclick="window.activateView('jarvis'); return false;">
+        <div class="brand-icon-wrapper" style="background: linear-gradient(135deg, #6366f1, #ec4899);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><circle cx="12" cy="9" r="2"/></svg>
         </div>
         <div style="display: flex; flex-direction: column;">
-          <span class="brand-name">Second Brain AI</span>
-          <span class="brand-subtext">HGM-12 PKM Platform</span>
+          <span class="brand-name">Gemini Notebook</span>
+          <span class="brand-subtext">AI Research Tool &amp; Thinking Partner</span>
         </div>
       </a>
 
@@ -106,135 +106,192 @@
 
   <main>
 
-    <!-- View 1: Conversational RAG Q&A Interface -->
-    <section id="view-jarvis" class="view-section active" aria-label="Conversational Q&A Interface">
-      <div class="jarvis-container">
+    <!-- View 1: Gemini Notebook — AI Research Tool & Thinking Partner Studio -->
+    <section id="view-jarvis" class="view-section active" aria-label="Gemini Notebook Studio Interface">
+      <div class="notebook-workspace-grid">
         
-        <!-- Main Screen AI Assistant Stage: ChatGPT/Claude Enterprise Workspace -->
-        <div class="jarvis-header-card glass-card">
-          <!-- Integrated AI Status Pill Bar -->
-          <div class="ai-status-pill-bar">
-            <div class="ai-status-item">
-              <span class="ai-status-dot"></span>
-              <span>AI Online</span>
-            </div>
-            <span>•</span>
-            <div class="ai-status-item">
-              <span style="color: var(--accent-indigo);">RAG Connected</span>
-            </div>
-            <span>•</span>
-            <div class="ai-status-item">
-              <span>100+ Docs Indexed</span>
-            </div>
-            <span>•</span>
-            <div class="ai-status-item" style="color: var(--accent-emerald);">
-              <span>Local RAG v3.4</span>
-            </div>
+        <!-- Left Column: Sources Panel (NotebookLM Grounding Sources) -->
+        <aside class="notebook-sources-panel">
+          <div class="sources-header">
+            <span class="sources-title">Sources (100)</span>
+            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="window.activateView('capture'); window.setCaptureTab('file');">+ Add Source</button>
           </div>
+          <div style="font-size: 11px; color: var(--accent-indigo); font-weight: 600; display: flex; align-items: center; gap: 4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span>Grounded on 100 sources</span>
+          </div>
+          <div id="notebook-sources-list" class="sources-list">
+            <!-- Populated via JavaScript renderNotebookSources() -->
+          </div>
+        </aside>
 
-          <!-- Hero Yellow Robot Companion Banner -->
-          <div class="main-hero-robo-banner">
-            <div class="hero-robo-avatar-container">
-              <img src="assets/nexus_yellow_bot.png" alt="Yellow Robot Helper 🌼" class="hero-robo-img float-animation">
-              <span class="hero-robo-pulse-ring"></span>
-            </div>
-            <div class="hero-robo-content">
-              <div class="hero-robo-header-row">
-                <span class="hero-robo-badge">🌼 JARVIS AI WORKSPACE</span>
-                <span class="hero-robo-status-text">● Ready to assist</span>
+        <!-- Center Column: Conversational AI Thinking Partner & Grounded Studio -->
+        <main class="notebook-chat-panel">
+          <div class="jarvis-header-card glass-card">
+            <!-- Integrated AI Status Pill Bar -->
+            <div class="ai-status-pill-bar">
+              <div class="ai-status-item">
+                <span class="ai-status-dot"></span>
+                <span>AI Thinking Partner Active</span>
               </div>
-              <h1 class="hero-title" style="margin: 4px 0 2px 0;">Welcome to Your Second Brain</h1>
-              <p class="hero-subtitle" style="margin-bottom: 0;">
-                Search saved notes, ask questions, or synthesize research with grounded AI retrieval.
-              </p>
+              <span>•</span>
+              <div class="ai-status-item">
+                <span style="color: var(--accent-indigo);">Gemini 1.5 Pro Engine</span>
+              </div>
+              <span>•</span>
+              <div class="ai-status-item" style="color: var(--accent-emerald);">
+                <span>Local RAG v3.4</span>
+              </div>
+            </div>
+
+            <!-- Hero Yellow Robot Companion Banner -->
+            <div class="main-hero-robo-banner">
+              <div class="hero-robo-avatar-container">
+                <img src="assets/nexus_yellow_bot.png" alt="Gemini Notebook AI 🌼" class="hero-robo-img float-animation">
+                <span class="hero-robo-pulse-ring"></span>
+              </div>
+              <div class="hero-robo-content">
+                <div class="hero-robo-header-row">
+                  <span class="hero-robo-badge">🌼 GEMINI NOTEBOOK</span>
+                  <span class="hero-robo-status-text">● Ready to assist</span>
+                </div>
+                <h1 class="hero-title" style="margin: 4px 0 2px 0;">Gemini Notebook</h1>
+                <p class="hero-subtitle" style="margin-bottom: 0;">
+                  Your AI Research Tool &amp; Thinking Partner. Ask questions or synthesize insights grounded in your sources.
+                </p>
+              </div>
+            </div>
+
+            <canvas id="waveform-canvas" class="waveform-canvas"></canvas>
+
+            <!-- Gemini Prompt Input Box -->
+            <form id="rag-query-form" class="enterprise-prompt-container" onsubmit="window.submitRAGQuery(event); return false;">
+              <textarea id="rag-query-input" class="prompt-textarea" placeholder="Ask Gemini Notebook anything... (e.g. 'What did I save about deep learning last month?')" aria-label="Query Input" rows="2"></textarea>
+              
+              <div class="prompt-toolbar">
+                <div class="prompt-actions-left">
+                  <button type="button" class="btn-prompt-action" title="Attach Document or Image for OCR" onclick="window.activateView('capture'); window.setCaptureTab('file');">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                    <span>Attach Source</span>
+                  </button>
+                  <button type="button" id="voice-trigger-btn" class="btn-prompt-action" title="Voice Input" onclick="window.toggleVoiceListen()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                    <span>Audio Note</span>
+                  </button>
+                </div>
+
+                <div class="prompt-actions-right">
+                  <span class="kbd-badge" title="Press Ctrl + Enter to submit">Ctrl ↵</span>
+                  <button type="submit" id="rag-submit-btn" class="btn btn-primary" style="padding: 7px 16px; border-radius: var(--radius-md);" onclick="window.submitRAGQuery(event)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3m-3.5-6.5l-2 2m-7 7l-2 2m0-11l2 2m7 7l2 2"/></svg>
+                    Ask Gemini
+                  </button>
+                </div>
+              </div>
+            </form>
+
+            <!-- Deliberate RAG Progress & Diagnostic Feedback Bar -->
+            <div id="rag-progress-bar-container" class="rag-progress-bar-container" style="display: none; margin-top: 14px; padding: 10px 14px; background: rgba(255, 255, 255, 0.04); border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.2);">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; color: var(--accent-indigo); font-weight: 600;">
+                <span id="rag-progress-status-text">⚡ Gemini Engine: Searching grounded sources & computing vector similarity...</span>
+                <span id="rag-progress-percentage">0%</span>
+              </div>
+              <div style="height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden;">
+                <div id="rag-progress-fill" style="height: 100%; width: 0%; background: linear-gradient(90deg, #6366f1, #10b981, #ec4899); transition: width 0.15s ease-out; border-radius: 3px;"></div>
+              </div>
+            </div>
+
+            <!-- Sample Query Pills -->
+            <div class="sample-queries-container">
+              <span class="sample-label">Suggested research prompts:</span>
+              <div class="sample-queries-row">
+                <button class="sample-query-btn" data-query="Deep learning notes" onclick="window.triggerSampleQuery('What did I save about deep learning last month?')">Deep learning notes</button>
+                <button class="sample-query-btn" data-query="Startup ideas" onclick="window.triggerSampleQuery('Startup idea I had in January?')">Startup ideas</button>
+                <button class="sample-query-btn" data-query="Sleep &amp; memory" onclick="window.triggerSampleQuery('Article on sleep and memory?')">Sleep &amp; memory</button>
+                <button class="sample-query-btn" data-query="Kafka systems" onclick="window.triggerSampleQuery('Kafka &amp; distributed systems?')">Kafka systems</button>
+              </div>
             </div>
           </div>
 
-          <canvas id="waveform-canvas" class="waveform-canvas"></canvas>
+          <!-- Bottom Chat Stream Card -->
+          <div class="glass-card chat-card-wrapper">
+            <div class="chat-card-header">
+              <h2 class="section-heading">Grounded Research Stream</h2>
+              <span class="rag-indicator">● RAG Active</span>
+            </div>
 
-          <!-- ChatGPT / Claude Style Focal Point Prompt Box -->
-          <form id="rag-query-form" class="enterprise-prompt-container" onsubmit="window.submitRAGQuery(event); return false;">
-            <textarea id="rag-query-input" class="prompt-textarea" placeholder="Ask your Second Brain anything... (e.g. 'What did I save about deep learning last month?')" aria-label="Query Input" rows="2"></textarea>
+            <!-- Real-Time Backend Processing & Telemetry Display -->
+            <div id="backend-telemetry-card" class="backend-telemetry-card" style="display: none; margin-bottom: 16px; padding: 12px 16px; background: rgba(99, 102, 241, 0.08); border-radius: var(--radius-sm); border: 1px solid rgba(99, 102, 241, 0.25);">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 12px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="background: var(--accent-indigo); color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-family: var(--font-code);">RAG RETRIEVAL</span>
+                  <span id="telemetry-matched-title" style="color: var(--text-primary); font-weight: 600;">Top Match: Deep Learning #1</span>
+                </div>
+                <div style="display: flex; gap: 12px; font-family: var(--font-code);">
+                  <span id="telemetry-similarity-score" style="color: var(--accent-emerald); font-weight: 600;">Cosine Similarity: 0.948 (94.8%)</span>
+                  <span id="telemetry-latency" style="color: var(--accent-amber); font-weight: 600;">Latency: 8ms</span>
+                </div>
+              </div>
+              <div id="telemetry-terms-cloud" style="margin-top: 8px; font-size: 11px; color: var(--text-secondary); display: flex; flex-wrap: wrap; gap: 6px;"></div>
+            </div>
+
+            <div id="chat-container" class="chat-stream">
+              <div class="chat-bubble ai-bubble glass-card">
+                <div class="chat-header">
+                  <div class="ai-avatar">•</div>
+                  <strong style="color: var(--accent-indigo);">Gemini Notebook Thinking Partner</strong>
+                </div>
+                <div class="chat-text">
+                  👋 Hi! I'm your Gemini Notebook Thinking Partner. Ask me anything grounded in your 100+ research sources!
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <!-- Right Column: Studio Notebook & Audio Overview Podcast -->
+        <aside class="notebook-studio-panel">
+          <!-- Audio Overview Podcast Player Card -->
+          <div class="glass-card audio-overview-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span class="podcast-badge">🎙️ Audio Overview</span>
+              <span style="font-size: 11px; color: var(--accent-emerald); font-weight: 600;">● Ready</span>
+            </div>
+            <h4 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 8px 0 4px 0;">Deep-Dive Podcast</h4>
+            <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+              Synthesizes a 2-host audio podcast discussion analyzing your research sources.
+            </p>
             
-            <div class="prompt-toolbar">
-              <div class="prompt-actions-left">
-                <button type="button" class="btn-prompt-action" title="Attach Document or Image for OCR" onclick="window.activateView('capture'); window.setCaptureTab('file');">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                  <span>Attach / OCR</span>
-                </button>
-                <button type="button" id="voice-trigger-btn" class="btn-prompt-action" title="Voice Input" onclick="window.toggleVoiceListen()">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-                  <span>Voice</span>
-                </button>
-              </div>
+            <div class="podcast-hosts-row">
+              <div class="podcast-host-avatar" title="Host Alex">A</div>
+              <div class="podcast-host-avatar" style="background: var(--accent-pink);" title="Host Sarah">S</div>
+              <div style="font-size: 12px; color: var(--text-primary); font-weight: 600;">Host Alex &amp; Host Sarah</div>
+            </div>
 
-              <div class="prompt-actions-right">
-                <span class="kbd-badge" title="Press Ctrl + Enter to submit">Ctrl ↵</span>
-                <button type="submit" id="rag-submit-btn" class="btn btn-primary" style="padding: 7px 16px; border-radius: var(--radius-md);" onclick="window.submitRAGQuery(event)">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3m-3.5-6.5l-2 2m-7 7l-2 2m0-11l2 2m7 7l2 2"/></svg>
-                  Query RAG
-                </button>
-              </div>
-            </div>
-          </form>
-
-          <!-- Deliberate RAG Progress & Diagnostic Feedback Bar -->
-          <div id="rag-progress-bar-container" class="rag-progress-bar-container" style="display: none; margin-top: 14px; padding: 10px 14px; background: rgba(255, 255, 255, 0.04); border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.2);">
-            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; color: var(--accent-indigo); font-weight: 600;">
-              <span id="rag-progress-status-text">⚡ RAG Vector Engine: Searching 100+ notes & computing cosine similarity...</span>
-              <span id="rag-progress-percentage">0%</span>
-            </div>
-            <div style="height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden;">
-              <div id="rag-progress-fill" style="height: 100%; width: 0%; background: linear-gradient(90deg, #6366f1, #10b981, #ec4899); transition: width 0.15s ease-out; border-radius: 3px;"></div>
-            </div>
+            <button id="podcast-play-btn" class="btn btn-primary" style="width: 100%; font-size: 13px; padding: 8px 14px;" onclick="window.playAudioOverviewPodcast()">
+              ▶ Play Audio Overview
+            </button>
           </div>
 
-          <!-- Sample Query Pills -->
-          <div class="sample-queries-container">
-            <span class="sample-label">Suggested prompts:</span>
-            <div class="sample-queries-row">
-              <button class="sample-query-btn" data-query="Deep learning notes" onclick="window.triggerSampleQuery('What did I save about deep learning last month?')">Deep learning notes</button>
-              <button class="sample-query-btn" data-query="Startup ideas" onclick="window.triggerSampleQuery('Startup idea I had in January?')">Startup ideas</button>
-              <button class="sample-query-btn" data-query="Sleep &amp; memory" onclick="window.triggerSampleQuery('Article on sleep and memory?')">Sleep &amp; memory</button>
-              <button class="sample-query-btn" data-query="Kafka systems" onclick="window.triggerSampleQuery('Kafka &amp; distributed systems?')">Kafka systems</button>
+          <!-- Studio Artifact Tools Grid -->
+          <div class="glass-card" style="padding: 16px;">
+            <h4 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">Studio Briefings &amp; Artifacts</h4>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <button class="btn btn-secondary" style="width: 100%; justify-content: flex-start; font-size: 12px;" onclick="window.runAgent('summarizer')">
+                📄 Generate Study Guide
+              </button>
+              <button class="btn btn-secondary" style="width: 100%; justify-content: flex-start; font-size: 12px;" onclick="window.runAgent('tutor')">
+                🧠 Active Recall Quiz
+              </button>
+              <button class="btn btn-secondary" style="width: 100%; justify-content: flex-start; font-size: 12px;" onclick="window.activateView('graph')">
+                🕸️ Mind Map &amp; Graph
+              </button>
+              <button class="btn btn-secondary" style="width: 100%; justify-content: flex-start; font-size: 12px;" onclick="window.activateView('resurfacing')">
+                🔮 Resurface Past Notes
+              </button>
             </div>
           </div>
-        </div>
-
-        <!-- Bottom Chat Stream Card -->
-        <div class="glass-card chat-card-wrapper">
-          <div class="chat-card-header">
-            <h2 class="section-heading">Conversation</h2>
-            <span class="rag-indicator">● RAG Active</span>
-          </div>
-
-          <!-- Real-Time Backend Processing & Telemetry Display -->
-          <div id="backend-telemetry-card" class="backend-telemetry-card" style="display: none; margin-bottom: 16px; padding: 12px 16px; background: rgba(99, 102, 241, 0.08); border-radius: var(--radius-sm); border: 1px solid rgba(99, 102, 241, 0.25);">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 12px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="background: var(--accent-indigo); color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-family: var(--font-code);">BACKEND MATH</span>
-                <span id="telemetry-matched-title" style="color: var(--text-primary); font-weight: 600;">Top Match: Deep Learning #1</span>
-              </div>
-              <div style="display: flex; gap: 12px; font-family: var(--font-code);">
-                <span id="telemetry-similarity-score" style="color: var(--accent-emerald); font-weight: 600;">Cosine Similarity: 0.948 (94.8%)</span>
-                <span id="telemetry-latency" style="color: var(--accent-amber); font-weight: 600;">Latency: 8ms</span>
-              </div>
-            </div>
-            <div id="telemetry-terms-cloud" style="margin-top: 8px; font-size: 11px; color: var(--text-secondary); display: flex; flex-wrap: wrap; gap: 6px;"></div>
-          </div>
-
-          <div id="chat-container" class="chat-stream">
-            <div class="chat-bubble ai-bubble glass-card">
-              <div class="chat-header">
-                <div class="ai-avatar">•</div>
-                <strong style="color: var(--accent-indigo);">Second Brain AI Assistant</strong>
-              </div>
-              <div class="chat-text">
-                👋 Hi Ankita! How can I help you today?
-              </div>
-            </div>
-          </div>
-        </div>
+        </aside>
 
       </div>
     </section>
@@ -1140,19 +1197,19 @@
   </div>
 
   <!-- JavaScript Modules -->
-  <script src="js/nlp-engine.js?v=14.0"></script>
-  <script src="js/store.js?v=14.0"></script>
-  <script src="js/rag-engine.js?v=14.0"></script>
-  <script src="js/voice-engine.js?v=14.0"></script>
-  <script src="js/audio-presets.js?v=14.0"></script>
-  <script src="js/sound-engine.js?v=14.0"></script>
-  <script src="js/resurfacing-engine.js?v=14.0"></script>
-  <script src="js/graph-visualizer.js?v=14.0"></script>
-  <script src="js/ai-engine.js?v=14.0"></script>
-  <script src="js/gemini-color-flow.js?v=14.0"></script>
-  <script src="js/nexus-bot.js?v=14.0"></script>
-  <script src="js/developer-hud.js?v=14.0"></script>
-  <script src="js/ai-agents.js?v=14.0"></script>
-  <script src="js/app.js?v=14.0"></script>
+  <script src="js/nlp-engine.js?v=15.0"></script>
+  <script src="js/store.js?v=15.0"></script>
+  <script src="js/rag-engine.js?v=15.0"></script>
+  <script src="js/voice-engine.js?v=15.0"></script>
+  <script src="js/audio-presets.js?v=15.0"></script>
+  <script src="js/sound-engine.js?v=15.0"></script>
+  <script src="js/resurfacing-engine.js?v=15.0"></script>
+  <script src="js/graph-visualizer.js?v=15.0"></script>
+  <script src="js/ai-engine.js?v=15.0"></script>
+  <script src="js/gemini-color-flow.js?v=15.0"></script>
+  <script src="js/nexus-bot.js?v=15.0"></script>
+  <script src="js/developer-hud.js?v=15.0"></script>
+  <script src="js/ai-agents.js?v=15.0"></script>
+  <script src="js/app.js?v=15.0"></script>
 </body>
 </html>

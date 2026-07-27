@@ -1322,6 +1322,40 @@
     }
 
     // ----------------------------------------------------
+    // Gemini Notebook Source List & Audio Overview Engine
+    // ----------------------------------------------------
+    function renderNotebookSources() {
+      const sourcesContainer = document.getElementById('notebook-sources-list');
+      if (!sourcesContainer || typeof Store === 'undefined') return;
+      const notes = Store.getNotes();
+      sourcesContainer.innerHTML = notes.slice(0, 35).map(n => {
+        const icon = n.sourceType === 'voice' ? '🎙️' : n.sourceType === 'web' ? '🌐' : n.sourceType === 'file' ? '📄' : '📝';
+        return `
+          <div class="source-item-row" onclick="window.openNoteDrawerById('${n.id}')">
+            <input type="checkbox" checked onclick="event.stopPropagation();">
+            <span style="font-size: 13px;">${icon}</span>
+            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; flex: 1;">${escapeHTML(n.title)}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.renderNotebookSources = renderNotebookSources;
+    renderNotebookSources();
+
+    window.playAudioOverviewPodcast = function() {
+      const btn = document.getElementById('podcast-play-btn');
+      if (btn) btn.textContent = '🔊 Synthesizing Podcast Audio...';
+      if (typeof VoiceEngine !== 'undefined' && VoiceEngine.speak) {
+        VoiceEngine.speak("Welcome to Gemini Notebook Audio Overview! In today's deep-dive, Host Alex and Host Sarah analyze your research sources on deep learning, neural architectures, and distributed systems.");
+      }
+      if (typeof showToast === 'function') showToast('Playing Gemini Notebook Deep-Dive Podcast Audio Overview!');
+      setTimeout(() => {
+        if (btn) btn.textContent = '▶ Play Audio Overview';
+      }, 7000);
+    };
+
+    // ----------------------------------------------------
     // Utility Helpers
     // ----------------------------------------------------
     function refreshAllViews() {
