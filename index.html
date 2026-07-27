@@ -532,41 +532,78 @@
 
     <!-- View 6: AI Flashcards & Spaced Repetition -->
     <section id="view-flashcards" class="view-section" aria-label="AI Flashcards & Spaced Repetition">
-      <div class="glass-card" style="margin-bottom: 24px;">
+      <div class="glass-card" style="margin-bottom: 24px; padding: 22px; border-radius: 20px;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
           <div>
-            <h2 class="hero-title" style="font-size: 22px; text-align: left;">AI Memory Flashcards (Spaced Repetition)</h2>
+            <h2 class="hero-title" style="font-size: 22px; text-align: left; margin-bottom: 4px;">🧠 AI Memory Flashcards (Spaced Repetition)</h2>
             <p class="hero-subtitle" style="text-align: left; margin: 0; max-width: 100%;">
-              Automatically generated Q&A review cards from your saved notes to boost long-term retention.
+              Synthesized Q&amp;A review cards with 3D flip animation, audio TTS readouts, and Spaced Repetition Leitner scoring.
             </p>
           </div>
-          <div class="flashcard-score-pill">
-            <span id="flashcard-progress-text">Memory Recall: 88%</span>
+
+          <!-- Gamified Telemetry Metrics -->
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <div class="status-badge online" style="font-weight: 700;">🔥 Streak: <span id="fc-streak-count">12 Cards</span></div>
+            <div class="status-badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706; font-weight: 700;">
+              <span id="flashcard-progress-text">Card 1 of 100</span>
+            </div>
+            <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;" onclick="window.generateNewAICard()">⚡ Synthesize New AI Card</button>
           </div>
         </div>
       </div>
 
+      <!-- 3D Interactive Flashcard Stage -->
       <div class="flashcard-stage-container">
-        <div id="flashcard-card" class="flashcard-3d-card">
+        <div id="flashcard-card" class="flashcard-3d-card" title="Click or Press Space to Flip Card">
+          
+          <!-- Front Face (Question) -->
           <div class="flashcard-face flashcard-front">
-            <span class="flashcard-badge" id="fc-category-badge">Artificial Intelligence</span>
-            <h3 id="fc-question" class="fc-question-text">What is the core attention mechanism in Transformers?</h3>
-            <p class="fc-hint-text">Click card or press Space to reveal answer</p>
-          </div>
-          <div class="flashcard-face flashcard-back">
-            <span class="flashcard-badge" style="background: rgba(16, 185, 129, 0.12); color: var(--accent-emerald);">Answer Insight</span>
-            <div id="fc-answer" class="fc-answer-text">
-              Transformers use multi-head self-attention: Attention(Q,K,V) = softmax(QK^T / sqrt(d_k)) V to dynamically weigh token relationships.
+            <div class="fc-header-bar">
+              <span class="flashcard-badge" id="fc-category-badge">Artificial Intelligence</span>
+              <button class="btn btn-secondary" style="font-size: 11px; padding: 4px 10px;" onclick="event.stopPropagation(); window.speakFCQuestion()" title="Read Question Out Loud">
+                🔊 Read Question
+              </button>
             </div>
-            <span id="fc-source-title" class="fc-source-tag">From Note: Deep Learning #1</span>
+
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; text-align: center; padding: 10px 0;">
+              <span style="font-size: 12px; font-weight: 700; color: var(--accent-amber); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Question Prompt</span>
+              <h3 id="fc-question" class="fc-question-text">What are the key concepts and takeaways of "Deep Learning &amp; Transformer Attention Mechanisms"?</h3>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; pt: 12px; border-top: 1px solid var(--border-color);">
+              <p class="fc-hint-text">💡 Click card or press <strong>Space</strong> to reveal answer</p>
+              <span style="font-size: 11px; font-weight: 600; color: var(--accent-primary);">3D FLIP ↻</span>
+            </div>
           </div>
+
+          <!-- Back Face (Answer Insight) -->
+          <div class="flashcard-face flashcard-back">
+            <div class="fc-header-bar">
+              <span class="flashcard-badge" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);">Answer &amp; Key Insight</span>
+              <div style="display: flex; gap: 6px;">
+                <button class="btn btn-secondary" style="font-size: 11px; padding: 4px 8px;" onclick="event.stopPropagation(); window.openFCLinkedNote()" title="Open Original Note">📖 View Source Note</button>
+                <button class="btn btn-secondary" style="font-size: 11px; padding: 4px 8px;" onclick="event.stopPropagation(); window.speakFCAnswer()" title="Read Answer Out Loud">🔊 Read Answer</button>
+              </div>
+            </div>
+
+            <div id="fc-answer" class="fc-answer-text">
+              Transformers use multi-head self-attention: Attention(Q,K,V) = softmax(QK^T / sqrt(d_k)) V to dynamically weigh token relationships across sequence lengths.
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+              <span id="fc-source-title" class="fc-source-tag" style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">From Note: Deep Learning #1</span>
+              <span style="font-size: 11px; font-weight: 600; color: var(--accent-primary);">3D FLIP ↺</span>
+            </div>
+          </div>
+
         </div>
 
+        <!-- Rating & Control Buttons -->
         <div class="flashcard-controls-row">
-          <button id="fc-rating-hard" class="btn btn-secondary fc-btn-hard">Hard (Again)</button>
-          <button id="fc-rating-good" class="btn btn-secondary fc-btn-good">Good (Review)</button>
-          <button id="fc-rating-easy" class="btn btn-primary fc-btn-easy">Easy (Mastered)</button>
-          <button id="fc-next-btn" class="btn btn-secondary">Next Card</button>
+          <button id="fc-rating-hard" class="btn btn-secondary fc-btn-hard" title="Shortcut: Press 1">🔴 Hard (Again)</button>
+          <button id="fc-rating-good" class="btn btn-secondary fc-btn-good" title="Shortcut: Press 2">🟡 Good (Review)</button>
+          <button id="fc-rating-easy" class="btn btn-primary fc-btn-easy" title="Shortcut: Press 3">🟢 Easy (Mastered)</button>
+          <button id="fc-next-btn" class="btn btn-secondary" title="Shortcut: Press Right Arrow">⚡ Next Card ➔</button>
         </div>
       </div>
     </section>
