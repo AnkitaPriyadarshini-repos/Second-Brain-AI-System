@@ -103,8 +103,32 @@
 
 @media (max-width: 768px) {
   main {
-    padding: 0 10px;
-    margin: 10px auto;
+    padding: 0 8px;
+    margin: 8px auto;
+  }
+
+  .centered-hero-stage {
+    margin: 16px auto 16px auto !important;
+    padding: 0 8px !important;
+  }
+
+  .centered-hero-stage h1 {
+    font-size: 22px !important;
+  }
+
+  .centered-hero-stage p {
+    font-size: 14px !important;
+  }
+
+  .prompt-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .prompt-card-item {
+    padding: 14px !important;
+    min-height: auto !important;
   }
 
   /* Responsive Hero Robo Banner */
@@ -197,7 +221,7 @@
 
   .nexus-bot-widget {
     position: fixed !important;
-    bottom: 12px !important;
+    bottom: 72px !important;
     right: 12px !important;
     max-width: 280px !important;
     z-index: 999 !important;
@@ -237,5 +261,6 @@
     overflow-y: auto;
   }
 }
+
 
 
