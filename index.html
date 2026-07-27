@@ -88,172 +88,10 @@
     <!-- Main Canvas Area -->
     <div class="app-main-canvas">
 
-      <main>
-
-        <!-- View 1: Juno AI — AskFlow Centered Studio Interface -->
+      <main>        <!-- View 1: Juno AI — AskFlow Centered Studio Interface -->
         <section id="view-jarvis" class="view-section active" aria-label="Juno AI Studio Interface">
-                <!-- Hero Yellow Robot Companion Stage -->
-          <div class="main-hero-robo-banner glass-card" style="max-width: 860px; margin: 0 auto 24px auto; padding: 20px 24px; border-radius: 18px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(236, 72, 153, 0.06)); border: 1.5px solid rgba(99, 102, 241, 0.2); display: flex; align-items: center; gap: 20px;">
-            <div class="hero-robo-avatar-container" style="position: relative; flex-shrink: 0;">
-              <img src="assets/nexus_yellow_bot.png" alt="Juno Yellow Robot Companion 🌼" class="hero-robo-img float-animation" style="width: 72px; height: 72px; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(99, 102, 241, 0.3)); cursor: pointer;" onclick="if(window.NexusBotEngine &amp;&amp; window.NexusBotEngine.speak){ window.NexusBotEngine.speak('Hi Ankita! I am your Yellow Robot thinking partner 🌼', 5000); }">
-              <span class="hero-robo-pulse-ring" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; border: 2px solid var(--accent-indigo); animation: floatAnim 2.5s infinite; opacity: 0.6; pointer-events: none;"></span>
-            </div>
-            <div class="hero-robo-content" style="display: flex; flex-direction: column; text-align: left; flex: 1;">
-              <div class="hero-robo-header-row" style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                <span class="hero-robo-badge" style="font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 20px; background: rgba(99, 102, 241, 0.15); color: var(--accent-indigo); text-transform: uppercase; letter-spacing: 0.05em;">🌼 JUNO AI ROBOT PARTNER</span>
-                <span class="hero-robo-status-text" style="font-size: 11px; color: var(--accent-emerald); font-weight: 600;">● Active &amp; Ready</span>
-              </div>
-              <h1 class="hero-title" style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 2px 0 4px 0;">Good day, Ankita 👋</h1>
-              <p class="hero-subtitle" style="font-size: 13.5px; color: var(--text-secondary); margin: 0; line-height: 1.45;">
-                I'm your Yellow Robot Thinking Partner. Ask me questions or synthesize insights grounded in your 100+ research sources!
-              </p>
-            </div>
-          </div>   </div>
-
-          <!-- AskFlow 3-Card Prompt Suggestions Grid -->
-          <div class="prompt-cards-grid">
-            <div class="prompt-card-item" onclick="window.triggerSampleQuery('What did I save about deep learning last month?')">
-              <div class="prompt-card-icon">💡</div>
-              <div class="prompt-card-text">Summarize my notes on deep learning &amp; neural models.</div>
-            </div>
-            <div class="prompt-card-item" onclick="window.triggerSampleQuery('Startup idea I had in January?')">
-              <div class="prompt-card-icon">🚀</div>
-              <div class="prompt-card-text">Recall my startup ideas &amp; product plans from January.</div>
-            </div>
-            <div class="prompt-card-item" onclick="window.triggerSampleQuery('Article on sleep and memory?')">
-              <div class="prompt-card-icon">🧠</div>
-              <div class="prompt-card-text">Synthesize research on sleep, memory &amp; learning.</div>
-            </div>
-          </div>
-
-          <!-- Centered Prompt Box -->
-          <div style="max-width: 860px; margin: 0 auto 24px auto;">
-            <form id="rag-query-form" class="enterprise-prompt-container" onsubmit="window.submitRAGQuery(event); return false;">
-              <textarea id="rag-query-input" class="prompt-textarea" placeholder="Ask Juno AI anything... ✨" aria-label="Query Input" rows="2"></textarea>
-              
-              <div class="prompt-toolbar">
-                <div class="prompt-actions-left">
-                  <button type="button" class="btn-prompt-action" title="Attach Source" onclick="window.activateView('capture'); window.setCaptureTab('file');">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                    <span>Attach</span>
-                  </button>
-                  <button type="button" id="voice-trigger-btn" class="btn-prompt-action" title="Voice Input" onclick="window.toggleVoiceListen()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-                    <span>Voice</span>
-                  </button>
-                </div>
-
-                <div class="prompt-actions-right">
-                  <span class="kbd-badge" title="Press Ctrl + Enter to submit">Ctrl ↵</span>
-                  <button type="submit" id="rag-submit-btn" class="btn btn-primary" style="padding: 7px 18px; border-radius: var(--radius-md);" onclick="window.submitRAGQuery(event)">
-                    Ask Juno ✨
-                  </button>
-                </div>
-              </div>
-            </form>
-
-            <!-- Deliberate RAG Progress & Diagnostic Feedback Bar -->
-            <div id="rag-progress-bar-container" class="rag-progress-bar-container" style="display: none; margin-top: 14px; padding: 10px 14px; background: rgba(99, 102, 241, 0.06); border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.2);">
-              <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; color: var(--accent-indigo); font-weight: 600;">
-                <span id="rag-progress-status-text">⚡ Juno AI Engine: Searching grounded sources &amp; computing vector similarity...</span>
-                <span id="rag-progress-percentage">0%</span>
-              </div>
-              <div style="height: 6px; background: rgba(0, 0, 0, 0.08); border-radius: 3px; overflow: hidden;">
-                <div id="rag-progress-fill" style="height: 100%; width: 0%; background: linear-gradient(90deg, #6366f1, #10b981, #ec4899); transition: width 0.15s ease-out; border-radius: 3px;"></div>
-              </div>
-            </div>
-
-            <!-- Sample Query Pills -->
-            <div class="sample-queries-container">
-              <span class="sample-label">Suggested research prompts:</span>
-              <div class="sample-queries-row">
-                <button class="sample-query-btn" data-query="Deep learning notes" onclick="window.triggerSampleQuery('What did I save about deep learning last month?')">Deep learning notes</button>
-                <button class="sample-query-btn" data-query="Startup ideas" onclick="window.triggerSampleQuery('Startup idea I had in January?')">Startup ideas</button>
-                <button class="sample-query-btn" data-query="Sleep &amp; memory" onclick="window.triggerSampleQuery('Article on sleep and memory?')">Sleep &amp; memory</button>
-                <button class="sample-query-btn" data-query="Kafka systems" onclick="window.triggerSampleQuery('Kafka &amp; distributed systems?')">Kafka systems</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Bottom Chat Stream Card -->
-          <div class="glass-card chat-card-wrapper">
-            <div class="chat-card-header">
-              <h2 class="section-heading">Grounded Research Stream</h2>
-              <span class="rag-indicator">● RAG Active</span>
-            </div>
-
-            <!-- Real-Time Backend Processing & Telemetry Display -->
-            <div id="backend-telemetry-card" class="backend-telemetry-card" style="display: none; margin-bottom: 16px; padding: 12px 16px; background: rgba(99, 102, 241, 0.08); border-radius: var(--radius-sm); border: 1px solid rgba(99, 102, 241, 0.25);">
-              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 12px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                  <span style="background: var(--accent-indigo); color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-family: var(--font-code);">RAG RETRIEVAL</span>
-                  <span id="telemetry-matched-title" style="color: var(--text-primary); font-weight: 600;">Top Match: Deep Learning #1</span>
-                </div>
-                <div style="display: flex; gap: 12px; font-family: var(--font-code);">
-                  <span id="telemetry-similarity-score" style="color: var(--accent-emerald); font-weight: 600;">Cosine Similarity: 0.948 (94.8%)</span>
-                  <span id="telemetry-latency" style="color: var(--accent-amber); font-weight: 600;">Latency: 8ms</span>
-                </div>
-              </div>
-              <div id="telemetry-terms-cloud" style="margin-top: 8px; font-size: 11px; color: var(--text-secondary); display: flex; flex-wrap: wrap; gap: 6px;"></div>
-            </div>
-
-            <div id="chat-container" class="chat-stream">
-              <div class="chat-bubble ai-bubble glass-card">
-                <div class="chat-header">
-                  <div class="ai-avatar">•</div>
-                  <strong style="color: var(--accent-indigo);">Juno AI Thinking Partner</strong>
-                </div>
-                <div class="chat-text">
-                  👋 Hi! I'm your Juno AI Thinking Partner. Ask me anything grounded in your 100+ research sources!
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
-
-        <!-- Right Column: Studio Notebook & Audio Overview Podcast -->
-        <aside class="notebook-studio-panel">
-          <!-- Audio Overview Podcast Player Card -->
-          <div class="glass-card audio-overview-card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span class="podcast-badge">🎙️ Audio Overview</span>
-              <span style="font-size: 11px; color: var(--accent-emerald); font-weight: 600;">● Ready</span>
-            </div>
-            <h4 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 8px 0 4px 0;">Deep-Dive Podcast</h4>
-            <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
-              Synthesizes a 2-host audio podcast discussion analyzing your research sources.
-            </p>
+          <div class="notebook-workspace-grid">
             
-            <div class="podcast-hosts-row">
-              <div class="podcast-host-avatar" title="Host Alex">A</div>
-              <div class="podcast-host-avatar" style="background: var(--accent-pink);" title="Host Sarah">S</div>
-              <div style="font-size: 12px; color: var(--text-primary); font-weight: 600;">Host Alex &amp; Host Sarah</div>
-            </div>
-
-            <button id="podcast-play-btn" class="btn btn-primary" style="width: 100%; font-size: 13px; padding: 8px 14px;" onclick="window.playAudioOverviewPodcast()">
-              ▶ Play Audio Overview
-            </button>
-          </div>
-
-          <!-- Studio Artifact Tools Grid -->
-          <div class="glass-card" style="padding: 16px;">
-            <h4 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">Studio Briefings &amp; Artifacts</h4>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-              <button class="btn btn-secondary" style="width: 100%; justify-content: flex-start; font-size: 12px;" onclick="window.runAgent('summarizer')">
-                📄 Generate Study Guide
-              </button>
-              <button class="btn btn-secondary" style="width: 100%; justify-content: flex-start; font-size: 12px;" onclick="window.runAgent('tutor')">
-                🧠 Active Recall Quiz
-              </button>
-              <button class="btn btn-secondary" style="width: 100%; justify-content: flex-start; font-size: 12px;" onclick="window.activateView('graph')">
-                🕸️ Mind Map &amp; Graph
-              </button>
-              <button class="btn btn-secondary" style="width: 100%; justify-content: flex-start; font-size: 12px;" onclick="window.activateView('resurfacing')">
-                🔮 Resurface Past Notes
-              </button>
-            </div>
-          </div>
-        </aside>
 
       </div>
     </section>
@@ -1176,19 +1014,19 @@
   </nav>
 
   <!-- JavaScript Modules -->
-  <script src="js/nlp-engine.js?v=24.0"></script>
-  <script src="js/store.js?v=24.0"></script>
-  <script src="js/rag-engine.js?v=24.0"></script>
-  <script src="js/voice-engine.js?v=24.0"></script>
-  <script src="js/audio-presets.js?v=24.0"></script>
-  <script src="js/sound-engine.js?v=24.0"></script>
-  <script src="js/resurfacing-engine.js?v=24.0"></script>
-  <script src="js/graph-visualizer.js?v=24.0"></script>
-  <script src="js/ai-engine.js?v=24.0"></script>
-  <script src="js/gemini-color-flow.js?v=24.0"></script>
-  <script src="js/nexus-bot.js?v=24.0"></script>
-  <script src="js/developer-hud.js?v=24.0"></script>
-  <script src="js/ai-agents.js?v=24.0"></script>
-  <script src="js/app.js?v=24.0"></script>
+  <script src="js/nlp-engine.js?v=25.0"></script>
+  <script src="js/store.js?v=25.0"></script>
+  <script src="js/rag-engine.js?v=25.0"></script>
+  <script src="js/voice-engine.js?v=25.0"></script>
+  <script src="js/audio-presets.js?v=25.0"></script>
+  <script src="js/sound-engine.js?v=25.0"></script>
+  <script src="js/resurfacing-engine.js?v=25.0"></script>
+  <script src="js/graph-visualizer.js?v=25.0"></script>
+  <script src="js/ai-engine.js?v=25.0"></script>
+  <script src="js/gemini-color-flow.js?v=25.0"></script>
+  <script src="js/nexus-bot.js?v=25.0"></script>
+  <script src="js/developer-hud.js?v=25.0"></script>
+  <script src="js/ai-agents.js?v=25.0"></script>
+  <script src="js/app.js?v=25.0"></script>
 </body>
 </html>
