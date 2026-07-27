@@ -345,10 +345,42 @@
 
         <!-- 2. Voice Memo Panel -->
         <div id="capture-voice" class="capture-panel">
-          <div class="voice-memo-box">
-            <div class="voice-pulse-ring"></div>
-            <button id="voice-record-btn" class="btn btn-primary voice-record-btn">Start Voice Memo</button>
-            <p id="voice-status-text" class="voice-status">Click microphone to record a voice memo. Audio will be transcribed via Whisper and auto-tagged.</p>
+          <div class="voice-memo-container glass-card" style="padding: 28px; text-align: center; border-radius: 20px; display: flex; flex-direction: column; align-items: center; gap: 18px; background: rgba(245, 158, 11, 0.04); border: 1.5px solid var(--border-color);">
+            
+            <!-- Real-Time Waveform Canvas -->
+            <canvas id="voice-memo-canvas" width="480" height="70" style="width: 100%; max-width: 480px; height: 70px; border-radius: 12px; background: rgba(0,0,0,0.06); border: 1px solid var(--border-color);"></canvas>
+            
+            <!-- Animated Big Microphone Button -->
+            <div style="position: relative; display: flex; justify-content: center; align-items: center; margin: 6px 0;">
+              <div id="voice-mic-pulse" class="mic-pulse-ring"></div>
+              <button id="voice-record-btn" class="mic-record-btn" title="Toggle Microphone Recording">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                  <line x1="12" y1="19" x2="12" y2="22"/>
+                  <line x1="8" y1="22" x2="16" y2="22"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Voice Status Indicator -->
+            <p id="voice-status-text" class="voice-status" style="font-size: 14px; font-weight: 600; color: var(--text-primary); margin: 0;">
+              Click microphone to record a real-time voice memo. Audio will be transcribed via Whisper &amp; auto-tagged.
+            </p>
+
+            <!-- Real-Time Live Transcript Area -->
+            <div id="voice-transcript-box" class="glass-card" style="width: 100%; max-width: 520px; padding: 14px 18px; border-radius: 12px; background: var(--bg-card); border: 1px solid var(--border-color); text-align: left; min-height: 70px; display: none;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 11px; font-weight: 700; color: var(--accent-amber); text-transform: uppercase;">🎙️ Real-Time Live Transcript:</span>
+                <span id="voice-live-badge" class="status-badge syncing">LISTENING</span>
+              </div>
+              <p id="voice-transcript-text" style="font-size: 13.5px; color: var(--text-primary); margin: 0; line-height: 1.5; font-family: var(--font-main);">Listening to speech...</p>
+            </div>
+
+            <!-- Save Voice Note Button -->
+            <button id="voice-save-note-btn" class="btn btn-primary" style="display: none; width: 100%; max-width: 320px; margin-top: 6px;">
+              💾 Save Transcribed Voice Note
+            </button>
           </div>
         </div>
 
