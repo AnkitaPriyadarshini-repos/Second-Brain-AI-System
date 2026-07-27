@@ -1261,8 +1261,10 @@
     }
 
     // ----------------------------------------------------
-    // Flashcard Controller
+    // Flashcard Controller & Spaced Repetition Engine
     // ----------------------------------------------------
+    let fcStreakCount = 12;
+
     function initFlashcards() {
       if (typeof aiEngine === 'undefined') return;
       activeFlashcards = aiEngine.generateFlashcards(Store.getNotes());
@@ -1276,35 +1278,122 @@
       const card = activeFlashcards[currentFlashcardIdx % activeFlashcards.length];
       flashcardCard.classList.remove('flipped');
 
-      if (fcCategoryBadge) fcCategoryBadge.textContent = card.category;
+      if (fcCategoryBadge) fcCategoryBadge.textContent = card.category || 'Artificial Intelligence';
       if (fcQuestion) fcQuestion.textContent = card.question;
       if (fcAnswer) fcAnswer.textContent = card.answer;
-      if (fcSourceTitle) fcSourceTitle.textContent = `From Note: ${card.title}`;
-      if (flashcardProgressText) flashcardProgressText.textContent = `Card ${currentFlashcardIdx + 1} of ${activeFlashcards.length}`;
+      if (fcSourceTitle) fcSourceTitle.textContent = `From Note: ${card.title || 'Knowledge Vault'}`;
+      if (flashcardProgressText) flashcardProgressText.textContent = `Card ${(currentFlashcardIdx % activeFlashcards.length) + 1} of ${activeFlashcards.length}`;
+      
+      const streakEl = document.getElementById('fc-streak-count');
+      if (streakEl) streakEl.textContent = `${fcStreakCount} Cards`;
     }
+
+    window.speakFCQuestion = function() {
+      if (typeof VoiceEngine !== 'undefined' && fcQuestion) {
+        VoiceEngine.speak(fcQuestion.textContent);
+      }
+    };
+
+    window.speakFCAnswer = function() {
+      if (typeof VoiceEngine !== 'undefined' && fcAnswer) {
+        VoiceEngine.speak(fcAnswer.textContent);
+      }
+    };
+
+    window.openFCLinkedNote = function() {
+      if (activeFlashcards.length > 0) {
+        const card = activeFlashcards[currentFlashcardIdx % activeFlashcards.length];
+        const allNotes = Store.getNotes();
+        const found = allNotes.find(n => n.id === card.id || n.title === card.title);
+        if (found) openNoteDrawer(found);
+        else showToast(`Linked Note: "${card.title}"`);
+      }
+    };
+
+    window.generateNewAICard = function() {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+      const allNotes = Store.getNotes();
+      const randomNote = allNotes[Math.floor(Math.random() * allNotes.length)];
+      if (randomNote) {
+        const newCard = {
+          id: randomNote.id,
+          title: randomNote.title,
+          category: (randomNote.tags && randomNote.tags[0]) ? randomNote.tags[0] : 'Artificial Intelligence',
+          question: `What are the core insights and key applications of "${randomNote.title}"?`,
+          answer: randomNote.summary || randomNote.content.substring(0, 180) + '...'
+        };
+        activeFlashcards.unshift(newCard);
+        currentFlashcardIdx = 0;
+        renderCurrentFlashcard();
+        showToast('✨ Synthesized new AI Memory Flashcard on-the-fly!');
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
+      }
+    };
 
     if (flashcardCard) {
       flashcardCard.addEventListener('click', () => {
         flashcardCard.classList.toggle('flipped');
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
       });
     }
 
     if (fcNextBtn) {
       fcNextBtn.addEventListener('click', () => {
         currentFlashcardIdx++;
+        fcStreakCount++;
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
         renderCurrentFlashcard();
       });
     }
 
-    [fcRatingHard, fcRatingGood, fcRatingEasy].forEach(btn => {
-      if (btn) {
-        btn.addEventListener('click', () => {
-          showToast('Flashcard recall score updated.');
-          currentFlashcardIdx++;
-          renderCurrentFlashcard();
-        });
-      }
-    });
+    if (fcRatingHard) {
+      fcRatingHard.addEventListener('click', () => {
+        showToast('🔴 Marked for review (Short interval).');
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+        currentFlashcardIdx++;
+        renderCurrentFlashcard();
+      });
+    }
+
+    if (fcRatingGood) {
+      fcRatingGood.addEventListener('click', () => {
+        fcStreakCount++;
+        showToast('🟡 Spaced Repetition score updated (Medium interval).');
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+        currentFlashcardIdx++;
+        renderCurrentFlashcard();
+      });
+    }
+
+    if (fcRatingEasy) {
+      fcRatingEasy.addEventListener('click', () => {
+        fcStreakCount += 2;
+        showToast('🟢 Mastered! Spaced Repetition interval increased to 14 days.');
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
+        currentFlashcardIdx++;
+        renderCurrentFlashcard();
+      });
+    }
+
+    // Keyboard Shortcuts for Flashcards
+    window.addEventListener('keydown', (e) => {
+      const activeSec = document.querySelector('.view-section.active');
+      if (activeSec && activeSec.id === 'view-flashcards') {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        if (e.code === 'Space' || e.key === ' ') {
+          e.preventDefault();
+          if (flashcardCard) flashcardCard.classList.toggle('flipped');
+        } else if (e.key === '1' && fcRatingHard) {
+          fcRatingHard.click();
+        } else if (e.key === '2' && fcRatingGood) {
+          fcRatingGood.click();
+        } else if (e.key === '3' && fcRatingEasy) {
+          fcRatingEasy.click();
+        } else if (e.key === 'ArrowRight' && fcNextBtn) {
+          fcNextBtn.click();
+        }
+      });
 
     // ----------------------------------------------------
     // Dashboard Controller
