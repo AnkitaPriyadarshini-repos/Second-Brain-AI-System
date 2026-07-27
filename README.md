@@ -1,4 +1,4 @@
-# 🌼 Juno AI — Research Tool & Thinking Partner
+# 🌙 Juno AI — Research Tool & Thinking Partner (Silver Moon)
 
 <p align="center">
   <a href="https://second-brain-ai-system.vercel.app">
@@ -16,7 +16,7 @@
 </p>
 
 <p align="center">
-  <b>A high-performance personal research tool & thinking partner powered by on-device RAG vector retrieval, voice synthesis, and golden sunflower yellow interface design.</b>
+  <b>A high-performance personal research tool &amp; thinking partner powered by on-device RAG vector retrieval, voice synthesis, floating 3D Silver Moon brandmark, and universal file drag-and-drop ingestion.</b>
 </p>
 
 <p align="center">
