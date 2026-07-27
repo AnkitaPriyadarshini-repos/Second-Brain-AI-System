@@ -121,6 +121,18 @@
         t.setAttribute('aria-selected', isTarget ? 'true' : 'false');
       });
 
+      const sidebarItems = document.querySelectorAll('.sidebar-menu-item');
+      sidebarItems.forEach(item => {
+        const isTarget = item.getAttribute('data-view') === targetView;
+        item.classList.toggle('active', isTarget);
+      });
+
+      const mobileNavBtns = document.querySelectorAll('.mobile-nav-btn');
+      mobileNavBtns.forEach(btn => {
+        const isTarget = btn.getAttribute('data-view') === targetView;
+        btn.classList.toggle('active', isTarget);
+      });
+
       viewSections.forEach(sec => {
         const isTarget = sec.id === `view-${targetView}`;
         sec.classList.toggle('active', isTarget);
