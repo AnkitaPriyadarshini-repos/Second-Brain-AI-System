@@ -12,11 +12,20 @@
   --border-color: #fde047;
   --border-highlight: #eab308;
   --border-accent: rgba(245, 158, 11, 0.4);
-  
+
   /* Typography Colors */
   --text-primary: #422006;
   --text-secondary: #713f12;
   --text-muted: #854d0e;
+}
+
+.sidebar-brand,
+.sidebar-brand:hover,
+.sidebar-brand:focus,
+.sidebar-brand span {
+  text-decoration: none !important;
+  outline: none !important;
+}
   
   /* Pure Golden Yellow Accent Palette */
   --accent-primary: #f59e0b;
