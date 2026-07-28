@@ -40,15 +40,17 @@
         <div class="sidebar-brand-header">
           <div class="brand-title" onclick="window.activateView('jarvis')" style="cursor: pointer;">
             <div class="brand-icon-wrapper">
-              <svg width="24" height="24" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
-                  <radialGradient id="junoSilverMoon" cx="30%" cy="25%" r="75%">
-                    <stop offset="0%" stop-color="#ffffff" />
-                    <stop offset="65%" stop-color="#e2e8f0" />
-                    <stop offset="100%" stop-color="#94a3b8" />
-                  </radialGradient>
+                  <linearGradient id="junoBrandStardum" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#818cf8"/>
+                    <stop offset="45%" stop-color="#c084fc"/>
+                    <stop offset="80%" stop-color="#f472b6"/>
+                    <stop offset="100%" stop-color="#fbbf24"/>
+                  </linearGradient>
                 </defs>
-                <path d="M29 18.5A13.5 13.5 0 1 1 15 4.2a10.8 10.8 0 0 0 14 14.3z" fill="url(#junoSilverMoon)" />
+                <path d="M16 2L19.2 11.8L29 15L19.2 18.2L16 28L12.8 18.2L3 15L12.8 11.8L16 2Z" fill="url(#junoBrandStardum)"/>
+                <circle cx="24" cy="7" r="2.5" fill="#f472b6" opacity="0.85"/>
               </svg>
             </div>
             <div class="brand-info">
@@ -168,16 +170,17 @@
             <!-- Hero Welcome View (Shown on Empty Thread) -->
             <div id="chat-hero-view" class="chat-hero-view">
               <div class="gemini-sparkle-hero float-animation">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L14.8 9.2L22 12L14.8 14.8L12 22L9.2 14.8L2 12L9.2 9.2L12 2Z" fill="url(#geminiHeroGrad)"/>
+                <svg width="68" height="68" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <defs>
-                    <linearGradient id="geminiHeroGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
-                      <stop offset="0%" stop-color="#4285f4"/>
-                      <stop offset="40%" stop-color="#9b51e0"/>
-                      <stop offset="75%" stop-color="#e91e63"/>
+                    <linearGradient id="junoHeroStardum" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stop-color="#6366f1"/>
+                      <stop offset="35%" stop-color="#a855f7"/>
+                      <stop offset="70%" stop-color="#ec4899"/>
                       <stop offset="100%" stop-color="#f59e0b"/>
                     </linearGradient>
                   </defs>
+                  <path d="M20 2L24.2 14.8L37 19L24.2 23.2L20 36L15.8 23.2L3 19L15.8 14.8L20 2Z" fill="url(#junoHeroStardum)"/>
+                  <circle cx="31" cy="9" r="3" fill="#f472b6" opacity="0.9"/>
                 </svg>
               </div>
 
