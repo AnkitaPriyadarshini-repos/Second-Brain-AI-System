@@ -295,6 +295,56 @@ test('Store.updateGoalProgress should update progress percentage accurately', ()
   assert.strictEqual(updated.progress, 90);
 });
 
+// --------------------------------------------------------
+// Test Suite 11: ChatGPT & Gemini Studio AI Engine
+// --------------------------------------------------------
+console.log('\nSuite 11: ChatGPT & Gemini Studio AI Engine & Threads');
+
+test('AIEngine should manage API key state cleanly', () => {
+  const AIEngineClass = require('../js/ai-engine');
+  const ai = new AIEngineClass();
+  const keys = ai.setAPIKeys({ geminiKey: 'test-gemini-key-123', preferredProvider: 'gemini' });
+  assert.strictEqual(keys.geminiKey, 'test-gemini-key-123');
+  assert.strictEqual(keys.preferredProvider, 'gemini');
+});
+
+test('AIEngine.generateResponse should execute fallback synthesis cleanly', async () => {
+  const AIEngineClass = require('../js/ai-engine');
+  const ai = new AIEngineClass();
+  const res = await ai.generateResponse({ prompt: 'Explain Transformer Models', model: 'juno-rag' });
+  assert.ok(res.text, 'Response text missing');
+  assert.ok(res.provider, 'Response provider missing');
+});
+
+test('Store should manage chat threads and active thread selection', () => {
+  const threads = Store.getChatThreads();
+  assert.ok(threads.length > 0, 'Expected at least 1 default chat thread');
+  assert.ok(threads[0].id, 'Chat thread missing id');
+
+  const newThread = {
+    id: 'thread-test-101',
+    title: 'Quantum Computing Research',
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    messages: [
+      { id: 'm1', role: 'user', content: 'What is a Qubit?' },
+      { id: 'm2', role: 'assistant', content: 'A qubit is a quantum bit...' }
+    ]
+  };
+
+  Store.saveChatThread(newThread);
+  Store.setActiveThreadId('thread-test-101');
+  assert.strictEqual(Store.getActiveThreadId(), 'thread-test-101');
+
+  const retrieved = Store.getChatThreads().find(t => t.id === 'thread-test-101');
+  assert.ok(retrieved, 'Failed to retrieve saved chat thread');
+  assert.strictEqual(retrieved.messages.length, 2);
+
+  // Cleanup test thread
+  Store.deleteChatThread('thread-test-101');
+  assert.strictEqual(Store.getChatThreads().find(t => t.id === 'thread-test-101'), undefined);
+});
+
 console.log('\n====================================================');
 console.log(`SUMMARY: ${passCount} / ${totalTests} TESTS PASSED CLEANLY.`);
 console.log('====================================================\n');
@@ -304,5 +354,6 @@ if (passCount === totalTests) {
 } else {
   process.exit(1);
 }
+
 
 
