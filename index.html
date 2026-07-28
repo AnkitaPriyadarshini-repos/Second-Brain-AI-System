@@ -1404,6 +1404,26 @@
     </div>
   </div>
 
+  <!-- Fixed Native Mobile Bottom Tab Bar (iOS/Android Native Style) -->
+  <nav class="bottom-mobile-nav" aria-label="Mobile Navigation">
+    <button class="mobile-nav-btn active" data-view="jarvis" onclick="window.activateView('jarvis')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Chat</span>
+    </button>
+    <button class="mobile-nav-btn" data-view="vault" onclick="window.activateView('vault')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      <span>Vault</span>
+    </button>
+    <button class="mobile-nav-btn" data-view="graph" onclick="window.activateView('graph')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><line x1="8.5" y1="7.5" x2="15.5" y2="7.5"/><line x1="7.5" y1="8.5" x2="10.5" y2="15.5"/><line x1="16.5" y1="8.5" x2="13.5" y2="15.5"/></svg>
+      <span>Graph</span>
+    </button>
+    <button class="mobile-nav-btn" data-view="settings" onclick="window.activateView('settings')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>Settings</span>
+    </button>
+  </nav>
+
   <!-- JavaScript Modules -->
   <script src="js/utils.js?v=51.0"></script>
   <script src="js/nlp-engine.js?v=51.0"></script>
