@@ -406,6 +406,61 @@
 
     notifyListeners: function () {
       this.listeners.forEach(fn => fn(this.notes));
+    },
+
+    // --- Chat Thread Persistence for ChatGPT / Gemini Interface ---
+    getChatThreads: function () {
+      const saved = this._getItem('second_brain_chat_threads_v1');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        } catch (e) { }
+      }
+      // Initial default conversation thread
+      const defaultThread = {
+        id: 'thread-default',
+        title: 'Welcome to Juno AI',
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        messages: [
+          {
+            id: 'msg-welcome',
+            role: 'assistant',
+            content: '### 👋 Welcome to Juno AI Studio!\n\nI am your **AI Thinking Partner & Grounded Research Assistant**, combining the visual excellence of **Google Gemini** and the multi-turn conversational power of **ChatGPT**.\n\n#### 🚀 Quick Start Features:\n- 🤖 **Multi-Model Switching**: Choose between Gemini 1.5 Flash/Pro, GPT-4o, or On-Device Local RAG Engine.\n- 🗝️ **Custom API Keys**: Plug in your Google Gemini or OpenAI API Key in **Settings** for unlimited cloud completions.\n- 📚 **Grounded RAG Knowledge**: Upload documents or query your 100+ saved notes with zero hallucination.\n- 🎙️ **Voice & Audio**: Speak out loud with speech recognition and read answers back with voice synthesis.\n\nHow can I assist your research today?',
+            timestamp: Date.now(),
+            provider: 'Juno On-Device Intelligence Engine'
+          }
+        ]
+      };
+      this._setItem('second_brain_chat_threads_v1', JSON.stringify([defaultThread]));
+      return [defaultThread];
+    },
+
+    saveChatThread: function (thread) {
+      if (!thread || !thread.id) return;
+      const threads = this.getChatThreads();
+      const idx = threads.findIndex(t => t.id === thread.id);
+      if (idx >= 0) {
+        threads[idx] = { ...threads[idx], ...thread, updatedAt: Date.now() };
+      } else {
+        threads.unshift({ ...thread, updatedAt: Date.now() });
+      }
+      this._setItem('second_brain_chat_threads_v1', JSON.stringify(threads));
+    },
+
+    deleteChatThread: function (id) {
+      let threads = this.getChatThreads();
+      threads = threads.filter(t => t.id !== id);
+      this._setItem('second_brain_chat_threads_v1', JSON.stringify(threads));
+    },
+
+    getActiveThreadId: function () {
+      return this._getItem('second_brain_active_thread_v1') || 'thread-default';
+    },
+
+    setActiveThreadId: function (id) {
+      this._setItem('second_brain_active_thread_v1', id);
     }
   };
 
