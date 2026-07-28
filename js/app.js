@@ -2172,13 +2172,13 @@
 
     window.handleModelChange = function(modelVal) {
       const names = {
-        'gemini-1.5-flash': 'Gemini 1.5 Flash (Google AI)',
-        'gemini-1.5-pro': 'Gemini 1.5 Pro (Deep Reasoning)',
-        'gpt-4o': 'GPT-4o Multimodal (OpenAI)',
-        'claude-3.5': 'Claude 3.5 Sonnet (Anthropic)',
-        'juno-rag': 'Juno Local RAG (100% On-Device)'
+        'gemini-1.5-flash': '✨ Gemini 1.5 Flash (Google AI)',
+        'gemini-1.5-pro': '🧠 Gemini 1.5 Pro (Deep Reasoning)',
+        'agentic-architect': '⚡ Agentic System Architect & Code Generator',
+        'deep-research': '🔮 Deep Research & Vault Synthesizer',
+        'juno-rag': '🔒 Local Vault RAG (100% On-Device)'
       };
-      showToast(`AI Model switched to: ${names[modelVal] || modelVal}`);
+      showToast(`Active AI Model set to: ${names[modelVal] || modelVal}`);
     };
 
     window.toggleAudioOverviewDrawer = function() {

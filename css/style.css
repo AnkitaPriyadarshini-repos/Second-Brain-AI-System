@@ -3991,6 +3991,56 @@ kbd {
   }
 }
 
+/* Gemini Advanced Signature Aesthetics */
+.gemini-sparkle-hero {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  background: radial-gradient(circle, rgba(155, 81, 224, 0.15) 0%, rgba(66, 133, 244, 0.05) 70%);
+  border: 1px solid rgba(155, 81, 224, 0.25);
+  box-shadow: 0 0 30px rgba(155, 81, 224, 0.2);
+}
+
+.gemini-hero-title {
+  font-size: 38px;
+  font-weight: 800;
+  background: linear-gradient(90deg, #4285f4 0%, #9b51e0 35%, #e91e63 70%, #f59e0b 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: geminiGradientShift 5s ease infinite alternate;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+@keyframes geminiGradientShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+.gemini-hero-sub {
+  font-size: 15px;
+  color: var(--text-secondary);
+  max-width: 580px;
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+.gemini-send-btn {
+  background: linear-gradient(135deg, #4285f4, #9b51e0, #e91e63) !important;
+  box-shadow: 0 4px 14px rgba(155, 81, 224, 0.35) !important;
+}
+
+.gemini-send-btn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 6px 20px rgba(155, 81, 224, 0.5) !important;
+}
+
+
 
 
 
