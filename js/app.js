@@ -651,6 +651,9 @@
       const targetContainer = document.getElementById('chat-container') || chatContainer || document.querySelector('.chat-card-wrapper');
       if (!targetContainer) return;
 
+      const heroView = document.getElementById('chat-hero-view');
+      if (heroView) heroView.style.display = 'none';
+
       const msgCard = document.createElement('div');
       msgCard.className = `chat-bubble ${sender}-bubble glass-card`;
 
@@ -2038,23 +2041,16 @@
       const newId = `thread-${Date.now()}`;
       const newThread = {
         id: newId,
-        title: 'New Chat Conversation',
+        title: 'New Conversation',
         createdAt: Date.now(),
         updatedAt: Date.now(),
-        messages: [
-          {
-            id: `msg-${Date.now()}`,
-            role: 'assistant',
-            content: '### ✨ New AI Chat Conversation Started\n\nHow can I help you research or code today?',
-            timestamp: Date.now(),
-            provider: 'Juno AI Engine'
-          }
-        ]
+        messages: []
       };
       Store.saveChatThread(newThread);
       Store.setActiveThreadId(newId);
       window.renderActiveChatThread();
       renderChatThreadsList();
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
       showToast('New Chat thread started.');
     };
 
@@ -2081,43 +2077,129 @@
     };
 
     function renderChatThreadsList() {
-      const listEl = document.getElementById('chat-threads-list');
-      if (!listEl || typeof Store === 'undefined') return;
+      if (typeof Store === 'undefined') return;
       const threads = Store.getChatThreads();
       const activeId = Store.getActiveThreadId();
 
-      let html = '';
-      threads.forEach(t => {
-        const isActive = t.id === activeId;
-        const dateStr = new Date(t.updatedAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        html += `
-          <div class="chat-thread-item ${isActive ? 'active' : ''}" onclick="window.switchChatThread('${t.id}')" style="padding: 10px 14px; border-radius: 10px; border: 1px solid ${isActive ? 'var(--accent-indigo)' : 'var(--border-color)'}; background: ${isActive ? 'rgba(99, 102, 241, 0.1)' : 'var(--card-bg)'}; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
-            <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; margin-right: 8px;">
-              <div style="font-weight: 700; font-size: 13px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis;">${escapeHTML(t.title)}</div>
-              <div style="font-size: 11px; color: var(--text-secondary);">${dateStr} • ${(t.messages || []).length} messages</div>
+      const sidebarContainer = document.getElementById('sidebar-chat-threads-container');
+      const drawerContainer = document.getElementById('chat-threads-list');
+
+      if (sidebarContainer) {
+        let sidebarHTML = '';
+        threads.forEach(t => {
+          const isActive = t.id === activeId;
+          sidebarHTML += `
+            <div class="sidebar-thread-item ${isActive ? 'active' : ''}" onclick="window.switchChatThread('${t.id}')">
+              <span class="thread-item-title" title="${escapeHTML(t.title)}">${escapeHTML(t.title)}</span>
+              ${t.id !== 'thread-default' ? `
+                <div class="thread-item-actions">
+                  <button class="thread-action-btn" onclick="window.deleteChatThread('${t.id}', event)" title="Delete thread">✕</button>
+                </div>
+              ` : ''}
             </div>
-            ${t.id !== 'thread-default' ? `<button onclick="window.deleteChatThread('${t.id}', event)" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; font-size: 14px;" title="Delete Thread">🗑️</button>` : ''}
-          </div>
-        `;
-      });
-      listEl.innerHTML = html;
+          `;
+        });
+        sidebarContainer.innerHTML = sidebarHTML || '<div style="font-size:12px; color:var(--text-muted); padding:6px 10px;">No saved threads</div>';
+      }
+
+      if (drawerContainer) {
+        let drawerHTML = '';
+        threads.forEach(t => {
+          const isActive = t.id === activeId;
+          const dateStr = new Date(t.updatedAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          drawerHTML += `
+            <div class="chat-thread-item ${isActive ? 'active' : ''}" onclick="window.switchChatThread('${t.id}')" style="padding: 10px 14px; border-radius: 10px; border: 1px solid ${isActive ? 'var(--accent-indigo)' : 'var(--border-color)'}; background: ${isActive ? 'rgba(99, 102, 241, 0.1)' : 'var(--card-bg)'}; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+              <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; margin-right: 8px;">
+                <div style="font-weight: 700; font-size: 13px; color: var(--text-primary);">${escapeHTML(t.title)}</div>
+                <div style="font-size: 11px; color: var(--text-secondary);">${dateStr} • ${(t.messages || []).length} messages</div>
+              </div>
+              ${t.id !== 'thread-default' ? `<button onclick="window.deleteChatThread('${t.id}', event)" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; font-size: 14px;" title="Delete Thread">🗑️</button>` : ''}
+            </div>
+          `;
+        });
+        drawerContainer.innerHTML = drawerHTML;
+      }
     }
 
     window.renderActiveChatThread = function() {
       const container = document.getElementById('chat-container');
+      const heroView = document.getElementById('chat-hero-view');
       if (!container || typeof Store === 'undefined') return;
+
       const activeId = Store.getActiveThreadId();
       const threads = Store.getChatThreads();
       const thread = threads.find(t => t.id === activeId) || threads[0];
       if (!thread) return;
 
       container.innerHTML = '';
-      (thread.messages || []).forEach(m => {
-        appendChatMessage(m.role === 'user' ? 'user' : 'ai', m.content, [], false, '', m.provider);
-      });
+      const msgs = (thread.messages || []).filter(m => m.id !== 'msg-welcome');
+
+      if (msgs.length === 0) {
+        if (heroView) heroView.style.display = 'flex';
+      } else {
+        if (heroView) heroView.style.display = 'none';
+        msgs.forEach(m => {
+          appendChatMessage(m.role === 'user' ? 'user' : 'ai', m.content, [], false, '', m.provider);
+        });
+      }
     };
 
     window.renderChatThreadsList = renderChatThreadsList;
+
+    window.toggleSidebar = function() {
+      const wrapper = document.querySelector('.app-layout-wrapper');
+      if (wrapper) wrapper.classList.toggle('sidebar-collapsed');
+    };
+
+    window.filterSidebarThreads = function(query) {
+      const container = document.getElementById('sidebar-chat-threads-container');
+      if (!container) return;
+      const items = container.querySelectorAll('.sidebar-thread-item');
+      const q = (query || '').toLowerCase();
+      items.forEach(item => {
+        item.style.display = item.textContent.toLowerCase().includes(q) ? 'flex' : 'none';
+      });
+    };
+
+    window.toggleRAGMode = function() {
+      const btn = document.getElementById('rag-mode-toggle-btn');
+      if (btn) {
+        btn.classList.toggle('active');
+        const isActive = btn.classList.contains('active');
+        showToast(isActive ? 'Vault Grounded Mode Enabled 🧠' : 'General LLM Mode Enabled 🌐');
+      }
+    };
+
+    window.handleModelChange = function(modelVal) {
+      const names = {
+        'gemini-1.5-flash': 'Gemini 1.5 Flash (Google AI)',
+        'gemini-1.5-pro': 'Gemini 1.5 Pro (Deep Reasoning)',
+        'gpt-4o': 'GPT-4o Multimodal (OpenAI)',
+        'claude-3.5': 'Claude 3.5 Sonnet (Anthropic)',
+        'juno-rag': 'Juno Local RAG (100% On-Device)'
+      };
+      showToast(`AI Model switched to: ${names[modelVal] || modelVal}`);
+    };
+
+    window.toggleAudioOverviewDrawer = function() {
+      const card = document.querySelector('.audio-overview-card');
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        showToast('Audio Overview Podcast is Ready 🎙️');
+      }
+    };
+
+    window.toggleDevTelemetryDrawer = function() {
+      const telem = document.getElementById('backend-telemetry-card');
+      if (telem) {
+        telem.style.display = telem.style.display === 'none' ? 'block' : 'none';
+      }
+    };
+
+    // Initial render of chat threads in sidebar & active thread
+    renderChatThreadsList();
+    window.renderActiveChatThread();
 
     // Global helper accessible via inline onclick fallback
     window.triggerSampleQuery = function(queryText) {
@@ -2130,6 +2212,7 @@
       if (inputEl) inputEl.value = cleanQuery;
       handleRAGQuery(cleanQuery);
     };
+
   }
 
   if (document.readyState === 'loading') {
