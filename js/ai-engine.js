@@ -287,9 +287,9 @@ export function HydratedComponent({ data }) {
     };
   }
 
-  fallbackSynthesize(prompt, model = 'gemini-1.5-flash', ragContext = '') {
+  fallbackSynthesize(prompt, model = 'juno-flash', ragContext = '') {
     // Check if query asks for system design, scale, code, or architecture
-    const isTechDeepDive = /design|architecture|distributed|queue|system|scale|code|algorithm|async|rate|database|api|transformer/i.test(prompt) || model === 'agentic-architect' || model === 'gemini-1.5-pro';
+    const isTechDeepDive = /design|architecture|distributed|queue|system|scale|code|algorithm|async|rate|database|api|transformer/i.test(prompt) || model === 'agentic-architect' || model === 'juno-pro' || model === 'gemini-1.5-pro';
 
     // Grounded Local Synthesis using RAG Engine if available and not explicitly asking for pure architectural code generation
     if (!isTechDeepDive && typeof window !== 'undefined' && window.RAGEngine && window.Store) {
@@ -298,7 +298,7 @@ export function HydratedComponent({ data }) {
       if (ragRes && ragRes.citations && ragRes.citations.length > 0) {
         return {
           text: ragRes.answer,
-          provider: 'Gemini Local RAG Engine (Grounded Vault)',
+          provider: 'Juno Local RAG Engine (Grounded Vault)',
           citations: ragRes.citations || [],
           grounded: true
         };
@@ -307,7 +307,7 @@ export function HydratedComponent({ data }) {
 
     if (isTechDeepDive) {
       const cleanPrompt = prompt.replace(/[#*`]/g, '').trim();
-      let agentOutput = `### 🧠 Gemini Agentic System Architect Solution\n\n`;
+      let agentOutput = `### 🧠 Juno Agentic System Architect Solution\n\n`;
       agentOutput += `**Problem Statement**: *${cleanPrompt}*\n\n`;
 
       if (ragContext) {
@@ -361,17 +361,17 @@ export function HydratedComponent({ data }) {
       agentOutput += `#### 3. 🛡️ Failure Modes & Observability Strategy\n`;
       agentOutput += `• **Dead Letter Queue (DLQ)**: Failed tasks after 3 retries automatically route to DLQ for manual inspection.\n`;
       agentOutput += `• **P99 Latency SLA**: Sub-10ms processing ensured via zero-blocking event loop execution.\n`;
-      agentOutput += `• **Live Cloud Model Execution**: Connect your **Gemini 1.5 Pro API Key** in Settings to run live Google Cloud models.`;
+      agentOutput += `• **Live Cloud Model Execution**: Connect your **Cloud API Key** in Settings to run live cloud models.`;
 
       return {
         text: agentOutput,
-        provider: `Gemini Agentic Solver (${model.toUpperCase()})`,
+        provider: `Juno Agentic Solver (${model.toUpperCase()})`,
         grounded: !!ragContext
       };
     }
 
     // Default offline fallback
-    let synthesized = `### ✨ Gemini AI Assistant (${model.toUpperCase()})\n\n`;
+    let synthesized = `### ✨ Juno AI Assistant (${model.toUpperCase()})\n\n`;
     synthesized += `Thank you for your prompt: **"${prompt}"**.\n\n`;
     if (ragContext) {
       synthesized += `#### 📚 Grounded Knowledge Context:\n${ragContext.substring(0, 250)}...\n\n`;
@@ -379,11 +379,11 @@ export function HydratedComponent({ data }) {
     synthesized += `#### 💡 Key Architectural Takeaways:\n`;
     synthesized += `• **Autonomous Agent Execution**: Task processed cleanly with zero network friction.\n`;
     synthesized += `• **High Throughput**: Zero external network dependency required for local data security.\n`;
-    synthesized += `• **Live Cloud Integration**: Connect your **Gemini API Key** in Settings for cloud reasoning!\n\n`;
+    synthesized += `• **Live Cloud Integration**: Connect your **Cloud API Key** in Settings for cloud reasoning!\n\n`;
 
     return {
       text: synthesized,
-      provider: 'Gemini Agentic Engine',
+      provider: 'Juno Agentic Engine',
       grounded: !!ragContext
     };
   }

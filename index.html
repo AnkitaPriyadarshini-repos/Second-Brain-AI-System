@@ -137,8 +137,8 @@
                   </defs>
                 </svg>
                 <select id="ai-model-selector" class="model-select-dropdown" onchange="window.handleModelChange(this.value)">
-                  <option value="gemini-1.5-flash" selected>✨ Gemini 1.5 Flash</option>
-                  <option value="gemini-1.5-pro">🧠 Gemini 1.5 Pro (Deep Reasoning)</option>
+                  <option value="juno-flash" selected>✨ Juno Ultra Flash</option>
+                  <option value="juno-pro">🧠 Juno Deep Reasoning</option>
                   <option value="agentic-architect">⚡ Agentic System Architect</option>
                   <option value="deep-research">🔮 Deep Research Agent</option>
                   <option value="juno-rag">🔒 Local Vault RAG</option>
@@ -187,7 +187,7 @@
               <h1 class="gemini-hero-title">Hello, Ankita</h1>
               <p class="gemini-hero-sub">Where would you like to start today? Solving wide-scale problems as an elite AI agent.</p>
 
-              <!-- 4 Gemini Prompt Cards -->
+              <!-- 4 Prompt Cards -->
               <div class="prompt-cards-grid">
                 <div class="prompt-card-item" onclick="window.triggerSampleQuery('Design a high-throughput distributed event-driven message queue system at scale')">
                   <div class="prompt-card-icon">💡</div>
@@ -223,7 +223,7 @@
             <!-- Real-Time Telemetry Processing Banner -->
             <div id="backend-telemetry-card" class="backend-telemetry-card" style="display: none;">
               <div class="telemetry-inner">
-                <span id="telemetry-matched-title" class="telemetry-title">Model: Gemini 1.5 Flash</span>
+                <span id="telemetry-matched-title" class="telemetry-title">Model: Juno Ultra Flash</span>
                 <span id="telemetry-similarity-score" class="telemetry-score">Cosine Similarity: 94.8%</span>
                 <span id="telemetry-latency" class="telemetry-latency">Latency: 8ms</span>
               </div>
@@ -235,17 +235,17 @@
               <div class="chat-bubble ai-bubble glass-card">
                 <div class="chat-header">
                   <div class="ai-avatar">✨</div>
-                  <strong style="color: var(--accent-indigo);">Gemini AI Agent</strong>
+                  <strong style="color: var(--accent-indigo);">Juno AI Agent</strong>
                 </div>
                 <div class="chat-text">
-                  👋 Hi! I'm Gemini, your elite AI Agent & System Architect. What scale problem or deep technical research shall we tackle today?
+                  👋 Hi! I'm Juno AI, your elite AI Agent & System Architect. What scale problem or deep technical research shall we tackle today?
                 </div>
               </div>
             </div>
 
           </div>
 
-          <!-- Floating Gemini Input Pill Deck -->
+          <!-- Floating Input Pill Deck -->
           <div class="chat-bottom-deck">
             <form id="rag-query-form" class="chat-input-container" onsubmit="window.submitRAGQuery(event); return false;">
               <div class="input-row">
@@ -255,7 +255,7 @@
                 </button>
 
                 <!-- Expanding Textarea -->
-                <textarea id="rag-query-input" class="chat-textarea" placeholder="Ask Gemini..." rows="1" aria-label="Query Input"></textarea>
+                <textarea id="rag-query-input" class="chat-textarea" placeholder="Ask Juno AI..." rows="1" aria-label="Query Input"></textarea>
 
                 <!-- Voice Dictation Mic Button -->
                 <button type="button" id="voice-trigger-btn" class="input-action-btn voice-btn" title="Voice Input" onclick="window.toggleVoiceListen()">

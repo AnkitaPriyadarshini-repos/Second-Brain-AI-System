@@ -2172,8 +2172,8 @@
 
     window.handleModelChange = function(modelVal) {
       const names = {
-        'gemini-1.5-flash': '✨ Gemini 1.5 Flash (Google AI)',
-        'gemini-1.5-pro': '🧠 Gemini 1.5 Pro (Deep Reasoning)',
+        'juno-flash': '✨ Juno Ultra Flash',
+        'juno-pro': '🧠 Juno Deep Reasoning',
         'agentic-architect': '⚡ Agentic System Architect & Code Generator',
         'deep-research': '🔮 Deep Research & Vault Synthesizer',
         'juno-rag': '🔒 Local Vault RAG (100% On-Device)'
