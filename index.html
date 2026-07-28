@@ -1354,7 +1354,10 @@
           <textarea id="fab-note-content" class="textarea-field" rows="5" placeholder="Type your notes or research summary here..." required></textarea>
         </div>
         <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
-      </main>
+          <button type="button" id="cancel-quick-note-btn" class="btn btn-secondary" onclick="window.closeModal('quick-note-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">⚡ Save Thought</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -1458,6 +1461,7 @@
   </div>
 
   <!-- JavaScript Modules -->
+  <script src="js/utils.js?v=51.0"></script>
   <script src="js/nlp-engine.js?v=51.0"></script>
   <script src="js/store.js?v=51.0"></script>
   <script src="js/rag-engine.js?v=51.0"></script>
