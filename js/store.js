@@ -191,7 +191,7 @@
     notes: [],
     dismissedIds: [],
     settings: {
-      theme: 'gemini-light',
+      theme: 'gemini-dark',
       privacyMode: true, // Default privacy mode on-device as requested in PDF page 7
       ttsEnabled: true,
       apiKey: ''
@@ -248,7 +248,13 @@
 
       const savedSettings = this._getItem(SETTINGS_KEY);
       if (savedSettings) {
-        try { this.settings = { ...this.settings, ...JSON.parse(savedSettings) }; } catch (e) { }
+        try {
+          this.settings = { ...this.settings, ...JSON.parse(savedSettings) };
+          if (this.settings.theme === 'sunflower-yellow' || this.settings.theme === 'gemini-light') {
+            this.settings.theme = 'gemini-dark';
+            this.saveSettings();
+          }
+        } catch (e) { }
       }
 
       const savedGoals = this._getItem(GOALS_KEY);

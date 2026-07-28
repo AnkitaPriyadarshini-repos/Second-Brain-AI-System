@@ -328,7 +328,10 @@
     }
 
     // Theme Switcher Initialization
-    const savedTheme = Store.settings.theme || 'sunflower-yellow';
+    let savedTheme = Store.settings.theme || 'gemini-dark';
+    if (savedTheme === 'sunflower-yellow' || savedTheme === 'gemini-light') {
+      savedTheme = 'gemini-dark';
+    }
     applyTheme(savedTheme);
 
     themePillBtns.forEach(btn => {

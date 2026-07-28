@@ -57,36 +57,11 @@ a, a:hover, a:visited, a:focus, a:active,
   --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Golden Yellow Theme Variant — Sunflower & Warm Gold */
-[data-theme="sunflower-yellow"],
-[data-theme="gemini-yellow"],
-[data-theme="gemini-light"],
-[data-theme="editorial-paper"] {
-  --bg-dark: #fefce8;
-  --bg-card: #ffffff;
-  --bg-card-hover: #fef08a;
-  --bg-card-active: #fde047;
-  --border-color: #fde047;
-  --border-highlight: #eab308;
-  --border-accent: #eab308;
-  
-  --text-primary: #422006;
-  --text-secondary: #713f12;
-  --text-muted: #854d0e;
-  
-  --accent-primary: #f59e0b;
-  --accent-primary-hover: #d97706;
-  --accent-primary-light: rgba(245, 158, 11, 0.15);
-  
-  --accent-amber: #f59e0b;
-  --accent-indigo: #d97706;
-  
-  --shadow-card: 0 4px 20px -2px rgba(245, 158, 11, 0.15);
-  --shadow-glow: 0 4px 25px 0 rgba(245, 158, 11, 0.25);
-}
-
+/* Obsidian Dark Theme - Default Universal Palette */
 [data-theme="gemini-dark"],
-[data-theme="obsidian"] {
+[data-theme="obsidian"],
+[data-theme="sunflower-yellow"],
+[data-theme="gemini-light"] {
   --bg-dark: #131314;
   --bg-card: #1e1e20;
   --bg-card-hover: #2a2a2d;

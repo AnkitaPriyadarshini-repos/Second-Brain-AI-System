@@ -22,12 +22,12 @@
     // Color palettes for different themes tailored for Juno AI Yellow Moon aesthetic
     palettes: {
       'gemini-light': [
-        { r: 245, g: 158, b: 11,  a: 0.35 }, // Warm Golden Sunflower (#f59e0b)
-        { r: 251, g: 191, b: 36,  a: 0.40 }, // Radiant Amber Glow (#fbbf24)
-        { r: 254, g: 240, b: 138, a: 0.45 }, // Soft Honey Sunlight (#fef08a)
-        { r: 217, g: 119, b: 6,   a: 0.25 }, // Deep Warm Gold (#d97706)
-        { r: 253, g: 230, b: 138, a: 0.35 }, // Pale Gold Sunshine (#fde68a)
-        { r: 250, g: 204, b: 21,  a: 0.30 }  // Vibrant Yellow Spark (#facc15)
+        { r: 66,  g: 133, b: 244, a: 0.15 }, // Subtle Blue Glow
+        { r: 155, g: 81,  b: 224, a: 0.15 }, // Subtle Purple Glow
+        { r: 245, g: 158, b: 11,  a: 0.15 }, // Subtle Amber Accent
+        { r: 30,  g: 41,  b: 59,  a: 0.50 }, // Dark Slate Shadow
+        { r: 233, g: 30,  b: 99,  a: 0.15 }, // Pink accent
+        { r: 16,  g: 185, b: 129, a: 0.15 }  // Emerald accent
       ],
       'gemini-dark': [
         { r: 245, g: 158, b: 11,  a: 0.35 }, // Golden Moon Glow
