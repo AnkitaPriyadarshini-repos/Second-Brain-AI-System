@@ -4313,8 +4313,9 @@ kbd {
   transition: width 0.15s ease-out;
 }
 
-/* Telemetry Processing Card */
+/* Telemetry Processing Card (Disabled) */
 .backend-telemetry-card {
+  display: none !important;
   width: 100%;
   max-width: 800px;
   background: rgba(99, 102, 241, 0.08);

@@ -624,17 +624,10 @@
           submitBtn.innerHTML = `Ask Juno ✨`;
         }
 
-        // Render Telemetry Banner Card
+        // Render Telemetry Banner Card (Disabled)
         const telemetryCard = document.getElementById('backend-telemetry-card');
-        const telemetryTitle = document.getElementById('telemetry-matched-title');
-        const telemetryScore = document.getElementById('telemetry-similarity-score');
-        const telemetryLatency = document.getElementById('telemetry-latency');
-
         if (telemetryCard) {
-          telemetryCard.style.display = 'block';
-          if (telemetryTitle) telemetryTitle.textContent = `Model: ${providerName}`;
-          if (telemetryScore) telemetryScore.textContent = citations.length > 0 ? `${citations.length} Grounded Notes Cited` : `Cloud LLM Completion`;
-          if (telemetryLatency) telemetryLatency.textContent = `Latency: ${latencyMs}ms`;
+          telemetryCard.style.display = 'none';
         }
 
         // Render final AI message card
