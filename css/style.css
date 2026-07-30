@@ -57,77 +57,77 @@ a, a:hover, a:visited, a:focus, a:active,
   --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Flagship Theme: Royal Amber & Champagne Gold */
+/* Flagship Theme: Royal Amber & Amethyst Gold (Vibrant Amethyst & Gold Canvas) */
 [data-theme="royal-gold"] {
-  --bg-dark: #0b0b0f;
-  --bg-card: #131219;
-  --bg-card-hover: #1c1b26;
-  --bg-card-active: #252433;
-  --border-color: rgba(229, 193, 88, 0.18);
-  --border-highlight: rgba(245, 158, 11, 0.6);
-  --border-accent: rgba(168, 85, 247, 0.5);
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
+  --bg-dark: #161228;
+  --bg-card: #221c3b;
+  --bg-card-hover: #2e2650;
+  --bg-card-active: #3a3064;
+  --border-color: rgba(251, 191, 36, 0.35);
+  --border-highlight: rgba(251, 191, 36, 0.75);
+  --border-accent: rgba(192, 132, 252, 0.6);
+  --text-primary: #ffffff;
+  --text-secondary: #e2e8f0;
+  --text-muted: #cbd5e1;
   --accent-primary: #fbbf24;
   --accent-primary-hover: #f59e0b;
-  --accent-primary-light: rgba(251, 191, 36, 0.18);
-  --accent-indigo: #a855f7;
-  --accent-violet: #c084fc;
-  --accent-emerald: #10b981;
+  --accent-primary-light: rgba(251, 191, 36, 0.22);
+  --accent-indigo: #c084fc;
+  --accent-violet: #e879f9;
+  --accent-emerald: #34d399;
   --accent-amber: #fbbf24;
   --accent-pink: #f472b6;
   --accent-blue: #60a5fa;
   --accent-cyan: #38bdf8;
-  --glow-1-color: rgba(245, 158, 11, 0.35);
-  --glow-2-color: rgba(168, 85, 247, 0.25);
-  --shadow-card: 0 8px 32px -4px rgba(0, 0, 0, 0.6), 0 0 15px 0 rgba(245, 158, 11, 0.1);
-  --shadow-glow: 0 4px 30px 0 rgba(251, 191, 36, 0.25);
+  --glow-1-color: rgba(251, 191, 36, 0.55);
+  --glow-2-color: rgba(192, 132, 252, 0.45);
+  --shadow-card: 0 10px 36px -4px rgba(0, 0, 0, 0.35), 0 0 24px 0 rgba(251, 191, 36, 0.25);
+  --shadow-glow: 0 4px 35px 0 rgba(251, 191, 36, 0.35);
 }
 
-/* Theme: Emerald Luxe & Titanium */
+/* Theme: Emerald Luxe & Titanium (Vibrant Jade & Gold Canvas) */
 [data-theme="emerald-luxe"] {
-  --bg-dark: #06110c;
-  --bg-card: #0d1e16;
-  --bg-card-hover: #162c21;
-  --bg-card-active: #1e3b2c;
-  --border-color: rgba(16, 185, 129, 0.2);
-  --border-highlight: rgba(16, 185, 129, 0.6);
-  --border-accent: rgba(245, 158, 11, 0.5);
+  --bg-dark: #0a251b;
+  --bg-card: #12372a;
+  --bg-card-hover: #1b4d3b;
+  --bg-card-active: #24634c;
+  --border-color: rgba(52, 211, 153, 0.35);
+  --border-highlight: rgba(52, 211, 153, 0.75);
+  --border-accent: rgba(251, 191, 36, 0.6);
   --text-primary: #f0fdf4;
   --text-secondary: #a7f3d0;
   --text-muted: #6ee7b7;
   --accent-primary: #10b981;
   --accent-primary-hover: #059669;
-  --accent-primary-light: rgba(16, 185, 129, 0.18);
+  --accent-primary-light: rgba(16, 185, 129, 0.22);
   --accent-indigo: #34d399;
-  --accent-violet: #059669;
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
+  --accent-violet: #10b981;
+  --accent-emerald: #34d399;
+  --accent-amber: #fbbf24;
   --accent-pink: #f472b6;
   --accent-blue: #38bdf8;
   --accent-cyan: #2dd4bf;
-  --glow-1-color: rgba(16, 185, 129, 0.35);
-  --glow-2-color: rgba(245, 158, 11, 0.25);
-  --shadow-card: 0 8px 32px -4px rgba(0, 0, 0, 0.6), 0 0 15px 0 rgba(16, 185, 129, 0.1);
-  --shadow-glow: 0 4px 30px 0 rgba(16, 185, 129, 0.25);
+  --glow-1-color: rgba(16, 185, 129, 0.55);
+  --glow-2-color: rgba(251, 191, 36, 0.4);
+  --shadow-card: 0 10px 36px -4px rgba(0, 0, 0, 0.35), 0 0 24px 0 rgba(16, 185, 129, 0.25);
+  --shadow-glow: 0 4px 30px 0 rgba(16, 185, 129, 0.35);
 }
 
-/* Theme: Sapphire Platinum */
+/* Theme: Sapphire Platinum (Vibrant Royal Ocean Blue Canvas) */
 [data-theme="sapphire-platinum"] {
-  --bg-dark: #080e1a;
-  --bg-card: #0f192c;
-  --bg-card-hover: #17253f;
-  --bg-card-active: #203152;
-  --border-color: rgba(56, 189, 248, 0.2);
-  --border-highlight: rgba(56, 189, 248, 0.6);
-  --border-accent: rgba(99, 102, 241, 0.5);
+  --bg-dark: #0d1a3a;
+  --bg-card: #152654;
+  --bg-card-hover: #1e3572;
+  --bg-card-active: #274590;
+  --border-color: rgba(56, 189, 248, 0.35);
+  --border-highlight: rgba(56, 189, 248, 0.75);
+  --border-accent: rgba(192, 132, 252, 0.6);
   --text-primary: #f0f9ff;
   --text-secondary: #bae6fd;
   --text-muted: #7dd3fc;
   --accent-primary: #38bdf8;
   --accent-primary-hover: #0284c7;
-  --accent-primary-light: rgba(56, 189, 248, 0.18);
+  --accent-primary-light: rgba(56, 189, 248, 0.22);
   --accent-indigo: #818cf8;
   --accent-violet: #c084fc;
   --accent-emerald: #34d399;
@@ -135,34 +135,60 @@ a, a:hover, a:visited, a:focus, a:active,
   --accent-pink: #f472b6;
   --accent-blue: #38bdf8;
   --accent-cyan: #06b6d4;
-  --glow-1-color: rgba(56, 189, 248, 0.35);
-  --glow-2-color: rgba(99, 102, 241, 0.25);
-  --shadow-card: 0 8px 32px -4px rgba(0, 0, 0, 0.6), 0 0 15px 0 rgba(56, 189, 248, 0.1);
-  --shadow-glow: 0 4px 30px 0 rgba(56, 189, 248, 0.25);
+  --glow-1-color: rgba(56, 189, 248, 0.55);
+  --glow-2-color: rgba(129, 140, 248, 0.45);
+  --shadow-card: 0 10px 36px -4px rgba(0, 0, 0, 0.35), 0 0 24px 0 rgba(56, 189, 248, 0.25);
+  --shadow-glow: 0 4px 30px 0 rgba(56, 189, 248, 0.35);
 }
 
-/* Obsidian Dark Theme & Backward Compatibility */
-[data-theme="gemini-dark"],
-[data-theme="obsidian"],
-[data-theme="sunflower-yellow"],
+/* Theme: Platinum Gold (Light Luxury Amber & Ivory Canvas) */
+[data-theme="platinum-gold"],
 [data-theme="gemini-light"] {
-  --bg-dark: #131314;
-  --bg-card: #1e1e20;
-  --bg-card-hover: #2a2a2d;
-  --bg-card-active: #323236;
-  --border-color: rgba(255, 255, 255, 0.1);
-  --border-highlight: rgba(245, 158, 11, 0.5);
-  --border-accent: rgba(99, 102, 241, 0.4);
-  --text-primary: #e3e3e3;
-  --text-secondary: #9e9e9e;
-  --text-muted: #757575;
+  --bg-dark: #fbf9f5;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f3eee6;
+  --bg-card-active: #ece5d8;
+  --border-color: rgba(217, 119, 6, 0.25);
+  --border-highlight: rgba(217, 119, 6, 0.65);
+  --border-accent: rgba(124, 58, 237, 0.5);
+  --text-primary: #1e1b4b;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --accent-primary: #d97706;
+  --accent-primary-hover: #b45309;
+  --accent-primary-light: rgba(217, 119, 6, 0.15);
+  --accent-indigo: #7c3aed;
+  --accent-violet: #9333ea;
+  --accent-emerald: #059669;
+  --accent-amber: #d97706;
+  --accent-pink: #db2777;
+  --accent-blue: #0284c7;
+  --accent-cyan: #0891b2;
+  --glow-1-color: rgba(245, 158, 11, 0.35);
+  --glow-2-color: rgba(168, 85, 247, 0.25);
+  --shadow-card: 0 8px 28px -4px rgba(217, 119, 6, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 4px 25px 0 rgba(245, 158, 11, 0.2);
+}
+
+/* Obsidian Theme */
+[data-theme="obsidian"] {
+  --bg-dark: #161a23;
+  --bg-card: #202736;
+  --bg-card-hover: #2b3447;
+  --bg-card-active: #364259;
+  --border-color: rgba(255, 255, 255, 0.15);
+  --border-highlight: rgba(245, 158, 11, 0.6);
+  --border-accent: rgba(99, 102, 241, 0.5);
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
   --accent-primary: #f59e0b;
   --accent-primary-hover: #d97706;
-  --accent-primary-light: rgba(245, 158, 11, 0.15);
-  --glow-1-color: rgba(245, 158, 11, 0.3);
-  --glow-2-color: rgba(251, 191, 36, 0.2);
-  --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 4px 25px 0 rgba(245, 158, 11, 0.15);
+  --accent-primary-light: rgba(245, 158, 11, 0.18);
+  --glow-1-color: rgba(245, 158, 11, 0.4);
+  --glow-2-color: rgba(99, 102, 241, 0.3);
+  --shadow-card: 0 6px 24px -2px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 4px 25px 0 rgba(245, 158, 11, 0.2);
 }
 
 /* Hide floating robot widget overlay to keep UI ultra-clean */
@@ -202,31 +228,31 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Subtle Golden Yellow Background Overlay */
+/* Radiant Vibrant Background Glow Overlays */
 .ambient-glow {
   position: fixed;
   border-radius: 50%;
-  filter: blur(140px);
+  filter: blur(90px);
   pointer-events: none;
   z-index: -1;
-  opacity: 0.25;
+  opacity: 0.55;
 }
 
 .ambient-glow-1 {
-  width: 600px;
-  height: 600px;
-  top: -150px;
-  left: -100px;
-  background: radial-gradient(circle, var(--glow-1-color, #f59e0b), transparent 70%);
+  width: 700px;
+  height: 700px;
+  top: -180px;
+  left: -120px;
+  background: radial-gradient(circle, var(--glow-1-color, rgba(251, 191, 36, 0.55)), transparent 70%);
   transition: background 0.5s ease;
 }
 
 .ambient-glow-2 {
-  width: 500px;
-  height: 500px;
-  bottom: -150px;
-  right: -100px;
-  background: radial-gradient(circle, var(--glow-2-color, #fbbf24), transparent 70%);
+  width: 650px;
+  height: 650px;
+  bottom: -180px;
+  right: -120px;
+  background: radial-gradient(circle, var(--glow-2-color, rgba(192, 132, 252, 0.45)), transparent 70%);
   transition: background 0.5s ease;
 }
 

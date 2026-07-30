@@ -42,6 +42,13 @@
         { r: 6,   g: 182, b: 212, a: 0.25 }, // Cyan Spark
         { r: 15,  g: 25,  b: 44,  a: 0.60 }  // Deep Oceanic Obsidian
       ],
+      'platinum-gold': [
+        { r: 245, g: 158, b: 11,  a: 0.35 }, // Bright Amber Gold
+        { r: 217, g: 119, b: 6,   a: 0.35 }, // Champagne Glow
+        { r: 124, g: 58,  b: 237, a: 0.25 }, // Royal Violet Accent
+        { r: 234, g: 179, b: 8,   a: 0.30 }, // Light Sparkle
+        { r: 248, g: 250, b: 252, a: 0.50 }  // Ivory Light Shadow
+      ],
       'gemini-light': [
         { r: 66,  g: 133, b: 244, a: 0.15 }, // Subtle Blue Glow
         { r: 155, g: 81,  b: 224, a: 0.15 }, // Subtle Purple Glow

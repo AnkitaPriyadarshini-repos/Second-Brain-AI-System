@@ -330,7 +330,7 @@
     // Theme Switcher Initialization
     const themeCardOpts = document.querySelectorAll('.theme-card-option');
     let savedTheme = Store.settings.theme || 'royal-gold';
-    const validThemes = ['royal-gold', 'emerald-luxe', 'sapphire-platinum', 'gemini-dark', 'obsidian'];
+    const validThemes = ['royal-gold', 'platinum-gold', 'emerald-luxe', 'sapphire-platinum', 'gemini-dark', 'obsidian', 'gemini-light'];
     if (!validThemes.includes(savedTheme)) {
       savedTheme = 'royal-gold';
     }
