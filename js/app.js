@@ -213,6 +213,69 @@
       if (query && typeof handleRAGQuery === 'function') handleRAGQuery(query);
     };
 
+    function updateUserGreetings(name) {
+      if (!name) return;
+      const heroGreeting = document.getElementById('user-hero-greeting');
+      const heroSub = document.getElementById('user-hero-sub');
+      
+      if (heroGreeting) {
+        heroGreeting.textContent = `Hello, ${name}`;
+      }
+      if (heroSub) {
+        heroSub.textContent = `Where would you like to start today? Solving wide-scale problems as an elite AI agent.`;
+      }
+    }
+
+    window.saveUserOnboardingName = function(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const input = document.getElementById('onboarding-name-input');
+      const name = input ? input.value.trim() : '';
+
+      if (name) {
+        if (typeof Store !== 'undefined' && Store.setUserName) {
+          Store.setUserName(name);
+        } else {
+          localStorage.setItem('second_brain_user_name', name);
+        }
+
+        const modal = document.getElementById('user-onboarding-modal');
+        if (modal) modal.classList.remove('active');
+
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
+        updateUserGreetings(name);
+
+        const wiseQuotes = [
+          `"Wisdom is not a product of schooling but of the lifelong attempt to acquire it." — Albert Einstein`,
+          `"An investment in knowledge pays the best interest." — Benjamin Franklin`,
+          `"The secret of getting ahead is getting started." — Mark Twain`,
+          `"Knowledge is power. Information is liberating." — Kofi Annan`,
+          `"The beautiful thing about learning is that no one can take it away from you." — B.B. King`
+        ];
+        const randomQuote = wiseQuotes[Math.floor(Math.random() * wiseQuotes.length)];
+
+        showToast(`✨ Welcome, ${name}! Your cognitive sanctuary is unlocked.`);
+
+        if (typeof NexusBotEngine !== 'undefined' && NexusBotEngine.speak) {
+          NexusBotEngine.speak(`Welcome, ${name}! 🌱 ${randomQuote}`, 10000);
+        }
+
+        if (typeof VoiceEngine !== 'undefined' && typeof Store !== 'undefined' && Store.settings && Store.settings.ttsEnabled) {
+          VoiceEngine.speak(`Welcome ${name}! Your Second Brain AI System is ready.`);
+        }
+      }
+    };
+
+    // Check One-Time User Onboarding Name
+    setTimeout(() => {
+      const storedName = (typeof Store !== 'undefined' && Store.getUserName) ? Store.getUserName() : localStorage.getItem('second_brain_user_name');
+      if (!storedName) {
+        const onboardingModal = document.getElementById('user-onboarding-modal');
+        if (onboardingModal) onboardingModal.classList.add('active');
+      } else {
+        updateUserGreetings(storedName);
+      }
+    }, 500);
+
     const ragQueryInputEl = document.getElementById('rag-query-input');
     if (ragQueryInputEl) {
       ragQueryInputEl.addEventListener('keydown', function(e) {

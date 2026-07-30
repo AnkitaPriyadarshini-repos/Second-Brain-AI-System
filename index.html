@@ -21,8 +21,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Stylesheets & App Manifest -->
-  <link rel="stylesheet" href="css/style.css?v=21.0">
-  <link rel="stylesheet" href="css/responsive.css?v=21.0">
+  <link rel="stylesheet" href="css/style.css?v=22.0">
+  <link rel="stylesheet" href="css/responsive.css?v=22.0">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#18181b">
 </head>
@@ -206,8 +206,8 @@
                 </div>
               </div>
 
-              <h1 class="gemini-hero-title" style="margin-top: 10px;">Hello, Ankita</h1>
-              <p class="gemini-hero-sub">Where would you like to start today? Solving wide-scale problems as an elite AI agent.</p>
+              <h1 class="gemini-hero-title" id="user-hero-greeting" style="margin-top: 10px;">Hello, Friend</h1>
+              <p class="gemini-hero-sub" id="user-hero-sub">Where would you like to start today? Solving wide-scale problems as an elite AI agent.</p>
 
               <!-- 4 Prompt Cards -->
               <div class="prompt-cards-grid">
@@ -1435,6 +1435,25 @@
       <button id="reindex-done-btn" class="btn btn-primary" style="width: 100%; display: none;" onclick="window.closeModal('vector-reindex-modal')">
         ✅ Indexing Complete &amp; Saved
       </button>
+  <!-- One-Time Welcome Onboarding Login Modal -->
+  <div id="user-onboarding-modal" class="modal-backdrop" aria-label="Welcome User Login Modal">
+    <div class="spec-modal-card glass-card" style="max-width: 480px; text-align: center; border: 1.5px solid var(--accent-amber); box-shadow: 0 25px 70px rgba(0, 0, 0, 0.45); padding: 32px 28px; border-radius: 20px; background: rgba(30, 31, 36, 0.95); backdrop-filter: blur(20px);">
+      <div style="font-size: 48px; margin-bottom: 12px; filter: drop-shadow(0 4px 12px rgba(245, 176, 65, 0.4));">🧠✨</div>
+      <h2 style="font-size: 24px; font-weight: 800; color: var(--accent-amber); margin-bottom: 8px; font-family: var(--font-primary);">Welcome to Second Brain AI</h2>
+      <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 24px;">
+        Please enter your name to personalize your cognitive knowledge sanctuary &amp; unlock your AI assistant.
+      </p>
+
+      <form id="onboarding-user-form" onsubmit="window.saveUserOnboardingName(event)" style="display: flex; flex-direction: column; gap: 16px;">
+        <div style="text-align: left;">
+          <label style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Your Name:</label>
+          <input type="text" id="onboarding-name-input" class="input-field" placeholder="Enter your name..." required style="font-size: 15.5px; padding: 13px 18px; border-radius: 12px; border: 1.5px solid var(--accent-amber); background: rgba(255, 255, 255, 0.05); color: var(--text-primary); width: 100%; box-sizing: border-box;" autofocus>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="padding: 14px; font-size: 15.5px; font-weight: 800; width: 100%; margin-top: 6px; background: linear-gradient(135deg, #d68910, #f5b041); border: none; border-radius: 12px; cursor: pointer; color: #121316; box-shadow: 0 8px 24px rgba(214, 137, 16, 0.35); transition: all 0.2s ease;">
+          Unlock My Second Brain 🚀
+        </button>
+      </form>
     </div>
   </div>
 

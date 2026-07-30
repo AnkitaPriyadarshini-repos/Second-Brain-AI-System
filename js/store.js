@@ -449,6 +449,19 @@
       }
     },
 
+    getUserName: function () {
+      return this._getItem('second_brain_user_name') || this.settings.userName || '';
+    },
+
+    setUserName: function (name) {
+      const cleanName = (name || '').trim();
+      if (cleanName) {
+        this._setItem('second_brain_user_name', cleanName);
+        this.settings.userName = cleanName;
+        this.saveNotes();
+      }
+    },
+
     updateSettings: function (newSettings) {
       this.settings = { ...this.settings, ...newSettings };
       this.saveNotes();
