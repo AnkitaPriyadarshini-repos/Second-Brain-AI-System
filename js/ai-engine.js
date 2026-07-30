@@ -187,13 +187,22 @@ export function HydratedComponent({ data }) {
     const { prompt = '', model = 'gemini-1.5-flash', systemPrompt = '', ragContext = '' } = options;
 
     const qClean = (prompt || '').trim().toLowerCase().replace(/[^\w\s]/gi, '');
-    const greetings = ['hi', 'hii', 'hiii', 'hello', 'hey', 'heyy', 'greetings', 'good morning', 'good afternoon', 'good evening', 'who are you', 'what can you do', 'help', 'how are you', 'what is this', 'yo', 'sup'];
-    if (greetings.includes(qClean)) {
-      return {
-        text: "Hello Ankita! 👋 How can I help you today?",
-        provider: 'Juno AI Assistant',
-        grounded: false
-      };
+    
+    // Natural ChatGPT-style Conversational Greetings
+    if (qClean === 'hi' || qClean === 'hii' || qClean === 'hiii') {
+      return { text: "Hello! How can I help you today?", provider: 'ChatGPT Engine', grounded: false };
+    }
+    if (qClean === 'hello') {
+      return { text: "Hello! How can I assist you today?", provider: 'ChatGPT Engine', grounded: false };
+    }
+    if (qClean === 'hey' || qClean === 'heyy' || qClean === 'yo' || qClean === 'sup') {
+      return { text: "Hey there! What's on your mind today?", provider: 'ChatGPT Engine', grounded: false };
+    }
+    if (qClean.includes('how are you') || qClean.includes('how r u')) {
+      return { text: "I'm doing great, thank you! How can I help you today?", provider: 'ChatGPT Engine', grounded: false };
+    }
+    if (qClean.includes('who are you') || qClean.includes('what are you')) {
+      return { text: "I'm your AI assistant, ready to help you with code, ideas, note analysis, or any question you have!", provider: 'ChatGPT Engine', grounded: false };
     }
 
     const keys = this.getAPIKeys();
@@ -300,13 +309,22 @@ export function HydratedComponent({ data }) {
 
   fallbackSynthesize(prompt, model = 'juno-flash', ragContext = '') {
     const qClean = (prompt || '').trim().toLowerCase().replace(/[^\w\s]/gi, '');
-    const greetings = ['hi', 'hii', 'hiii', 'hello', 'hey', 'heyy', 'greetings', 'good morning', 'good afternoon', 'good evening', 'who are you', 'what can you do', 'help', 'how are you', 'what is this', 'yo', 'sup'];
-    if (greetings.includes(qClean)) {
-      return {
-        text: "Hello Ankita! 👋 How can I help you today?",
-        provider: 'Juno AI Assistant',
-        grounded: false
-      };
+    
+    // Natural ChatGPT-style Conversational Greetings
+    if (qClean === 'hi' || qClean === 'hii' || qClean === 'hiii') {
+      return { text: "Hello! How can I help you today?", provider: 'ChatGPT Engine', grounded: false };
+    }
+    if (qClean === 'hello') {
+      return { text: "Hello! How can I assist you today?", provider: 'ChatGPT Engine', grounded: false };
+    }
+    if (qClean === 'hey' || qClean === 'heyy' || qClean === 'yo' || qClean === 'sup') {
+      return { text: "Hey there! What's on your mind today?", provider: 'ChatGPT Engine', grounded: false };
+    }
+    if (qClean.includes('how are you') || qClean.includes('how r u')) {
+      return { text: "I'm doing great, thank you! How can I help you today?", provider: 'ChatGPT Engine', grounded: false };
+    }
+    if (qClean.includes('who are you') || qClean.includes('what are you')) {
+      return { text: "I'm your AI assistant, ready to help you with code, ideas, note analysis, or any question you have!", provider: 'ChatGPT Engine', grounded: false };
     }
 
     // Check if query asks for system design, scale, code, or architecture

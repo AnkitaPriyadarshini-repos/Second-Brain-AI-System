@@ -1921,6 +1921,8 @@
     function cleanRogueText(text) {
       if (!text) return '';
       return text
+        .replace(/###?\s*✨?\s*Juno AI Assistant.*(?=\n|$)/gi, '')
+        .replace(/Thank you for your prompt:.*(?=\n|$)/gi, '')
         .replace(/^#\s*$/gm, '')
         .replace(/####?\s*💡?\s*Key Architectural Takeaways:[\s\S]*/gi, '')
         .replace(/•\s*\*\*Autonomous Agent Execution\*\*:[\s\S]*/gi, '')
