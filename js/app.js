@@ -2234,6 +2234,18 @@
     renderChatThreadsList();
     window.renderActiveChatThread();
 
+    window.triggerAstronautQuote = function() {
+      const quotes = [
+        '👨‍🚀 "Floating with Second Brain AI across the cosmos!"',
+        '👨‍🚀 "Zero-gravity knowledge retrieval activated!"',
+        '👨‍🚀 "Exploring 100+ indexed vector memories in deep space!"',
+        '👨‍🚀 "Houston, zero network friction & high throughput confirmed!"'
+      ];
+      const q = quotes[Math.floor(Math.random() * quotes.length)];
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+      showToast(q);
+    };
+
     // Global helper accessible via inline onclick fallback
     window.triggerSampleQuery = function(queryText) {
       if (!queryText) return;

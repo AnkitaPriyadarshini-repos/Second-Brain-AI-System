@@ -117,6 +117,12 @@
       <section id="view-jarvis" class="view-section active" aria-label="Juno AI Studio Interface">
         <div class="chatgpt-layout-container">
           
+          <!-- Permanent 3D Floating Astronaut Hanging on Rope (Ambient Signature Emblem) -->
+          <div class="floating-astronaut-wrapper" onclick="window.triggerAstronautQuote()" title="3D Space Astronaut">
+            <img src="assets/astronaut.png" alt="3D Space Astronaut" class="floating-astronaut-img" />
+            <div class="astronaut-speech-bubble">👨‍🚀 "Floating with Second Brain AI!"</div>
+          </div>
+          
           <!-- Top Sticky Header Bar -->
           <div class="chat-top-bar">
             <div class="chat-top-left">
@@ -188,12 +194,6 @@
                     <input type="text" class="glass-circular-input" id="circular-ai-prompt-input" placeholder="Ask Juno AI anything..." onkeypress="if(event.key==='Enter') window.submitCircularPrompt()" />
                     <button class="glass-circular-btn" onclick="window.submitCircularPrompt()">✨ Ask Juno AI</button>
                   </div>
-                </div>
-
-                <!-- Right Flank: 3D Floating Astronaut Hanging on Rope (Striking Contrast Element) -->
-                <div class="floating-astronaut-wrapper" onclick="window.triggerAstronautQuote()" title="3D Space Astronaut">
-                  <img src="assets/astronaut.png" alt="3D Space Astronaut" class="floating-astronaut-img" />
-                  <div class="astronaut-speech-bubble">👨‍🚀 "Floating with Second Brain AI!"</div>
                 </div>
               </div>
 
