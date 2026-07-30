@@ -9,6 +9,22 @@
   const SoundEngine = {
     audioCtx: null,
     enabled: true,
+    muted: false,
+
+    toggleMute: function () {
+      this.muted = !this.muted;
+      this.enabled = !this.muted;
+      if (typeof VoiceEngine !== 'undefined' && VoiceEngine.stopSpeak) {
+        VoiceEngine.stopSpeak();
+      }
+      return this.muted;
+    },
+
+    stopAllAudio: function () {
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    },
 
     init: function () {
       if (typeof window === 'undefined') return;

@@ -285,6 +285,42 @@
         }
       });
     }
+    window.toggleGlobalAudioMute = function() {
+      let isMuted = false;
+      if (typeof SoundEngine !== 'undefined' && SoundEngine.toggleMute) {
+        isMuted = SoundEngine.toggleMute();
+      }
+      if (typeof VoiceEngine !== 'undefined') {
+        VoiceEngine.ttsEnabled = !isMuted;
+        if (isMuted && VoiceEngine.stopSpeak) {
+          VoiceEngine.stopSpeak();
+        }
+      }
+      const iconEl = document.getElementById('global-sound-toggle-icon');
+      const textEl = document.getElementById('global-sound-toggle-text');
+      const btnEl = document.getElementById('global-sound-toggle-btn');
+
+      if (isMuted) {
+        if (iconEl) iconEl.textContent = '🔇';
+        if (textEl) textEl.textContent = 'Muted';
+        if (btnEl) {
+          btnEl.style.borderColor = 'var(--text-secondary)';
+          btnEl.style.color = 'var(--text-secondary)';
+          btnEl.style.opacity = '0.7';
+        }
+        if (typeof showToast === 'function') showToast('🔇 Silent Mode Active: Audio & speech muted.');
+      } else {
+        if (iconEl) iconEl.textContent = '🔊';
+        if (textEl) textEl.textContent = 'Sound ON';
+        if (btnEl) {
+          btnEl.style.borderColor = 'var(--accent-amber)';
+          btnEl.style.color = 'var(--accent-amber)';
+          btnEl.style.opacity = '1.0';
+        }
+        if (typeof showToast === 'function') showToast('🔊 Sound Active: Audio effects enabled.');
+      }
+    };
+
     window.toggleVoiceListen = function() {
       if (typeof VoiceEngine !== 'undefined' && VoiceEngine.toggleListen) {
         VoiceEngine.toggleListen();
@@ -795,12 +831,21 @@
         });
       });
 
-      // Bind Speak button
+      // Bind Speak button with instant Stop/Mute toggle for silent environment
       const speakBtn = msgCard.querySelector('.speak-btn');
       if (speakBtn) {
         speakBtn.addEventListener('click', () => {
           if (typeof VoiceEngine !== 'undefined') {
-            VoiceEngine.speak(text);
+            if (VoiceEngine.isSpeaking) {
+              VoiceEngine.stopSpeak();
+              speakBtn.innerHTML = '🔊 Read Aloud';
+              if (typeof showToast === 'function') showToast('🔇 Speech Stopped');
+            } else {
+              speakBtn.innerHTML = '⏹️ Stop Speech';
+              VoiceEngine.speak(text, () => {
+                speakBtn.innerHTML = '🔊 Read Aloud';
+              });
+            }
           }
         });
       }

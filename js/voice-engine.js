@@ -170,6 +170,10 @@
       if (this.callbacks.onStateChange) this.callbacks.onStateChange('idle');
     },
 
+    stopSpeech: function () {
+      this.stopSpeak();
+    },
+
     /**
      * Renders animated waveform on canvas element
      * @param {HTMLCanvasElement} canvas 
