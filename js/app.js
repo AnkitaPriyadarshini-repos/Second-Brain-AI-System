@@ -2195,8 +2195,14 @@
       const thread = threads.find(t => t.id === activeId) || threads[0];
       if (!thread) return;
 
-      container.innerHTML = '';
-      const msgs = (thread.messages || []).filter(m => m.id !== 'msg-welcome');
+      const msgs = (thread.messages || []).filter(m => {
+        if (!m || !m.content) return false;
+        if (m.id === 'msg-welcome') return false;
+        if (m.content.includes('Urban density') || m.content.includes('During non-REM') || m.content.includes('neocortical storage') || m.content.includes('hippocampal memories')) {
+          return false;
+        }
+        return true;
+      });
 
       if (msgs.length === 0) {
         if (heroView) heroView.style.display = 'flex';

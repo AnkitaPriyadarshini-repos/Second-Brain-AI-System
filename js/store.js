@@ -493,9 +493,16 @@
           if (Array.isArray(parsed) && parsed.length > 0) {
             parsed.forEach(t => {
               if (t && Array.isArray(t.messages)) {
+                t.messages = t.messages.filter(m => {
+                  if (!m || typeof m.content !== 'string') return false;
+                  if (m.content.includes('Urban density') || m.content.includes('During non-REM') || m.content.includes('neocortical storage') || m.content.includes('hippocampal memories')) {
+                    return false;
+                  }
+                  return true;
+                });
                 t.messages.forEach(m => {
                   if (m && m.role === 'assistant' && typeof m.content === 'string') {
-                    let cleaned = m.content
+                    m.content = m.content
                       .replace(/###?\s*✨?\s*Juno AI Assistant.*(?=\n|$)/gi, '')
                       .replace(/###?\s*Grounded Insight from Your Second Brain.*(?=\n|$)/gi, '')
                       .replace(/Based on your saved note.*(?=\n|$)/gi, '')
@@ -515,17 +522,11 @@
                       .replace(/•\s*\*\*Live Cloud Integration\*\*:[\s\S]*/gi, '')
                       .replace(/\.\s*\./g, '.')
                       .trim();
-                    if (cleaned.includes('\n\n')) {
-                      const paragraphs = cleaned.split('\n\n').map(p => p.trim()).filter(Boolean);
-                      if (paragraphs.length > 1 && (paragraphs[0].startsWith('Urban density') || paragraphs[1].startsWith('During non-REM'))) {
-                        cleaned = paragraphs[0];
-                      }
-                    }
-                    m.content = cleaned;
                   }
                 });
               }
             });
+            this._setItem('second_brain_chat_threads_v2', JSON.stringify(parsed));
             return parsed;
           }
         } catch (e) { }
