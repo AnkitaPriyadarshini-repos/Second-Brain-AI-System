@@ -56,14 +56,24 @@
       this.allNodes = [];
       this.allLinks = [];
 
-      const entityMap = new Map();
       const width = this.cssWidth || 800;
       const height = this.cssHeight || 600;
 
-      // 1. Create Note Nodes
+      // 1. Define Topic Cluster Hub Centers
+      const clusterCenters = [
+        { name: 'AI Systems & Deep Learning', x: width * 0.3, y: height * 0.35, color: '#8b5cf6' },
+        { name: 'Voice Memos & Audio', x: width * 0.7, y: height * 0.3, color: '#10b981' },
+        { name: 'Web Research & Clips', x: width * 0.75, y: height * 0.7, color: '#f59e0b' },
+        { name: 'System Architecture', x: width * 0.25, y: height * 0.72, color: '#3b82f6' }
+      ];
+
+      // 2. Create Note Nodes with Cluster Gravity
       notes.forEach((note, idx) => {
-        const angle = (idx / notes.length) * Math.PI * 2;
-        const radius = 160 + Math.random() * 140;
+        const clusterIdx = idx % clusterCenters.length;
+        const cluster = clusterCenters[clusterIdx];
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 40 + Math.random() * 120;
+
         const node = {
           id: note.id,
           label: note.title || 'Untitled Note',
@@ -71,50 +81,34 @@
           sourceType: note.sourceType || 'typing',
           tags: note.tags || [],
           noteObj: note,
-          x: width / 2 + Math.cos(angle) * radius,
-          y: height / 2 + Math.sin(angle) * radius,
-          vx: (Math.random() - 0.5) * 0.4,
-          vy: (Math.random() - 0.5) * 0.4,
-          radius: 9 + Math.min((note.content || '').length / 250, 7)
+          clusterIdx: clusterIdx,
+          x: cluster.x + Math.cos(angle) * dist,
+          y: cluster.y + Math.sin(angle) * dist,
+          vx: (Math.random() - 0.5) * 0.2,
+          vy: (Math.random() - 0.5) * 0.2,
+          radius: 10 + Math.min((note.content || '').length / 280, 6)
         };
         this.allNodes.push(node);
-
-        if (note.entities) {
-          Object.entries(note.entities).forEach(([cat, list]) => {
-            (list || []).forEach(ent => {
-              if (!entityMap.has(ent)) {
-                entityMap.set(ent, { label: ent, category: cat, noteIds: [] });
-              }
-              entityMap.get(ent).noteIds.push(note.id);
-            });
-          });
-        }
       });
 
-      // 2. Create Shared Entity Nodes & Links
-      entityMap.forEach((entData, entName) => {
-        if (entData.noteIds.length >= 1) {
-          const entNode = {
-            id: `ent-${entName}`,
-            label: entName,
-            type: 'entity',
-            category: entData.category,
-            x: width / 2 + (Math.random() - 0.5) * 360,
-            y: height / 2 + (Math.random() - 0.5) * 360,
-            vx: (Math.random() - 0.5) * 0.4,
-            vy: (Math.random() - 0.5) * 0.4,
-            radius: 5
-          };
-          this.allNodes.push(entNode);
+      // 3. Connect Notes within the Same Cluster or Shared Primary Tags (Max 2 Links per Note)
+      for (let i = 0; i < this.allNodes.length; i++) {
+        let linksForNode = 0;
+        for (let j = i + 1; j < this.allNodes.length; j++) {
+          if (linksForNode >= 2) break;
+          const n1 = this.allNodes[i];
+          const n2 = this.allNodes[j];
 
-          entData.noteIds.forEach(nId => {
+          const sharedTag = (n1.tags || []).some(t => (n2.tags || []).includes(t));
+          if (n1.clusterIdx === n2.clusterIdx && (sharedTag || Math.random() < 0.25)) {
             this.allLinks.push({
-              source: nId,
-              target: entNode.id
+              source: n1.id,
+              target: n2.id
             });
-          });
+            linksForNode++;
+          }
         }
-      });
+      }
 
       this.applyFilter(this.activeFilter);
       this.updateNodeCountBadge();
@@ -130,10 +124,6 @@
         this.nodes = this.allNodes.filter(n => n.type === 'note');
         const nodeIds = new Set(this.nodes.map(n => n.id));
         this.links = this.allLinks.filter(l => nodeIds.has(l.source) && nodeIds.has(l.target));
-      } else if (this.activeFilter === 'entities') {
-        this.nodes = this.allNodes.filter(n => n.type === 'entity');
-        const nodeIds = new Set(this.nodes.map(n => n.id));
-        this.links = this.allLinks.filter(l => nodeIds.has(l.source) && nodeIds.has(l.target));
       } else {
         this.nodes = this.allNodes.filter(n => n.type === 'note' && n.sourceType === this.activeFilter);
         const nodeIds = new Set(this.nodes.map(n => n.id));
@@ -146,8 +136,7 @@
       const badge = document.getElementById('graph-node-count-badge');
       if (badge) {
         const notesCount = this.nodes.filter(n => n.type === 'note').length;
-        const entCount = this.nodes.filter(n => n.type === 'entity').length;
-        badge.textContent = `● ${notesCount} Notes | ${entCount} Entities | ${this.links.length} Links`;
+        badge.textContent = `● ${notesCount} Visual Topic Nodes`;
       }
     },
 
@@ -169,19 +158,19 @@
         const n1 = this.nodes[i];
         if (n1 === this.draggedNode) continue;
 
-        // Center gravity
-        n1.vx += (width / 2 - n1.x) * 0.00025;
-        n1.vy += (height / 2 - n1.y) * 0.00025;
+        // Gentle center gravity
+        n1.vx += (width / 2 - n1.x) * 0.00015;
+        n1.vy += (height / 2 - n1.y) * 0.00015;
 
-        // Repulsion between nodes
+        // Repulsion between nodes to prevent overlapping clutter
         for (let j = i + 1; j < this.nodes.length; j++) {
           const n2 = this.nodes[j];
           const dx = n2.x - n1.x;
           const dy = n2.y - n1.y;
           const dist = Math.sqrt(dx * dx + dy * dy) || 1;
 
-          if (dist < 130) {
-            const force = (130 - dist) / dist * 0.04;
+          if (dist < 180) {
+            const force = (180 - dist) / dist * 0.03;
             n1.vx -= dx * force;
             n1.vy -= dy * force;
             n2.vx += dx * force;
@@ -189,8 +178,8 @@
           }
         }
 
-        n1.vx *= 0.88;
-        n1.vy *= 0.88;
+        n1.vx *= 0.86;
+        n1.vy *= 0.86;
         n1.x += n1.vx;
         n1.y += n1.vy;
       }
@@ -212,9 +201,9 @@
       ctx.scale(this.transform.k, this.transform.k);
 
       // Background Grid Dots
-      ctx.fillStyle = isLight ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.05)';
-      for (let x = 20; x < width; x += 40) {
-        for (let y = 20; y < height; y += 40) {
+      ctx.fillStyle = isLight ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.04)';
+      for (let x = 25; x < width; x += 45) {
+        for (let y = 25; y < height; y += 45) {
           ctx.beginPath();
           ctx.arc(x, y, 1.2, 0, Math.PI * 2);
           ctx.fill();
@@ -223,14 +212,14 @@
 
       const nodeMap = new Map(this.nodes.map(n => [n.id, n]));
 
-      // Draw Links
+      // Draw Links (Subtle Unhovered, Glowing Accent when Hovered)
       this.links.forEach(link => {
         const s = nodeMap.get(link.source);
         const t = nodeMap.get(link.target);
         if (s && t) {
           ctx.beginPath();
           const isHighlighted = (this.hoveredNode && (this.hoveredNode.id === s.id || this.hoveredNode.id === t.id));
-          ctx.strokeStyle = isHighlighted ? (isLight ? '#d97706' : '#fbbf24') : (isLight ? 'rgba(15, 23, 42, 0.16)' : 'rgba(255, 255, 255, 0.15)');
+          ctx.strokeStyle = isHighlighted ? (isLight ? '#d97706' : '#fbbf24') : (isLight ? 'rgba(15, 23, 42, 0.05)' : 'rgba(255, 255, 255, 0.06)');
           ctx.lineWidth = isHighlighted ? 2.5 : 1;
           ctx.moveTo(s.x, s.y);
           ctx.lineTo(t.x, t.y);
@@ -240,48 +229,51 @@
 
       // Draw Nodes
       this.nodes.forEach(node => {
+        const isHovered = node === this.hoveredNode || node === this.selectedNode;
+        const isConnected = this.hoveredNode && this.links.some(l => (l.source === node.id && l.target === this.hoveredNode.id) || (l.target === node.id && l.source === this.hoveredNode.id));
+
+        ctx.globalAlpha = (this.hoveredNode && !isHovered && !isConnected) ? 0.35 : 1;
+
         ctx.beginPath();
         ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
 
-        if (node.type === 'note') {
-          switch (node.sourceType) {
-            case 'voice': ctx.fillStyle = '#10b981'; break;   // Emerald
-            case 'clip': ctx.fillStyle = '#f59e0b'; break;    // Amber
-            case 'file': ctx.fillStyle = '#ec4899'; break;    // Pink
-            case 'bookmark': ctx.fillStyle = '#3b82f6'; break;// Blue
-            default: ctx.fillStyle = '#8b5cf6'; break;         // Violet
-          }
-        } else {
-          ctx.fillStyle = isLight ? '#64748b' : '#94a3b8'; // Slate
+        switch (node.sourceType) {
+          case 'voice': ctx.fillStyle = '#10b981'; break;   // Emerald
+          case 'clip': ctx.fillStyle = '#f59e0b'; break;    // Amber
+          case 'file': ctx.fillStyle = '#ec4899'; break;    // Pink
+          case 'bookmark': ctx.fillStyle = '#3b82f6'; break;// Blue
+          default: ctx.fillStyle = '#8b5cf6'; break;         // Violet
         }
 
         ctx.fill();
 
-        // Node Glow Ring
-        if (node === this.hoveredNode || node === this.selectedNode) {
+        // Node Glow Ring on Hover
+        if (isHovered) {
           ctx.lineWidth = 3;
           ctx.strokeStyle = isLight ? '#d97706' : '#ffffff';
           ctx.stroke();
         }
 
-        // Draw Crisp High-Contrast Labels
-        if (node.type === 'note' || node === this.hoveredNode || this.transform.k > 0.8) {
+        // Draw Crisp Labels ONLY on Hover/Selected or High Zoom Level to Eliminate Clutter
+        if (isHovered || this.transform.k > 1.3) {
           ctx.font = '600 12px "Inter", -apple-system, sans-serif';
           const labelText = node.label.length > 24 ? node.label.substring(0, 22) + '...' : node.label;
           const textWidth = ctx.measureText(labelText).width;
 
           // Draw pill backdrop
-          ctx.fillStyle = isLight ? 'rgba(255, 255, 255, 0.9)' : 'rgba(22, 18, 40, 0.88)';
+          ctx.fillStyle = isLight ? 'rgba(255, 255, 255, 0.95)' : 'rgba(22, 18, 40, 0.92)';
           if (ctx.roundRect) {
             ctx.beginPath();
-            ctx.roundRect(node.x + node.radius + 4, node.y - 10, textWidth + 8, 16, 4);
+            ctx.roundRect(node.x + node.radius + 4, node.y - 10, textWidth + 10, 18, 5);
             ctx.fill();
           }
 
           ctx.fillStyle = isLight ? '#0f172a' : '#ffffff';
-          ctx.fillText(labelText, node.x + node.radius + 8, node.y + 2);
+          ctx.fillText(labelText, node.x + node.radius + 9, node.y + 3);
         }
       });
+
+      ctx.globalAlpha = 1;
 
       ctx.restore();
     },
