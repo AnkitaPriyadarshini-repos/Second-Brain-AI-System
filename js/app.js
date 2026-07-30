@@ -2219,7 +2219,7 @@
       window.renderActiveChatThread();
       renderChatThreadsList();
       if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
-      showToast('New Chat thread started.');
+      window.location.reload();
     };
 
     window.switchChatThread = function(threadId) {
