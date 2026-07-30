@@ -1920,7 +1920,7 @@
 
     function cleanRogueText(text) {
       if (!text) return '';
-      return text
+      let cleaned = text
         .replace(/###?\s*✨?\s*Juno AI Assistant.*(?=\n|$)/gi, '')
         .replace(/###?\s*Grounded Insight from Your Second Brain.*(?=\n|$)/gi, '')
         .replace(/Based on your saved note.*(?=\n|$)/gi, '')
@@ -1940,6 +1940,15 @@
         .replace(/•\s*\*\*Live Cloud Integration\*\*:[\s\S]*/gi, '')
         .replace(/\.\s*\./g, '.')
         .trim();
+
+      if (cleaned.includes('\n\n')) {
+        const paragraphs = cleaned.split('\n\n').map(p => p.trim()).filter(Boolean);
+        if (paragraphs.length > 1 && (paragraphs[0].startsWith('Urban density') || paragraphs[1].startsWith('During non-REM'))) {
+          cleaned = paragraphs[0];
+        }
+      }
+
+      return cleaned;
     }
 
     function formatMarkdownText(text) {

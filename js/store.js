@@ -490,7 +490,44 @@
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            parsed.forEach(t => {
+              if (t && Array.isArray(t.messages)) {
+                t.messages.forEach(m => {
+                  if (m && m.role === 'assistant' && typeof m.content === 'string') {
+                    let cleaned = m.content
+                      .replace(/###?\s*✨?\s*Juno AI Assistant.*(?=\n|$)/gi, '')
+                      .replace(/###?\s*Grounded Insight from Your Second Brain.*(?=\n|$)/gi, '')
+                      .replace(/Based on your saved note.*(?=\n|$)/gi, '')
+                      .replace(/Found \d+ relevant notes.*(?=\n|$)/gi, '')
+                      .replace(/####?\s*\d+\.\s+.*(?=\n|$)/gi, '')
+                      .replace(/Thank you for your prompt:.*(?=\n|$)/gi, '')
+                      .replace(/^#\s*$/gm, '')
+                      .replace(/\(Ref item \d+: [^)]+\)/gi, '')
+                      .replace(/\*?Tags:\*?.*(?=\n|$)/gi, '')
+                      .replace(/---?\s*####?\s*Actionable Takeaways:[\s\S]*/gi, '')
+                      .replace(/•\s*\*\*Core Concept\*\*:[\s\S]*/gi, '')
+                      .replace(/•\s*\*\*Surfaces Ingested\*\*:[\s\S]*/gi, '')
+                      .replace(/•\s*\*\*Next Steps\*\*:[\s\S]*/gi, '')
+                      .replace(/####?\s*💡?\s*Key Architectural Takeaways:[\s\S]*/gi, '')
+                      .replace(/•\s*\*\*Autonomous Agent Execution\*\*:[\s\S]*/gi, '')
+                      .replace(/•\s*\*\*High Throughput\*\*:[\s\S]*/gi, '')
+                      .replace(/•\s*\*\*Live Cloud Integration\*\*:[\s\S]*/gi, '')
+                      .replace(/\.\s*\./g, '.')
+                      .trim();
+                    if (cleaned.includes('\n\n')) {
+                      const paragraphs = cleaned.split('\n\n').map(p => p.trim()).filter(Boolean);
+                      if (paragraphs.length > 1 && (paragraphs[0].startsWith('Urban density') || paragraphs[1].startsWith('During non-REM'))) {
+                        cleaned = paragraphs[0];
+                      }
+                    }
+                    m.content = cleaned;
+                  }
+                });
+              }
+            });
+            return parsed;
+          }
         } catch (e) { }
       }
       // Initial clean default conversation thread (Starts on clean main hero screen)
