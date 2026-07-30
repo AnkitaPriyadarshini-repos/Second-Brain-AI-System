@@ -1918,9 +1918,21 @@
       }[tag] || tag));
     }
 
+    function cleanRogueText(text) {
+      if (!text) return '';
+      return text
+        .replace(/^#\s*$/gm, '')
+        .replace(/####?\s*💡?\s*Key Architectural Takeaways:[\s\S]*/gi, '')
+        .replace(/•\s*\*\*Autonomous Agent Execution\*\*:[\s\S]*/gi, '')
+        .replace(/•\s*\*\*High Throughput\*\*:[\s\S]*/gi, '')
+        .replace(/•\s*\*\*Live Cloud Integration\*\*:[\s\S]*/gi, '')
+        .trim();
+    }
+
     function formatMarkdownText(text) {
       if (!text) return '';
-      return escapeHTML(text)
+      const cleaned = cleanRogueText(text);
+      return escapeHTML(cleaned)
         .replace(/### (.*?)(?=<br>|\n|$)/g, '<h3 style="color: var(--accent-indigo); margin: 12px 0 6px;">$1</h3>')
         .replace(/#### (.*?)(?=<br>|\n|$)/g, '<h4 style="color: var(--text-primary); margin: 10px 0 4px;">$1</h4>')
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -2169,7 +2181,10 @@
       } else {
         if (heroView) heroView.style.display = 'none';
         msgs.forEach(m => {
-          appendChatMessage(m.role === 'user' ? 'user' : 'ai', m.content, [], false, '', m.provider);
+          const cleanedText = cleanRogueText(m.content);
+          if (cleanedText) {
+            appendChatMessage(m.role === 'user' ? 'user' : 'ai', cleanedText, [], false, '', m.provider);
+          }
         });
       }
     };
