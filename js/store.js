@@ -494,21 +494,13 @@
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         } catch (e) { }
       }
-      // Initial default conversation thread
+      // Initial default conversation thread (Starts on clean hero view with astronaut)
       const defaultThread = {
         id: 'thread-default',
-        title: 'Welcome to Juno AI',
+        title: 'New Chat',
         createdAt: Date.now(),
         updatedAt: Date.now(),
-        messages: [
-          {
-            id: 'msg-welcome',
-            role: 'assistant',
-            content: '### 👋 Welcome to Juno AI Studio!\n\nI am your **AI Thinking Partner & Grounded Research Assistant**, combining the visual excellence of **Google Gemini** and the multi-turn conversational power of **ChatGPT**.\n\n#### 🚀 Quick Start Features:\n- 🤖 **Multi-Model Switching**: Choose between Gemini 1.5 Flash/Pro, GPT-4o, or On-Device Local RAG Engine.\n- 🗝️ **Custom API Keys**: Plug in your Google Gemini or OpenAI API Key in **Settings** for unlimited cloud completions.\n- 📚 **Grounded RAG Knowledge**: Upload documents or query your 100+ saved notes with zero hallucination.\n- 🎙️ **Voice & Audio**: Speak out loud with speech recognition and read answers back with voice synthesis.\n\nHow can I assist your research today?',
-            timestamp: Date.now(),
-            provider: 'Juno On-Device Intelligence Engine'
-          }
-        ]
+        messages: []
       };
       this._setItem('second_brain_chat_threads_v1', JSON.stringify([defaultThread]));
       return [defaultThread];
