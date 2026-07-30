@@ -1922,6 +1922,10 @@
       if (!text) return '';
       return text
         .replace(/###?\s*✨?\s*Juno AI Assistant.*(?=\n|$)/gi, '')
+        .replace(/###?\s*Grounded Insight from Your Second Brain.*(?=\n|$)/gi, '')
+        .replace(/Based on your saved note.*(?=\n|$)/gi, '')
+        .replace(/Found \d+ relevant notes.*(?=\n|$)/gi, '')
+        .replace(/####?\s*\d+\.\s+.*(?=\n|$)/gi, '')
         .replace(/Thank you for your prompt:.*(?=\n|$)/gi, '')
         .replace(/^#\s*$/gm, '')
         .replace(/\(Ref item \d+: [^)]+\)/gi, '')

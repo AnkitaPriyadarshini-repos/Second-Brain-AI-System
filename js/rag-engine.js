@@ -117,27 +117,17 @@
       if (retrievedNotes.length === 0) return '';
 
       const topNote = retrievedNotes[0];
-      let synthesis = `### Grounded Insight from Your Second Brain\n\n`;
-
+      const cleanContent = (topNote.content || '').replace(/\(Ref item \d+: [^)]+\)/gi, '').trim();
+      
       if (retrievedNotes.length === 1) {
-        const cleanContent = (topNote.content || '').replace(/\(Ref item \d+: [^)]+\)/gi, '').trim();
-        synthesis += `Based on your saved note **"${topNote.title}"** (${topNote.dateStr}):\n\n`;
-        synthesis += `${cleanContent}\n\n`;
-        if (topNote.summary) {
-          const cleanSummary = (topNote.summary || '').replace(/\(Ref item \d+: [^)]+\)/gi, '').trim();
-          synthesis += `> **Key Summary**: ${cleanSummary}\n\n`;
-        }
-      } else {
-        synthesis += `Found **${retrievedNotes.length} relevant notes** in your vault addressing "${query}":\n\n`;
-        
-        retrievedNotes.forEach((note, idx) => {
-          synthesis += `#### ${idx + 1}. ${note.title} *(${note.sourceType.toUpperCase()} • ${note.dateStr})*\n`;
-          const rawSnippet = note.summary || note.content || '';
-          const textSnippet = rawSnippet.replace(/\(Ref item \d+: [^)]+\)/gi, '').trim();
-          synthesis += `${textSnippet.length > 280 ? textSnippet.substring(0, 280) + '...' : textSnippet}\n\n`;
-        });
+        return cleanContent;
       }
-      return synthesis;
+
+      // For multiple notes, merge snippets cleanly without headers or title numbers
+      return retrievedNotes.map(note => {
+        const rawSnippet = note.summary || note.content || '';
+        return rawSnippet.replace(/\(Ref item \d+: [^)]+\)/gi, '').trim();
+      }).join('\n\n');
     },
 
     /**
