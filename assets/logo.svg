@@ -1,49 +1,49 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
   <defs>
-    <!-- Seamless Liquid Purple Background Gradient -->
+    <!-- Warm Golden Amber Background Gradient -->
     <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#9333ea" />
-      <stop offset="40%" stop-color="#7e22ce" />
-      <stop offset="80%" stop-color="#6366f1" />
-      <stop offset="100%" stop-color="#4f46e5" />
+      <stop offset="0%" stop-color="#f5b041" />
+      <stop offset="40%" stop-color="#d68910" />
+      <stop offset="80%" stop-color="#b9770e" />
+      <stop offset="100%" stop-color="#7e5109" />
     </linearGradient>
 
-    <radialGradient id="bgGlow" cx="50%" cy="40%" r="60%">
-      <stop offset="0%" stop-color="#c084fc" stop-opacity="0.6" />
-      <stop offset="60%" stop-color="#7e22ce" stop-opacity="0.2" />
-      <stop offset="100%" stop-color="#4f46e5" stop-opacity="0" />
+    <radialGradient id="bgGlow" cx="50%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ffeaa7" stop-opacity="0.75" />
+      <stop offset="50%" stop-color="#f5b041" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#7e5109" stop-opacity="0" />
     </radialGradient>
 
-    <!-- Liquid Chrome Metallic Base Gradient -->
+    <!-- Liquid Gold Chrome Base Gradient -->
     <linearGradient id="chromeBase" x1="15%" y1="0%" x2="85%" y2="100%">
       <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="20%" stop-color="#e0f2fe" />
-      <stop offset="45%" stop-color="#7dd3fc" />
-      <stop offset="65%" stop-color="#0284c7" />
-      <stop offset="85%" stop-color="#1e3a8a" />
-      <stop offset="100%" stop-color="#312e81" />
+      <stop offset="22%" stop-color="#fff8e7" />
+      <stop offset="45%" stop-color="#f7dc6f" />
+      <stop offset="68%" stop-color="#d68910" />
+      <stop offset="88%" stop-color="#7e5109" />
+      <stop offset="100%" stop-color="#4a3000" />
     </linearGradient>
 
-    <!-- Specular White Ridge Highlight -->
+    <!-- Specular White-Gold Ridge Highlight -->
     <linearGradient id="specularHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#ffffff" stop-opacity="0.98" />
-      <stop offset="35%" stop-color="#bae6fd" stop-opacity="0.85" />
-      <stop offset="70%" stop-color="#38bdf8" stop-opacity="0.4" />
+      <stop offset="35%" stop-color="#ffeaa7" stop-opacity="0.9" />
+      <stop offset="70%" stop-color="#f5b041" stop-opacity="0.5" />
       <stop offset="100%" stop-color="#ffffff" stop-opacity="0.95" />
     </linearGradient>
 
-    <!-- Deep Metallic Reflection Gradient -->
+    <!-- Deep Metallic Amber Reflection Gradient -->
     <linearGradient id="chromeReflection" x1="100%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="30%" stop-color="#a5f3fc" />
-      <stop offset="60%" stop-color="#0052cc" />
-      <stop offset="100%" stop-color="#091e42" />
+      <stop offset="30%" stop-color="#ffeaa7" />
+      <stop offset="60%" stop-color="#d68910" />
+      <stop offset="100%" stop-color="#3e2723" />
     </linearGradient>
 
     <!-- Drop Shadows & Glow Filters -->
     <filter id="starShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#1e1b4b" flood-opacity="0.45" />
-      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0052cc" flood-opacity="0.3" />
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#3e2723" flood-opacity="0.4" />
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#d68910" flood-opacity="0.3" />
     </filter>
 
     <filter id="starGlow" x="-30%" y="-30%" width="160%" height="160%">
@@ -52,20 +52,20 @@
     </filter>
   </defs>
 
-  <!-- Squircle Purple Container -->
+  <!-- Squircle Golden Amber Container -->
   <rect x="25" y="25" width="450" height="450" rx="105" ry="105" fill="url(#bgGradient)" />
   <rect x="25" y="25" width="450" height="450" rx="105" ry="105" fill="url(#bgGlow)" />
-  <rect x="25" y="25" width="450" height="450" rx="105" ry="105" fill="none" stroke="rgba(255, 255, 255, 0.25)" stroke-width="3" />
+  <rect x="25" y="25" width="450" height="450" rx="105" ry="105" fill="none" stroke="rgba(255, 255, 255, 0.45)" stroke-width="3" />
 
   <!-- Ambient Light Reflection on Squircle -->
-  <path d="M50 35 C180 28, 320 28, 450 35 C420 70, 80 70, 50 35 Z" fill="#ffffff" opacity="0.15" />
+  <path d="M50 35 C180 28, 320 28, 450 35 C420 70, 80 70, 50 35 Z" fill="#ffffff" opacity="0.22" />
 
   <!-- Central Star Ambient Glow -->
   <g filter="url(#starGlow)">
-    <circle cx="250" cy="245" r="140" fill="#bae6fd" opacity="0.3" />
+    <circle cx="250" cy="245" r="140" fill="#ffeaa7" opacity="0.35" />
   </g>
 
-  <!-- 3D Liquid Chrome Metallic Star Geometry -->
+  <!-- 3D Liquid Gold Metallic Star Geometry -->
   <g filter="url(#starShadow)">
     <!-- Outer Smooth Liquid Star Path -->
     <path d="M250 85 
@@ -82,12 +82,12 @@
     <!-- Top Specular Ridge Highlight Facet -->
     <path d="M250 85 C256 170, 280 215, 412 218 C318 245, 272 265, 250 280 Z" 
           fill="url(#specularHighlight)" 
-          opacity="0.9" />
+          opacity="0.92" />
 
     <!-- Left Metallic Shadow Facet -->
     <path d="M250 85 C244 170, 220 215, 88 218 C182 245, 228 265, 250 280 Z" 
           fill="url(#chromeReflection)" 
-          opacity="0.8" />
+          opacity="0.82" />
 
     <!-- Lower Right Liquid Chrome Facet -->
     <path d="M250 280 C275 295, 310 330, 355 405 C295 355, 268 320, 250 280 Z" 
@@ -97,9 +97,9 @@
     <!-- Lower Left Liquid Chrome Facet -->
     <path d="M250 280 C225 295, 190 330, 145 405 C205 355, 232 320, 250 280 Z" 
           fill="url(#specularHighlight)" 
-          opacity="0.85" />
+          opacity="0.88" />
 
-    <!-- Center Liquid Chrome Core Starburst -->
+    <!-- Center Liquid Gold Core Starburst -->
     <circle cx="250" cy="245" r="16" fill="#ffffff" filter="url(#starGlow)" opacity="0.95" />
     <path d="M250 210 Q250 245 285 245 Q250 245 250 280 Q250 245 215 245 Q250 245 250 210 Z" fill="#ffffff" />
   </g>
