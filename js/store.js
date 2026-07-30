@@ -234,7 +234,7 @@
       const dateStr = `${month} ${day}, 2026`;
 
       const title = `${template.title} #${i}`;
-      const content = `${template.content} (Ref item ${i}: Detailed notes on ${topic.toLowerCase()} discussing implementation strategies and practical takeaways).`;
+      const content = template.content;
 
       const entities = nlp.extractEntities(title + ' ' + content);
       const tags = nlp.classifyTopics(title, content);

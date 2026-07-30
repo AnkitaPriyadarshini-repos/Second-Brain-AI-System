@@ -1924,6 +1924,8 @@
         .replace(/###?\s*✨?\s*Juno AI Assistant.*(?=\n|$)/gi, '')
         .replace(/Thank you for your prompt:.*(?=\n|$)/gi, '')
         .replace(/^#\s*$/gm, '')
+        .replace(/\(Ref item \d+: [^)]+\)/gi, '')
+        .replace(/\*?Tags:\*?.*(?=\n|$)/gi, '')
         .replace(/---?\s*####?\s*Actionable Takeaways:[\s\S]*/gi, '')
         .replace(/•\s*\*\*Core Concept\*\*:[\s\S]*/gi, '')
         .replace(/•\s*\*\*Surfaces Ingested\*\*:[\s\S]*/gi, '')
