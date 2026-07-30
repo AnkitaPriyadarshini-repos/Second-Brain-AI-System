@@ -485,16 +485,15 @@
       this.listeners.forEach(fn => fn(this.notes));
     },
 
-    // --- Chat Thread Persistence for ChatGPT / Gemini Interface ---
     getChatThreads: function () {
-      const saved = this._getItem('second_brain_chat_threads_v1');
+      const saved = this._getItem('second_brain_chat_threads_v2');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         } catch (e) { }
       }
-      // Initial default conversation thread (Starts on clean hero view with astronaut)
+      // Initial clean default conversation thread (Starts on clean main hero screen)
       const defaultThread = {
         id: 'thread-default',
         title: 'New Chat',
@@ -502,7 +501,8 @@
         updatedAt: Date.now(),
         messages: []
       };
-      this._setItem('second_brain_chat_threads_v1', JSON.stringify([defaultThread]));
+      this._setItem('second_brain_chat_threads_v2', JSON.stringify([defaultThread]));
+      this._setItem('second_brain_active_thread_id', 'thread-default');
       return [defaultThread];
     },
 
@@ -515,21 +515,21 @@
       } else {
         threads.unshift({ ...thread, updatedAt: Date.now() });
       }
-      this._setItem('second_brain_chat_threads_v1', JSON.stringify(threads));
+      this._setItem('second_brain_chat_threads_v2', JSON.stringify(threads));
     },
 
     deleteChatThread: function (id) {
       let threads = this.getChatThreads();
       threads = threads.filter(t => t.id !== id);
-      this._setItem('second_brain_chat_threads_v1', JSON.stringify(threads));
+      this._setItem('second_brain_chat_threads_v2', JSON.stringify(threads));
     },
 
     getActiveThreadId: function () {
-      return this._getItem('second_brain_active_thread_v1') || 'thread-default';
+      return this._getItem('second_brain_active_thread_v2') || 'thread-default';
     },
 
     setActiveThreadId: function (id) {
-      this._setItem('second_brain_active_thread_v1', id);
+      this._setItem('second_brain_active_thread_v2', id);
     }
   };
 
