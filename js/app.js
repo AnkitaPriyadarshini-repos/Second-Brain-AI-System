@@ -329,9 +329,9 @@
 
     // Theme Switcher Initialization
     const themeCardOpts = document.querySelectorAll('.theme-card-option');
-    let savedTheme = Store.settings.theme || 'royal-gold';
+    let savedTheme = Store.settings.theme || 'atlassian-azure';
     if (!savedTheme || ['gemini-dark', 'obsidian', 'sunflower-yellow'].includes(savedTheme)) {
-      savedTheme = 'royal-gold';
+      savedTheme = 'atlassian-azure';
     }
     applyTheme(savedTheme);
 

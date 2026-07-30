@@ -57,34 +57,35 @@ a, a:hover, a:visited, a:focus, a:active,
   --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Flagship Theme: Royal Amber & Amethyst Gold (Vibrant Amethyst & Gold Canvas) */
+/* Flagship Theme: Atlassian Electric Azure & Sky Blue (Confluence & Jira Aesthetic) */
+[data-theme="atlassian-azure"],
 [data-theme="royal-gold"],
 [data-theme="gemini-dark"],
 [data-theme="obsidian"] {
-  --bg-dark: #161228;
-  --bg-card: #221c3b;
-  --bg-card-hover: #2e2650;
-  --bg-card-active: #3a3064;
-  --border-color: rgba(251, 191, 36, 0.35);
-  --border-highlight: rgba(251, 191, 36, 0.75);
-  --border-accent: rgba(192, 132, 252, 0.6);
-  --text-primary: #ffffff;
-  --text-secondary: #e2e8f0;
-  --text-muted: #cbd5e1;
-  --accent-primary: #fbbf24;
-  --accent-primary-hover: #f59e0b;
-  --accent-primary-light: rgba(251, 191, 36, 0.22);
-  --accent-indigo: #c084fc;
-  --accent-violet: #e879f9;
-  --accent-emerald: #34d399;
-  --accent-amber: #fbbf24;
-  --accent-pink: #f472b6;
-  --accent-blue: #60a5fa;
-  --accent-cyan: #38bdf8;
-  --glow-1-color: rgba(251, 191, 36, 0.55);
-  --glow-2-color: rgba(192, 132, 252, 0.45);
-  --shadow-card: 0 10px 36px -4px rgba(0, 0, 0, 0.35), 0 0 24px 0 rgba(251, 191, 36, 0.25);
-  --shadow-glow: 0 4px 35px 0 rgba(251, 191, 36, 0.35);
+  --bg-dark: #f0f7ff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #e8f3ff;
+  --bg-card-active: #dbeafe;
+  --border-color: rgba(0, 82, 204, 0.18);
+  --border-highlight: rgba(0, 101, 255, 0.65);
+  --border-accent: rgba(0, 184, 217, 0.5);
+  --text-primary: #091e42;
+  --text-secondary: #253858;
+  --text-muted: #42526e;
+  --accent-primary: #0052cc;
+  --accent-primary-hover: #0065ff;
+  --accent-primary-light: rgba(0, 101, 255, 0.12);
+  --accent-indigo: #0747a6;
+  --accent-violet: #0052cc;
+  --accent-emerald: #00b8d9;
+  --accent-amber: #ffab00;
+  --accent-pink: #e60067;
+  --accent-blue: #0065ff;
+  --accent-cyan: #00b8d9;
+  --glow-1-color: rgba(0, 101, 255, 0.35);
+  --glow-2-color: rgba(0, 184, 217, 0.3);
+  --shadow-card: 0 8px 30px -4px rgba(0, 82, 204, 0.12), 0 2px 8px rgba(9, 30, 66, 0.06);
+  --shadow-glow: 0 4px 25px 0 rgba(0, 101, 255, 0.25);
 }
 
 /* Theme: Emerald Luxe & Titanium (Vibrant Jade & Gold Canvas) */
@@ -4287,21 +4288,21 @@ kbd {
   width: 100%;
   padding: 11px 18px;
   border-radius: var(--radius-full, 9999px);
-  background: linear-gradient(135deg, var(--accent-primary, #fbbf24) 0%, var(--accent-primary-hover, #f59e0b) 40%, var(--accent-indigo, #c084fc) 100%) !important;
-  color: #08070d !important;
+  background: linear-gradient(135deg, #0052cc 0%, #0065ff 100%) !important;
+  color: #ffffff !important;
   font-weight: 800 !important;
   font-size: 13.5px !important;
   letter-spacing: 0.02em !important;
-  border: 1px solid var(--border-highlight, rgba(251, 191, 36, 0.5)) !important;
+  border: 1px solid rgba(0, 101, 255, 0.4) !important;
   cursor: pointer;
-  box-shadow: var(--shadow-glow, 0 4px 20px -2px rgba(251, 191, 36, 0.4)), inset 0 1px 1px rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 82, 204, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .new-chat-btn:hover {
   transform: translateY(-2px) scale(1.01) !important;
-  box-shadow: 0 8px 25px 0 var(--accent-primary-light, rgba(251, 191, 36, 0.55)), inset 0 1px 1px rgba(255, 255, 255, 0.7) !important;
-  border-color: var(--accent-primary, #fbbf24) !important;
+  box-shadow: 0 8px 25px 0 rgba(0, 101, 255, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.6) !important;
+  border-color: #0065ff !important;
 }
 
 .gemini-sparkle-hero {
@@ -4312,15 +4313,15 @@ kbd {
   align-items: center;
   justify-content: center;
   margin-bottom: 24px;
-  background: radial-gradient(circle, var(--accent-primary-light, rgba(251, 191, 36, 0.25)) 0%, transparent 80%) !important;
-  border: 1px solid var(--border-highlight, rgba(251, 191, 36, 0.35)) !important;
-  box-shadow: 0 0 40px var(--accent-primary-light, rgba(251, 191, 36, 0.3)) !important;
+  background: radial-gradient(circle, rgba(0, 101, 255, 0.18) 0%, transparent 80%) !important;
+  border: 1px solid rgba(0, 82, 204, 0.3) !important;
+  box-shadow: 0 0 40px rgba(0, 101, 255, 0.2) !important;
 }
 
 .gemini-hero-title {
   font-size: 42px !important;
   font-weight: 800 !important;
-  background: linear-gradient(90deg, var(--text-primary, #ffffff) 0%, var(--accent-primary, #fbbf24) 40%, var(--accent-pink, #f472b6) 75%, var(--accent-indigo, #c084fc) 100%) !important;
+  background: linear-gradient(90deg, #091e42 0%, #0052cc 40%, #0065ff 75%, #00b8d9 100%) !important;
   background-size: 200% auto !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
@@ -4331,7 +4332,7 @@ kbd {
 
 [data-theme="platinum-gold"] .gemini-hero-title,
 [data-theme="gemini-light"] .gemini-hero-title {
-  background: linear-gradient(90deg, #1e1b4b 0%, #d97706 45%, #b45309 85%) !important;
+  background: linear-gradient(90deg, #091e42 0%, #0052cc 45%, #0065ff 85%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
 }
@@ -4339,15 +4340,15 @@ kbd {
 [data-theme="platinum-gold"] .prompt-card-item,
 [data-theme="gemini-light"] .prompt-card-item {
   background: #ffffff !important;
-  border-color: rgba(217, 119, 6, 0.3) !important;
-  box-shadow: 0 8px 28px -4px rgba(217, 119, 6, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 82, 204, 0.2) !important;
+  box-shadow: 0 8px 28px -4px rgba(0, 82, 204, 0.1), 0 2px 6px rgba(0, 0, 0, 0.03) !important;
 }
 
 [data-theme="platinum-gold"] .enterprise-prompt-container,
 [data-theme="gemini-light"] .enterprise-prompt-container {
   background: #ffffff !important;
-  border-color: rgba(217, 119, 6, 0.3) !important;
-  box-shadow: 0 8px 30px -4px rgba(217, 119, 6, 0.15) !important;
+  border-color: rgba(0, 82, 204, 0.25) !important;
+  box-shadow: 0 8px 30px -4px rgba(0, 82, 204, 0.12) !important;
 }
 
 .gemini-hero-sub {
@@ -4359,14 +4360,15 @@ kbd {
 }
 
 .gemini-send-btn {
-  background: linear-gradient(135deg, var(--accent-primary, #fbbf24), var(--accent-indigo, #a855f7)) !important;
-  color: #08070d !important;
-  box-shadow: 0 4px 16px var(--accent-primary-light, rgba(251, 191, 36, 0.4)) !important;
+  background: linear-gradient(135deg, #0052cc, #0065ff) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 16px rgba(0, 82, 204, 0.35) !important;
 }
 
 .gemini-send-btn:hover {
   transform: scale(1.06) !important;
-  box-shadow: 0 6px 22px var(--accent-primary, #fbbf24) !important;
+  box-shadow: 0 6px 22px rgba(0, 101, 255, 0.5) !important;
+}
 }
 
 

@@ -322,7 +322,7 @@
         try {
           this.settings = { ...this.settings, ...JSON.parse(savedSettings) };
           if (!this.settings.theme || ['gemini-dark', 'obsidian', 'sunflower-yellow'].includes(this.settings.theme)) {
-            this.settings.theme = 'royal-gold';
+            this.settings.theme = 'atlassian-azure';
             this.saveSettings();
           }
         } catch (e) { }

@@ -21,12 +21,19 @@
 
     // Color palettes for different themes tailored for Juno AI Yellow Moon & Premium Aesthetics
     palettes: {
+      'atlassian-azure': [
+        { r: 0,   g: 82,  b: 204, a: 0.38 }, // Electric Atlassian Azure Blue
+        { r: 0,   g: 101, b: 255, a: 0.35 }, // Vibrant Blue Glow
+        { r: 0,   g: 184, b: 217, a: 0.30 }, // Cyan Skylight Sparkle
+        { r: 7,   g: 71,  b: 166, a: 0.25 }, // Deep Ocean Blue
+        { r: 240, g: 247, b: 255, a: 0.60 }  // Sky Light Background
+      ],
       'royal-gold': [
-        { r: 251, g: 191, b: 36,  a: 0.38 }, // Shimmering Gold Aura
-        { r: 245, g: 158, b: 11,  a: 0.40 }, // Rich Amber Core
-        { r: 168, g: 85,  b: 247, a: 0.30 }, // Royal Amethyst Glow
-        { r: 192, g: 132, b: 252, a: 0.25 }, // Violet Starlight Sparkle
-        { r: 13,  g: 12,  b: 25,  a: 0.60 }  // Obsidian Deep Void
+        { r: 0,   g: 82,  b: 204, a: 0.38 }, // Electric Atlassian Azure Blue
+        { r: 0,   g: 101, b: 255, a: 0.35 }, // Vibrant Blue Glow
+        { r: 0,   g: 184, b: 217, a: 0.30 }, // Cyan Skylight Sparkle
+        { r: 7,   g: 71,  b: 166, a: 0.25 }, // Deep Ocean Blue
+        { r: 240, g: 247, b: 255, a: 0.60 }  // Sky Light Background
       ],
       'emerald-luxe': [
         { r: 16,  g: 185, b: 129, a: 0.38 }, // Emerald Velvet Spark
