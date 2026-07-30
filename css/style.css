@@ -3440,8 +3440,8 @@ kbd {
 .app-sidebar {
   width: 270px;
   min-width: 270px;
-  background: #171717;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-card) !important;
+  border-right: 1px solid var(--border-color) !important;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -3763,14 +3763,14 @@ kbd {
   position: relative;
 }
 
-/* Top Header Bar - Refined Dark Obsidian Style */
+/* Top Header Bar - Refined Style */
 .chat-top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px;
-  background: #171717;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-card) !important;
+  border-bottom: 1px solid var(--border-color) !important;
   z-index: 20;
 }
 
@@ -3781,8 +3781,8 @@ kbd {
 }
 
 .mobile-sidebar-toggle {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   color: var(--text-primary);
   border-radius: 8px;
   padding: 6px 10px;
@@ -3791,15 +3791,15 @@ kbd {
 }
 
 .mobile-sidebar-toggle:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-card-hover);
 }
 
 .model-picker-wrapper {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
   padding: 6px 12px;
   border-radius: 10px;
 }
@@ -3810,13 +3810,13 @@ kbd {
   outline: none;
   font-weight: 700;
   font-size: 13px;
-  color: #ffffff;
+  color: var(--text-primary) !important;
   cursor: pointer;
 }
 
 .model-select-dropdown option {
-  background: #1e1e20;
-  color: #ffffff;
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
 }
 
 .rag-mode-pill {
@@ -4321,7 +4321,7 @@ kbd {
 .gemini-hero-title {
   font-size: 42px !important;
   font-weight: 800 !important;
-  background: linear-gradient(90deg, #ffffff 0%, var(--accent-primary, #fbbf24) 35%, var(--accent-pink, #f472b6) 70%, var(--accent-indigo, #c084fc) 100%) !important;
+  background: linear-gradient(90deg, var(--text-primary, #ffffff) 0%, var(--accent-primary, #fbbf24) 40%, var(--accent-pink, #f472b6) 75%, var(--accent-indigo, #c084fc) 100%) !important;
   background-size: 200% auto !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
@@ -4330,9 +4330,25 @@ kbd {
   letter-spacing: -0.8px !important;
 }
 
-@keyframes geminiGradientShift {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
+[data-theme="platinum-gold"] .gemini-hero-title,
+[data-theme="gemini-light"] .gemini-hero-title {
+  background: linear-gradient(90deg, #1e1b4b 0%, #d97706 45%, #b45309 85%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+[data-theme="platinum-gold"] .prompt-card-item,
+[data-theme="gemini-light"] .prompt-card-item {
+  background: #ffffff !important;
+  border-color: rgba(217, 119, 6, 0.3) !important;
+  box-shadow: 0 8px 28px -4px rgba(217, 119, 6, 0.12), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="platinum-gold"] .enterprise-prompt-container,
+[data-theme="gemini-light"] .enterprise-prompt-container {
+  background: #ffffff !important;
+  border-color: rgba(217, 119, 6, 0.3) !important;
+  box-shadow: 0 8px 30px -4px rgba(217, 119, 6, 0.15) !important;
 }
 
 .gemini-hero-sub {
