@@ -4501,22 +4501,126 @@ kbd {
 /* -------------------------------------------------------------
    3D FLOATING ASTRONAUT HANGING ON ROPE (CONTRASTING EMBLEM)
    ------------------------------------------------------------- */
+/* -------------------------------------------------------------
+   BALANCED HERO COMPOSITION LAYOUT (IMMACULATE SPACING)
+   ------------------------------------------------------------- */
+.hero-elements-composition {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 950px;
+  margin: 10px auto 25px auto;
+}
+
+.glass-circular-card {
+  width: 430px;
+  height: 430px;
+  max-width: 85vw;
+  max-height: 85vw;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.28) !important;
+  backdrop-filter: blur(35px) !important;
+  -webkit-backdrop-filter: blur(35px) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.65) !important;
+  box-shadow: 0 25px 65px rgba(180, 130, 40, 0.22), inset 0 1px 3px rgba(255, 255, 255, 0.8) !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 35px;
+  position: relative;
+  z-index: 20;
+  text-align: center;
+}
+
+/* Left Flank: 3D Cybernetic Mechanical Bird Orb */
+.cybernetic-bird-wrapper {
+  position: absolute;
+  left: 25px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 155px;
+  height: 155px;
+  z-index: 15;
+  cursor: pointer;
+  filter: drop-shadow(0 15px 35px rgba(180, 130, 40, 0.3));
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: birdHover 6s ease-in-out infinite alternate;
+}
+
+.cybernetic-bird-wrapper:hover {
+  transform: translateY(-50%) scale(1.08) rotate(-4deg);
+}
+
+.cybernetic-bird-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 12px 35px rgba(214, 137, 16, 0.3);
+}
+
+.bird-tag {
+  position: absolute;
+  background: #3e2723;
+  color: #ffeaa7;
+  font-family: var(--font-code, monospace);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #d68910;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+.bird-tag-1 { top: 10px; right: -15px; }
+.bird-tag-2 { bottom: 15px; left: -15px; }
+
+.bird-speech-bubble {
+  position: absolute;
+  bottom: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  color: #3e2723;
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 11.5px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  border: 1.5px solid rgba(245, 176, 65, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.cybernetic-bird-wrapper:hover .bird-speech-bubble {
+  opacity: 1;
+  transform: translateX(-50%) translateY(4px);
+}
+
+/* Right Flank: 3D Floating Astronaut */
 .floating-astronaut-wrapper {
   position: absolute;
-  top: -15px;
-  right: 60px;
-  width: 175px;
-  height: 250px;
-  z-index: 45;
-  pointer-events: auto;
+  right: 25px;
+  top: 48%;
+  transform: translateY(-50%);
+  width: 150px;
+  height: 220px;
+  z-index: 15;
   cursor: pointer;
-  filter: drop-shadow(0 18px 35px rgba(0, 0, 0, 0.38));
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: drop-shadow(0 18px 35px rgba(0, 0, 0, 0.25));
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   animation: astronautHang 6.5s ease-in-out infinite alternate;
 }
 
 .floating-astronaut-wrapper:hover {
-  transform: scale(1.08) rotate(4deg);
+  transform: translateY(-50%) scale(1.08) rotate(4deg);
 }
 
 .floating-astronaut-img {
@@ -4549,99 +4653,20 @@ kbd {
   transform: translateX(-50%) translateY(6px);
 }
 
-@keyframes astronautHang {
-  0% { transform: translateY(0px) rotate(-3deg); }
-  50% { transform: translateY(14px) rotate(4deg); }
-  100% { transform: translateY(-8px) rotate(-2deg); }
-}
-
-@media (max-width: 900px) {
-  .floating-astronaut-wrapper {
-    width: 120px;
-    height: 180px;
-    right: 15px;
-    top: -10px;
-  }
-}
-
-/* -------------------------------------------------------------
-   3D CYBERNETIC MECHANICAL BIRD (PINTEREST FEATURED HERO AVATAR)
-   ------------------------------------------------------------- */
-.cybernetic-bird-wrapper {
-  position: absolute;
-  top: 15px;
-  left: 50px;
-  width: 200px;
-  height: 220px;
-  z-index: 45;
-  cursor: pointer;
-  filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.35));
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  animation: birdHover 7s ease-in-out infinite alternate;
-}
-
-.cybernetic-bird-wrapper:hover {
-  transform: scale(1.08) rotate(-3deg);
-}
-
-.cybernetic-bird-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 18px;
-  border: 1.5px solid rgba(245, 176, 65, 0.7);
-  box-shadow: 0 10px 30px rgba(214, 137, 16, 0.25);
-}
-
-.bird-tag {
-  position: absolute;
-  background: #3e2723;
-  color: #ffeaa7;
-  font-family: var(--font-code, monospace);
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px solid #d68910;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  pointer-events: none;
-}
-
-.bird-tag-1 { top: 20px; right: -15px; }
-.bird-tag-2 { bottom: 35px; left: -15px; }
-
-.bird-speech-bubble {
-  position: absolute;
-  bottom: -22px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #ffffff;
-  color: #3e2723;
-  padding: 6px 14px;
-  border-radius: 16px;
-  font-size: 11.5px;
-  font-weight: 800;
-  white-space: nowrap;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  border: 1.5px solid rgba(245, 176, 65, 0.5);
-  opacity: 0;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  pointer-events: none;
-}
-
-.cybernetic-bird-wrapper:hover .bird-speech-bubble {
-  opacity: 1;
-  transform: translateX(-50%) translateY(4px);
-}
-
 @keyframes birdHover {
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-12px) rotate(-2deg); }
-  100% { transform: translateY(6px) rotate(1deg); }
+  0% { transform: translateY(-50%) translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-50%) translateY(-10px) rotate(-2deg); }
+  100% { transform: translateY(-50%) translateY(6px) rotate(1deg); }
 }
 
-@media (max-width: 1100px) {
-  .cybernetic-bird-wrapper {
+@keyframes astronautHang {
+  0% { transform: translateY(-50%) translateY(0px) rotate(-2deg); }
+  50% { transform: translateY(-50%) translateY(12px) rotate(3deg); }
+  100% { transform: translateY(-50%) translateY(-8px) rotate(-1deg); }
+}
+
+@media (max-width: 1000px) {
+  .cybernetic-bird-wrapper, .floating-astronaut-wrapper {
     display: none;
   }
 }
