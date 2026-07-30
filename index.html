@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="gemini-dark">
+<html lang="en" data-theme="royal-gold">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -109,7 +109,7 @@
           <span class="pulse-dot"></span>
           <span>Local RAG</span>
         </div>
-        <button class="theme-pill-btn" onclick="window.applyTheme(document.documentElement.getAttribute('data-theme') === 'gemini-dark' ? 'obsidian' : 'gemini-dark')">Theme</button>
+        <button class="theme-pill-btn" onclick="const current = document.documentElement.getAttribute('data-theme'); const next = current === 'royal-gold' ? 'emerald-luxe' : (current === 'emerald-luxe' ? 'sapphire-platinum' : (current === 'sapphire-platinum' ? 'gemini-dark' : 'royal-gold')); window.applyTheme(next);">✨ Theme</button>
       </div>
     </aside>
 
@@ -170,14 +170,14 @@
                 <svg width="68" height="68" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <defs>
                     <linearGradient id="junoHeroStardum" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                      <stop offset="0%" stop-color="#6366f1"/>
-                      <stop offset="35%" stop-color="#a855f7"/>
-                      <stop offset="70%" stop-color="#ec4899"/>
-                      <stop offset="100%" stop-color="#f59e0b"/>
+                      <stop offset="0%" stop-color="#fbbf24"/>
+                      <stop offset="35%" stop-color="#f59e0b"/>
+                      <stop offset="70%" stop-color="#f472b6"/>
+                      <stop offset="100%" stop-color="#c084fc"/>
                     </linearGradient>
                   </defs>
                   <path d="M20 2L24.2 14.8L37 19L24.2 23.2L20 36L15.8 23.2L3 19L15.8 14.8L20 2Z" fill="url(#junoHeroStardum)"/>
-                  <circle cx="31" cy="9" r="3" fill="#f472b6" opacity="0.9"/>
+                  <circle cx="31" cy="9" r="3" fill="#fbbf24" opacity="0.9"/>
                 </svg>
               </div>
 
@@ -954,6 +954,31 @@
     <section id="view-settings" class="view-section" aria-label="Settings & Privacy Console">
       <div class="glass-card settings-card">
         <h2 class="hero-title" style="font-size: 22px; text-align: left;">System Settings & Data Vault Management</h2>
+
+        <div class="setting-item" style="flex-direction: column; align-items: flex-start; gap: 16px;">
+          <div class="setting-info" style="max-width: 100%;">
+            <h3>✨ Premium Visual Themes &amp; Color Palettes</h3>
+            <p>Select your preferred luxury theme aesthetic and dynamic canvas backdrop palette.</p>
+          </div>
+          <div class="theme-grid-picker">
+            <div class="theme-card-option active" data-theme="royal-gold">
+              <span class="theme-swatch-dot theme-swatch-royal-gold"></span>
+              <span>✨ Royal Gold</span>
+            </div>
+            <div class="theme-card-option" data-theme="emerald-luxe">
+              <span class="theme-swatch-dot theme-swatch-emerald-luxe"></span>
+              <span>💎 Emerald Luxe</span>
+            </div>
+            <div class="theme-card-option" data-theme="sapphire-platinum">
+              <span class="theme-swatch-dot theme-swatch-sapphire-platinum"></span>
+              <span>⚡ Sapphire Platinum</span>
+            </div>
+            <div class="theme-card-option" data-theme="gemini-dark">
+              <span class="theme-swatch-dot theme-swatch-obsidian"></span>
+              <span>🌙 Obsidian Amber</span>
+            </div>
+          </div>
+        </div>
 
         <div class="setting-item">
           <div class="setting-info">

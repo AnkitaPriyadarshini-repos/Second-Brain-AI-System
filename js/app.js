@@ -328,13 +328,16 @@
     }
 
     // Theme Switcher Initialization
-    let savedTheme = Store.settings.theme || 'gemini-dark';
-    if (savedTheme === 'sunflower-yellow' || savedTheme === 'gemini-light') {
-      savedTheme = 'gemini-dark';
+    const themeCardOpts = document.querySelectorAll('.theme-card-option');
+    let savedTheme = Store.settings.theme || 'royal-gold';
+    const validThemes = ['royal-gold', 'emerald-luxe', 'sapphire-platinum', 'gemini-dark', 'obsidian'];
+    if (!validThemes.includes(savedTheme)) {
+      savedTheme = 'royal-gold';
     }
     applyTheme(savedTheme);
 
-    themePillBtns.forEach(btn => {
+    const allThemeButtons = [...themePillBtns, ...themeCardOpts];
+    allThemeButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         const theme = btn.getAttribute('data-theme');
         if (theme) {
@@ -345,21 +348,27 @@
     });
 
     function applyTheme(themeName) {
+      if (!themeName) return;
       const root = document.documentElement || document.body || (typeof document !== 'undefined' ? document.querySelector('html') : null);
       if (root && typeof root.setAttribute === 'function') {
         root.setAttribute('data-theme', themeName);
       }
-      themePillBtns.forEach(b => {
+      
+      const themeElements = document.querySelectorAll('.theme-pill-btn, .theme-card-option');
+      themeElements.forEach(b => {
         if (b.getAttribute('data-theme') === themeName) {
           b.classList.add('active');
         } else {
           b.classList.remove('active');
         }
       });
-      if (typeof GeminiColorFlowEngine !== 'undefined') {
+
+      if (typeof GeminiColorFlowEngine !== 'undefined' && GeminiColorFlowEngine.setThemePalette) {
         GeminiColorFlowEngine.setThemePalette(themeName);
       }
     }
+
+    window.applyTheme = applyTheme;
 
     // Init Voice Engine Callback
     if (typeof VoiceEngine !== 'undefined') {

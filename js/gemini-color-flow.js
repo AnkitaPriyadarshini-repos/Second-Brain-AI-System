@@ -10,7 +10,7 @@
     canvas: null,
     ctx: null,
     animId: null,
-    theme: 'gemini-light', // 'gemini-light' | 'gemini-dark' | 'obsidian'
+    theme: 'royal-gold', // 'royal-gold' | 'emerald-luxe' | 'sapphire-platinum' | 'gemini-dark' | 'obsidian' | 'gemini-light'
     speedPreset: 'swift',  // 'gentle' | 'swift' | 'hyper'
     speedMultiplier: 1.2,
     currentState: 'idle',  // 'idle' | 'listening' | 'thinking' | 'responding'
@@ -19,8 +19,29 @@
 
     nodes: [],
 
-    // Color palettes for different themes tailored for Juno AI Yellow Moon aesthetic
+    // Color palettes for different themes tailored for Juno AI Yellow Moon & Premium Aesthetics
     palettes: {
+      'royal-gold': [
+        { r: 251, g: 191, b: 36,  a: 0.38 }, // Shimmering Gold Aura
+        { r: 245, g: 158, b: 11,  a: 0.40 }, // Rich Amber Core
+        { r: 168, g: 85,  b: 247, a: 0.30 }, // Royal Amethyst Glow
+        { r: 192, g: 132, b: 252, a: 0.25 }, // Violet Starlight Sparkle
+        { r: 13,  g: 12,  b: 25,  a: 0.60 }  // Obsidian Deep Void
+      ],
+      'emerald-luxe': [
+        { r: 16,  g: 185, b: 129, a: 0.38 }, // Emerald Velvet Spark
+        { r: 5,   g: 150, b: 105, a: 0.35 }, // Deep Forest Jade
+        { r: 245, g: 158, b: 11,  a: 0.28 }, // Titanium Gold Highlight
+        { r: 52,  g: 211, b: 153, a: 0.25 }, // Mint Shimmer
+        { r: 13,  g: 30,  b: 22,  a: 0.60 }  // Velvet Slate Shadow
+      ],
+      'sapphire-platinum': [
+        { r: 56,  g: 189, b: 248, a: 0.38 }, // Sapphire Platinum Ice
+        { r: 129, g: 140, b: 248, a: 0.35 }, // Electric Indigo Aura
+        { r: 192, g: 132, b: 252, a: 0.25 }, // Crystal Violet
+        { r: 6,   g: 182, b: 212, a: 0.25 }, // Cyan Spark
+        { r: 15,  g: 25,  b: 44,  a: 0.60 }  // Deep Oceanic Obsidian
+      ],
       'gemini-light': [
         { r: 66,  g: 133, b: 244, a: 0.15 }, // Subtle Blue Glow
         { r: 155, g: 81,  b: 224, a: 0.15 }, // Subtle Purple Glow
@@ -122,6 +143,10 @@
         document.documentElement.setAttribute('data-theme', newTheme);
       }
       this.initNodes();
+    },
+
+    setThemePalette: function (newTheme) {
+      this.setTheme(newTheme);
     },
 
     setSpeed: function (preset) {

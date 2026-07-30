@@ -181,9 +181,15 @@ console.log('\nSuite 7: Gemini Dynamic Color Flow Engine');
 
 test('GeminiColorFlowEngine should initialize with theme and speed controls', () => {
   const GeminiColorFlowEngine = require('../js/gemini-color-flow');
-  GeminiColorFlowEngine.setTheme('gemini-light');
-  assert.strictEqual(GeminiColorFlowEngine.theme, 'gemini-light');
-  assert.strictEqual(GeminiColorFlowEngine.nodes.length, 6);
+  GeminiColorFlowEngine.setTheme('royal-gold');
+  assert.strictEqual(GeminiColorFlowEngine.theme, 'royal-gold');
+  assert.strictEqual(GeminiColorFlowEngine.nodes.length, 5);
+
+  GeminiColorFlowEngine.setTheme('emerald-luxe');
+  assert.strictEqual(GeminiColorFlowEngine.theme, 'emerald-luxe');
+
+  GeminiColorFlowEngine.setTheme('sapphire-platinum');
+  assert.strictEqual(GeminiColorFlowEngine.theme, 'sapphire-platinum');
 
   GeminiColorFlowEngine.setSpeed('swift');
   assert.strictEqual(GeminiColorFlowEngine.speedPreset, 'swift');
