@@ -4310,6 +4310,8 @@ kbd {
 .telemetry-score { color: #10b981; }
 .telemetry-latency { color: #f59e0b; }
 
+.rag-mode-pill { display: none !important; }
+
 @media (max-width: 768px) {
   .prompt-cards-grid {
     grid-template-columns: 1fr;
