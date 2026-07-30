@@ -329,7 +329,7 @@
 
     // Theme Switcher Initialization
     const themeCardOpts = document.querySelectorAll('.theme-card-option');
-    let savedTheme = Store.settings.theme || 'grey-titanium';
+    let savedTheme = Store.settings.theme || 'royal-gold';
     applyTheme(savedTheme);
 
     const allThemeButtons = [...themePillBtns, ...themeCardOpts];

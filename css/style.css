@@ -4968,26 +4968,12 @@ kbd {
 }
 
 /* -------------------------------------------------------------
-   AMBIENT AUTUMN LEAF PARTICLES ENGINE (PINTEREST FEATURE)
+   AMBIENT AUTUMN LEAF PARTICLES ENGINE (DISABLED - ZERO LAG)
    ------------------------------------------------------------- */
-.ambient-leaves-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 2;
-  overflow: hidden;
-}
-
+.ambient-leaves-container,
 .ambient-leaf {
-  position: absolute;
-  top: -40px;
-  pointer-events: none;
-  animation: fallingLeaves linear infinite;
-  filter: drop-shadow(0 4px 10px rgba(214, 137, 16, 0.4));
-  user-select: none;
+  display: none !important;
+  pointer-events: none !important;
 }
 
 @keyframes fallingLeaves {
