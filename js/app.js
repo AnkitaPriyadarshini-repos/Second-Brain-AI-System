@@ -1938,6 +1938,7 @@
         .replace(/•\s*\*\*Autonomous Agent Execution\*\*:[\s\S]*/gi, '')
         .replace(/•\s*\*\*High Throughput\*\*:[\s\S]*/gi, '')
         .replace(/•\s*\*\*Live Cloud Integration\*\*:[\s\S]*/gi, '')
+        .replace(/\.\s*\./g, '.')
         .trim();
     }
 

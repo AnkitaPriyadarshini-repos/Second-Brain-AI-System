@@ -117,7 +117,7 @@
       if (retrievedNotes.length === 0) return '';
 
       const topNote = retrievedNotes[0];
-      const cleanContent = (topNote.content || '').replace(/\(Ref item \d+: [^)]+\)/gi, '').trim();
+      const cleanContent = (topNote.content || '').replace(/\(Ref item \d+: [^)]+\)/gi, '').replace(/\.\s*\./g, '.').trim();
       
       if (retrievedNotes.length === 1) {
         return cleanContent;
@@ -126,7 +126,7 @@
       // For multiple notes, merge snippets cleanly without headers or title numbers
       return retrievedNotes.map(note => {
         const rawSnippet = note.summary || note.content || '';
-        return rawSnippet.replace(/\(Ref item \d+: [^)]+\)/gi, '').trim();
+        return rawSnippet.replace(/\(Ref item \d+: [^)]+\)/gi, '').replace(/\.\s*\./g, '.').trim();
       }).join('\n\n');
     },
 
