@@ -465,6 +465,17 @@
       });
     }
 
+    window.submitCircularPrompt = function() {
+      const input = document.getElementById('circular-ai-prompt-input');
+      if (input && input.value.trim()) {
+        const query = input.value.trim();
+        input.value = '';
+        if (typeof handleRAGQuery === 'function') {
+          handleRAGQuery(query);
+        }
+      }
+    };
+
     if (voiceTriggerBtn) {
       voiceTriggerBtn.addEventListener('click', () => {
         if (typeof VoiceEngine !== 'undefined') {

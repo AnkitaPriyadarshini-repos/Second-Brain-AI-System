@@ -168,13 +168,19 @@
             <!-- Hero Welcome View (Shown on Empty Thread) -->
             <div id="chat-hero-view" class="chat-hero-view">
               
-              <!-- Frosted Glass Circular Login / Gateway Card (Exact Design Aesthetic) -->
+              <!-- Frosted Glass Circular AI Assistant Hub Card (Exact Design Aesthetic) -->
               <div class="glass-circular-card">
-                <h2 class="glass-circular-title">Login</h2>
-                <input type="email" class="glass-circular-input" placeholder="Email" value="ankita@secondbrain.ai" />
-                <input type="password" class="glass-circular-input" placeholder="Password" value="••••••••••••" />
-                <div class="glass-circular-subtext">Forget Password?</div>
-                <button class="glass-circular-btn" onclick="window.triggerSampleQuery('Rank the 10 largest AI infrastructure and data center projects in the world')">Login</button>
+                <div class="circular-hero-logo" style="margin-bottom: 12px;">
+                  <img src="assets/logo.svg" alt="Liquid Chrome Star Logo" width="60" height="60" style="object-fit: contain; filter: drop-shadow(0 4px 14px rgba(245, 176, 65, 0.4));" />
+                </div>
+                <h2 class="glass-circular-title" style="margin-bottom: 6px;">Juno AI</h2>
+                <p style="color: rgba(255, 255, 255, 0.95); font-size: 13.5px; margin-bottom: 22px; font-weight: 600; text-shadow: 0 1px 4px rgba(180, 130, 40, 0.3);">Talk to Jarvis &amp; Grounded Vault RAG</p>
+
+                <!-- Integrated AI Prompt Input Inside Circular Glass Card -->
+                <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+                  <input type="text" class="glass-circular-input" id="circular-ai-prompt-input" placeholder="Ask Juno AI anything..." onkeypress="if(event.key==='Enter') window.submitCircularPrompt()" />
+                  <button class="glass-circular-btn" onclick="window.submitCircularPrompt()">✨ Ask Juno AI</button>
+                </div>
               </div>
 
               <h1 class="gemini-hero-title">Hello, Ankita</h1>
