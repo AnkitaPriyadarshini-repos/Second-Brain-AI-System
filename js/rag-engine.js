@@ -32,6 +32,20 @@
         };
       }
 
+      // Intercept Casual Conversational Greetings ('hi', 'hello', 'hey', 'how are you') FIRST
+      const qClean = queryText.trim().toLowerCase().replace(/[^\w\s]/gi, '');
+      const greetings = ['hi', 'hii', 'hiii', 'hello', 'hey', 'heyy', 'greetings', 'good morning', 'good afternoon', 'good evening', 'who are you', 'what can you do', 'help', 'how are you', 'what is this', 'yo', 'sup'];
+      
+      if (greetings.includes(qClean)) {
+        return {
+          answer: `Hello Ankita! 👋 How can I help you today? Ask me anything about your saved notes, architecture, code, or technical ideas!`,
+          citations: [],
+          isGrounded: false,
+          isGeneralKnowledge: true,
+          modelUsed: this.activeModel
+        };
+      }
+
       // Check multi-turn follow-up
       let effectiveQuery = queryText;
       const isFollowUp = /(this topic|that|what else|more about|tell me more|on this)/i.test(queryText);
@@ -55,7 +69,9 @@
         const fullTextLower = fullText.toLowerCase();
         let keywordMatches = 0;
         qTokens.forEach(token => {
-          if (fullTextLower.includes(token)) keywordMatches++;
+          // Use exact word boundaries so 'hi' doesn't match 'machine', 'this', 'architecture', 'history'
+          const regex = new RegExp('\\b' + token + '\\b', 'i');
+          if (regex.test(fullTextLower)) keywordMatches++;
         });
 
         const combinedScore = simScore + (keywordMatches * 0.1);
