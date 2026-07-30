@@ -250,8 +250,8 @@
       if (savedSettings) {
         try {
           this.settings = { ...this.settings, ...JSON.parse(savedSettings) };
-          if (this.settings.theme === 'sunflower-yellow' || this.settings.theme === 'gemini-light') {
-            this.settings.theme = 'gemini-dark';
+          if (!this.settings.theme || ['gemini-dark', 'obsidian', 'sunflower-yellow'].includes(this.settings.theme)) {
+            this.settings.theme = 'royal-gold';
             this.saveSettings();
           }
         } catch (e) { }

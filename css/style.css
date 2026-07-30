@@ -58,7 +58,9 @@ a, a:hover, a:visited, a:focus, a:active,
 }
 
 /* Flagship Theme: Royal Amber & Amethyst Gold (Vibrant Amethyst & Gold Canvas) */
-[data-theme="royal-gold"] {
+[data-theme="royal-gold"],
+[data-theme="gemini-dark"],
+[data-theme="obsidian"] {
   --bg-dark: #161228;
   --bg-card: #221c3b;
   --bg-card-hover: #2e2650;
