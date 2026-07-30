@@ -575,6 +575,18 @@
       this._setItem('second_brain_chat_threads_v2', JSON.stringify(threads));
     },
 
+    clearAllChatMessages: function () {
+      const freshDefault = {
+        id: 'thread-default',
+        title: 'New Chat',
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        messages: []
+      };
+      this._setItem('second_brain_chat_threads_v2', JSON.stringify([freshDefault]));
+      this._setItem('second_brain_active_thread_v2', 'thread-default');
+    },
+
     getActiveThreadId: function () {
       return this._getItem('second_brain_active_thread_v2') || 'thread-default';
     },
