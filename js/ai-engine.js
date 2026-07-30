@@ -184,7 +184,18 @@ export function HydratedComponent({ data }) {
    * Main unified AI completion method supporting Gemini REST API, OpenAI REST API, and Local RAG Fallback
    */
   async generateResponse(options = {}) {
-    const { prompt, model = 'gemini-1.5-flash', systemPrompt = '', ragContext = '' } = options;
+    const { prompt = '', model = 'gemini-1.5-flash', systemPrompt = '', ragContext = '' } = options;
+
+    const qClean = (prompt || '').trim().toLowerCase().replace(/[^\w\s]/gi, '');
+    const greetings = ['hi', 'hii', 'hiii', 'hello', 'hey', 'heyy', 'greetings', 'good morning', 'good afternoon', 'good evening', 'who are you', 'what can you do', 'help', 'how are you', 'what is this', 'yo', 'sup'];
+    if (greetings.includes(qClean)) {
+      return {
+        text: "Hello Ankita! 👋 How can I help you today?",
+        provider: 'Juno AI Assistant',
+        grounded: false
+      };
+    }
+
     const keys = this.getAPIKeys();
 
     if (keys.geminiKey && (model.startsWith('gemini') || keys.preferredProvider === 'gemini')) {
@@ -288,6 +299,16 @@ export function HydratedComponent({ data }) {
   }
 
   fallbackSynthesize(prompt, model = 'juno-flash', ragContext = '') {
+    const qClean = (prompt || '').trim().toLowerCase().replace(/[^\w\s]/gi, '');
+    const greetings = ['hi', 'hii', 'hiii', 'hello', 'hey', 'heyy', 'greetings', 'good morning', 'good afternoon', 'good evening', 'who are you', 'what can you do', 'help', 'how are you', 'what is this', 'yo', 'sup'];
+    if (greetings.includes(qClean)) {
+      return {
+        text: "Hello Ankita! 👋 How can I help you today?",
+        provider: 'Juno AI Assistant',
+        grounded: false
+      };
+    }
+
     // Check if query asks for system design, scale, code, or architecture
     const isTechDeepDive = /design|architecture|distributed|queue|system|scale|code|algorithm|async|rate|database|api|transformer/i.test(prompt) || model === 'agentic-architect' || model === 'juno-pro' || model === 'gemini-1.5-pro';
 
