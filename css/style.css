@@ -61,9 +61,7 @@ a, a:hover, a:visited, a:focus, a:active,
 [data-theme="gold-glassmorphism"],
 [data-theme="sunflower-yellow"],
 [data-theme="royal-gold"],
-[data-theme="atlassian-azure"],
-[data-theme="gemini-dark"],
-[data-theme="obsidian"] {
+[data-theme="atlassian-azure"] {
   --bg-dark: #f2e4c6;
   --bg-card: rgba(255, 255, 255, 0.5);
   --bg-card-hover: rgba(255, 255, 255, 0.72);
@@ -88,6 +86,36 @@ a, a:hover, a:visited, a:focus, a:active,
   --glow-2-color: rgba(214, 137, 16, 0.35);
   --shadow-card: 0 20px 45px -5px rgba(180, 130, 40, 0.2), 0 4px 15px rgba(0, 0, 0, 0.05);
   --shadow-glow: 0 10px 35px 0 rgba(245, 176, 65, 0.4);
+}
+
+/* Flagship Theme: Sleek Grey Titanium Dark Interface (Matte Charcoal & Silver Slate Canvas) */
+[data-theme="grey-titanium"],
+[data-theme="gemini-dark"],
+[data-theme="obsidian"] {
+  --bg-dark: #121316;
+  --bg-card: rgba(30, 31, 36, 0.78);
+  --bg-card-hover: rgba(42, 44, 52, 0.88);
+  --bg-card-active: rgba(52, 54, 64, 0.95);
+  --border-color: rgba(255, 255, 255, 0.12);
+  --border-highlight: rgba(168, 85, 247, 0.5);
+  --border-accent: rgba(99, 102, 241, 0.5);
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-primary: #818cf8;
+  --accent-primary-hover: #6366f1;
+  --accent-primary-light: rgba(99, 102, 241, 0.18);
+  --accent-indigo: #818cf8;
+  --accent-violet: #a855f7;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-pink: #ec4899;
+  --accent-blue: #38bdf8;
+  --accent-cyan: #06b6d4;
+  --glow-1-color: rgba(99, 102, 241, 0.25);
+  --glow-2-color: rgba(168, 85, 247, 0.2);
+  --shadow-card: 0 15px 40px -5px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+  --shadow-glow: 0 10px 35px 0 rgba(99, 102, 241, 0.3);
 }
 
 /* Theme: Emerald Luxe & Titanium (Vibrant Jade & Gold Canvas) */

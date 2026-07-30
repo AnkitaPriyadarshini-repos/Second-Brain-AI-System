@@ -329,10 +329,7 @@
 
     // Theme Switcher Initialization
     const themeCardOpts = document.querySelectorAll('.theme-card-option');
-    let savedTheme = Store.settings.theme || 'gold-glassmorphism';
-    if (!savedTheme || ['gemini-dark', 'obsidian'].includes(savedTheme)) {
-      savedTheme = 'gold-glassmorphism';
-    }
+    let savedTheme = Store.settings.theme || 'grey-titanium';
     applyTheme(savedTheme);
 
     const allThemeButtons = [...themePillBtns, ...themeCardOpts];
