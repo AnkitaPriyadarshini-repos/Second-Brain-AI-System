@@ -153,6 +153,9 @@
             </div>
 
             <div class="chat-top-right">
+              <button class="top-action-btn" onclick="if(typeof TelemetryMeshEngine!=='undefined') TelemetryMeshEngine.toggle();" title="Toggle Cybernetic Telemetry Spatial HUD">
+                🛰️ <span class="hide-mobile">Telemetry HUD</span>
+              </button>
               <button class="top-action-btn" onclick="const current = document.documentElement.getAttribute('data-theme'); const next = (current === 'royal-gold' || current === 'gemini-dark' || current === 'obsidian') ? 'platinum-gold' : 'royal-gold'; window.applyTheme(next);" title="Toggle Theme Palette" style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(192, 132, 252, 0.2)); border: 1px solid rgba(251, 191, 36, 0.4); color: var(--accent-primary);">
                 ✨ <span>Switch Theme</span>
               </button>
@@ -1474,6 +1477,7 @@
   <script src="js/nexus-bot.js?v=51.0"></script>
   <script src="js/developer-hud.js?v=51.0"></script>
   <script src="js/ai-agents.js?v=51.0"></script>
+  <script src="js/telemetry-mesh.js?v=51.0"></script>
   <script src="js/app.js?v=51.0"></script>
 </body>
 </html>
