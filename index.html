@@ -450,39 +450,36 @@
       <div class="glass-card" style="padding: 24px; border-radius: 20px;">
         <div class="graph-header-row" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 18px;">
           <div>
-            <h2 class="section-heading" style="margin-bottom: 4px;">🧠 Interactive Knowledge Graph Network</h2>
+            <h2 class="section-heading" style="margin-bottom: 4px;">🕸️ Mind Map &amp; Knowledge Network</h2>
             <p class="section-subtext" style="margin-bottom: 0;">
-              Notes are connected automatically by shared NLP entities &amp; topic clusters. Click any node to open details, or drag to explore network topology.
+              Visual map of your saved ideas and their automatic connections. Click any node to explore.
             </p>
           </div>
-          <div class="graph-legend" style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; font-weight: 600;">
-            <span style="color: #8b5cf6;">● Typing Note</span>
-            <span style="color: #10b981;">● Voice Memo</span>
-            <span style="color: #f59e0b;">● Web Clip</span>
-            <span style="color: #3b82f6;">● Bookmark</span>
-            <span style="color: #ec4899;">● File OCR</span>
-            <span style="color: #64748b;">● Entity Node</span>
+          <div class="graph-legend" style="display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; font-weight: 600; color: var(--text-secondary);">
+            <span><strong style="color: #8b5cf6;">●</strong> Notes</span>
+            <span><strong style="color: #10b981;">●</strong> Voice Memos</span>
+            <span><strong style="color: #f59e0b;">●</strong> Web Clips</span>
+            <span><strong style="color: #ec4899;">●</strong> Documents</span>
           </div>
         </div>
 
         <!-- Graph Controls Bar -->
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; padding: 10px 16px; background: rgba(0,0,0,0.03); border-radius: 12px; border: 1px solid var(--border-color);">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; padding: 10px 16px; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-color);">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <span id="graph-node-count-badge" class="status-badge online">● Loading Graph...</span>
-            <select id="graph-filter-select" class="input-field" style="padding: 4px 10px; font-size: 12px; height: 32px; width: auto;" onchange="window.filterKnowledgeGraph(this.value)">
-              <option value="all">Filter: All Nodes &amp; Entities</option>
+            <span id="graph-node-count-badge" class="status-badge online">● Loading Map...</span>
+            <select id="graph-filter-select" class="input-field" style="padding: 4px 10px; font-size: 12px; height: 32px; width: auto; background: var(--bg-card); color: var(--text-primary);" onchange="window.filterKnowledgeGraph(this.value)">
+              <option value="all">Filter: All Topics</option>
               <option value="notes">Notes Only</option>
-              <option value="entities">Entities Only</option>
               <option value="voice">Voice Memos</option>
               <option value="clip">Web Clips</option>
-              <option value="file">File OCR</option>
+              <option value="file">Documents</option>
             </select>
           </div>
 
           <div style="display: flex; gap: 8px;">
-            <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px; height: 32px;" onclick="window.zoomKnowledgeGraph(1.2)" title="Zoom In">🔍 Zoom +</button>
-            <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px; height: 32px;" onclick="window.zoomKnowledgeGraph(0.8)" title="Zoom Out">🔍 Zoom -</button>
-            <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px; height: 32px;" onclick="window.resetKnowledgeGraph()" title="Reset Network Position">🔄 Reset Topology</button>
+            <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px; height: 32px;" onclick="window.zoomKnowledgeGraph(1.2)" title="Zoom In">🔍 Zoom In</button>
+            <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px; height: 32px;" onclick="window.zoomKnowledgeGraph(0.8)" title="Zoom Out">🔍 Zoom Out</button>
+            <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px; height: 32px;" onclick="window.resetKnowledgeGraph()" title="Center Map">🎯 Center View</button>
           </div>
         </div>
 

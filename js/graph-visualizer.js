@@ -202,7 +202,8 @@
       const width = this.cssWidth || 800;
       const height = this.cssHeight || 600;
 
-      const isLight = document.documentElement.getAttribute('data-theme') === 'sunflower-yellow' || !document.documentElement.getAttribute('data-theme');
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'royal-gold';
+      const isLight = currentTheme === 'platinum-gold' || currentTheme === 'gemini-light';
 
       ctx.clearRect(0, 0, width, height);
 
@@ -211,7 +212,7 @@
       ctx.scale(this.transform.k, this.transform.k);
 
       // Background Grid Dots
-      ctx.fillStyle = isLight ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.04)';
+      ctx.fillStyle = isLight ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.05)';
       for (let x = 20; x < width; x += 40) {
         for (let y = 20; y < height; y += 40) {
           ctx.beginPath();
@@ -229,7 +230,7 @@
         if (s && t) {
           ctx.beginPath();
           const isHighlighted = (this.hoveredNode && (this.hoveredNode.id === s.id || this.hoveredNode.id === t.id));
-          ctx.strokeStyle = isHighlighted ? (isLight ? '#d97706' : '#fbbf24') : (isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.14)');
+          ctx.strokeStyle = isHighlighted ? (isLight ? '#d97706' : '#fbbf24') : (isLight ? 'rgba(15, 23, 42, 0.16)' : 'rgba(255, 255, 255, 0.15)');
           ctx.lineWidth = isHighlighted ? 2.5 : 1;
           ctx.moveTo(s.x, s.y);
           ctx.lineTo(t.x, t.y);
@@ -251,7 +252,7 @@
             default: ctx.fillStyle = '#8b5cf6'; break;         // Violet
           }
         } else {
-          ctx.fillStyle = isLight ? '#475569' : '#94a3b8'; // Slate
+          ctx.fillStyle = isLight ? '#64748b' : '#94a3b8'; // Slate
         }
 
         ctx.fill();
@@ -263,12 +264,22 @@
           ctx.stroke();
         }
 
-        // Draw Labels
-        if (node.type === 'note' || node === this.hoveredNode) {
-          ctx.font = '600 12px -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif';
-          ctx.fillStyle = isLight ? '#422006' : '#f3f4f6';
-          const labelText = node.label.length > 22 ? node.label.substring(0, 20) + '...' : node.label;
-          ctx.fillText(labelText, node.x + node.radius + 5, node.y + 4);
+        // Draw Crisp High-Contrast Labels
+        if (node.type === 'note' || node === this.hoveredNode || this.transform.k > 0.8) {
+          ctx.font = '600 12px "Inter", -apple-system, sans-serif';
+          const labelText = node.label.length > 24 ? node.label.substring(0, 22) + '...' : node.label;
+          const textWidth = ctx.measureText(labelText).width;
+
+          // Draw pill backdrop
+          ctx.fillStyle = isLight ? 'rgba(255, 255, 255, 0.9)' : 'rgba(22, 18, 40, 0.88)';
+          if (ctx.roundRect) {
+            ctx.beginPath();
+            ctx.roundRect(node.x + node.radius + 4, node.y - 10, textWidth + 8, 16, 4);
+            ctx.fill();
+          }
+
+          ctx.fillStyle = isLight ? '#0f172a' : '#ffffff';
+          ctx.fillText(labelText, node.x + node.radius + 8, node.y + 2);
         }
       });
 
