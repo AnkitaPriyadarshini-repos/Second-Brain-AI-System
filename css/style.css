@@ -4748,6 +4748,29 @@ kbd {
   box-shadow: 0 0 10px #27ae60;
 }
 
+/* -------------------------------------------------------------
+   MODAL OVERLAYS (STRICT FIXED POSITIONING - ZERO INLINE BLEED)
+   ------------------------------------------------------------- */
+.modal-backdrop, .spec-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(15, 23, 42, 0.75) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  z-index: 10000 !important;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-backdrop.active, .spec-modal-overlay.active {
+  display: flex !important;
+}
+
 .hud-dot.pulsing {
   animation: hudPulse 1.5s ease-in-out infinite alternate;
 }
