@@ -153,6 +153,9 @@
             </div>
 
             <div class="chat-top-right">
+              <button class="top-action-btn" onclick="if(typeof CodeInspectorEngine!=='undefined') CodeInspectorEngine.openInspector();" title="Launch Live DOM Code Syntax Inspector">
+                💻 <span class="hide-mobile">Code Inspector</span>
+              </button>
               <button class="top-action-btn" onclick="if(typeof TelemetryMeshEngine!=='undefined') TelemetryMeshEngine.toggle();" title="Toggle Cybernetic Telemetry Spatial HUD">
                 🛰️ <span class="hide-mobile">Telemetry HUD</span>
               </button>
@@ -1504,6 +1507,8 @@
   <script src="js/developer-hud.js?v=51.0"></script>
   <script src="js/ai-agents.js?v=51.0"></script>
   <script src="js/telemetry-mesh.js?v=51.0"></script>
+  <script src="js/particles-engine.js?v=51.0"></script>
+  <script src="js/code-inspector.js?v=51.0"></script>
   <script src="js/app.js?v=51.0"></script>
 </body>
 </html>
