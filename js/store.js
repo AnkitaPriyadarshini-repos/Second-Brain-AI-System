@@ -321,8 +321,8 @@
       if (savedSettings) {
         try {
           this.settings = { ...this.settings, ...JSON.parse(savedSettings) };
-          if (!this.settings.theme || ['gemini-dark', 'obsidian', 'sunflower-yellow'].includes(this.settings.theme)) {
-            this.settings.theme = 'atlassian-azure';
+          if (!this.settings.theme || ['gemini-dark', 'obsidian'].includes(this.settings.theme)) {
+            this.settings.theme = 'gold-glassmorphism';
             this.saveSettings();
           }
         } catch (e) { }

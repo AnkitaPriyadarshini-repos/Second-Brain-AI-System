@@ -329,9 +329,9 @@
 
     // Theme Switcher Initialization
     const themeCardOpts = document.querySelectorAll('.theme-card-option');
-    let savedTheme = Store.settings.theme || 'atlassian-azure';
-    if (!savedTheme || ['gemini-dark', 'obsidian', 'sunflower-yellow'].includes(savedTheme)) {
-      savedTheme = 'atlassian-azure';
+    let savedTheme = Store.settings.theme || 'gold-glassmorphism';
+    if (!savedTheme || ['gemini-dark', 'obsidian'].includes(savedTheme)) {
+      savedTheme = 'gold-glassmorphism';
     }
     applyTheme(savedTheme);
 

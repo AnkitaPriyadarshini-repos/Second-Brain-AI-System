@@ -21,19 +21,26 @@
 
     // Color palettes for different themes tailored for Juno AI Yellow Moon & Premium Aesthetics
     palettes: {
+      'gold-glassmorphism': [
+        { r: 245, g: 176, b: 65,  a: 0.85 }, // Warm 3D Amber Orb Core
+        { r: 214, g: 137, b: 16,  a: 0.90 }, // Rich Golden Sphere Shadow
+        { r: 255, g: 230, b: 153, a: 0.95 }, // Specular Gold Highlight
+        { r: 230, g: 126, b: 34,  a: 0.80 }, // Warm Amber Glow
+        { r: 242, g: 230, b: 198, a: 1.00 }  // Warm Golden Champagne Canvas
+      ],
       'atlassian-azure': [
-        { r: 0,   g: 82,  b: 204, a: 0.38 }, // Electric Atlassian Azure Blue
-        { r: 0,   g: 101, b: 255, a: 0.35 }, // Vibrant Blue Glow
-        { r: 0,   g: 184, b: 217, a: 0.30 }, // Cyan Skylight Sparkle
-        { r: 7,   g: 71,  b: 166, a: 0.25 }, // Deep Ocean Blue
-        { r: 240, g: 247, b: 255, a: 0.60 }  // Sky Light Background
+        { r: 245, g: 176, b: 65,  a: 0.85 }, // Warm 3D Amber Orb Core
+        { r: 214, g: 137, b: 16,  a: 0.90 }, // Rich Golden Sphere Shadow
+        { r: 255, g: 230, b: 153, a: 0.95 }, // Specular Gold Highlight
+        { r: 230, g: 126, b: 34,  a: 0.80 }, // Warm Amber Glow
+        { r: 242, g: 230, b: 198, a: 1.00 }  // Warm Golden Champagne Canvas
       ],
       'royal-gold': [
-        { r: 0,   g: 82,  b: 204, a: 0.38 }, // Electric Atlassian Azure Blue
-        { r: 0,   g: 101, b: 255, a: 0.35 }, // Vibrant Blue Glow
-        { r: 0,   g: 184, b: 217, a: 0.30 }, // Cyan Skylight Sparkle
-        { r: 7,   g: 71,  b: 166, a: 0.25 }, // Deep Ocean Blue
-        { r: 240, g: 247, b: 255, a: 0.60 }  // Sky Light Background
+        { r: 245, g: 176, b: 65,  a: 0.85 }, // Warm 3D Amber Orb Core
+        { r: 214, g: 137, b: 16,  a: 0.90 }, // Rich Golden Sphere Shadow
+        { r: 255, g: 230, b: 153, a: 0.95 }, // Specular Gold Highlight
+        { r: 230, g: 126, b: 34,  a: 0.80 }, // Warm Amber Glow
+        { r: 242, g: 230, b: 198, a: 1.00 }  // Warm Golden Champagne Canvas
       ],
       'emerald-luxe': [
         { r: 16,  g: 185, b: 129, a: 0.38 }, // Emerald Velvet Spark
