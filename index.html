@@ -31,6 +31,15 @@
   <!-- Dynamic Background Canvas -->
   <canvas id="gemini-flow-canvas" class="gemini-flow-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none; opacity: 0.65;"></canvas>
 
+  <!-- Ambient 3D Floating Gold Amber Orbs Layer -->
+  <div class="ambient-orbs-container">
+    <div class="orb-3d orb-1"></div>
+    <div class="orb-3d orb-2"></div>
+    <div class="orb-3d orb-3"></div>
+    <div class="orb-3d orb-4"></div>
+    <div class="orb-3d orb-5"></div>
+  </div>
+
   <!-- App Layout Wrapper -->
   <div class="app-layout-wrapper">
     <!-- Left Vertical Navigation Sidebar -->
@@ -158,8 +167,14 @@
 
             <!-- Hero Welcome View (Shown on Empty Thread) -->
             <div id="chat-hero-view" class="chat-hero-view">
-              <div class="gemini-sparkle-hero float-animation">
-                <img src="assets/logo.svg" alt="Liquid Chrome Metallic Star Logo" width="76" height="76" style="object-fit: contain; filter: drop-shadow(0 4px 16px rgba(0, 101, 255, 0.35));" />
+              
+              <!-- Frosted Glass Circular Login / Gateway Card (Exact Design Aesthetic) -->
+              <div class="glass-circular-card">
+                <h2 class="glass-circular-title">Login</h2>
+                <input type="email" class="glass-circular-input" placeholder="Email" value="ankita@secondbrain.ai" />
+                <input type="password" class="glass-circular-input" placeholder="Password" value="••••••••••••" />
+                <div class="glass-circular-subtext">Forget Password?</div>
+                <button class="glass-circular-btn" onclick="window.triggerSampleQuery('Rank the 10 largest AI infrastructure and data center projects in the world')">Login</button>
               </div>
 
               <h1 class="gemini-hero-title">Hello, Ankita</h1>
