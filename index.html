@@ -21,8 +21,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Stylesheets & App Manifest -->
-  <link rel="stylesheet" href="css/style.css?v=26.0">
-  <link rel="stylesheet" href="css/responsive.css?v=26.0">
+  <link rel="stylesheet" href="css/style.css?v=27.0">
+  <link rel="stylesheet" href="css/responsive.css?v=27.0">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#18181b">
 </head>
@@ -150,12 +150,7 @@
               <button id="global-sound-toggle-btn" class="top-action-btn" onclick="window.toggleGlobalAudioMute()" title="Toggle Sound / Silent Environment Mode" style="border: 1px solid var(--accent-amber); color: var(--accent-amber);">
                 <span id="global-sound-toggle-icon">🔊</span> <span class="hide-mobile" id="global-sound-toggle-text">Sound ON</span>
               </button>
-              <button class="top-action-btn" onclick="if(typeof CodeInspectorEngine!=='undefined') CodeInspectorEngine.openInspector();" title="Launch Live DOM Code Syntax Inspector">
-                💻 <span class="hide-mobile">Code Inspector</span>
-              </button>
-              <button class="top-action-btn" onclick="if(typeof TelemetryMeshEngine!=='undefined') TelemetryMeshEngine.toggle();" title="Toggle Cybernetic Telemetry Spatial HUD">
-                🛰️ <span class="hide-mobile">Telemetry HUD</span>
-              </button>
+
               <button class="top-action-btn" onclick="const current = document.documentElement.getAttribute('data-theme'); const next = (current === 'royal-gold' || current === 'gemini-dark' || current === 'obsidian') ? 'platinum-gold' : 'royal-gold'; window.applyTheme(next);" title="Toggle Theme Palette" style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(192, 132, 252, 0.2)); border: 1px solid rgba(251, 191, 36, 0.4); color: var(--accent-primary);">
                 ✨ <span>Switch Theme</span>
               </button>
