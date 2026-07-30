@@ -4103,14 +4103,13 @@ kbd {
   font-size: 13px;
 }
 
-/* Floating Bottom Input Deck */
 .chat-bottom-deck {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   padding: 12px 20px 18px 20px;
-  background: linear-gradient(to top, #131314 92%, transparent 100%);
+  background: linear-gradient(to top, var(--bg-dark) 82%, transparent 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
