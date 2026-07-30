@@ -2216,10 +2216,13 @@
       };
       Store.saveChatThread(newThread);
       Store.setActiveThreadId(newId);
-      window.renderActiveChatThread();
-      renderChatThreadsList();
-      if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
-      window.location.reload();
+
+      const container = document.getElementById('chat-container');
+      if (container) container.innerHTML = '';
+      const heroView = document.getElementById('chat-hero-view');
+      if (heroView) heroView.style.display = 'flex';
+
+      window.location.href = window.location.pathname;
     };
 
     window.switchChatThread = function(threadId) {
@@ -2298,6 +2301,8 @@
       const threads = Store.getChatThreads();
       const thread = threads.find(t => t.id === activeId) || threads[0];
       if (!thread) return;
+
+      container.innerHTML = '';
 
       const msgs = (thread.messages || []).filter(m => {
         if (!m || !m.content) return false;
