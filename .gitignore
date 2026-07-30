@@ -16,16 +16,14 @@ Thumbs.db
 
 # Sub projects & Caches
 trippa-stayFinder-major-project/
+spotify-remix/
 __pycache__/
 *.pyc
 
-# Local helper scripts
-check_*.py
-inspect_*.py
-unlock_*.py
-trigger_*.py
-submit_*.py
-enable_discussions.py
+# Local helper scripts & unrelated project files
+*.py
 scratch/
+docs/pull_shark_log_*
+docs/optimization_*
 
 .vercel
