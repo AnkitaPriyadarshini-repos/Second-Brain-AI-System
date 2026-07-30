@@ -4537,30 +4537,31 @@ kbd {
   text-align: center;
 }
 
-/* Left Flank: 3D Cybernetic Mechanical Bird Orb */
+/* Left Flank: 3D Cybernetic Mechanical Bird Holographic Card */
 .cybernetic-bird-wrapper {
   position: relative;
-  width: 155px;
-  height: 155px;
+  width: 145px;
+  height: 190px;
   flex-shrink: 0;
   z-index: 15;
   cursor: pointer;
-  filter: drop-shadow(0 15px 35px rgba(180, 130, 40, 0.3));
+  filter: drop-shadow(0 15px 35px rgba(180, 130, 40, 0.35));
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: rotate(3deg);
   animation: birdHover 6s ease-in-out infinite alternate;
 }
 
 .cybernetic-bird-wrapper:hover {
-  transform: scale(1.08) rotate(-4deg);
+  transform: rotate(0deg) scale(1.06);
 }
 
 .cybernetic-bird-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 12px 35px rgba(214, 137, 16, 0.3);
+  border-radius: 20px;
+  border: 2px solid rgba(245, 176, 65, 0.85);
+  box-shadow: 0 12px 35px rgba(214, 137, 16, 0.35);
 }
 
 .bird-tag {
