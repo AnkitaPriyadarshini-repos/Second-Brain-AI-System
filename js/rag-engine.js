@@ -203,6 +203,71 @@ processDataQuery("${query.replace(/"/g, '')}");
         topicHeading = "Deep Learning & Generative AI Architecture";
         bodyText = "Deep Learning relies on multi-layer neural network architectures that automatically extract hierarchical representations from data. Modern generative models leverage Self-Attention mechanisms, Transformer backbones, and Retrieval-Augmented Generation (RAG) vector pipelines to synthesize accurate context without hallucination.";
       } 
+      // AI Infrastructure & Megawatt Data Centers
+      else if (qLower.includes("infrastructure") || qLower.includes("data center") || qLower.includes("datacenter") || qLower.includes("colossus") || qLower.includes("stargate") || qLower.includes("h100") || qLower.includes("power capacity") || qLower.includes("megawatt") || qLower.includes("gigawatt") || qLower.includes("hardware deployment")) {
+        topicHeading = "⚡ Global Top 10 AI Infrastructure & Data Center Megaprojects";
+        bodyText = `The world's 10 largest AI infrastructure and data center projects, ranked by scale, power capacity, and specialized hardware deployment:
+
+1. **xAI Memphis "Colossus" Supercluster (Tennessee, USA)**
+   • **Scale**: 100,000–200,000 Nvidia H100/H200 GPUs
+   • **Power Capacity**: 150MW–300MW dedicated liquid-cooled facility
+   • **Hardware**: Direct-to-chip liquid cooling manifolds, 400Gbps RoCE Ethernet
+   • **Owner**: Elon Musk / xAI (Trained Grok-3 in under 122 days)
+
+2. **Microsoft & OpenAI "Stargate" AI Supercomputer (USA)**
+   • **Scale**: $100 Billion flagship project, multi-million accelerator chips (GB200 Blackwell & Maia 100)
+   • **Power Capacity**: 5 Gigawatts (5,000 Megawatts) nuclear & clean energy
+   • **Hardware**: Liquid-cooled GB200 NVL72 racks & Small Modular Reactors (SMRs)
+   • **Owner**: Microsoft & OpenAI
+
+3. **Google Council Bluffs & Fairview TPU Pod Hub (Iowa/Oregon, USA)**
+   • **Scale**: 1,000,000+ Custom TPU v5p & Trillium AI Pods
+   • **Power Capacity**: 2.4 Gigawatts (2,400 Megawatts) clean campus
+   • **Hardware**: 3D Torus TPU topologies & 100% Optical Circuit Switches (OCS)
+   • **Owner**: Google / Alphabet (Gemini 1.5 & Gemini 2.0)
+
+4. **Meta Llama 3 Infrastructure — Prometheus & Hyperion (USA)**
+   • **Scale**: 350,000 Nvidia H100 GPUs (600,000 H100 GPU equivalent compute)
+   • **Power Capacity**: 600 Megawatts (600MW) across 4 data center campuses
+   • **Hardware**: Meta Grand Teton hardware chassis, PyTorch distributed cluster fabric
+   • **Owner**: Meta (Mark Zuckerberg)
+
+5. **AWS "Project Rainier" AI Infrastructure Hub (Indiana, USA)**
+   • **Scale**: $11 Billion campus with AWS Trainium2 & Inferentia2 + Nvidia GB200 racks
+   • **Power Capacity**: 1.2 Gigawatts (1,200 Megawatts)
+   • **Hardware**: Direct-to-chip liquid cooling loops powering Anthropic Claude 3.5 & AWS Bedrock
+   • **Owner**: Amazon Web Services (AWS)
+
+6. **Oracle OCI 131k GPU Supercluster (Abilene, Texas, USA)**
+   • **Scale**: 131,072 Nvidia Blackwell GB200 & H200 GPUs in a single fabric
+   • **Power Capacity**: 1.2 Gigawatts (1,200 Megawatts) liquid-cooled facility
+   • **Hardware**: OCI RDMA over Converged Ethernet (RoCE) networking
+   • **Owner**: Oracle Cloud Infrastructure (OCI) & OpenAI
+
+7. **Saudi Arabia / HUMAIN & Alat AI Megacity Hub (Riyadh, KSA)**
+   • **Scale**: $100 Billion sovereign AI compute initiative
+   • **Power Capacity**: 500MW initial, scaling to 2 Gigawatts (2,000MW) solar + nuclear energy
+   • **Hardware**: Nvidia GH200 Grace Hopper superchips powering Arabic LLMs & sovereign AI
+   • **Owner**: Public Investment Fund (PIF) / Alat / Saudi Arabia
+
+8. **UAE / G42 & Microsoft Stargate Abu Dhabi Hub (Abu Dhabi, UAE)**
+   • **Scale**: $15 Billion sovereign AI cluster
+   • **Power Capacity**: 1 Gigawatt (1,000 Megawatts) clean energy from Barakah Nuclear Plant
+   • **Hardware**: High-density Microsoft Azure AI racks & Arabic foundation models
+   • **Owner**: G42 & Microsoft
+
+9. **Tesla Cortex AI Supercomputer (Giga Texas, USA)**
+   • **Scale**: 50,000 Nvidia H100 GPUs + 20,000 Tesla Dojo D1 custom AI processors
+   • **Power Capacity**: 130 Megawatts (130MW) dedicated liquid-cooled facility
+   • **Hardware**: Direct-to-chip liquid manifolds powering FSD V13 & Optimus humanoid AI
+   • **Owner**: Tesla / Elon Musk
+
+10. **Yotta Shakti-Cloud AI Megacenter (Navi Mumbai, India)**
+    • **Scale**: 16,000–24,000 Nvidia H100 & GH200 GPUs
+    • **Power Capacity**: 250 Megawatts (250MW) green NM1 facility
+    • **Hardware**: Asia-Pacific's largest sovereign AI data center offering enterprise LLM compute
+    • **Owner**: Yotta Data Services / Hiranandani Group`;
+      } 
       // Distributed Systems & Cloud
       else if (qLower.includes("distributed") || qLower.includes("kafka") || qLower.includes("cloud") || qLower.includes("docker") || qLower.includes("kubernetes") || qLower.includes("microservice")) {
         topicHeading = "Distributed Systems & Scalable Microservices";

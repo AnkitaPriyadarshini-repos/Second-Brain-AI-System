@@ -132,6 +132,77 @@
         dateStr: "March 18, 2026",
         sourceUrl: "cCREs_paper_draft.pdf"
       },
+      // World's Top 10 AI Infrastructure & Data Center Megaprojects
+      {
+        title: "Global AI Infrastructure #1: xAI Memphis Colossus Supercluster (Tennessee, USA)",
+        content: "Rank #1 Global AI Infrastructure: Elon Musk's xAI Colossus supercluster in Memphis, Tennessee. Scale: 100,000 to 200,000 Nvidia H100/H200 GPUs. Power Capacity: 150MW to 300MW dedicated liquid-cooled facility. Hardware: Direct-to-chip liquid cooling manifolds, 400Gbps RoCE Ethernet. Built in under 122 days to train xAI Grok-3 foundation models.",
+        sourceType: "typing",
+        dateStr: "July 15, 2026",
+        sourceUrl: "https://x.ai/colossus-infrastructure"
+      },
+      {
+        title: "Global AI Infrastructure #2: Microsoft & OpenAI Stargate AI Supercomputer (USA)",
+        content: "Rank #2 Global AI Infrastructure: Microsoft & OpenAI Stargate Megaproject. Scale: $100 Billion supercomputer deployment with millions of Nvidia GB200 Blackwell & Maia 100 accelerators. Power Capacity: 5 Gigawatts (5,000 Megawatts) nuclear & clean energy. Hardware: Liquid-cooled GB200 NVL72 chassis & Small Modular Nuclear Reactors (SMRs).",
+        sourceType: "typing",
+        dateStr: "July 16, 2026",
+        sourceUrl: "https://microsoft.com/stargate-ai-datacenter"
+      },
+      {
+        title: "Global AI Infrastructure #3: Google Council Bluffs & Fairview TPU Pod Hub (Iowa/Oregon, USA)",
+        content: "Rank #3 Global AI Infrastructure: Google Alphabet Council Bluffs & Fairview Hub. Scale: Over 1 Million Custom TPU v5p & Trillium AI Pods. Power Capacity: 2.4 Gigawatts (2,400 Megawatts) clean-powered campus. Hardware: 3D torus TPU topologies with 100% Optical Circuit Switches (OCS) for zero-packet-loss Gemini 1.5 & Gemini 2.0 training.",
+        sourceType: "typing",
+        dateStr: "July 17, 2026",
+        sourceUrl: "https://cloud.google.com/tpu-infrastructure"
+      },
+      {
+        title: "Global AI Infrastructure #4: Meta Llama 3 Infrastructure - Prometheus & Hyperion (USA)",
+        content: "Rank #4 Global AI Infrastructure: Meta AI Megaclusters (Mark Zuckerberg). Scale: 350,000 Nvidia H100 GPUs (scaling to 600,000 H100 equivalents). Power Capacity: 600 Megawatts (600MW) across 4 data center sites. Hardware: Custom Meta Grand Teton hardware chassis, 400Gbps RoCE v2, PyTorch distributed cluster orchestration for Llama 3 & Llama 4.",
+        sourceType: "typing",
+        dateStr: "July 18, 2026",
+        sourceUrl: "https://ai.meta.com/infrastructure"
+      },
+      {
+        title: "Global AI Infrastructure #5: Amazon AWS Project Rainier & Indiana Campus (Indiana, USA)",
+        content: "Rank #5 Global AI Infrastructure: AWS Project Rainier AI Hub. Scale: $11 Billion campus featuring custom Trainium2 & Inferentia2 chips + Nvidia GB200 NVL72 racks. Power Capacity: 1.2 Gigawatts (1,200 Megawatts). Hardware: Direct-to-chip liquid cooling loops powering Anthropic Claude 3.5 & AWS Bedrock model synthesis.",
+        sourceType: "typing",
+        dateStr: "July 19, 2026",
+        sourceUrl: "https://aws.amazon.com/trainium2-rainier"
+      },
+      {
+        title: "Global AI Infrastructure #6: Oracle OCI 131k GPU Supercluster (Abilene, Texas, USA)",
+        content: "Rank #6 Global AI Infrastructure: Oracle Cloud Infrastructure (OCI) Supercluster Hub. Scale: 131,072 Nvidia Blackwell GB200 & H200 GPUs in a single fabric. Power Capacity: 1.2 Gigawatts (1,200 Megawatts) liquid-cooled infrastructure. Hardware: OCI RDMA over Converged Ethernet (RoCE) networking powering OpenAI enterprise workloads.",
+        sourceType: "typing",
+        dateStr: "July 20, 2026",
+        sourceUrl: "https://oracle.com/cloud/oci-ai-supercomputer"
+      },
+      {
+        title: "Global AI Infrastructure #7: Saudi Arabia HUMAIN & Alat AI Megacity Hub (Riyadh, KSA)",
+        content: "Rank #7 Global AI Infrastructure: Saudi Sovereign AI Megacity Project (PIF / Alat). Scale: $100 Billion sovereign compute initiative. Power Capacity: 500 Megawatts initial, scaling to 2 Gigawatts (2,000MW) solar + nuclear energy. Hardware: Nvidia GH200 Grace Hopper superchips powering Arabic LLMs and global AI research.",
+        sourceType: "typing",
+        dateStr: "July 21, 2026",
+        sourceUrl: "https://alat.sa/humain-ai-infrastructure"
+      },
+      {
+        title: "Global AI Infrastructure #8: UAE G42 & Microsoft Stargate Abu Dhabi Hub (Abu Dhabi, UAE)",
+        content: "Rank #8 Global AI Infrastructure: G42 & Microsoft Stargate Abu Dhabi AI Center. Scale: $15 Billion sovereign AI cluster. Power Capacity: 1 Gigawatt (1,000 Megawatts) clean energy from Barakah Nuclear Plant. Hardware: High-density Microsoft Azure AI racks powering enterprise AI vaults and regional LLM models.",
+        sourceType: "typing",
+        dateStr: "July 22, 2026",
+        sourceUrl: "https://g42.ai/abudhabi-stargate"
+      },
+      {
+        title: "Global AI Infrastructure #9: Tesla Cortex AI Supercomputer (Giga Texas, USA)",
+        content: "Rank #9 Global AI Infrastructure: Elon Musk / Tesla Cortex Supercomputer. Scale: 50,000 Nvidia H100 GPUs + 20,000 Tesla Dojo D1 custom AI processors. Power Capacity: 130 Megawatts (130MW) liquid-cooled facility inside Giga Texas. Hardware: High-density liquid cooling manifolds powering Full Self-Driving (FSD V13) vision models and Optimus humanoid robot neural networks.",
+        sourceType: "typing",
+        dateStr: "July 23, 2026",
+        sourceUrl: "https://tesla.com/cortex-ai-supercomputer"
+      },
+      {
+        title: "Global AI Infrastructure #10: Yotta Shakti-Cloud AI Megacenter (Navi Mumbai, India)",
+        content: "Rank #10 Global AI Infrastructure: Yotta Shakti-Cloud Supercomputing Center. Scale: 16,000 to 24,000 Nvidia H100 & GH200 GPUs. Power Capacity: 250 Megawatts (250MW) green NM1 facility. Hardware: Asia-Pacific's largest sovereign AI data center offering enterprise LLM training, Indian AI startups, and AI research infrastructure.",
+        sourceType: "typing",
+        dateStr: "July 24, 2026",
+        sourceUrl: "https://yotta.com/shakti-cloud-ai"
+      },
       {
         title: "Email Forward: AI Engineering Newsletter - RAG & Vector DB Benchmarks",
         content: "Forwarded from newsletter@aiweekly.io: Evaluating Pinecone vs Chroma vs Qdrant for semantic search. Cosine similarity performs consistently well for short note snippets when combined with hybrid BM25 lexical re-ranking.",
