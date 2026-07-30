@@ -476,6 +476,12 @@
       }
     };
 
+    window.triggerAstronautQuote = function() {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+      showToast('👨‍🚀 Space Juno: "Floating through space while scaling global AI megaclusters!"');
+      window.triggerSampleQuery('Rank the 10 largest AI infrastructure and data center projects in the world');
+    };
+
     if (voiceTriggerBtn) {
       voiceTriggerBtn.addEventListener('click', () => {
         if (typeof VoiceEngine !== 'undefined') {
