@@ -481,6 +481,12 @@
       showToast('👨‍🚀 Space Juno: "Floating through space with Second Brain AI!"');
     };
 
+    window.openCyberneticMeshModal = function() {
+      const modal = document.getElementById('cybernetic-mesh-modal');
+      if (modal) modal.classList.add('active');
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+    };
+
     if (voiceTriggerBtn) {
       voiceTriggerBtn.addEventListener('click', () => {
         if (typeof VoiceEngine !== 'undefined') {
