@@ -4502,24 +4502,26 @@ kbd {
    3D FLOATING ASTRONAUT HANGING ON ROPE (CONTRASTING EMBLEM)
    ------------------------------------------------------------- */
 /* -------------------------------------------------------------
-   BALANCED HERO COMPOSITION LAYOUT (IMMACULATE SPACING)
+   BALANCED HERO COMPOSITION LAYOUT (FLEX 3-COLUMN NO-OVERLAP)
    ------------------------------------------------------------- */
 .hero-elements-composition {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 30px;
   width: 100%;
-  max-width: 950px;
+  max-width: 1050px;
   margin: 10px auto 25px auto;
+  position: relative;
 }
 
 .glass-circular-card {
-  width: 430px;
-  height: 430px;
+  width: 420px;
+  height: 420px;
   max-width: 85vw;
   max-height: 85vw;
   border-radius: 50%;
+  flex-shrink: 0;
   background: rgba(255, 255, 255, 0.28) !important;
   backdrop-filter: blur(35px) !important;
   -webkit-backdrop-filter: blur(35px) !important;
@@ -4529,7 +4531,7 @@ kbd {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 35px;
+  padding: 30px;
   position: relative;
   z-index: 20;
   text-align: center;
@@ -4537,12 +4539,10 @@ kbd {
 
 /* Left Flank: 3D Cybernetic Mechanical Bird Orb */
 .cybernetic-bird-wrapper {
-  position: absolute;
-  left: 25px;
-  top: 50%;
-  transform: translateY(-50%);
+  position: relative;
   width: 155px;
   height: 155px;
+  flex-shrink: 0;
   z-index: 15;
   cursor: pointer;
   filter: drop-shadow(0 15px 35px rgba(180, 130, 40, 0.3));
@@ -4551,7 +4551,7 @@ kbd {
 }
 
 .cybernetic-bird-wrapper:hover {
-  transform: translateY(-50%) scale(1.08) rotate(-4deg);
+  transform: scale(1.08) rotate(-4deg);
 }
 
 .cybernetic-bird-img {
@@ -4577,8 +4577,8 @@ kbd {
   pointer-events: none;
 }
 
-.bird-tag-1 { top: 10px; right: -15px; }
-.bird-tag-2 { bottom: 15px; left: -15px; }
+.bird-tag-1 { top: 5px; right: -15px; }
+.bird-tag-2 { bottom: 10px; left: -15px; }
 
 .bird-speech-bubble {
   position: absolute;
@@ -4606,12 +4606,10 @@ kbd {
 
 /* Right Flank: 3D Floating Astronaut */
 .floating-astronaut-wrapper {
-  position: absolute;
-  right: 25px;
-  top: 48%;
-  transform: translateY(-50%);
-  width: 150px;
+  position: relative;
+  width: 145px;
   height: 220px;
+  flex-shrink: 0;
   z-index: 15;
   cursor: pointer;
   filter: drop-shadow(0 18px 35px rgba(0, 0, 0, 0.25));
@@ -4620,7 +4618,7 @@ kbd {
 }
 
 .floating-astronaut-wrapper:hover {
-  transform: translateY(-50%) scale(1.08) rotate(4deg);
+  transform: scale(1.08) rotate(4deg);
 }
 
 .floating-astronaut-img {
@@ -4654,15 +4652,15 @@ kbd {
 }
 
 @keyframes birdHover {
-  0% { transform: translateY(-50%) translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-50%) translateY(-10px) rotate(-2deg); }
-  100% { transform: translateY(-50%) translateY(6px) rotate(1deg); }
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(-2deg); }
+  100% { transform: translateY(6px) rotate(1deg); }
 }
 
 @keyframes astronautHang {
-  0% { transform: translateY(-50%) translateY(0px) rotate(-2deg); }
-  50% { transform: translateY(-50%) translateY(12px) rotate(3deg); }
-  100% { transform: translateY(-50%) translateY(-8px) rotate(-1deg); }
+  0% { transform: translateY(0px) rotate(-2deg); }
+  50% { transform: translateY(12px) rotate(3deg); }
+  100% { transform: translateY(-8px) rotate(-1deg); }
 }
 
 @media (max-width: 1000px) {
