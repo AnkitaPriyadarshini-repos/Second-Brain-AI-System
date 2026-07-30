@@ -1,37 +1,82 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
   <defs>
-    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#06b6d4" />
-      <stop offset="50%" stop-color="#8b5cf6" />
-      <stop offset="100%" stop-color="#ec4899" />
+    <!-- Liquid Chrome Metallic Base Gradient -->
+    <linearGradient id="chromeBase" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="25%" stop-color="#bae6fd" />
+      <stop offset="50%" stop-color="#38bdf8" />
+      <stop offset="75%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#1e3a8a" />
     </linearGradient>
-    <linearGradient id="coreGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#38bdf8" />
-      <stop offset="100%" stop-color="#f43f5e" />
+
+    <!-- Liquid Chrome Specular Highlight Gradient -->
+    <linearGradient id="chromeHighlight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+      <stop offset="40%" stop-color="#e0f2fe" stop-opacity="0.85" />
+      <stop offset="70%" stop-color="#93c5fd" stop-opacity="0.5" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.95" />
     </linearGradient>
-    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="3" result="blur" />
+
+    <!-- Metallic Reflection Gradient -->
+    <linearGradient id="chromeReflection" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="30%" stop-color="#a5f3fc" />
+      <stop offset="60%" stop-color="#0052cc" />
+      <stop offset="100%" stop-color="#091e42" />
+    </linearGradient>
+
+    <!-- Ambient Chrome Glow Filter -->
+    <filter id="chromeGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
       <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+    
+    <filter id="subtleDropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#0052cc" flood-opacity="0.3" />
     </filter>
   </defs>
 
-  <!-- Hexagonal Outer Shield -->
-  <polygon points="50,5 90,27.5 90,72.5 50,95 10,72.5 10,27.5" fill="none" stroke="url(#logoGradient)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#neonGlow)"/>
+  <!-- Ambient Glow Backdrop -->
+  <g filter="url(#chromeGlow)">
+    <circle cx="250" cy="230" r="160" fill="url(#chromeHighlight)" opacity="0.2" />
+  </g>
 
-  <!-- Inner Neural Network Nodes & Circuit Connections -->
-  <path d="M50 20 L50 42 M50 58 L50 80 M25 35 L42 45 M58 55 L75 65 M75 35 L58 45 M42 55 L25 65" stroke="url(#logoGradient)" stroke-width="2.5" stroke-linecap="round" opacity="0.85" />
-  
-  <!-- Neural Synapse Circles -->
-  <circle cx="50" cy="20" r="5" fill="#06b6d4" filter="url(#neonGlow)" />
-  <circle cx="25" cy="35" r="4.5" fill="#38bdf8" />
-  <circle cx="75" cy="35" r="4.5" fill="#8b5cf6" />
-  <circle cx="25" cy="65" r="4.5" fill="#ec4899" />
-  <circle cx="75" cy="65" r="4.5" fill="#f43f5e" />
-  <circle cx="50" cy="80" r="5" fill="#10b981" filter="url(#neonGlow)" />
+  <!-- 3D Liquid Chrome Star Geometry -->
+  <g filter="url(#subtleDropShadow)">
+    <!-- Main Smooth Liquid Chrome Star Path -->
+    <path d="M250 35 
+             C264 140, 295 170, 395 178 
+             C300 215, 278 260, 340 355 
+             C255 292, 220 292, 160 355 
+             C222 260, 200 215, 105 178 
+             C205 170, 236 140, 250 35 Z" 
+          fill="url(#chromeBase)" 
+          stroke="#ffffff" 
+          stroke-width="3.5" 
+          stroke-linejoin="round" />
 
-  <!-- Central AI Core Sparkle Star -->
-  <g transform="translate(50, 50)">
-    <circle r="12" fill="url(#logoGradient)" opacity="0.3" filter="url(#neonGlow)" />
-    <path d="M0 -10 Q0 0 10 0 Q0 0 0 10 Q0 0 -10 0 Q0 0 0 -10 Z" fill="#ffffff" filter="url(#neonGlow)" />
+    <!-- Upper Specular Metallic Ridge Highlight -->
+    <path d="M250 35 C255 125, 275 180, 395 178 C305 205, 265 235, 250 250 Z" 
+          fill="url(#chromeHighlight)" 
+          opacity="0.9" />
+
+    <!-- Left Metallic Reflection Facet -->
+    <path d="M250 35 C242 125, 210 180, 105 178 C195 205, 240 235, 250 250 Z" 
+          fill="url(#chromeReflection)" 
+          opacity="0.8" />
+
+    <!-- Lower Right Liquid Facet -->
+    <path d="M250 250 C272 265, 305 295, 340 355 C280 310, 258 285, 250 250 Z" 
+          fill="url(#chromeBase)" 
+          opacity="0.95" />
+
+    <!-- Lower Left Liquid Facet -->
+    <path d="M250 250 C228 265, 195 295, 160 355 C220 310, 242 285, 250 250 Z" 
+          fill="url(#chromeHighlight)" 
+          opacity="0.85" />
+
+    <!-- Central Chrome Flare Center -->
+    <circle cx="250" cy="210" r="16" fill="#ffffff" filter="url(#chromeGlow)" opacity="0.95" />
+    <path d="M250 178 Q250 210 282 210 Q250 210 250 242 Q250 210 218 210 Q250 210 250 178 Z" fill="#ffffff" />
   </g>
 </svg>
