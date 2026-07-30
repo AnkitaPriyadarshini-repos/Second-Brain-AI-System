@@ -138,12 +138,6 @@
           synthesis += `\n`;
         });
       }
-
-      synthesis += `\n---\n#### Actionable Takeaways:\n`;
-      synthesis += `• **Core Concept**: ${topNote.summary || topNote.title}\n`;
-      synthesis += `• **Surfaces Ingested**: Surfaced across ${[...new Set(retrievedNotes.map(n => n.sourceType))].join(', ')} captures.\n`;
-      synthesis += `• **Next Steps**: Click any cited note pill below to open its full view or edit its contents.`;
-
       return synthesis;
     },
 
