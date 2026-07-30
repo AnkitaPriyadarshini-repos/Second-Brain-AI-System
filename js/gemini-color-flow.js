@@ -43,18 +43,18 @@
         { r: 242, g: 230, b: 198, a: 1.00 }  // Warm Golden Champagne Canvas
       ],
       'emerald-luxe': [
-        { r: 16,  g: 185, b: 129, a: 0.38 }, // Emerald Velvet Spark
-        { r: 5,   g: 150, b: 105, a: 0.35 }, // Deep Forest Jade
-        { r: 245, g: 158, b: 11,  a: 0.28 }, // Titanium Gold Highlight
-        { r: 52,  g: 211, b: 153, a: 0.25 }, // Mint Shimmer
-        { r: 13,  g: 30,  b: 22,  a: 0.60 }  // Velvet Slate Shadow
+        { r: 245, g: 176, b: 65,  a: 0.85 },
+        { r: 214, g: 137, b: 16,  a: 0.90 },
+        { r: 255, g: 230, b: 153, a: 0.95 },
+        { r: 230, g: 126, b: 34,  a: 0.80 },
+        { r: 242, g: 230, b: 198, a: 1.00 }
       ],
       'sapphire-platinum': [
-        { r: 56,  g: 189, b: 248, a: 0.38 }, // Sapphire Platinum Ice
-        { r: 129, g: 140, b: 248, a: 0.35 }, // Electric Indigo Aura
-        { r: 192, g: 132, b: 252, a: 0.25 }, // Crystal Violet
-        { r: 6,   g: 182, b: 212, a: 0.25 }, // Cyan Spark
-        { r: 15,  g: 25,  b: 44,  a: 0.60 }  // Deep Oceanic Obsidian
+        { r: 245, g: 176, b: 65,  a: 0.85 },
+        { r: 214, g: 137, b: 16,  a: 0.90 },
+        { r: 255, g: 230, b: 153, a: 0.95 },
+        { r: 230, g: 126, b: 34,  a: 0.80 },
+        { r: 242, g: 230, b: 198, a: 1.00 }
       ],
       'platinum-gold': [
         { r: 245, g: 158, b: 11,  a: 0.35 }, // Bright Amber Gold

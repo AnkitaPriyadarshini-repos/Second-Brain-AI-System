@@ -118,60 +118,33 @@ a, a:hover, a:visited, a:focus, a:active,
   --shadow-glow: 0 10px 35px 0 rgba(99, 102, 241, 0.3);
 }
 
-/* Theme: Emerald Luxe & Titanium (Vibrant Jade & Gold Canvas) */
-[data-theme="emerald-luxe"] {
-  --bg-dark: #0a251b;
-  --bg-card: #12372a;
-  --bg-card-hover: #1b4d3b;
-  --bg-card-active: #24634c;
-  --border-color: rgba(52, 211, 153, 0.35);
-  --border-highlight: rgba(52, 211, 153, 0.75);
-  --border-accent: rgba(251, 191, 36, 0.6);
-  --text-primary: #f0fdf4;
-  --text-secondary: #a7f3d0;
-  --text-muted: #6ee7b7;
-  --accent-primary: #10b981;
-  --accent-primary-hover: #059669;
-  --accent-primary-light: rgba(16, 185, 129, 0.22);
-  --accent-indigo: #34d399;
-  --accent-violet: #10b981;
-  --accent-emerald: #34d399;
-  --accent-amber: #fbbf24;
-  --accent-pink: #f472b6;
-  --accent-blue: #38bdf8;
-  --accent-cyan: #2dd4bf;
-  --glow-1-color: rgba(16, 185, 129, 0.55);
-  --glow-2-color: rgba(251, 191, 36, 0.4);
-  --shadow-card: 0 10px 36px -4px rgba(0, 0, 0, 0.35), 0 0 24px 0 rgba(16, 185, 129, 0.25);
-  --shadow-glow: 0 4px 30px 0 rgba(16, 185, 129, 0.35);
-}
-
-/* Theme: Sapphire Platinum (Vibrant Royal Ocean Blue Canvas) */
+/* Theme: Emerald Luxe (Fallback Gold) */
+[data-theme="emerald-luxe"],
 [data-theme="sapphire-platinum"] {
-  --bg-dark: #0d1a3a;
-  --bg-card: #152654;
-  --bg-card-hover: #1e3572;
-  --bg-card-active: #274590;
-  --border-color: rgba(56, 189, 248, 0.35);
-  --border-highlight: rgba(56, 189, 248, 0.75);
-  --border-accent: rgba(192, 132, 252, 0.6);
-  --text-primary: #f0f9ff;
-  --text-secondary: #bae6fd;
-  --text-muted: #7dd3fc;
-  --accent-primary: #38bdf8;
-  --accent-primary-hover: #0284c7;
-  --accent-primary-light: rgba(56, 189, 248, 0.22);
-  --accent-indigo: #818cf8;
-  --accent-violet: #c084fc;
-  --accent-emerald: #34d399;
-  --accent-amber: #fbbf24;
+  --bg-dark: #121316;
+  --bg-card: #1c1d22;
+  --bg-card-hover: #26272e;
+  --bg-card-active: #30323a;
+  --border-color: rgba(245, 176, 65, 0.30);
+  --border-highlight: rgba(245, 176, 65, 0.70);
+  --border-accent: rgba(214, 137, 16, 0.60);
+  --text-primary: #fcfaf7;
+  --text-secondary: #ebdcc9;
+  --text-muted: #cbb89e;
+  --accent-primary: #f5b041;
+  --accent-primary-hover: #d68910;
+  --accent-primary-light: rgba(245, 176, 65, 0.22);
+  --accent-indigo: #d68910;
+  --accent-violet: #e59866;
+  --accent-emerald: #f5b041;
+  --accent-amber: #f5b041;
   --accent-pink: #f472b6;
-  --accent-blue: #38bdf8;
-  --accent-cyan: #06b6d4;
-  --glow-1-color: rgba(56, 189, 248, 0.55);
-  --glow-2-color: rgba(129, 140, 248, 0.45);
-  --shadow-card: 0 10px 36px -4px rgba(0, 0, 0, 0.35), 0 0 24px 0 rgba(56, 189, 248, 0.25);
-  --shadow-glow: 0 4px 30px 0 rgba(56, 189, 248, 0.35);
+  --accent-blue: #f5b041;
+  --accent-cyan: #f5b041;
+  --glow-1-color: rgba(245, 176, 65, 0.45);
+  --glow-2-color: rgba(214, 137, 16, 0.35);
+  --shadow-card: 0 10px 36px -4px rgba(0, 0, 0, 0.40), 0 0 24px 0 rgba(245, 176, 65, 0.20);
+  --shadow-glow: 0 4px 30px 0 rgba(245, 176, 65, 0.30);
 }
 
 /* Theme: Platinum Gold (Light Luxury Amber & Ivory Canvas) */

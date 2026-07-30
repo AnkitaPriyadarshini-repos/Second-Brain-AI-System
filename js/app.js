@@ -444,6 +444,9 @@
 
     function applyTheme(themeName) {
       if (!themeName) return;
+      if (themeName === 'emerald-luxe' || themeName === 'sapphire-platinum' || themeName === 'atlassian-azure') {
+        themeName = 'royal-gold';
+      }
       const root = document.documentElement || document.body || (typeof document !== 'undefined' ? document.querySelector('html') : null);
       if (root && typeof root.setAttribute === 'function') {
         root.setAttribute('data-theme', themeName);
