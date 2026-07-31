@@ -4473,6 +4473,7 @@ kbd {
 }
 
 .hero-left-flank-circle {
+  display: none !important;
   position: absolute;
   left: 25px;
   top: 50%;
@@ -4666,6 +4667,7 @@ kbd {
 
 /* Right Flank: 3D Floating Astronaut */
 .floating-astronaut-wrapper {
+  display: none !important;
   position: absolute;
   right: 20px;
   top: 50%;
@@ -4883,6 +4885,7 @@ kbd {
    3D FLOATING ASTRONAUT (PERMANENT AMBIENT EMBLEM)
    ------------------------------------------------------------- */
 .floating-astronaut-wrapper {
+  display: none !important;
   position: fixed !important;
   top: 75px !important;
   right: 32px !important;
