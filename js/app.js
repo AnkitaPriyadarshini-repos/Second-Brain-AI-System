@@ -2205,35 +2205,11 @@
     };
 
     window.createNewChatThread = function() {
-      if (typeof window.activateView === 'function') {
-        window.activateView('jarvis');
-      }
-
       if (typeof Store !== 'undefined' && Store.clearAllChatMessages) {
         Store.clearAllChatMessages();
       }
-
-      const container = document.getElementById('chat-container');
-      if (container) container.innerHTML = '';
-      const heroView = document.getElementById('chat-hero-view');
-      if (heroView) heroView.style.display = 'flex';
-
-      const ragInput = document.getElementById('rag-query-input');
-      if (ragInput) ragInput.value = '';
-      const circularInput = document.getElementById('circular-ai-prompt-input');
-      if (circularInput) {
-        circularInput.value = '';
-        circularInput.focus();
-      }
-
-      if (typeof renderChatThreadsList === 'function') {
-        renderChatThreadsList();
-      }
-
       if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
-      if (typeof showToast === 'function') {
-        showToast('✨ Started new chat with Juno AI!');
-      }
+      window.location.reload();
     };
 
     window.switchChatThread = function(threadId) {
