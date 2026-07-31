@@ -29,5 +29,5 @@ docs/optimization_*
 .vercel
 .next/
 
+# Binary & Document Exclusions
 *.pdf
-
