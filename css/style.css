@@ -4753,13 +4753,12 @@ kbd {
 
 /* Right Flank: 3D Floating Astronaut */
 .floating-astronaut-wrapper {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 120px;
-  height: 180px;
-  z-index: 25;
+  position: fixed;
+  right: 140px;
+  top: 85px;
+  width: 110px;
+  height: 165px;
+  z-index: 95;
   cursor: pointer;
   filter: drop-shadow(0 18px 35px rgba(0, 0, 0, 0.25));
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -4767,7 +4766,7 @@ kbd {
 }
 
 .floating-astronaut-wrapper:hover {
-  transform: translateY(-50%) scale(1.08) rotate(4deg);
+  transform: scale(1.08) rotate(4deg);
 }
 
 .floating-astronaut-img {
@@ -4972,10 +4971,10 @@ kbd {
 .floating-astronaut-wrapper {
   display: block !important;
   position: fixed !important;
-  top: 75px !important;
-  right: 28px !important;
-  width: 120px !important;
-  height: 180px !important;
+  top: 85px !important;
+  right: 140px !important;
+  width: 110px !important;
+  height: 165px !important;
   z-index: 95 !important;
   cursor: pointer;
   filter: drop-shadow(0 18px 35px rgba(0, 0, 0, 0.25));
@@ -5025,11 +5024,20 @@ kbd {
   100% { transform: translateY(-8px) rotate(-1deg); }
 }
 
+@media (max-width: 1280px) {
+  .floating-astronaut-wrapper {
+    right: 80px !important;
+    width: 95px !important;
+    height: 145px !important;
+  }
+}
+
 @media (max-width: 1024px) {
   .floating-astronaut-wrapper {
     display: none !important;
   }
 }
+
 
 /* -------------------------------------------------------------
    AMBIENT AUTUMN LEAF PARTICLES ENGINE (DISABLED - ZERO LAG)
