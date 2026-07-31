@@ -452,6 +452,14 @@ html, body {
     justify-content: center !important;
     border-radius: 8px !important;
   }
+
+  /* Mobile Slide-out Drawer Fit */
+  .note-drawer {
+    width: 90vw !important;
+    max-width: 380px !important;
+    padding: 20px 16px !important;
+    box-sizing: border-box !important;
+  }
 }
 
 
