@@ -213,6 +213,15 @@
       if (query && typeof handleRAGQuery === 'function') handleRAGQuery(query);
     };
 
+    function getUserInitials(name) {
+      if (!name) return 'U';
+      const parts = name.trim().split(/\s+/);
+      if (parts.length === 1) {
+        return parts[0].substring(0, 2).toUpperCase();
+      }
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
     function updateUserGreetings(name) {
       if (!name) return;
       const hour = new Date().getHours();
@@ -223,19 +232,27 @@
         timeSalutation = 'Good evening';
       }
 
+      const firstName = name.trim().split(/\s+/)[0];
+      const initials = getUserInitials(name);
+
       const heroGreeting = document.getElementById('user-hero-greeting');
       const heroSub = document.getElementById('user-hero-sub');
       const circularSub = document.getElementById('circular-card-sub');
       
       if (heroGreeting) {
-        heroGreeting.textContent = `${timeSalutation}, ${name}! 👋`;
+        heroGreeting.textContent = `${timeSalutation}, ${firstName}! 👋`;
       }
       if (heroSub) {
-        heroSub.textContent = `Where would you like to start your session today, ${name}? Solving wide-scale problems as an elite AI agent.`;
+        heroSub.textContent = `Where would you like to start your session today, ${firstName}? Solving wide-scale problems as an elite AI agent.`;
       }
       if (circularSub) {
-        circularSub.textContent = `Talk to Jarvis • Grounded Vault RAG for ${name}`;
+        circularSub.textContent = `Talk to Jarvis • Grounded Vault RAG for ${firstName}`;
       }
+
+      const avatarInitialsEl = document.getElementById('user-avatar-initials');
+      const avatarFullNameEl = document.getElementById('user-avatar-fullname');
+      if (avatarInitialsEl) avatarInitialsEl.textContent = initials;
+      if (avatarFullNameEl) avatarFullNameEl.textContent = name;
 
       const settingsInput = document.getElementById('settings-user-name');
       if (settingsInput) settingsInput.value = name;
@@ -245,41 +262,50 @@
       const modal = document.getElementById('user-onboarding-modal');
       if (modal) {
         modal.classList.add('active');
-        const input = document.getElementById('onboarding-name-input');
         const stored = (typeof Store !== 'undefined' && Store.getUserName) ? Store.getUserName() : localStorage.getItem('second_brain_user_name');
-        if (input && stored) input.value = stored;
+        if (stored) {
+          const parts = stored.trim().split(/\s+/);
+          const firstEl = document.getElementById('onboarding-first-name-input');
+          const lastEl = document.getElementById('onboarding-last-name-input');
+          if (firstEl) firstEl.value = parts[0] || '';
+          if (lastEl) lastEl.value = parts.slice(1).join(' ') || '';
+        }
       }
     };
 
     window.saveUserOnboardingName = function(e) {
       if (e && e.preventDefault) e.preventDefault();
-      const input = document.getElementById('onboarding-name-input');
-      const name = input ? input.value.trim() : '';
+      const firstEl = document.getElementById('onboarding-first-name-input');
+      const lastEl = document.getElementById('onboarding-last-name-input');
+      
+      const firstName = firstEl ? firstEl.value.trim() : '';
+      const lastName = lastEl ? lastEl.value.trim() : '';
+      const fullName = [firstName, lastName].filter(Boolean).join(' ');
 
-      if (name) {
+      if (fullName) {
         if (typeof Store !== 'undefined' && Store.setUserName) {
-          Store.setUserName(name);
+          Store.setUserName(fullName);
         } else {
-          localStorage.setItem('second_brain_user_name', name);
+          localStorage.setItem('second_brain_user_name', fullName);
         }
 
         const modal = document.getElementById('user-onboarding-modal');
         if (modal) modal.classList.remove('active');
 
         if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
-        updateUserGreetings(name);
+        updateUserGreetings(fullName);
 
         const hour = new Date().getHours();
         let timeSalutation = hour >= 12 && hour < 17 ? 'Good afternoon' : (hour >= 17 || hour < 5 ? 'Good evening' : 'Good morning');
 
-        showToast(`✨ ${timeSalutation}, ${name}! Your AI chat session is ready.`);
+        showToast(`✨ ${timeSalutation}, ${firstName}! Your Google profile avatar is ready.`);
 
         if (typeof NexusBotEngine !== 'undefined' && NexusBotEngine.speak) {
-          NexusBotEngine.speak(`${timeSalutation}, ${name}! Your Second Brain AI System is ready.`, 8000);
+          NexusBotEngine.speak(`${timeSalutation}, ${firstName}! Your Second Brain AI System is ready.`, 8000);
         }
 
         if (typeof VoiceEngine !== 'undefined' && typeof Store !== 'undefined' && Store.settings && Store.settings.ttsEnabled) {
-          VoiceEngine.speak(`${timeSalutation} ${name}! Your Second Brain AI System is ready.`);
+          VoiceEngine.speak(`${timeSalutation} ${firstName}! Your Second Brain AI System is ready.`);
         }
       }
     };

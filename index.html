@@ -148,6 +148,12 @@
             </div>
 
             <div class="chat-top-right">
+              <!-- Google-Style User Profile Avatar Badge -->
+              <div id="user-google-avatar-badge" class="user-google-avatar-badge" onclick="window.openUserOnboardingModal()" title="Click to view/edit user profile">
+                <div id="user-avatar-initials" class="user-avatar-initials">AP</div>
+                <span id="user-avatar-fullname" class="user-avatar-fullname hide-mobile">Ankita Priyadarshini</span>
+              </div>
+
               <button id="global-sound-toggle-btn" class="top-action-btn" onclick="window.toggleGlobalAudioMute()" title="Toggle Sound / Silent Environment Mode" style="border: 1px solid var(--accent-amber); color: var(--accent-amber);">
                 <span id="global-sound-toggle-icon">🔊</span> <span class="hide-mobile" id="global-sound-toggle-text">Sound ON</span>
               </button>
@@ -155,7 +161,6 @@
               <button class="top-action-btn" onclick="const current = document.documentElement.getAttribute('data-theme'); const next = (current === 'royal-gold' || current === 'gemini-dark' || current === 'obsidian') ? 'platinum-gold' : 'royal-gold'; window.applyTheme(next);" title="Toggle Theme Palette" style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(192, 132, 252, 0.2)); border: 1px solid rgba(251, 191, 36, 0.4); color: var(--accent-primary);">
                 ✨ <span>Switch Theme</span>
               </button>
-
             </div>
           </div>
 
@@ -1407,19 +1412,25 @@
   <div id="user-onboarding-modal" class="modal-backdrop" aria-label="Welcome User Login Modal">
     <div class="spec-modal-card glass-card" style="max-width: 480px; text-align: center; border: 1.5px solid var(--accent-amber); box-shadow: 0 25px 70px rgba(0, 0, 0, 0.45); padding: 32px 28px; border-radius: 20px; background: rgba(30, 31, 36, 0.95); backdrop-filter: blur(20px);">
       <div style="font-size: 48px; margin-bottom: 12px; filter: drop-shadow(0 4px 12px rgba(245, 176, 65, 0.4));">🧠✨</div>
-      <h2 style="font-size: 24px; font-weight: 800; color: var(--accent-amber); margin-bottom: 8px; font-family: var(--font-primary);">Welcome to Second Brain AI</h2>
+      <h2 style="font-size: 24px; font-weight: 800; color: var(--accent-amber); margin-bottom: 8px; font-family: var(--font-primary);">Welcome to Juno AI</h2>
       <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 24px;">
-        Please enter your name to personalize your cognitive knowledge sanctuary &amp; unlock your AI assistant.
+        Please enter your First &amp; Last Name to initialize your personalized Google-style profile avatar.
       </p>
 
-      <form id="onboarding-user-form" onsubmit="window.saveUserOnboardingName(event)" style="display: flex; flex-direction: column; gap: 16px;">
-        <div style="text-align: left;">
-          <label style="font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Your Name:</label>
-          <input type="text" id="onboarding-name-input" class="input-field" placeholder="Enter your name..." required style="font-size: 15.5px; padding: 13px 18px; border-radius: 12px; border: 1.5px solid var(--accent-amber); background: rgba(255, 255, 255, 0.05); color: var(--text-primary); width: 100%; box-sizing: border-box;" autofocus>
+      <form id="onboarding-user-form" onsubmit="window.saveUserOnboardingName(event)" style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; gap: 12px; width: 100%;">
+          <div style="flex: 1; text-align: left;">
+            <label style="font-size: 11px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">First Name</label>
+            <input type="text" id="onboarding-first-name-input" class="input-field" placeholder="First name..." required style="font-size: 14.5px; padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--accent-amber); background: rgba(255, 255, 255, 0.05); color: var(--text-primary); width: 100%; box-sizing: border-box;" autofocus>
+          </div>
+          <div style="flex: 1; text-align: left;">
+            <label style="font-size: 11px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Last Name</label>
+            <input type="text" id="onboarding-last-name-input" class="input-field" placeholder="Last name..." style="font-size: 14.5px; padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--accent-amber); background: rgba(255, 255, 255, 0.05); color: var(--text-primary); width: 100%; box-sizing: border-box;">
+          </div>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="padding: 14px; font-size: 15.5px; font-weight: 800; width: 100%; margin-top: 6px; background: linear-gradient(135deg, #d68910, #f5b041); border: none; border-radius: 12px; cursor: pointer; color: #121316; box-shadow: 0 8px 24px rgba(214, 137, 16, 0.35); transition: all 0.2s ease;">
-          Unlock My Second Brain 🚀
+        <button type="submit" class="btn btn-primary" style="padding: 13px; font-size: 15px; font-weight: 800; width: 100%; margin-top: 6px; background: linear-gradient(135deg, #d68910, #f5b041); border: none; border-radius: 12px; cursor: pointer; color: #121316; box-shadow: 0 8px 24px rgba(214, 137, 16, 0.35); transition: all 0.2s ease;">
+          Save &amp; Enter Chat 🚀
         </button>
       </form>
     </div>
