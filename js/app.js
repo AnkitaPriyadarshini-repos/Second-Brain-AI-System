@@ -406,7 +406,52 @@
       } else {
         updateUserGreetings(storedName, storedEmail);
       }
+      if (typeof window.updateAuthUI === 'function') {
+        window.updateAuthUI();
+      }
     }, 500);
+
+    window.handleAuthAction = function() {
+      const name = (typeof Store !== 'undefined' && Store.getUserName) ? Store.getUserName() : localStorage.getItem('second_brain_user_name');
+      if (name) {
+        localStorage.removeItem('second_brain_user_name');
+        localStorage.removeItem('second_brain_user_email');
+        localStorage.removeItem('second_brain_user_avatar');
+        if (typeof Store !== 'undefined' && Store._removeItem) {
+          Store._removeItem('second_brain_user_name');
+          Store._removeItem('second_brain_user_email');
+        }
+      }
+      window.location.href = 'pages/login.html';
+    };
+
+    window.updateAuthUI = function() {
+      const name = (typeof Store !== 'undefined' && Store.getUserName) ? Store.getUserName() : localStorage.getItem('second_brain_user_name');
+      const authBtnText = document.getElementById('global-auth-btn-text');
+      const authBtnIcon = document.getElementById('global-auth-btn-icon');
+      const authBtn = document.getElementById('global-auth-action-btn');
+      if (authBtnText) {
+        if (name) {
+          authBtnText.textContent = 'Logout';
+          if (authBtnIcon) authBtnIcon.textContent = '🚪';
+          if (authBtn) {
+            authBtn.title = 'Logout (' + name + ')';
+            authBtn.style.background = 'rgba(239, 68, 68, 0.18)';
+            authBtn.style.border = '1px solid rgba(239, 68, 68, 0.5)';
+            authBtn.style.color = '#f87171';
+          }
+        } else {
+          authBtnText.textContent = 'Login';
+          if (authBtnIcon) authBtnIcon.textContent = '🔐';
+          if (authBtn) {
+            authBtn.title = 'Login / Sign In';
+            authBtn.style.background = 'rgba(147, 51, 234, 0.18)';
+            authBtn.style.border = '1px solid rgba(147, 51, 234, 0.4)';
+            authBtn.style.color = '#c084fc';
+          }
+        }
+      }
+    };
 
     const ragQueryInputEl = document.getElementById('rag-query-input');
     if (ragQueryInputEl) {

@@ -163,13 +163,13 @@
                 ✨ <span class="hide-mobile">Switch Theme</span>
               </button>
 
-              <a href="landing.html" class="top-action-btn" title="View Showcase Website" style="background: rgba(245, 158, 11, 0.15); border: 1px solid var(--accent-amber); color: var(--accent-amber); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px;">
+              <a href="landing.html" class="top-action-btn" title="View Showcase Website" style="background: rgba(245, 158, 11, 0.15); border: 1px solid var(--accent-amber); color: var(--accent-amber); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; flex-shrink: 0;">
                 🌐 <span class="hide-mobile">Showcase Site</span>
               </a>
 
-              <a href="pages/login.html" class="top-action-btn" title="View Animated Login Page" style="background: rgba(147, 51, 234, 0.18); border: 1px solid rgba(147, 51, 234, 0.4); color: #c084fc; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px;">
-                🔐 <span class="hide-mobile">Login Page</span>
-              </a>
+              <button id="global-auth-action-btn" class="top-action-btn" onclick="window.handleAuthAction()" title="Log out of current session" style="background: rgba(239, 68, 68, 0.18); border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; cursor: pointer; flex-shrink: 0; white-space: nowrap;">
+                <span id="global-auth-btn-icon">🚪</span> <span id="global-auth-btn-text">Logout</span>
+              </button>
             </div>
           </div>
 
