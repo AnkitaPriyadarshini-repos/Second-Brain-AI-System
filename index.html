@@ -1408,16 +1408,17 @@
       <button id="reindex-done-btn" class="btn btn-primary" style="width: 100%; display: none;" onclick="window.closeModal('vector-reindex-modal')">
         ✅ Indexing Complete &amp; Saved
       </button>
-  <!-- One-Time Welcome Onboarding Login Modal -->
+  <!-- One-Time Welcome Onboarding Login & OTP Modal -->
   <div id="user-onboarding-modal" class="modal-backdrop" aria-label="Welcome User Login Modal">
     <div class="spec-modal-card glass-card" style="max-width: 480px; text-align: center; border: 1.5px solid var(--accent-amber); box-shadow: 0 25px 70px rgba(0, 0, 0, 0.45); padding: 32px 28px; border-radius: 20px; background: rgba(30, 31, 36, 0.95); backdrop-filter: blur(20px);">
       <div style="font-size: 48px; margin-bottom: 12px; filter: drop-shadow(0 4px 12px rgba(245, 176, 65, 0.4));">🧠✨</div>
       <h2 style="font-size: 24px; font-weight: 800; color: var(--accent-amber); margin-bottom: 8px; font-family: var(--font-primary);">Welcome to Juno AI</h2>
-      <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 24px;">
-        Please enter your First &amp; Last Name to initialize your personalized Google-style profile avatar.
+      <p id="onboarding-modal-subtitle" style="color: var(--text-secondary); font-size: 13.5px; line-height: 1.6; margin-bottom: 22px;">
+        Please enter your details to verify your Email ID &amp; unlock your personalized session.
       </p>
 
-      <form id="onboarding-user-form" onsubmit="window.saveUserOnboardingName(event)" style="display: flex; flex-direction: column; gap: 14px;">
+      <!-- Step 1: User Login Details Form -->
+      <form id="onboarding-user-form" onsubmit="window.sendLoginOTP(event)" style="display: flex; flex-direction: column; gap: 14px;">
         <div style="display: flex; gap: 12px; width: 100%;">
           <div style="flex: 1; text-align: left;">
             <label style="font-size: 11px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">First Name</label>
@@ -1429,9 +1430,36 @@
           </div>
         </div>
 
+        <div style="text-align: left;">
+          <label style="font-size: 11px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">Email Address</label>
+          <input type="email" id="onboarding-email-input" class="input-field" placeholder="name@domain.com..." required style="font-size: 14.5px; padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--accent-amber); background: rgba(255, 255, 255, 0.05); color: var(--text-primary); width: 100%; box-sizing: border-box;">
+        </div>
+
         <button type="submit" class="btn btn-primary" style="padding: 13px; font-size: 15px; font-weight: 800; width: 100%; margin-top: 6px; background: linear-gradient(135deg, #d68910, #f5b041); border: none; border-radius: 12px; cursor: pointer; color: #121316; box-shadow: 0 8px 24px rgba(214, 137, 16, 0.35); transition: all 0.2s ease;">
-          Save &amp; Enter Chat 🚀
+          Send OTP Verification Code 📩
         </button>
+      </form>
+
+      <!-- Step 2: OTP Verification Container (Hidden by default) -->
+      <form id="onboarding-otp-form" onsubmit="window.verifyLoginOTP(event)" style="display: none; flex-direction: column; gap: 14px;">
+        <div style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); border-radius: 12px; padding: 12px 16px; font-size: 13px; color: var(--accent-amber); font-weight: 600;">
+          📩 OTP Sent to: <strong id="target-otp-email-display" style="color: #ffffff;">user@email.com</strong>
+          <div style="font-size: 11px; opacity: 0.85; margin-top: 4px;">(Demo Code: <span id="generated-otp-code-hint" style="font-weight: 800; text-decoration: underline;">582914</span>)</div>
+        </div>
+
+        <div style="text-align: left;">
+          <label style="font-size: 11px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; display: block; text-transform: uppercase; letter-spacing: 0.5px;">6-Digit OTP Code</label>
+          <input type="text" id="onboarding-otp-input" class="input-field" placeholder="Enter 6-digit OTP code..." maxlength="6" required style="font-size: 18px; font-weight: 800; letter-spacing: 4px; text-align: center; padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--accent-amber); background: rgba(255, 255, 255, 0.05); color: var(--accent-amber); width: 100%; box-sizing: border-box;">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="padding: 13px; font-size: 15px; font-weight: 800; width: 100%; margin-top: 4px; background: linear-gradient(135deg, #10b981, #34d399); border: none; border-radius: 12px; cursor: pointer; color: #064e3b; box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35); transition: all 0.2s ease;">
+          Verify OTP &amp; Start Session 🔐
+        </button>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-top: 4px;">
+          <button type="button" onclick="window.backToDetailsStep()" style="background: none; border: none; color: var(--text-secondary); cursor: pointer; text-decoration: underline;">← Edit Details</button>
+          <button type="button" onclick="window.resendOTPCode()" style="background: none; border: none; color: var(--accent-amber); cursor: pointer; font-weight: 700;">🔄 Resend OTP</button>
+        </div>
       </form>
     </div>
   </div>

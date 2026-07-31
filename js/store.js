@@ -462,6 +462,19 @@
       }
     },
 
+    getUserEmail: function () {
+      return this._getItem('second_brain_user_email') || this.settings.userEmail || '';
+    },
+
+    setUserEmail: function (email) {
+      const cleanEmail = (email || '').trim();
+      if (cleanEmail) {
+        this._setItem('second_brain_user_email', cleanEmail);
+        this.settings.userEmail = cleanEmail;
+        this.saveNotes();
+      }
+    },
+
     updateSettings: function (newSettings) {
       this.settings = { ...this.settings, ...newSettings };
       this.saveNotes();
