@@ -340,6 +340,31 @@
       }
     },
 
+    getRepository: function (name) {
+      if (typeof require !== 'undefined') {
+        try {
+          const c = require('./container').container;
+          return c ? c.resolve(name) : null;
+        } catch (e) {}
+      }
+      if (typeof window !== 'undefined' && window.container) {
+        return window.container.resolve(name);
+      }
+      return null;
+    },
+
+    setRepository: function (name, adapter) {
+      if (typeof require !== 'undefined') {
+        try {
+          const c = require('./container').container;
+          if (c) c.register(name, adapter);
+        } catch (e) {}
+      }
+      if (typeof window !== 'undefined' && window.container) {
+        window.container.register(name, adapter);
+      }
+    },
+
     saveNotes: function () {
       this._setItem(STORAGE_KEY, JSON.stringify(this.notes));
       this._setItem(DISMISSED_KEY, JSON.stringify(this.dismissedIds));
@@ -349,6 +374,13 @@
     },
 
     getNotes: function () {
+      const repo = this.getRepository('NoteRepository');
+      if (repo) {
+        const repoNotes = repo.getAll();
+        if (repoNotes && repoNotes.length > 0) {
+          this.notes = repoNotes;
+        }
+      }
       return this.notes;
     },
 

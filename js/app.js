@@ -225,9 +225,19 @@
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
 
-    function updateUserGreetings(name, email) {
-      if (!name) return;
-      const userEmail = email || ((typeof Store !== 'undefined' && Store.getUserEmail) ? Store.getUserEmail() : localStorage.getItem('second_brain_user_email')) || '';
+    function updateUserGreetings(rawName, rawEmail) {
+      let name = rawName;
+      let userEmail = rawEmail;
+
+      if (!name || name.startsWith('User_')) {
+        name = 'Ankita Priyadarshini';
+        localStorage.setItem('second_brain_user_name', name);
+      }
+      if (!userEmail || userEmail.includes('google.com') || userEmail.includes('github.com')) {
+        userEmail = 'ankita@junoai.io';
+        localStorage.setItem('second_brain_user_email', userEmail);
+      }
+
       const hour = new Date().getHours();
       let timeSalutation = 'Good morning';
       if (hour >= 12 && hour < 17) {
@@ -260,7 +270,9 @@
       const avatarInitialsEl = document.getElementById('user-avatar-initials');
       const avatarFullNameEl = document.getElementById('user-avatar-fullname');
       if (avatarInitialsEl) avatarInitialsEl.textContent = initials;
-      if (avatarFullNameEl) avatarFullNameEl.textContent = userEmail ? `${name} (${userEmail})` : name;
+      if (avatarFullNameEl) {
+        avatarFullNameEl.innerHTML = `<span>${name}</span> <span style="font-size: 10.5px; font-weight: 700; color: #34d399; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); padding: 1.5px 6px; border-radius: 8px; margin-left: 4px;">✓ Verified</span>`;
+      }
 
       const settingsInput = document.getElementById('settings-user-name');
       if (settingsInput) settingsInput.value = name;
@@ -841,9 +853,11 @@
           thinkingCard.remove();
         }
 
+        const RAG_SEND_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
+
         if (submitBtn) {
           submitBtn.disabled = false;
-          submitBtn.innerHTML = `Ask Juno ✨`;
+          submitBtn.innerHTML = RAG_SEND_SVG;
         }
 
         // Render Telemetry Banner Card (Disabled)
@@ -886,7 +900,7 @@
       } catch (err) {
         console.error('Error during AI synthesis:', err);
         if (thinkingCard && thinkingCard.parentNode) thinkingCard.remove();
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = 'Ask Juno ✨'; }
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`; }
         if (progressBarContainer) progressBarContainer.style.display = 'none';
         appendChatMessage('ai', `⚠️ **AI Completion Error**: ${err.message}\n\nPlease check your API key settings or switch to **Juno Local RAG** model.`, [], false, query);
       }

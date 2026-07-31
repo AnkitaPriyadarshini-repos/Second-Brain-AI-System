@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — Juno AI</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+    :root {
+      --bg-dark: #07090e;
+      --bg-card: rgba(15, 20, 32, 0.95);
+      --accent-amber: #f59e0b;
+      --accent-gold: #fbbf24;
+      --accent-violet: #9333ea;
+      --accent-emerald: #10b981;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --border-color: rgba(245, 158, 11, 0.35);
+      --font-main: 'Outfit', 'Poppins', sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: var(--font-main);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: var(--bg-dark);
+      overflow-x: hidden;
+      position: relative;
+      padding: 20px;
+    }
+
+    /* Ambient Background Glow Particles */
+    .background-orb {
+      height: 420px;
+      width: 420px;
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(150px);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .orb-1 {
+      background: radial-gradient(circle, #f59e0b, rgba(245, 158, 11, 0));
+      left: 20%;
+      top: 15%;
+      animation: floatOrb 7s ease-in-out infinite alternate;
+    }
+
+    .orb-2 {
+      background: radial-gradient(circle, #9333ea, rgba(147, 51, 234, 0));
+      right: 20%;
+      bottom: 15%;
+      animation: floatOrb 9s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translateY(0px) scale(1); }
+      100% { transform: translateY(-30px) scale(1.1); }
+    }
+
+    /* Worldwide Ticker Header Chip */
+    .global-welcome-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 8px 18px;
+      border-radius: 30px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin-bottom: 24px;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      z-index: 10;
+      animation: badgeFadeIn 0.8s ease-out;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--accent-emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent-emerald);
+      animation: pulseDot 1.5s infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+
+    @keyframes badgeFadeIn {
+      0% { opacity: 0; transform: translateY(-15px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Centered Master Login Card Container */
+    .login-box-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      height: 600px;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(245, 158, 11, 0.2);
+      z-index: 10;
+      animation: cardFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes cardFadeIn {
+      0% { opacity: 0; transform: translateY(25px) scale(0.96); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Rotating Conic Border Animation */
+    .login-box-wrapper::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(0deg, transparent, #f59e0b, #fbbf24);
+      transform-origin: bottom right;
+      animation: animateBorder 6s linear infinite;
+    }
+
+    .login-box-wrapper::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(0deg, transparent, #9333ea, #f59e0b);
+      transform-origin: bottom right;
+      animation: animateBorder 6s linear infinite;
+      animation-delay: -3s;
+    }
+
+    @keyframes animateBorder {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Inner Glass Container */
+    .form-container {
+      position: absolute;
+      inset: 3px;
+      background: #0d111a;
+      padding: 38px 34px;
+      border-radius: 25px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Top Mascot Avatar Badge */
+    .mascot-avatar-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .mascot-avatar-frame {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid var(--accent-gold);
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.45);
+      background: radial-gradient(circle at center, #1e2638 0%, #0d111a 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.4s ease;
+    }
+
+    .mascot-avatar-frame:hover {
+      transform: scale(1.08) rotate(3deg);
+    }
+
+    .mascot-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .form-title {
+      font-size: 24px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #fbbf24 60%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+    }
+
+    /* Golden Tab Slider */
+    .tab-toggle-wrapper {
+      display: flex;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 30px;
+      padding: 4px;
+      position: relative;
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 0;
+      cursor: pointer;
+      z-index: 2;
+      transition: color 0.3s;
+    }
+
+    .tab-btn.active {
+      color: #0b0f17;
+      font-weight: 800;
+    }
+
+    .tab-indicator {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: calc(50% - 4px);
+      height: calc(100% - 8px);
+      background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+      border-radius: 26px;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+    }
+
+    /* Floating Animated Inputs */
+    .input-box {
+      position: relative;
+      margin-bottom: 22px;
+    }
+
+    .input-box input {
+      width: 100%;
+      padding: 13px 12px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.18);
+      outline: none;
+      color: #ffffff;
+      font-size: 14.5px;
+      transition: border-color 0.3s;
+    }
+
+    .input-box label {
+      position: absolute;
+      left: 12px;
+      top: 13px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+
+    .input-box input:focus ~ label,
+    .input-box input:valid ~ label {
+      top: -12px;
+      left: 0;
+      color: var(--accent-gold);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .input-box input:focus {
+      border-bottom-color: var(--accent-amber);
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 13px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .toggle-password:hover {
+      color: var(--accent-gold);
+    }
+
+    /* Options Row */
+    .options-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 22px;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .remember-me input[type="checkbox"] {
+      accent-color: var(--accent-amber);
+      cursor: pointer;
+    }
+
+    .forgot-link {
+      color: var(--accent-gold);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .forgot-link:hover {
+      color: var(--accent-amber);
+      text-decoration: underline;
+    }
+
+    /* Theme Golden Amber Glow Button */
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
+      color: #ffffff;
+      font-size: 15.5px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 22px rgba(245, 158, 11, 0.4);
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(245, 158, 11, 0.6);
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      color: #0b0f17;
+    }
+
+    .btn-submit:active {
+      transform: scale(0.98);
+    }
+
+    /* Social Icons Row */
+    .social-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .social-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 15px;
+      text-decoration: none;
+    }
+
+    .social-icon-btn:hover {
+      background: var(--accent-amber);
+      border-color: var(--accent-gold);
+      color: #000;
+      transform: translateY(-3px);
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 14px;
+    }
+
+    .footer-note a {
+      color: var(--text-secondary);
+      font-size: 12.5px;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-note a:hover {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="background-orb orb-1"></div>
+  <div class="background-orb orb-2"></div>
+
+  <!-- Worldwide Multilingual Ticker Header Badge -->
+  <div class="global-welcome-badge">
+    <span class="live-dot"></span>
+    <span id="multilingual-greeting">👋 Welcome Worldwide • Juno AI</span>
+  </div>
+
+  <!-- Centered Master Login Box Wrapper -->
+  <div class="login-box-wrapper">
+    <div class="form-container">
+      
+      <!-- Top Mascot Avatar & Header -->
+      <div>
+        <div class="mascot-avatar-wrapper">
+          <div class="mascot-avatar-frame" title="Juno AI Companion">
+            <img src="../assets/juno_ai_robot_mascot.png" alt="Juno AI Robot Avatar" class="mascot-avatar-img" />
+          </div>
+          <h1 class="form-title" id="form-heading">Welcome Back</h1>
+        </div>
+
+        <!-- Golden Tab Slider -->
+        <div class="tab-toggle-wrapper">
+          <button id="tab-login" class="tab-btn active" onclick="switchFormTab('login')">Sign In</button>
+          <button id="tab-register" class="tab-btn" onclick="switchFormTab('register')">Register</button>
+          <div id="tab-indicator" class="tab-indicator"></div>
+        </div>
+      </div>
+
+      <!-- Login / Register Form -->
+      <form id="animated-auth-form" onsubmit="handleAuthSubmit(event)">
+        
+        <!-- Name Input (For Register Mode) -->
+        <div class="input-box" id="name-input-container" style="display: none;">
+          <input type="text" id="input-name" required />
+          <label>Full Name</label>
+        </div>
+
+        <!-- Email Input -->
+        <div class="input-box">
+          <input type="email" id="input-email" required />
+          <label>Email Address</label>
+        </div>
+
+        <!-- Password Input -->
+        <div class="input-box">
+          <input type="password" id="input-password" required />
+          <label>Password</label>
+          <button type="button" class="toggle-password" onclick="togglePasswordVisibility()" title="Toggle Password">👁️</button>
+        </div>
+
+        <!-- Options Row -->
+        <div class="options-row" id="options-row">
+          <label class="remember-me">
+            <input type="checkbox" id="remember-checkbox" checked />
+            <span>Remember me</span>
+          </label>
+          <a href="#" class="forgot-link" onclick="handleForgotPassword(event)">Forgot Password?</a>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="submit-btn" class="btn-submit">Sign In</button>
+      </form>
+
+      <!-- Social Row & Footer -->
+      <div>
+        <div class="social-row">
+          <a href="#" class="social-icon-btn" title="Google Login" onclick="triggerSocialAuth('Google')">G</a>
+          <a href="#" class="social-icon-btn" title="GitHub Login" onclick="triggerSocialAuth('GitHub')">🐙</a>
+          <a href="#" class="social-icon-btn" title="Twitter Login" onclick="triggerSocialAuth('Twitter')">🐦</a>
+        </div>
+
+        <div class="footer-note">
+          <a href="../index.html">← Back to Juno AI Studio</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    /* Multilingual Greeting Loop for Worldwide Visitors */
+    const greetings = [
+      "👋 Welcome Worldwide • Juno AI",
+      "🌐 Hola & Bienvenido!",
+      "✨ Bonjour & Bienvenue!",
+      "Namaste & स्वागतम्! 🙏",
+      "Nǐ Hǎo (你好) & Welcome!",
+      "Konnichiwa (こんにちは)!",
+      "Olá & Bem-vindo! 🇧🇷",
+      "Salaam (سلام) & Welcome!"
+    ];
+    let greetingIndex = 0;
+    const greetingEl = document.getElementById('multilingual-greeting');
+
+    setInterval(() => {
+      greetingIndex = (greetingIndex + 1) % greetings.length;
+      if (greetingEl) {
+        greetingEl.style.opacity = '0';
+        setTimeout(() => {
+          greetingEl.textContent = greetings[greetingIndex];
+          greetingEl.style.opacity = '1';
+        }, 300);
+      }
+    }, 2800);
+
+    /* Form Switcher & Password Handler */
+    let currentMode = 'login';
+
+    function switchFormTab(mode) {
+      currentMode = mode;
+      const indicator = document.getElementById('tab-indicator');
+      const heading = document.getElementById('form-heading');
+      const nameBox = document.getElementById('name-input-container');
+      const submitBtn = document.getElementById('submit-btn');
+      const optionsRow = document.getElementById('options-row');
+      const tabLogin = document.getElementById('tab-login');
+      const tabRegister = document.getElementById('tab-register');
+
+      if (mode === 'register') {
+        indicator.style.transform = 'translateX(100%)';
+        heading.textContent = 'Create Account';
+        nameBox.style.display = 'block';
+        submitBtn.textContent = 'Create Account';
+        optionsRow.style.display = 'none';
+        tabLogin.classList.remove('active');
+        tabRegister.classList.add('active');
+      } else {
+        indicator.style.transform = 'translateX(0%)';
+        heading.textContent = 'Welcome Back';
+        nameBox.style.display = 'none';
+        submitBtn.textContent = 'Sign In';
+        optionsRow.style.display = 'flex';
+        tabRegister.classList.remove('active');
+        tabLogin.classList.add('active');
+      }
+    }
+
+    function togglePasswordVisibility() {
+      const pwdInput = document.getElementById('input-password');
+      const btn = document.querySelector('.toggle-password');
+      if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+        btn.textContent = '🙈';
+      } else {
+        pwdInput.type = 'password';
+        btn.textContent = '👁️';
+      }
+    }
+
+    function handleForgotPassword(e) {
+      e.preventDefault();
+      const email = document.getElementById('input-email').value.trim();
+      if (!email) {
+        alert('Please enter your email address first.');
+      } else {
+        alert(`Reset code sent to ${email}! Check your inbox.`);
+      }
+    }
+
+    function triggerSocialAuth(provider) {
+      alert(`🔐 Authenticating via ${provider} Single Sign-On...`);
+      localStorage.setItem('second_brain_user_name', 'Ankita Priyadarshini');
+      localStorage.setItem('second_brain_user_email', 'ankita@junoai.io');
+      window.location.href = '../index.html';
+    }
+
+    function handleAuthSubmit(e) {
+      e.preventDefault();
+      const rawName = document.getElementById('input-name').value.trim();
+      const rawEmail = document.getElementById('input-email').value.trim();
+      
+      const name = rawName || 'Ankita Priyadarshini';
+      const email = rawEmail || 'ankita@junoai.io';
+      const submitBtn = document.getElementById('submit-btn');
+
+      submitBtn.textContent = currentMode === 'login' ? 'Signing in...' : 'Creating Account...';
+      submitBtn.disabled = true;
+
+      setTimeout(() => {
+        localStorage.setItem('second_brain_user_name', name);
+        localStorage.setItem('second_brain_user_email', email);
+
+        submitBtn.textContent = '✅ Authenticated!';
+        submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+        submitBtn.style.color = '#ffffff';
+
+        setTimeout(() => {
+          window.location.href = '../index.html';
+        }, 800);
+      }, 1000);
+    }
+  </script>
+</body>
+</html>

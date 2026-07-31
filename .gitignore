@@ -27,3 +27,4 @@ docs/pull_shark_log_*
 docs/optimization_*
 
 .vercel
+.next/

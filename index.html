@@ -23,6 +23,7 @@
   <!-- Stylesheets & App Manifest -->
   <link rel="stylesheet" href="css/style.css?v=32.0">
   <link rel="stylesheet" href="css/responsive.css?v=32.0">
+  <link rel="stylesheet" href="css/websocket-chat.css?v=32.0">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#18181b">
 </head>
@@ -159,8 +160,16 @@
               </button>
 
               <button class="top-action-btn" onclick="const current = document.documentElement.getAttribute('data-theme'); const next = (current === 'royal-gold' || current === 'gemini-dark' || current === 'obsidian') ? 'platinum-gold' : 'royal-gold'; window.applyTheme(next);" title="Toggle Theme Palette" style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(192, 132, 252, 0.2)); border: 1px solid rgba(251, 191, 36, 0.4); color: var(--accent-primary);">
-                ✨ <span>Switch Theme</span>
+                ✨ <span class="hide-mobile">Switch Theme</span>
               </button>
+
+              <a href="landing.html" class="top-action-btn" title="View Showcase Website" style="background: rgba(245, 158, 11, 0.15); border: 1px solid var(--accent-amber); color: var(--accent-amber); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px;">
+                🌐 <span class="hide-mobile">Showcase Site</span>
+              </a>
+
+              <a href="pages/login.html" class="top-action-btn" title="View Animated Login Page" style="background: rgba(147, 51, 234, 0.18); border: 1px solid rgba(147, 51, 234, 0.4); color: #c084fc; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px;">
+                🔐 <span class="hide-mobile">Login Page</span>
+              </a>
             </div>
           </div>
 

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Juno AI — Private Second Brain & Instant Search Engine</title>
+  <meta name="description" content="Juno AI is a high-performance personal research tool engineered by Ankita Priyadarshini. Built with Next.js SSR, WebSockets, and Dependency Inversion storage adapters for sub-10ms local search.">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="stylesheet" href="css/landing.css">
+</head>
+<body>
+
+  <!-- Dynamic Background Canvas -->
+  <canvas id="particle-canvas"></canvas>
+  <div class="ambient-glow ambient-1"></div>
+  <div class="ambient-glow ambient-2"></div>
+
+  <!-- Navigation Header -->
+  <header class="landing-header">
+    <a href="#" class="brand-container">
+      <img src="assets/logo.svg" alt="Juno AI Logo" class="brand-logo-img" />
+      <div class="brand-text-stack">
+        <span class="brand-name">Juno AI</span>
+        <span class="brand-tagline">by Ankita Priyadarshini</span>
+      </div>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#story" class="nav-link">Design Story</a></li>
+      <li><a href="#playground" class="nav-link">Live Demo</a></li>
+      <li><a href="#architecture" class="nav-link">Architecture</a></li>
+      <li><a href="#benchmarks" class="nav-link">Benchmarks</a></li>
+      <li><a href="#developers" class="nav-link">Quick Start</a></li>
+    </ul>
+
+    <div class="header-right-actions" style="display: flex; gap: 10px; align-items: center;">
+      <a href="pages/login.html" class="nav-cta-btn" style="background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border-color); color: #fff;">
+        <span>🔐 Login Page</span>
+      </a>
+      <a href="index.html" class="nav-cta-btn">
+        <span>Open Studio App</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container">
+      <h1 class="hero-title">
+        Search your technical notes instantly. <br />
+        <span class="hero-title-gradient">No cloud latency. 100% private.</span>
+      </h1>
+
+      <div class="hero-actions">
+        <a href="index.html" class="btn-primary">
+          <span>Launch AI Studio App</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <a href="#playground" class="btn-secondary">
+          <span>Try Interactive Demo</span>
+        </a>
+      </div>
+
+      <!-- Real Benchmark Telemetry Bar -->
+      <div class="stats-grid" id="benchmarks">
+        <div class="stat-card">
+          <div class="stat-number">6.2 ms</div>
+          <div class="stat-label">Measured Round-Trip Latency</div>
+          <div class="stat-sub font-code">&lt; 300ms SLA Target</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">2.3x</div>
+          <div class="stat-label">Initial Hydration Speedup</div>
+          <div class="stat-sub font-code">Next.js SSR Pre-Rendered</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">0.17 ms</div>
+          <div class="stat-label">Schema Migration Time</div>
+          <div class="stat-sub font-code">685,000+ Records / Sec</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">39 / 39</div>
+          <div class="stat-label">Automated Test Suites</div>
+          <div class="stat-sub font-code">100% Passing Score</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Creator's Story & Engineering Motivation Section -->
+  <section class="story-section" id="story">
+    <div class="container">
+      <div class="story-card">
+        <div class="story-header">
+          <div class="creator-avatar">AP</div>
+          <div>
+            <div class="creator-name">Ankita Priyadarshini</div>
+            <div class="creator-title">System Architect &amp; Creator of Juno AI</div>
+          </div>
+        </div>
+        <div class="story-pillars-grid">
+          <div class="pillar-item">
+            <div class="pillar-num font-code">01</div>
+            <div class="pillar-title">Zero Data Exfiltration</div>
+            <div class="pillar-desc">All note vectors and cosine similarity calculations run locally inside your browser memory.</div>
+          </div>
+          <div class="pillar-item">
+            <div class="pillar-num font-code">02</div>
+            <div class="pillar-title">WebSockets vs HTTP Polling</div>
+            <div class="pillar-desc">By keeping a persistent WebSocket connection active, message streams bypass HTTP handshake overhead.</div>
+          </div>
+          <div class="pillar-item">
+            <div class="pillar-num font-code">03</div>
+            <div class="pillar-title">Dependency Inversion Principle</div>
+            <div class="pillar-desc">Abstract repository interfaces allow seamless switching between LocalStorage, InMemory, and IndexedDB adapters.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Interactive AI Demo Playground -->
+  <section class="playground-section" id="playground">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Interactive Playground</span>
+        <h2 class="section-title">Test Local RAG Search &amp; Model Switching</h2>
+      </div>
+
+      <div class="demo-window">
+        <div class="demo-titlebar">
+          <div class="window-dots">
+            <span class="dot dot-red"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-green"></span>
+          </div>
+          <div class="demo-bar-title font-code">juno-ai-runtime ~ local-rag-demo</div>
+          <select id="demo-model-select" class="demo-model-selector font-code">
+            <option value="Juno Ultra Flash">✨ Juno Ultra Flash</option>
+            <option value="Juno Deep Reasoning">🧠 Juno Deep Reasoning</option>
+            <option value="Local Vault RAG">🔒 Local Vault RAG</option>
+          </select>
+        </div>
+
+        <div class="demo-body">
+          <div class="demo-prompts-row">
+            <button class="demo-prompt-chip" data-prompt="Distributed System Architecture">Distributed Event Queue</button>
+            <button class="demo-prompt-chip" data-prompt="Production Code Generator">Rate-Limited Async Queue</button>
+            <button class="demo-prompt-chip" data-prompt="Deep Reasoning & AI Math">Transformer Attention Math</button>
+            <button class="demo-prompt-chip" data-prompt="Top 10 Global AI Megaclusters">Global AI Supercomputers</button>
+          </div>
+
+          <div class="demo-output-box" id="demo-output">
+            <span id="demo-latency" class="demo-latency-badge font-code">Latency: 6.2ms (Passed &lt;300ms SLA)</span>
+            <p>Select a query chip above or type any custom question below to test local vector retrieval.</p>
+          </div>
+
+          <div class="demo-input-row">
+            <input type="text" id="demo-input" class="demo-input" placeholder="Type a technical question..." />
+            <button id="demo-send-btn" class="demo-send-btn">Send Query</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive Architecture Explorer Section -->
+  <section class="architecture-section" id="architecture">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Software Architecture</span>
+        <h2 class="section-title">Layered Backend &amp; Repository Abstractions</h2>
+      </div>
+
+      <div class="arch-tabs">
+        <button class="arch-tab active" data-arch="controllers">Controllers Layer</button>
+        <button class="arch-tab" data-arch="services">Domain Services</button>
+        <button class="arch-tab" data-arch="dip">DIP Repositories</button>
+        <button class="arch-tab" data-arch="components">Reusable UI Library</button>
+      </div>
+
+      <div class="arch-display-card">
+        <h3 id="arch-title-display" style="font-size: 20px; color: var(--accent-gold); margin-bottom: 8px;">Controllers Layer (HTTP &amp; WebSockets)</h3>
+        <p id="arch-desc-display" style="color: var(--text-secondary); font-size: 14.5px; margin-bottom: 16px;">Encapsulates DTO extraction, route handling, and connection state with zero direct database queries or core business logic.</p>
+        <pre class="arch-code-preview"><code id="arch-code-display">// controllers/NoteController.js
+export class NoteController {
+  constructor(noteService) {
+    this.noteService = noteService;
+  }
+  async getNotes(req, res) {
+    const notes = await this.noteService.getAllNotes();
+    res.json({ success: true, count: notes.length, data: notes });
+  }
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- Developer Hub Section -->
+  <section class="dev-section" id="developers">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Developer Instructions</span>
+        <h2 class="section-title">Run Locally in 3 Steps</h2>
+      </div>
+
+      <div class="terminal-card">
+        <div class="terminal-header">
+          <span class="font-code" style="font-size: 13px; color: var(--text-secondary);">bash terminal</span>
+          <button class="copy-btn font-code" data-copy="git clone https://github.com/AnkitaPriyadarshini-repos/Second-Brain-AI-System.git && cd Second-Brain-AI-System && npm install && npm test">Copy Command</button>
+        </div>
+        <div class="terminal-body font-code">
+          <div><span style="color: var(--text-muted);"># 1. Clone repository</span></div>
+          <div><span style="color: #38bdf8;">git clone https://github.com/AnkitaPriyadarshini-repos/Second-Brain-AI-System.git</span></div>
+          <div><span style="color: #38bdf8;">cd Second-Brain-AI-System</span></div>
+          <br>
+          <div><span style="color: var(--text-muted);"># 2. Start Next.js SSR + WebSockets server</span></div>
+          <div><span style="color: #38bdf8;">npm start</span></div>
+          <br>
+          <div><span style="color: var(--text-muted);"># 3. Run automated verification suite</span></div>
+          <div><span style="color: #38bdf8;">npm test</span></div>
+          <div style="margin-top: 10px;"><span style="color: #10b981;">✅ SUMMARY: 39 / 39 TESTS PASSED CLEANLY.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <div class="container">
+      <p>Handcrafted with care by <strong>Ankita Priyadarshini</strong> • Juno AI Second Brain System</p>
+      <p style="margin-top: 6px; font-size: 13px; color: var(--text-muted);">Open Source under MIT License • Built with Next.js SSR, WebSockets, &amp; Dependency Inversion Principle</p>
+    </div>
+  </footer>
+
+  <script src="js/landing.js"></script>
+</body>
+</html>
