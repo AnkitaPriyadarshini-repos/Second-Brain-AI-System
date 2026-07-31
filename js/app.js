@@ -215,16 +215,41 @@
 
     function updateUserGreetings(name) {
       if (!name) return;
+      const hour = new Date().getHours();
+      let timeSalutation = 'Good morning';
+      if (hour >= 12 && hour < 17) {
+        timeSalutation = 'Good afternoon';
+      } else if (hour >= 17 || hour < 5) {
+        timeSalutation = 'Good evening';
+      }
+
       const heroGreeting = document.getElementById('user-hero-greeting');
       const heroSub = document.getElementById('user-hero-sub');
+      const circularSub = document.getElementById('circular-card-sub');
       
       if (heroGreeting) {
-        heroGreeting.textContent = `Hello, ${name}`;
+        heroGreeting.textContent = `${timeSalutation}, ${name}! 👋`;
       }
       if (heroSub) {
-        heroSub.textContent = `Where would you like to start today? Solving wide-scale problems as an elite AI agent.`;
+        heroSub.textContent = `Where would you like to start your session today, ${name}? Solving wide-scale problems as an elite AI agent.`;
       }
+      if (circularSub) {
+        circularSub.textContent = `Talk to Jarvis • Grounded Vault RAG for ${name}`;
+      }
+
+      const settingsInput = document.getElementById('settings-user-name');
+      if (settingsInput) settingsInput.value = name;
     }
+
+    window.openUserOnboardingModal = function() {
+      const modal = document.getElementById('user-onboarding-modal');
+      if (modal) {
+        modal.classList.add('active');
+        const input = document.getElementById('onboarding-name-input');
+        const stored = (typeof Store !== 'undefined' && Store.getUserName) ? Store.getUserName() : localStorage.getItem('second_brain_user_name');
+        if (input && stored) input.value = stored;
+      }
+    };
 
     window.saveUserOnboardingName = function(e) {
       if (e && e.preventDefault) e.preventDefault();
@@ -244,28 +269,22 @@
         if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
         updateUserGreetings(name);
 
-        const wiseQuotes = [
-          `"Wisdom is not a product of schooling but of the lifelong attempt to acquire it." — Albert Einstein`,
-          `"An investment in knowledge pays the best interest." — Benjamin Franklin`,
-          `"The secret of getting ahead is getting started." — Mark Twain`,
-          `"Knowledge is power. Information is liberating." — Kofi Annan`,
-          `"The beautiful thing about learning is that no one can take it away from you." — B.B. King`
-        ];
-        const randomQuote = wiseQuotes[Math.floor(Math.random() * wiseQuotes.length)];
+        const hour = new Date().getHours();
+        let timeSalutation = hour >= 12 && hour < 17 ? 'Good afternoon' : (hour >= 17 || hour < 5 ? 'Good evening' : 'Good morning');
 
-        showToast(`✨ Welcome, ${name}! Your cognitive sanctuary is unlocked.`);
+        showToast(`✨ ${timeSalutation}, ${name}! Your AI chat session is ready.`);
 
         if (typeof NexusBotEngine !== 'undefined' && NexusBotEngine.speak) {
-          NexusBotEngine.speak(`Welcome, ${name}! 🌱 ${randomQuote}`, 10000);
+          NexusBotEngine.speak(`${timeSalutation}, ${name}! Your Second Brain AI System is ready.`, 8000);
         }
 
         if (typeof VoiceEngine !== 'undefined' && typeof Store !== 'undefined' && Store.settings && Store.settings.ttsEnabled) {
-          VoiceEngine.speak(`Welcome ${name}! Your Second Brain AI System is ready.`);
+          VoiceEngine.speak(`${timeSalutation} ${name}! Your Second Brain AI System is ready.`);
         }
       }
     };
 
-    // Check One-Time User Onboarding Name
+    // Check User Onboarding Name & Apply Time Greeting
     setTimeout(() => {
       const storedName = (typeof Store !== 'undefined' && Store.getUserName) ? Store.getUserName() : localStorage.getItem('second_brain_user_name');
       if (!storedName) {

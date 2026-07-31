@@ -51,8 +51,9 @@
             <div class="brand-icon-wrapper">
               <img src="assets/logo.svg" alt="Rocket Code AI Logo" width="32" height="32" style="object-fit: contain; filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.4));" />
             </div>
-            <div class="brand-info">
+            <div class="brand-info" style="display: flex; align-items: center; gap: 6px;">
               <span class="brand-name">Juno AI</span>
+              <button onclick="window.openUserOnboardingModal()" title="Edit Your Profile Name" style="background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 6px; cursor: pointer; font-size: 10.5px; font-weight: 700; color: var(--accent-amber); padding: 2px 6px; display: inline-flex; align-items: center; gap: 3px;">✏️ Name</button>
             </div>
           </div>
           <button class="sidebar-collapse-btn" onclick="window.toggleSidebar()" title="Collapse Sidebar">
@@ -171,7 +172,7 @@
                     <img src="assets/logo.svg" alt="Rocket Code AI Logo" width="60" height="60" style="object-fit: contain; filter: drop-shadow(0 4px 14px rgba(245, 176, 65, 0.4));" />
                   </div>
                   <h2 class="glass-circular-title" style="margin-bottom: 6px;">Juno AI</h2>
-                  <p style="color: #5d4037; font-size: 13.5px; margin-bottom: 22px; font-weight: 700;">Talk to Jarvis &amp; Grounded Vault RAG</p>
+                  <p id="circular-card-sub" style="color: #5d4037; font-size: 13.5px; margin-bottom: 22px; font-weight: 700;">Talk to Jarvis &amp; Grounded Vault RAG</p>
 
                   <!-- Integrated AI Prompt Input Inside Circular Glass Card -->
                   <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
