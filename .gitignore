@@ -29,4 +29,5 @@ docs/optimization_*
 .vercel
 .next/
 
+*.pdf
 
