@@ -2205,6 +2205,10 @@
     };
 
     window.createNewChatThread = function() {
+      if (typeof window.activateView === 'function') {
+        window.activateView('jarvis');
+      }
+
       if (typeof Store !== 'undefined' && Store.clearAllChatMessages) {
         Store.clearAllChatMessages();
       }
@@ -2217,13 +2221,25 @@
       const ragInput = document.getElementById('rag-query-input');
       if (ragInput) ragInput.value = '';
       const circularInput = document.getElementById('circular-ai-prompt-input');
-      if (circularInput) circularInput.value = '';
+      if (circularInput) {
+        circularInput.value = '';
+        circularInput.focus();
+      }
+
+      if (typeof renderChatThreadsList === 'function') {
+        renderChatThreadsList();
+      }
 
       if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
-      window.location.reload(true);
+      if (typeof showToast === 'function') {
+        showToast('✨ Started new chat with Juno AI!');
+      }
     };
 
     window.switchChatThread = function(threadId) {
+      if (typeof window.activateView === 'function') {
+        window.activateView('jarvis');
+      }
       if (typeof Store === 'undefined') return;
       Store.setActiveThreadId(threadId);
       window.renderActiveChatThread();
