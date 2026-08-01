@@ -5345,6 +5345,201 @@ kbd {
 .send-prompt-btn {
   background: #3b82f6 !important;
   color: #ffffff !important;
+  gap: 8px;
+}
+
+.win-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.dot-red { background: #ff5f56; }
+.dot-yellow { background: #ffbd2e; }
+.dot-green { background: #27c93f; }
+
+.inspector-title {
+  color: #a6adc8;
+  font-family: var(--font-code, monospace);
+  font-size: 12px;
+  margin-left: 10px;
+  font-weight: 600;
+}
+
+.inspector-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.inspector-tab-btn {
+  background: transparent;
+  border: none;
+  color: #6c7086;
+  font-family: var(--font-code, monospace);
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inspector-tab-btn.active, .inspector-tab-btn:hover {
+  background: #313244;
+  color: #f5b041;
+}
+
+.inspector-close-btn {
+  background: transparent;
+  border: none;
+  color: #a6adc8;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.inspector-body {
+  padding: 18px;
+  background: #1e1e2e;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.inspector-code-block {
+  margin: 0;
+  font-family: 'Fira Code', var(--font-code, monospace);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #cdd6f4;
+}
+
+.code-line {
+  display: flex;
+  gap: 16px;
+}
+
+.line-num {
+  color: #585b70;
+  user-select: none;
+  width: 24px;
+  text-align: right;
+}
+
+.line-content {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.syntax-tag { color: #f38ba8; font-weight: 700; }
+.syntax-attr { color: #a6e3a1; }
+.syntax-val { color: #f9e2af; }
+.syntax-selector { color: #cba6f7; font-weight: 700; }
+.syntax-prop { color: #89b4fa; }
+.syntax-kw { color: #f38ba8; font-weight: 700; }
+
+/* ==========================================
+   HUMAN-ENGINEERED PREMIUM UI OVERHAUL
+   (Linear / Raycast / Vercel Aesthetic)
+   ========================================== */
+
+/* Top Header Bar */
+.chat-top-bar {
+  background: rgba(11, 15, 23, 0.85) !important;
+  backdrop-filter: blur(16px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.model-select-dropdown {
+  background: #131b2e !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #f8fafc !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.top-action-btn {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #cbd5e1 !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  box-shadow: none !important;
+}
+
+.top-action-btn:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.user-google-avatar-badge {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #f8fafc !important;
+  border-radius: 20px !important;
+}
+
+/* Prompt Cards Grid */
+.prompt-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.prompt-card-item {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  padding: 18px !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: none !important;
+}
+
+.prompt-card-item:hover {
+  background: rgba(59, 130, 246, 0.08) !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
+  transform: translateY(-2px);
+}
+
+.prompt-card-title {
+  color: #f8fafc !important;
+  font-weight: 600 !important;
+  font-size: 13.5px !important;
+}
+
+.prompt-card-desc {
+  color: #94a3b8 !important;
+  font-size: 12px !important;
+}
+
+/* Floating Input Box */
+.chat-input-wrapper, .chat-input-bar {
+  background: rgba(19, 27, 46, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  backdrop-filter: blur(18px) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.6) !important;
+}
+
+.chat-input-field {
+  color: #f8fafc !important;
+  font-size: 14px !important;
+}
+
+.chat-input-field::placeholder {
+  color: #64748b !important;
+}
+
+.send-prompt-btn {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
   border-radius: 10px !important;
   border: none !important;
   box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4) !important;
@@ -5352,4 +5547,45 @@ kbd {
 
 .send-prompt-btn:hover {
   background: #2563eb !important;
+}
+
+/* HIGH-CONTRAST DARK MODE OVERRIDES */
+body, html {
+  background-color: #0b0f17 !important;
+  color: #f8fafc !important;
+}
+
+.gemini-hero-title {
+  color: #f8fafc !important;
+  background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.gemini-hero-sub {
+  color: #94a3b8 !important;
+}
+
+.prompt-card-title {
+  color: #f8fafc !important;
+}
+
+.prompt-card-desc {
+  color: #94a3b8 !important;
+}
+
+.app-sidebar {
+  background-color: #0d1322 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.new-chat-btn {
+  background: rgba(59, 130, 246, 0.12) !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  color: #60a5fa !important;
+}
+
+.new-chat-btn:hover {
+  background: rgba(59, 130, 246, 0.22) !important;
+  color: #ffffff !important;
 }

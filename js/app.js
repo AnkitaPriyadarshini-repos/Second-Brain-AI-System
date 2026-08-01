@@ -626,7 +626,10 @@
 
     // Theme Switcher Initialization
     const themeCardOpts = document.querySelectorAll('.theme-card-option');
-    let savedTheme = Store.settings.theme || 'royal-gold';
+    let savedTheme = Store.settings.theme || 'gemini-glow';
+    if (!savedTheme || savedTheme === 'royal-gold' || savedTheme === 'gold-glassmorphism' || savedTheme === 'sunflower-yellow' || savedTheme === 'emerald-luxe') {
+      savedTheme = 'gemini-glow';
+    }
     applyTheme(savedTheme);
 
     const allThemeButtons = [...themePillBtns, ...themeCardOpts];
@@ -641,9 +644,9 @@
     });
 
     function applyTheme(themeName) {
-      if (!themeName) return;
-      if (themeName === 'emerald-luxe' || themeName === 'sapphire-platinum' || themeName === 'atlassian-azure') {
-        themeName = 'royal-gold';
+      if (!themeName) themeName = 'gemini-glow';
+      if (themeName === 'royal-gold' || themeName === 'gold-glassmorphism' || themeName === 'sunflower-yellow' || themeName === 'emerald-luxe' || themeName === 'sapphire-platinum' || themeName === 'atlassian-azure') {
+        themeName = 'gemini-glow';
       }
       const root = document.documentElement || document.body || (typeof document !== 'undefined' ? document.querySelector('html') : null);
       if (root && typeof root.setAttribute === 'function') {
