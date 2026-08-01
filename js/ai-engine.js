@@ -346,7 +346,18 @@ export function HydratedComponent({ data }) {
 
     if (isTechDeepDive) {
       const cleanPrompt = prompt.replace(/[#*`]/g, '').trim();
-      let agentOutput = `### 🧠 Juno Agentic System Architect Solution\n\n`;
+      let agentOutput = `<details class="thinking-accordion" open style="margin-bottom: 14px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 14px;">
+  <summary style="cursor: pointer; font-weight: 600; font-size: 12px; color: var(--accent-primary); display: flex; align-items: center; gap: 6px; user-select: none;">
+    <span>🧠 Thought Process &amp; Deep System Reasoning</span>
+  </summary>
+  <div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); line-height: 1.5;">
+    • <strong>Step 1</strong>: Deconstructing core requirements for "${escapeHTML(cleanPrompt)}"<br/>
+    • <strong>Step 2</strong>: Synthesizing architecture against local RAG Knowledge Vault &amp; high-performance C++/JS patterns.<br/>
+    • <strong>Step 3</strong>: Formulating non-blocking async execution pipelines and concurrency boundaries.
+  </div>
+</details>\n\n`;
+
+      agentOutput += `### 🧠 Juno Agentic System Architect Solution\n\n`;
       agentOutput += `**Problem Statement**: *${cleanPrompt}*\n\n`;
 
       if (ragContext) {

@@ -498,6 +498,27 @@
       }
     };
 
+    window.handleModelChange = function(modelVal) {
+      if (!modelVal) return;
+      // Map model value directly to theme
+      let targetTheme = 'gemini-glow';
+      if (modelVal === 'claude-obsidian') targetTheme = 'claude-obsidian';
+      else if (modelVal === 'chatgpt-emerald') targetTheme = 'chatgpt-emerald';
+      else if (modelVal === 'perplexity-cyan') targetTheme = 'perplexity-cyan';
+      else if (modelVal === 'gemini-glow') targetTheme = 'gemini-glow';
+      
+      window.applyTheme(targetTheme);
+      
+      if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) {
+        SoundEngine.playClick();
+      }
+      
+      const badge = document.querySelector('.sidebar-rag-badge span:last-child');
+      if (badge) {
+        badge.textContent = modelVal === 'perplexity-cyan' ? 'Web RAG' : (modelVal === 'claude-obsidian' ? 'Deep Think' : 'Gemini RAG');
+      }
+    };
+
     window.toggleVoiceListen = function() {
       if (typeof VoiceEngine !== 'undefined' && VoiceEngine.toggleListen) {
         VoiceEngine.toggleListen();
@@ -1422,6 +1443,26 @@
       });
     }
 
+    let vaultViewMode = 'grid';
+
+    const vaultViewGridBtn = document.getElementById('vault-view-grid-btn');
+    const vaultViewTreeBtn = document.getElementById('vault-view-tree-btn');
+
+    if (vaultViewGridBtn && vaultViewTreeBtn) {
+      vaultViewGridBtn.addEventListener('click', () => {
+        vaultViewMode = 'grid';
+        vaultViewGridBtn.classList.add('active');
+        vaultViewTreeBtn.classList.remove('active');
+        renderNotesGrid();
+      });
+      vaultViewTreeBtn.addEventListener('click', () => {
+        vaultViewMode = 'tree';
+        vaultViewTreeBtn.classList.add('active');
+        vaultViewGridBtn.classList.remove('active');
+        renderNotesGrid();
+      });
+    }
+
     function renderNotesGrid() {
       if (!notesGrid) return;
       const allNotes = Store.getNotes();
@@ -1448,26 +1489,91 @@
         return;
       }
 
-      notesGrid.innerHTML = filtered.map(note => `
-        <div class="note-card glass-card ${note.pinned ? 'pinned-card' : ''}" data-id="${note.id}">
-          <div class="note-card-header">
-            <span class="source-badge badge-${note.sourceType}">${note.sourceType.toUpperCase()}</span>
-            <span class="note-date">${escapeHTML(note.dateStr || '')}</span>
+      if (vaultViewMode === 'tree') {
+        // Render Folder Tree Explorer Mode
+        const categoriesMap = {};
+        filtered.forEach(note => {
+          let cat = 'Uncategorized';
+          if (note.tags && note.tags.length > 0) {
+            cat = note.tags[0];
+          }
+          if (!categoriesMap[cat]) categoriesMap[cat] = [];
+          categoriesMap[cat].push(note);
+        });
+
+        notesGrid.style.gridTemplateColumns = '1fr';
+        notesGrid.innerHTML = `
+          <div class="file-explorer-tree glass-card" style="padding: 20px; border-radius: 16px; width: 100%;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+              <div style="font-weight: 700; font-size: 15px; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                <span>📂 Knowledge Vault File Explorer</span>
+                <span style="font-size: 11px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 2px 8px; border-radius: 12px; font-weight: 600;">${filtered.length} Items</span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted);">Click folders to expand & inspect files</div>
+            </div>
+
+            <div class="folder-tree-list" style="display: flex; flex-direction: column; gap: 12px;">
+              ${Object.entries(categoriesMap).map(([folderName, files], idx) => `
+                <details class="folder-tree-item" ${idx === 0 || folderName.includes('Career') || folderName.includes('Resumes') ? 'open' : ''} style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden;">
+                  <summary style="padding: 12px 16px; font-weight: 600; font-size: 13.5px; color: var(--text-primary); cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.04);">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                      <span style="font-size: 16px;">📂</span>
+                      <span>${escapeHTML(folderName)}</span>
+                    </div>
+                    <span style="font-size: 11.5px; font-weight: 500; color: var(--text-muted); background: var(--bg-card); padding: 2px 8px; border-radius: 10px; border: 1px solid var(--border-color);">${files.length} ${files.length === 1 ? 'file' : 'files'}</span>
+                  </summary>
+                  <div class="folder-files-container" style="padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; background: rgba(0, 0, 0, 0.15);">
+                    ${files.map(file => `
+                      <div class="file-row-item" style="padding: 10px 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease;" onmouseenter="this.style.background='rgba(59, 130, 246, 0.08)'" onmouseleave="this.style.background='rgba(255, 255, 255, 0.03)'">
+                        <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+                          <span style="font-size: 16px;">${file.sourceType === 'file' ? '📄' : file.sourceType === 'voice' ? '🎙️' : file.sourceType === 'clip' ? '🔗' : '📝'}</span>
+                          <div style="min-width: 0;">
+                            <div style="font-weight: 600; font-size: 13px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                              ${file.pinned ? '📌 ' : ''}${escapeHTML(file.title)}
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-muted); display: flex; gap: 10px; align-items: center;">
+                              <span>${escapeHTML(file.dateStr || '')}</span>
+                              <span>•</span>
+                              <span style="text-transform: uppercase; color: var(--accent-indigo); font-weight: 600;">${escapeHTML(file.sourceType)}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div style="display: flex; gap: 6px; align-items: center;">
+                          <button class="btn btn-secondary view-btn" data-id="${file.id}" style="padding: 4px 10px; font-size: 12px;">View</button>
+                          <button class="btn btn-secondary pin-btn" data-id="${file.id}" style="padding: 4px 10px; font-size: 12px;">${file.pinned ? 'Pinned' : 'Pin'}</button>
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </details>
+              `).join('')}
+            </div>
           </div>
-          <h3 class="note-title">${escapeHTML(note.title)}</h3>
-          <p class="note-snippet">${escapeHTML(note.summary || note.content.substring(0, 140) + '...')}</p>
-          <div class="note-tags">
-            ${(note.tags || []).map(t => `<span class="tag-pill">#${escapeHTML(t)}</span>`).join('')}
+        `;
+      } else {
+        // Grid View
+        notesGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(300px, 1fr))';
+        notesGrid.innerHTML = filtered.map(note => `
+          <div class="note-card glass-card ${note.pinned ? 'pinned-card' : ''}" data-id="${note.id}">
+            <div class="note-card-header">
+              <span class="source-badge badge-${note.sourceType}">${note.sourceType.toUpperCase()}</span>
+              <span class="note-date">${escapeHTML(note.dateStr || '')}</span>
+            </div>
+            <h3 class="note-title">${escapeHTML(note.title)}</h3>
+            <p class="note-snippet">${escapeHTML(note.summary || note.content.substring(0, 140) + '...')}</p>
+            <div class="note-tags">
+              ${(note.tags || []).map(t => `<span class="tag-pill">#${escapeHTML(t)}</span>`).join('')}
+            </div>
+            <div class="note-card-actions">
+              <button class="btn-icon pin-btn" data-id="${note.id}" title="${note.pinned ? 'Unpin Note' : 'Pin Note'}">
+                ${note.pinned ? 'Pinned' : 'Pin'}
+              </button>
+              <button class="btn-icon view-btn" data-id="${note.id}">View</button>
+              <button class="btn-icon delete-btn" data-id="${note.id}">Delete</button>
+            </div>
           </div>
-          <div class="note-card-actions">
-            <button class="btn-icon pin-btn" data-id="${note.id}" title="${note.pinned ? 'Unpin Note' : 'Pin Note'}">
-              ${note.pinned ? 'Pinned' : 'Pin'}
-            </button>
-            <button class="btn-icon view-btn" data-id="${note.id}">View</button>
-            <button class="btn-icon delete-btn" data-id="${note.id}">Delete</button>
-          </div>
-        </div>
-      `).join('');
+        `).join('');
+      }
 
       // Bind note card clicks
       notesGrid.querySelectorAll('.view-btn').forEach(btn => {

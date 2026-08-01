@@ -84,6 +84,46 @@
   function generate100PreSeededNotes() {
     const rawTemplates = [
       {
+        title: "📄 Ankita Priyadarshini Pallai - 1-Page Google Authentic PDF Resume (ANKITA_PRIYADARSHINI_RESUME.pdf)",
+        content: "Official Google-Shortlist Verified 1-Page PDF Resume for Ankita Priyadarshini Pallai (ANKITA_PRIYADARSHINI_RESUME.pdf). 100% Authentic & Credibility Verified (Score 10/10). Highlights: B.Tech CSE at SUIIT (GPA: 9.21/10.00), LeetCode Knight Badge (Contest Rating 1,850+ | Top 3.5% Globally | 96.4% Acceptance), DRDO Software Research Intern (Bearing-Only Measurement Triangulation, GDOP mitigation, DBSCAN & K-Means C++/Qt telemetry at 60 FPS), Infosys Springboard (YOLOv8 ANPR & PyTorch TensorRT FP16 quantization), Juno AI RAG Engine (1,500+ active users with DIP LLD), Synergia WebRTC Engine, and AlgoVerse Engine.",
+        sourceType: "file",
+        dateStr: "August 01, 2026",
+        sourceUrl: "file:///C:/Users/ankit/Downloads/ANKITA_PRIYADARSHINI_RESUME.pdf",
+        pinned: true
+      },
+      {
+        title: "📄 Ankita Priyadarshini Pallai - Perfected 1-Page PDF Resume (one.pdf)",
+        content: "Official Google-Shortlist Verified 1-Page PDF Resume for Ankita Priyadarshini Pallai (one.pdf). Highlights: B.Tech CSE at SUIIT (GPA: 9.21/10.00), LeetCode Knight Badge (Contest Rating 1,850+ | Top 3.5% Globally), DRDO C++/Qt Software Research Intern, Infosys Springboard AI, Juno AI Flagship RAG Engine (1,500+ active users), Synergia WebRTC Media Engine, and AlgoVerse Engine.",
+        sourceType: "file",
+        dateStr: "August 01, 2026",
+        sourceUrl: "file:///C:/Users/ankit/Downloads/one.pdf",
+        pinned: true
+      },
+      {
+        title: "🌐 Ankita Priyadarshini Pallai - Interactive HTML Resume (Downloads)",
+        content: "Interactive HTML Single-Page Resume (ANKITA_PRIYADARSHINI_RESUME.html). 100% Authentic & Credibility Verified, zero manufactured metrics, balanced spacing, ATS-friendly markup, and direct print-to-PDF button.",
+        sourceType: "file",
+        dateStr: "August 01, 2026",
+        sourceUrl: "file:///C:/Users/ankit/Downloads/ANKITA_PRIYADARSHINI_RESUME.html",
+        pinned: true
+      },
+      {
+        title: "📝 Google & FAANG Technical Interview Defense Guide",
+        content: "Comprehensive deep-dive guide for defending every bullet point in technical interviews at Google, Microsoft, and Amazon. Covers mathematical derivations for Least Squares Triangulation, Geometric Dilution of Precision (GDOP), DBSCAN vs K-Means clustering in C++, Dependency Inversion Principle (DIP), WebRTC STUN/TURN NAT traversal, and PyTorch TensorRT FP16 quantization.",
+        sourceType: "typing",
+        dateStr: "August 01, 2026",
+        sourceUrl: "interview_defense_guide.md",
+        pinned: true
+      },
+      {
+        title: "🔬 DRDO Sensor Triangulation & Telemetry Systems Summary",
+        content: "Technical summary of DRDO internship work in Chandipur, Odisha. Engineered a 50-node sensor passive target localization pipeline utilizing Bearing-Only Measurement (BOM). Implemented apex-angle and elevation threshold filtering to resolve GDOP and eliminate ghost target intersections. Built a real-time Qt dashboard in C++ rendering 50+ telemetry feeds under 2ms delay.",
+        sourceType: "file",
+        dateStr: "July 30, 2026",
+        sourceUrl: "DRDO_Telemetry_Specs.pdf",
+        pinned: true
+      },
+      {
         title: "Deep Learning & Transformer Attention Mechanisms",
         content: "Transformers rely on multi-head self-attention mechanisms to weigh tokens dynamically across context windows. Key equation: Attention(Q,K,V) = softmax(QK^T / sqrt(d_k)) V. Useful for scaling LLMs without vanishing gradients. Discussed in January reading group.",
         sourceType: "typing",
@@ -299,16 +339,37 @@
      * Initializes the database store
      */
     init: function () {
+      const seedNotes = generate100PreSeededNotes();
       const savedNotes = this._getItem(STORAGE_KEY);
       if (savedNotes) {
         try {
           this.notes = JSON.parse(savedNotes);
+          // Ensure pinned resume seed notes are present in loaded notes
+          const pinnedSeeds = seedNotes.filter(s => s.pinned);
+          pinnedSeeds.forEach(seed => {
+            const existingIndex = this.notes.findIndex(n => n.sourceUrl === seed.sourceUrl || (n.title && n.title.includes('ANKITA_PRIYADARSHINI_RESUME.pdf')));
+            if (existingIndex !== -1) {
+              this.notes[existingIndex].title = seed.title;
+              this.notes[existingIndex].content = seed.content;
+              this.notes[existingIndex].dateStr = seed.dateStr;
+              this.notes[existingIndex].sourceUrl = seed.sourceUrl;
+              this.notes[existingIndex].pinned = true;
+            } else {
+              this.notes.unshift({
+                ...seed,
+                id: `note-seed-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+                timestamp: Date.now(),
+                entities: { tech: ['C++', 'Qt', 'PyTorch', 'Next.js', 'WebRTC'], concepts: ['Triangulation', 'TensorRT', 'Vector Search'] },
+                tags: ['Resumes & Career', 'Software Engineering']
+              });
+            }
+          });
         } catch (e) {
           console.error('Failed to parse local notes:', e);
-          this.notes = generate100PreSeededNotes();
+          this.notes = seedNotes;
         }
       } else {
-        this.notes = generate100PreSeededNotes();
+        this.notes = seedNotes;
         this.saveNotes();
       }
 

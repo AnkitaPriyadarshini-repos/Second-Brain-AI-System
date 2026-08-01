@@ -1,0 +1,174 @@
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+
+\pagestyle{fancy}
+\fancyhf{} % clear all header and footer fields
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust margins
+\addtolength{\oddsidemargin}{-0.5in}
+\addtolength{\evensidemargin}{-0.5in}
+\addtolength{\textwidth}{1in}
+\addtolength{\topmargin}{-.5in}
+\addtolength{\textheight}{1.0in}
+
+\urlstyle{same}
+
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0pt}
+
+% Sections formatting
+\titleformat{\section}{
+  \vspace{-4pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\vline height 1.5pt width \linewidth\vspace{-5pt}]
+
+% Custom commands
+\newcommand{\resumeItem}[1]{
+  \item\small{
+    {#1 \vspace{-2pt}}
+  }
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \vspace{-1pt}\item
+    \begin{tabular*}{\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-5pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \vspace{-1pt}\item
+    \begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}r}
+      \small#1 & #2 \\
+    \end{tabular*}\vspace{-5pt}
+}
+
+\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
+
+\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
+
+\newcommand{\resumeSubHeadingListStart}{\begin{itemList}[leftmargin=*]}
+\newcommand{\resumeSubHeadingListEnd}{\end{itemList}}
+\newcommand{\resumeItemListStart}{\begin{itemize}[leftmargin=15pt, label={$\bullet$}]}
+\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
+
+%-------------------------------------------
+%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%----------HEADING----------
+\begin{center}
+    \textbf{\Huge \scshape Ankita Priyadarshini Pallai} \\ \vspace{4pt}
+    \small +91 7978037908 $|$ \href{mailto:ankitapriyadarshini8600@gmail.com}{\underline{ankitapriyadarshini8600@gmail.com}} $|$ 
+    \href{https://linkedin.com/in/ankita-priyadarshini-pallai}{\underline{linkedin.com/in/ankita-priyadarshini-pallai}} $|$
+    \href{https://github.com/AnkitaPriyadarshini-repos}{\underline{github.com/AnkitaPriyadarshini-repos}}
+\end{center}
+
+
+%-----------EDUCATION-----------
+\section{Education}
+  \begin{itemize}[leftmargin=0.15in, label={}]
+    \resumeSubheading
+      {Sambalpur University Institute of Information Technology (SUIIT)}{2023 -- 2027}
+      {Bachelor of Technology in Computer Science and Engineering (GPA: 9.21 / 10.00)}{Burla, Odisha}
+      \resumeItemListStart
+        \resumeItem{\textbf{Relevant Coursework:} Data Structures \& Algorithms, Object-Oriented Programming, Operating Systems, DBMS, Computer Networks, Low-Level Design (LLD), Compiler Design.}
+      \resumeItemListEnd
+  \end{itemize}
+
+
+%-----------ALGORITHMIC EXCELLENCE & OPEN-SOURCE IMPACT-----------
+\section{Algorithmic Excellence \& Open-Source Impact}
+ \begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+     \textbf{LeetCode Knight Badge}: Contest Rating \textbf{1,850+} (\textbf{Top 3.5\% Globally}) $|$ 300+ DSA problems solved with \textbf{96.4\% acceptance rate}. \\
+     \textbf{High-Impact Open-Source Contributor}: Merged PRs across \textbf{30+ public repositories} (including \emph{First Contributions}, \emph{CodeHarbourX}); earned GitHub \emph{Pair Extraordinaire}, \emph{Quickdraw}, and \emph{YOLO} badges. \\
+     \textbf{Postman Certified Student Expert}: 100\% score on automated REST API testing, collection scripts, and environment schemas. \\
+     \textbf{Deloitte Technology Consulting Simulation}: Top evaluation in enterprise cloud architecture and system design.
+    }}
+ \end{itemize}
+
+
+%-----------EXPERIENCE-----------
+\section{Experience}
+  \begin{itemize}[leftmargin=0.15in, label={}]
+
+    \resumeSubheading
+      {Defence Research and Development Organisation (DRDO)}{Jun 2026 -- Jul 2026}
+      {Software Development \& Research Intern -- CDP Division}{Chandipur, Odisha}
+      \resumeItemListStart
+        \resumeItem{\textbf{Designed a passive target localization system} in C++/Qt utilizing \textbf{Bearing-Only Measurement (BOM)} and multi-node triangulation across a 50-sensor network for real-time 3D tracking.}
+        \resumeItem{\textbf{Engineered spatial noise reduction filters} (apex-angle \& elevation thresholding), mitigating Geometric Dilution of Precision (GDOP) and eliminating ghost target ray intersections.}
+        \resumeItem{\textbf{Implemented DBSCAN \& K-Means spatial clustering} in C++ to segment dense trajectory point clouds and resolve multi-object target ambiguities in real-time telemetry streams.}
+        \resumeItem{\textbf{Developed a low-latency Qt visualization dashboard} rendering 50+ telemetry streams at \textbf{60 FPS ($<$2ms render delay)} for field test evaluations.}
+      \resumeItemListEnd
+
+    \resumeSubheading
+      {Infosys Springboard}{Oct 2025 -- Dec 2025}
+      {AI \& Machine Learning Virtual Intern}{Remote}
+      \resumeItemListStart
+        \resumeItem{\textbf{Trained custom YOLOv8 object detection models} on 25,000+ annotated images for multi-class vehicle classification and Automatic Number Plate Recognition (ANPR).}
+        \resumeItem{\textbf{Integrated OpenCV video frame preprocessing with Tesseract OCR}, building an automated plate extraction pipeline robust against low-resolution and variable lighting conditions.}
+        \resumeItem{\textbf{Optimized PyTorch inference latency by 5x (120ms to 24ms per frame)} via TensorRT FP16 quantization and CUDA batching, deploying an interactive evaluation dashboard.}
+      \resumeItemListEnd
+
+  \end{itemize}
+
+
+%-----------PROJECTS-----------
+\section{Projects}
+    \begin{itemize}[leftmargin=0.15in, label={}]
+      \resumeProjectHeading
+          {\textbf{Juno AI -- High-Performance Offline RAG \& Vector Search Engine} \emph{(Flagship Open-Source Project)}}{ }
+          \resumeItemListStart
+            \resumeItem{\textbf{Flagship System with Active Adoption:} Architected an offline local RAG engine serving \textbf{1,500+ active users} with Next.js (SSR) and persistent WebSockets for sub-10ms context retrieval.}
+            \resumeItem{\textbf{Applied Dependency Inversion \& clean architecture (LLD)}, decoupling core business logic from storage layers to support interchangeable SQLite, PostgreSQL, and In-Memory persistence adapters.}
+            \resumeItem{\textbf{Implemented TF-IDF \& Cosine Similarity vector retrieval} over unstructured markdown notes, enabling fast, zero-dependency offline semantic document search.}
+            \resumeItem{\textbf{Designed an automated database migration engine} and transactional schema versioning system for zero-downtime note indexing.}
+          \resumeItemListEnd
+
+      \resumeProjectHeading
+          {\textbf{Synergia -- WebRTC Real-Time Media Streaming \& Signaling Engine} $|$ \emph{JavaScript, WebSockets, WebRTC, Express}}{}
+          \resumeItemListStart
+            \resumeItem{\textbf{Architected a WebRTC peer-to-peer media streaming platform} with custom STUN/TURN NAT traversal fallback, enabling multi-party HD video conferencing with \textbf{$<$80ms streaming latency}.}
+            \resumeItem{\textbf{Implemented adaptive bitrate scaling and dynamic SDP renegotiation}, maintaining smooth \textbf{60 FPS video playback} under simulated 30\% network packet loss.}
+            \resumeItem{\textbf{Built a resilient WebSocket signaling service} with heartbeat ping/pong keep-alives and state machine reconnection handling across 500+ active room sessions.}
+          \resumeItemListEnd
+
+      \resumeProjectHeading
+          {\textbf{AlgoVerse -- Interactive Algorithm \& State Machine Visualization Engine} $|$ \emph{React, Canvas API, Async Queues}}{}
+          \resumeItemListStart
+            \resumeItem{\textbf{Engineered a real-time visual execution engine} for graph algorithms (Dijkstra, A*, BFS/DFS) and sorting algorithms with custom speed control and step-by-step state visualization.}
+            \resumeItem{\textbf{Implemented an asynchronous step-execution queue} with HTML5 Canvas rendering to benchmark space/time complexity and memory operations dynamically.}
+          \resumeItemListEnd
+    \end{itemize}
+
+
+%-----------TECHNICAL SKILLS-----------
+\section{Technical Skills}
+ \begin{itemize}[leftmargin=0.15in, label={}]
+    \small{\item{
+     \textbf{Languages}{: C++, C, Java, Python, JavaScript, SQL, HTML, CSS} \\
+     \textbf{Frameworks \& Libraries}{: React, Next.js, Node.js, Express, PyTorch, OpenCV, Qt, TensorRT} \\
+     \textbf{Tools \& Databases}{: Git, GitHub, MongoDB, SQLite, Firebase, Postman, Linux} \\
+     \textbf{Core Computer Science}{: Data Structures \& Algorithms, Low-Level Design (LLD), Object-Oriented Programming (OOP), Operating Systems, Computer Networks, WebSockets, WebRTC}
+    }}
+ \end{itemize}
+
+\end{document}
