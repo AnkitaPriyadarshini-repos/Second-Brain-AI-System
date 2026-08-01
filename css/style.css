@@ -3786,15 +3786,21 @@ kbd {
   text-decoration: none;
 }
 
-.sidebar-menu-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary);
+.sidebar-menu-item span {
+  color: #f8fafc !important;
 }
 
-.sidebar-menu-item.active {
+.sidebar-menu-item:hover,
+.sidebar-menu-item:hover span {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff !important;
+}
+
+.sidebar-menu-item.active,
+.sidebar-menu-item.active span {
   background: linear-gradient(90deg, var(--accent-primary-light, rgba(251, 191, 36, 0.16)) 0%, rgba(255, 255, 255, 0.04) 100%) !important;
   border: 1px solid var(--border-highlight, rgba(251, 191, 36, 0.4)) !important;
-  color: var(--text-primary, #ffffff) !important;
+  color: #ffffff !important;
   font-weight: 700 !important;
   box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.4), 0 0 12px var(--accent-primary-light) !important;
   position: relative;
@@ -3813,8 +3819,9 @@ kbd {
   box-shadow: 0 0 10px var(--accent-primary, #fbbf24);
 }
 
+.sidebar-menu-item svg,
 .sidebar-menu-item.active svg {
-  stroke: var(--accent-primary, #fbbf24) !important;
+  stroke: #f8fafc !important;
 }
 
 /* Main ChatGPT Workspace Layout & Scrolling Containers */
