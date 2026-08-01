@@ -4277,26 +4277,26 @@ kbd {
 .chat-input-container {
   width: 100%;
   max-width: 800px;
-  background: #181c24 !important;
-  backdrop-filter: blur(25px) !important;
-  -webkit-backdrop-filter: blur(25px) !important;
-  border: 1.5px solid rgba(245, 158, 11, 0.4) !important;
+  background: rgba(18, 22, 33, 0.92) !important;
+  backdrop-filter: blur(25px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+  border: 1.5px solid rgba(245, 158, 11, 0.45) !important;
   border-radius: 9999px !important;
-  padding: 8px 16px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45) !important;
+  padding: 8px 18px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 0 24px rgba(245, 158, 11, 0.25) !important;
   transition: all 0.2s ease !important;
 }
 
 [data-theme="platinum-gold"] .chat-input-container,
 [data-theme="gemini-light"] .chat-input-container {
-  background: #ffffff !important;
-  border: 1.5px solid #d97706 !important;
-  box-shadow: 0 4px 20px rgba(217, 119, 6, 0.15) !important;
+  background: rgba(18, 22, 33, 0.92) !important;
+  border: 1.5px solid rgba(245, 158, 11, 0.45) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(245, 158, 11, 0.25) !important;
 }
 
 .chat-input-container:focus-within {
-  border-color: var(--accent-primary) !important;
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.35) !important;
+  border-color: #fbbf24 !important;
+  box-shadow: 0 0 24px rgba(251, 191, 36, 0.45), 0 12px 48px rgba(0, 0, 0, 0.7) !important;
 }
 
 .input-row {
@@ -5652,29 +5652,36 @@ body, html {
 }
 
 .gemini-hero-title {
-  font-size: 38px !important;
-  font-weight: 600 !important;
+  font-size: 40px !important;
+  font-weight: 700 !important;
   font-family: 'Inter', -apple-system, sans-serif !important;
-  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 45%, #60a5fa 80%, #93c5fd 100%) !important;
+  background: linear-gradient(135deg, #ffffff 0%, #fff7ed 35%, #fbbf24 75%, #f59e0b 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
-  letter-spacing: -0.03em !important;
-  filter: drop-shadow(0 2px 14px rgba(59, 130, 246, 0.25)) !important;
+  letter-spacing: -0.02em !important;
+  filter: drop-shadow(0 2px 18px rgba(245, 158, 11, 0.35)) !important;
 }
 
 .gemini-floating-pill {
-  background: #1e1f20 !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 28px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+  background: rgba(18, 22, 33, 0.92) !important;
+  backdrop-filter: blur(25px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+  border: 1.5px solid rgba(245, 158, 11, 0.45) !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 0 24px rgba(245, 158, 11, 0.25) !important;
+  transition: all 0.2s ease !important;
 }
 
 .gemini-floating-pill:focus-within {
-  border-color: rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6) !important;
+  border-color: #fbbf24 !important;
+  box-shadow: 0 0 24px rgba(251, 191, 36, 0.45), 0 12px 48px rgba(0, 0, 0, 0.7) !important;
+}
+
+.gemini-floating-pill input {
+  color: #f8fafc !important;
+  font-size: 15.5px !important;
 }
 
 .gemini-floating-pill input::placeholder {
-  color: #8e8e93 !important;
+  color: #94a3b8 !important;
 }
