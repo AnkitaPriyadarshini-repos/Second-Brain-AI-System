@@ -347,7 +347,7 @@
           // Ensure pinned resume seed notes are present in loaded notes
           const pinnedSeeds = seedNotes.filter(s => s.pinned);
           pinnedSeeds.forEach(seed => {
-            const existingIndex = this.notes.findIndex(n => n.sourceUrl === seed.sourceUrl || (n.title && n.title.includes('ANKITA_PRIYADARSHINI_RESUME.pdf')));
+            const existingIndex = this.notes.findIndex(n => n.sourceUrl === seed.sourceUrl);
             if (existingIndex !== -1) {
               this.notes[existingIndex].title = seed.title;
               this.notes[existingIndex].content = seed.content;
