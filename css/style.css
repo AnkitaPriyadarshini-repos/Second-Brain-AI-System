@@ -4062,15 +4062,20 @@ kbd {
   gap: 16px;
   cursor: pointer;
   text-align: left;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: var(--shadow-card);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(12px);
 }
 
 .prompt-card-item:hover {
-  transform: translateY(-3px) scale(1.01);
+  transform: translateY(-4px);
   border-color: var(--border-highlight);
-  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.6), 0 0 20px var(--accent-primary-light);
+  background: var(--bg-card-hover);
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.6), 0 0 20px var(--accent-primary-light);
+}
+
+.prompt-card-item:active {
+  transform: translateY(-1px) scale(0.99);
 }
 
 .prompt-card-icon {

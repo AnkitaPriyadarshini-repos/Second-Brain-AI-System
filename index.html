@@ -137,34 +137,34 @@
                 </div>
               </div>
 
-              <!-- 4 Prompt Cards -->
+              <!-- 4 Workflow Action Cards -->
               <div class="prompt-cards-grid">
-                <div class="prompt-card-item" onclick="window.triggerSampleQuery('Design a high-throughput distributed event-driven message queue system at scale')">
-                  <div class="prompt-card-icon">💡</div>
+                <div class="prompt-card-item" onclick="window.triggerSampleQuery('Summarize uploaded research PDFs and technical whitepapers with source citations')">
+                  <div class="prompt-card-icon">📄</div>
                   <div class="prompt-card-content">
-                    <div class="prompt-card-title">Distributed System Architecture</div>
-                    <div class="prompt-card-desc">Design a high-throughput message queue at wide scale</div>
+                    <div class="prompt-card-title">Research Papers &amp; PDFs</div>
+                    <div class="prompt-card-desc">Summarize uploaded PDFs &amp; technical whitepapers</div>
                   </div>
                 </div>
-                <div class="prompt-card-item" onclick="window.triggerSampleQuery('Write a zero-dependency async task queue with rate limiting & retries in JS')">
+                <div class="prompt-card-item" onclick="window.triggerSampleQuery('Ask deep architecture questions about connected GitHub repositories & DIP design patterns')">
                   <div class="prompt-card-icon">💻</div>
                   <div class="prompt-card-content">
-                    <div class="prompt-card-title">Production Code Generator</div>
-                    <div class="prompt-card-desc">Write production-grade algorithms & code modules</div>
+                    <div class="prompt-card-title">GitHub Repositories</div>
+                    <div class="prompt-card-desc">Ask questions about codebase architecture</div>
                   </div>
                 </div>
-                <div class="prompt-card-item" onclick="window.triggerSampleQuery('Explain Transformer multi-head self-attention mechanics & matrix math')">
-                  <div class="prompt-card-icon">🧠</div>
+                <div class="prompt-card-item" onclick="window.triggerSampleQuery('Synthesize unstructured meeting transcripts & lecture notes into clear key takeaways')">
+                  <div class="prompt-card-icon">📝</div>
                   <div class="prompt-card-content">
-                    <div class="prompt-card-title">Deep Reasoning & AI Math</div>
-                    <div class="prompt-card-desc">Deconstruct Transformer mechanics & attention math</div>
+                    <div class="prompt-card-title">Meeting &amp; Lecture Notes</div>
+                    <div class="prompt-card-desc">Convert transcripts into actionable summaries</div>
                   </div>
                 </div>
-                <div class="prompt-card-item" onclick="window.triggerSampleQuery('Rank the 10 largest AI infrastructure and data center projects in the world by scale, power capacity, and specialized hardware deployment')">
-                  <div class="prompt-card-icon">⚡</div>
+                <div class="prompt-card-item" onclick="window.triggerSampleQuery('Search across all my saved notes, vector embeddings, and indexed articles instantly')">
+                  <div class="prompt-card-icon">🔍</div>
                   <div class="prompt-card-content">
-                    <div class="prompt-card-title">Top 10 Global AI Megaclusters</div>
-                    <div class="prompt-card-desc">Rank xAI Colossus, MSFT Stargate, Google TPUs, Meta & AWS megacenters</div>
+                    <div class="prompt-card-title">Knowledge Vault Search</div>
+                    <div class="prompt-card-desc">Search across all saved memories instantly</div>
                   </div>
                 </div>
               </div>
@@ -197,7 +197,7 @@
                 </button>
 
                 <!-- Expanding Textarea -->
-                <textarea id="rag-query-input" class="chat-textarea" placeholder="Ask Juno AI..." rows="1" aria-label="Query Input"></textarea>
+                <textarea id="rag-query-input" class="chat-textarea" placeholder="Ask anything or search your memory..." rows="1" aria-label="Query Input"></textarea>
 
                 <!-- Voice Dictation Mic Button -->
                 <button type="button" id="voice-trigger-btn" class="input-action-btn voice-btn" title="Voice Input" onclick="window.toggleVoiceListen()">
