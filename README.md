@@ -2,19 +2,16 @@
 
 <p align="center">
   <a href="https://second-brain-ai-system.vercel.app">
-    <img src="https://img.shields.io/badge/Vercel-Live%20Application-f59e0b?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel Live App">
+    <img src="https://img.shields.io/badge/Vercel-Live%20Application-3b82f6?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel Live App">
   </a>
   <a href="https://github.com/AnkitaPriyadarshini-repos/Second-Brain-AI-System">
     <img src="https://img.shields.io/badge/GitHub-Repository-10b981?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Repo">
   </a>
   <a href="test/run_tests.js">
-    <img src="https://img.shields.io/badge/Tests-39%2F39%20Passed-d97706?style=for-the-badge" alt="Tests Passed">
+    <img src="https://img.shields.io/badge/Tests-39%2F39%20Passed-6366f1?style=for-the-badge" alt="Tests Passed">
   </a>
-  <a href="server.js">
-    <img src="https://img.shields.io/badge/Next.js-SSR-000000?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js SSR">
-  </a>
-  <a href="js/websocket-chat-engine.js">
-    <img src="https://img.shields.io/badge/WebSockets-Sub--300ms%20Latency-10b981?style=for-the-badge" alt="WebSockets Sub-300ms">
+  <a href="manifest.json">
+    <img src="https://img.shields.io/badge/PWA-Installable%20Offline-a855f7?style=for-the-badge" alt="PWA Installable">
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-8b5cf6?style=for-the-badge" alt="License">
@@ -22,7 +19,8 @@
 </p>
 
 <p align="center">
-  <b>A high-performance personal research tool &amp; real-time thinking partner powered by Next.js Server-Side Rendering (2.3x load speedup), WebSockets bi-directional streaming (< 300ms latency), Dependency Inversion Principle (DIP) storage adapters, and layered enterprise architecture.</b>
+  <b>Never lose an idea again. Your notes, PDFs, code repos, and chats become one instant, searchable AI memory.</b><br />
+  Engineered with Next.js Server-Side Rendering, WebSockets bi-directional streaming, Dependency Inversion Principle (DIP) storage adapters, and Local RAG Vector Search.
 </p>
 
 <p align="center">
@@ -35,19 +33,17 @@
 
 ---
 
-## ✨ Key Features & Performance Metrics
+## ✨ Key Features & Technical Specifications
 
 | Feature | Description | Performance / Spec |
 | :--- | :--- | :--- |
-| 🚀 **Next.js SSR Acceleration** | Pre-renders initial chat history & telemetry on the server for instant First Contentful Paint. | **2.3x Faster Initial Load** (135ms vs 340ms) |
-| ⚡ **Real-Time WebSockets Stream** | Bi-directional streaming channel with client-side ACK tracking and latency telemetry. | **< 300ms Delivery Latency** (Avg: ~6ms) |
-| 🏗️ **Dependency Inversion (DIP)** | Decouples persistence from services via `INoteRepository`, `IGoalRepository`, `IChatThreadRepository`, and `IMessageRepository`. | **Dynamic Storage Adapters** (`LocalStorage`, `InMemory`, `IndexedDB`) |
-| ⚡ **Database Migration Manager** | Automated schema migration runner (`v1` → `v2` → `v3`) with zero downtime. | **0.17ms Migration Time** (685,000+ ops/sec) |
-| 🏛️ **Layered Backend Architecture** | Clean 3-tier separation of concerns across Controllers, Domain Services, and Data Access Repositories. | **Controllers → Services → Repositories** |
-| 🧩 **Reusable Component Frontend** | Modular React component library (`Badge`, `Card`, `Button`, `MessageBubble`, `ChatFeed`, `ChatInput`). | **Component UI Isolation** |
-| 🌼 **Grounded RAG Engine** | Conversational Q&A grounded against 100+ pre-seeded technical notes with zero hallucination. | **100+ Technical Notes Pre-Seeded** |
+| 🚀 **Next.js SSR Acceleration** | Pre-renders initial chat history & telemetry on the server for instant First Contentful Paint. | **Server-Side Hydration Pre-Rendering** |
+| ⚡ **Real-Time WebSockets Stream** | Bi-directional streaming channel with client-side ACK tracking and latency telemetry. | **Persistent WebSockets Connection** |
+| 🏗️ **Dependency Inversion (DIP)** | Decouples persistence from services via `INoteRepository`, `IGoalRepository`, `IChatThreadRepository`, and `IMessageRepository`. | **Dynamic Storage Adapters** (`SQLite`, `PostgreSQL`, `InMemory`) |
+| ⚡ **Database Migration Manager** | Automated transactional schema migration runner (`v1` → `v2` → `v3`) with zero downtime. | **Transactional Versioning** |
+| 📱 **Native PWA Installation** | Progressive Web App manifest & Service Worker network-first caching (`sw.js`). | **Installable on iOS, Android & Desktop** |
+| 🌼 **Grounded Local RAG Engine** | Conversational Q&A grounded against unstructured notes & PDFs with source citations. | **Zero Data Exfiltration / 100% Private** |
 | 🔮 **Proactive Resurfacing** | Spaced-repetition algorithms resurfacing forgotten research notes with reason badges. | **SuperMemo-2 Spaced Repetition** |
-| 🔒 **100% On-Device Privacy** | All vector embeddings and data processing stay strictly local. | **Zero Data Exfiltration** |
 
 ---
 
