@@ -3460,7 +3460,7 @@ kbd {
   border-radius: 10px;
   background: transparent;
   border: 1px solid transparent;
-  color: var(--text-secondary, #713f12);
+  color: #cbd5e1 !important;
   font-family: var(--font-main);
   font-size: 13.5px;
   font-weight: 600;
@@ -3471,20 +3471,20 @@ kbd {
 }
 
 .sidebar-menu-item:hover {
-  background: rgba(245, 158, 11, 0.12);
-  color: var(--text-primary, #422006);
+  background: rgba(255, 255, 255, 0.08);
+  color: #f8fafc !important;
   transform: translateX(2px);
 }
 
 .sidebar-menu-item.active {
-  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
-  color: #ffffff !important;
-  border-color: rgba(245, 158, 11, 0.4) !important;
-  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35) !important;
+  background: rgba(59, 130, 246, 0.15) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(59, 130, 246, 0.4) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
 }
 
 .sidebar-menu-item.active svg {
-  stroke: #ffffff !important;
+  stroke: #3b82f6 !important;
 }
 
 /* ==========================================================================
