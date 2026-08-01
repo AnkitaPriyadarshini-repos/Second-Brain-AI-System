@@ -541,6 +541,20 @@
       if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) SoundEngine.playClick();
     };
 
+    window.triggerPWAInstall = function() {
+      if (typeof deferredPWAInstallPrompt !== 'undefined' && deferredPWAInstallPrompt) {
+        deferredPWAInstallPrompt.prompt();
+        deferredPWAInstallPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted PWA installation');
+          }
+        });
+      } else {
+        alert('📲 Juno AI is ready for offline installation! Tap your browser menu ("..." or Share) and select "Add to Home Screen" or "Install App".');
+      }
+      if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) SoundEngine.playClick();
+    };
+
     window.toggleVoiceListen = function() {
       if (typeof VoiceEngine !== 'undefined' && VoiceEngine.toggleListen) {
         VoiceEngine.toggleListen();
