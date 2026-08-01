@@ -4119,15 +4119,43 @@ kbd {
   font-size: 14.5px;
   position: relative;
   animation: fadeIn 0.3s ease;
+  animation: slideInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .user-bubble {
   align-self: flex-end;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: #ffffff !important;
+  background: var(--accent-primary-light);
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-accent);
   max-width: 80%;
   border-bottom-right-radius: 4px;
-  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  white-space: pre-wrap;
+  word-break: break-word;
+  animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .user-bubble .chat-header {
