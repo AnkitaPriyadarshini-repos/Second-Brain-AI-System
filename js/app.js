@@ -519,6 +519,28 @@
       }
     };
 
+    window.toggleSidebar = function() {
+      const sidebar = document.getElementById('app-sidebar');
+      if (!sidebar) return;
+      
+      const isOpen = sidebar.classList.contains('mobile-open');
+      if (isOpen) {
+        sidebar.classList.remove('mobile-open');
+        const backdrop = document.querySelector('.mobile-drawer-backdrop');
+        if (backdrop) backdrop.remove();
+      } else {
+        sidebar.classList.add('mobile-open');
+        let backdrop = document.querySelector('.mobile-drawer-backdrop');
+        if (!backdrop) {
+          backdrop = document.createElement('div');
+          backdrop.className = 'mobile-drawer-backdrop';
+          backdrop.onclick = window.toggleSidebar;
+          document.body.appendChild(backdrop);
+        }
+      }
+      if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) SoundEngine.playClick();
+    };
+
     window.toggleVoiceListen = function() {
       if (typeof VoiceEngine !== 'undefined' && VoiceEngine.toggleListen) {
         VoiceEngine.toggleListen();

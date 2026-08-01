@@ -502,14 +502,14 @@ html, body {
   }
 
   .model-select-dropdown {
-    max-width: 135px !important;
+    max-width: 150px !important;
     font-size: 12px !important;
     height: 34px !important;
     padding: 2px 8px !important;
-    border-radius: 17px !important;
-    background: rgba(255, 255, 255, 0.06) !important;
-    border: 1px solid rgba(245, 158, 11, 0.3) !important;
-    color: var(--text-primary) !important;
+    border-radius: 8px !important;
+    background: #131b2e !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    color: #f8fafc !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
     overflow: hidden !important;
@@ -520,6 +520,8 @@ html, body {
     height: 34px !important;
     border-radius: 17px !important;
     gap: 4px !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
   }
 
   .top-action-btn {
@@ -528,72 +530,73 @@ html, body {
     min-width: 34px !important;
     min-height: 34px !important;
     padding: 0 !important;
-    border-radius: 50% !important;
+    border-radius: 8px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     font-size: 14px !important;
     flex-shrink: 0 !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #cbd5e1 !important;
   }
 
-  /* Hero Section Mobile Cleanup: Remove duplicate inputs & circle collisions */
+  /* Mobile Slide-Out Drawer Navigation */
+  .app-sidebar {
+    display: none;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 285px !important;
+    z-index: 1000000 !important;
+    background: #0d1322 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 8px 0 30px rgba(0, 0, 0, 0.8) !important;
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .app-sidebar.mobile-open {
+    display: flex !important;
+    transform: translateX(0) !important;
+  }
+
+  .mobile-drawer-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 999999;
+  }
+
+  /* Hero Section Mobile Cleanup */
   .chat-hero-view {
-    margin: 8px auto 16px auto !important;
-    padding: 0 10px !important;
+    margin: 12px auto 16px auto !important;
+    padding: 0 8px !important;
     width: 100% !important;
     box-sizing: border-box !important;
   }
 
-  /* Hide duplicate inputs & circular form inside hero card on mobile */
-  .glass-circular-card input,
-  .glass-circular-card button,
-  .glass-circular-input,
-  .glass-circular-btn {
-    display: none !important;
-  }
-
-  .glass-circular-card {
-    width: auto !important;
-    max-width: 220px !important;
-    padding: 12px 18px !important;
-    margin: 0 auto 12px auto !important;
-    border-radius: 30px !important;
-    background: rgba(255, 255, 255, 0.04) !important;
-    border: 1px solid rgba(245, 158, 11, 0.25) !important;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25) !important;
-    backdrop-filter: blur(12px) !important;
-  }
-
-  .circular-hero-logo img {
-    width: 44px !important;
-    height: 44px !important;
-  }
-
-  .glass-circular-title {
-    font-size: 18px !important;
-    margin-bottom: 2px !important;
-  }
-
-  #circular-card-sub {
-    font-size: 11.5px !important;
-    margin-bottom: 0 !important;
-  }
-
   .gemini-hero-title {
     font-size: 22px !important;
-    margin-top: 10px !important;
+    margin-top: 8px !important;
     text-align: center !important;
-    font-weight: 800 !important;
+    font-weight: 700 !important;
+    color: #f8fafc !important;
   }
 
   .gemini-hero-sub {
     font-size: 12.5px !important;
     text-align: center !important;
     margin-bottom: 16px !important;
-    opacity: 0.8 !important;
+    color: #94a3b8 !important;
   }
 
-  /* ChatGPT / Google Style Prompt Chips */
+  /* Mobile Prompt Chips */
   .prompt-cards-grid {
     display: grid !important;
     grid-template-columns: 1fr !important;
@@ -603,34 +606,29 @@ html, body {
   }
 
   .prompt-card-item {
-    padding: 10px 12px !important;
+    padding: 12px 14px !important;
     border-radius: 12px !important;
     min-height: 48px !important;
     background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
     display: flex !important;
     align-items: center !important;
     gap: 10px !important;
-    transition: transform 0.15s ease, background 0.15s ease !important;
-  }
-
-  .prompt-card-item:active {
-    transform: scale(0.98) !important;
-    background: rgba(245, 158, 11, 0.12) !important;
   }
 
   .prompt-card-title {
     font-size: 13px !important;
     font-weight: 600 !important;
+    color: #f8fafc !important;
   }
 
   .prompt-card-desc {
     font-size: 11.5px !important;
-    opacity: 0.75 !important;
+    color: #94a3b8 !important;
   }
 
-  /* Fixed Bottom Chat Deck directly above Navigation Bar */
+  /* Fixed Bottom Chat Deck */
   .chat-bottom-deck {
     position: fixed !important;
     bottom: 60px !important;
@@ -638,49 +636,36 @@ html, body {
     right: 0 !important;
     width: 100% !important;
     padding: 8px 10px !important;
-    background: rgba(14, 17, 23, 0.96) !important;
+    background: rgba(11, 15, 23, 0.95) !important;
     backdrop-filter: blur(20px) !important;
     -webkit-backdrop-filter: blur(20px) !important;
     border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5) !important;
     z-index: 99999 !important;
     box-sizing: border-box !important;
   }
 
   .chat-input-container {
     max-width: 100% !important;
-    border-radius: 22px !important;
+    border-radius: 14px !important;
     padding: 4px 8px !important;
-    background: rgba(26, 31, 40, 0.95) !important;
-    border: 1px solid rgba(245, 158, 11, 0.35) !important;
+    background: rgba(19, 27, 46, 0.95) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
   }
 
   .chat-textarea {
-    font-size: 16px !important; /* Prevents auto-zoom on iOS */
+    font-size: 16px !important; /* Prevents iOS auto-zoom */
     max-height: 85px !important;
     padding: 8px 6px !important;
+    color: #f8fafc !important;
   }
 
-  .chat-disclaimer-text {
-    font-size: 10px !important;
-    text-align: center !important;
-    opacity: 0.65 !important;
-    margin-top: 3px !important;
-  }
-
-  /* Workspace Padding to prevent scroll overlap */
-  .chat-main-workspace {
-    padding: 10px 10px 170px 10px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  /* Ronas IT Bottom Fixed Navigation Bar */
+  /* Bottom Fixed Mobile Navigation Bar */
   .bottom-mobile-nav {
     height: 60px !important;
     z-index: 999999 !important;
-    background: rgba(13, 17, 23, 0.98) !important;
-    border-top: 1px solid rgba(245, 158, 11, 0.2) !important;
+    background: rgba(11, 15, 23, 0.98) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
   }
 }
 
