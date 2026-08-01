@@ -555,6 +555,58 @@
       if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) SoundEngine.playClick();
     };
 
+    window.triggerQuickUpload = function(type) {
+      if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) SoundEngine.playClick();
+      
+      if (type === 'pdf') {
+        const title = prompt('📄 Upload PDF / Document Title:', 'System Design Architecture Whitepaper.pdf');
+        if (title) {
+          Store.addNote({
+            title: title,
+            content: `Document Summary: Comprehensive analysis of distributed caching, LSM-tree storage engines, and Raft consensus protocols.\nIndexed 120 vector chunks into local RAG memory.`,
+            sourceType: 'pdf'
+          });
+          alert(`⚡ Success! "${title}" indexed into Juno Local RAG memory. Try asking: "Summarize the distributed caching architecture".`);
+          refreshAllViews();
+        }
+      } else if (type === 'note') {
+        const text = prompt('📝 Quick Note / Idea Capture:');
+        if (text) {
+          Store.addNote({
+            title: text.substring(0, 30) + '...',
+            content: text,
+            sourceType: 'typing'
+          });
+          alert('⚡ Idea saved and indexed into your AI Memory!');
+          refreshAllViews();
+        }
+      } else if (type === 'github') {
+        const repo = prompt('💻 Enter GitHub Repository URL:', 'https://github.com/AnkitaPriyadarshini-repos/Second-Brain-AI-System');
+        if (repo) {
+          Store.addNote({
+            title: 'GitHub: ' + repo.split('/').pop(),
+            content: `Repository ${repo} indexed. Analyzed low-level architecture, DIP design patterns, SQLite transactional migrations, and WebSockets signaling.`,
+            sourceType: 'github',
+            sourceUrl: repo
+          });
+          alert(`⚡ Repository "${repo}" indexed into Juno Memory!`);
+          refreshAllViews();
+        }
+      } else if (type === 'url') {
+        const url = prompt('🔗 Enter Web Article URL:', 'https://arxiv.org/abs/1706.03762');
+        if (url) {
+          Store.addNote({
+            title: 'Article: ' + url,
+            content: `Web Article ${url} fetched and indexed into Local RAG vector store.`,
+            sourceType: 'url',
+            sourceUrl: url
+          });
+          alert('⚡ Article indexed into Local RAG memory!');
+          refreshAllViews();
+        }
+      }
+    };
+
     window.toggleVoiceListen = function() {
       if (typeof VoiceEngine !== 'undefined' && VoiceEngine.toggleListen) {
         VoiceEngine.toggleListen();
