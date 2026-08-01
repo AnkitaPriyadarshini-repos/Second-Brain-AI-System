@@ -42,187 +42,135 @@
   </div>
 
   <!-- App Layout Wrapper -->
-  <div class="app-layout-wrapper">
-    <!-- Left Vertical Navigation Sidebar -->
-    <aside id="app-sidebar" class="app-sidebar">
+  <div class="app-layout-wrapper gemini-layout">
+    <!-- Left Vertical Navigation Sidebar (Google Gemini 1:1) -->
+    <aside id="app-sidebar" class="app-sidebar gemini-sidebar">
       <div class="sidebar-top">
-        <!-- Brand & Collapse Row -->
+        <!-- Brand Header with Collapse Toggle -->
         <div class="sidebar-brand-header">
-          <div class="brand-title" onclick="window.activateView('jarvis')" style="cursor: pointer;">
-            <div class="brand-icon-wrapper">
-              <img src="assets/logo.svg" alt="Rocket Code AI Logo" width="32" height="32" style="object-fit: contain; filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.4));" />
+          <div class="brand-title" onclick="window.activateView('jarvis')" style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            <div class="brand-sparkle-icon" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z" fill="url(#gemini-sparkle-grad)"/><defs><linearGradient id="gemini-sparkle-grad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#4285F4"/><stop offset="0.5" stop-color="#9B51E0"/><stop offset="1" stop-color="#EA4335"/></linearGradient></defs></svg>
             </div>
-            <div class="brand-info" style="display: flex; align-items: center; gap: 6px;">
-              <span class="brand-name">Juno AI</span>
-              <button onclick="window.openUserOnboardingModal()" title="Edit Your Profile Name" style="background: rgba(251, 191, 36, 0.12); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 6px; cursor: pointer; font-size: 10.5px; font-weight: 700; color: var(--accent-amber); padding: 2px 6px; display: inline-flex; align-items: center; gap: 3px;">✏️ Name</button>
-            </div>
+            <span class="brand-name" style="font-size: 18px; font-weight: 600; color: #e3e3e3; font-family: 'Inter', sans-serif;">Gemini</span>
           </div>
-          <button class="sidebar-collapse-btn" onclick="window.toggleSidebar()" title="Collapse Sidebar">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          <button class="sidebar-collapse-btn" onclick="window.toggleSidebar()" title="Collapse Sidebar" style="background: transparent; border: none; color: #c4c7c5; cursor: pointer; padding: 4px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
           </button>
         </div>
 
-        <!-- New Chat Button -->
-        <button class="new-chat-btn" onclick="window.createNewChatThread()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span>New Chat</span>
+        <!-- Mode Switcher Tabs (Chat | Spark BETA) -->
+        <div class="gemini-tab-switcher" style="display: flex; background: #131314; border-radius: 20px; padding: 3px; margin: 12px 0 16px 0; border: 1px solid rgba(255, 255, 255, 0.06);">
+          <button class="gemini-tab-btn active" onclick="window.activateView('jarvis')" style="flex: 1; padding: 6px 12px; border-radius: 16px; border: none; background: #28292a; color: #f2f2f2; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center;">Chat</button>
+          <button class="gemini-tab-btn" onclick="alert('Spark Beta features active.')" style="flex: 1; padding: 6px 12px; border-radius: 16px; border: none; background: transparent; color: #8e8e93; font-size: 13px; font-weight: 500; cursor: pointer; text-align: center;">Spark <span style="font-size: 9px; opacity: 0.7; letter-spacing: 0.5px;">BETA</span></button>
+        </div>
+
+        <!-- + New Chat Button -->
+        <button class="new-chat-btn gemini-new-chat" onclick="window.createNewChatThread()" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 20px; background: #1e1f20; border: 1px solid rgba(255, 255, 255, 0.08); color: #e3e3e3; font-size: 13.5px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>New chat</span>
         </button>
 
-        <!-- Thread Search Filter -->
-        <div class="sidebar-search-box">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="sidebar-thread-search" placeholder="Search chats..." oninput="window.filterSidebarThreads(this.value)">
+        <!-- Sidebar Navigation Menu Links -->
+        <div class="gemini-nav-menu" style="margin-top: 14px; display: flex; flex-direction: column; gap: 2px;">
+          <button class="sidebar-menu-item" onclick="window.focusThreadSearch()" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 10px; color: #c4c7c5; background: transparent; border: none; cursor: pointer; font-size: 13.5px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Search chats</span>
+          </button>
+          <button class="sidebar-menu-item" onclick="window.activateView('vault')" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 10px; color: #c4c7c5; background: transparent; border: none; cursor: pointer; font-size: 13.5px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>Images</span>
+          </button>
+          <button class="sidebar-menu-item" onclick="window.activateView('vault')" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 10px; color: #c4c7c5; background: transparent; border: none; cursor: pointer; font-size: 13.5px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            <span>Videos</span>
+          </button>
+          <button class="sidebar-menu-item" onclick="window.activateView('vault')" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 10px; color: #c4c7c5; background: transparent; border: none; cursor: pointer; font-size: 13.5px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span>Library</span>
+          </button>
+        </div>
+
+        <!-- Notebooks Section -->
+        <div class="gemini-notebooks-section" style="margin-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 12px;">
+          <div style="font-size: 12px; color: #8e8e93; font-weight: 500; margin-bottom: 6px; padding-left: 8px;">Notebooks</div>
+          <button class="sidebar-menu-item" onclick="window.activateView('capture')" style="display: flex; align-items: center; gap: 10px; padding: 6px 12px; border-radius: 8px; color: #c4c7c5; background: transparent; border: none; cursor: pointer; font-size: 13px;">
+            <span style="font-size: 16px;">+</span>
+            <span>New notebook</span>
+          </button>
         </div>
       </div>
 
-      <!-- Chat History Threads Container -->
-      <div class="sidebar-chat-history">
-        <div class="history-section-label">Recent Conversations</div>
+      <!-- Recent Chats List -->
+      <div class="sidebar-chat-history" style="margin-top: 12px;">
+        <div class="history-section-label" style="font-size: 12px; color: #8e8e93; font-weight: 500; margin-bottom: 6px;">Recent</div>
         <div id="sidebar-chat-threads-container" class="sidebar-threads-list">
           <!-- Rendered dynamically -->
         </div>
       </div>
 
-      <!-- Main Navigation Menu -->
-      <div class="sidebar-menu">
-        <button class="sidebar-menu-item active" data-view="jarvis" onclick="window.activateView('jarvis')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          <span>AI Assistant</span>
-        </button>
-        <button class="sidebar-menu-item" data-view="settings" onclick="window.activateView('settings')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          <span>Settings</span>
-        </button>
-        <button id="pwa-install-sidebar-btn" class="sidebar-menu-item" onclick="window.triggerPWAInstall()" style="cursor: pointer; color: var(--accent-primary);">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <span>Install App</span>
-        </button>
-      </div>
-
-      <!-- Sidebar Status Footer -->
-      <div class="sidebar-footer">
-        <div class="sidebar-rag-badge">
-          <span class="pulse-dot"></span>
-          <span>Local RAG</span>
+      <!-- Bottom Profile Footer (Google Gemini 1:1) -->
+      <div class="sidebar-footer gemini-footer" style="padding: 12px 14px; border-top: 1px solid rgba(255, 255, 255, 0.06); display: flex; align-items: center; justify-content: space-between;">
+        <div class="user-profile-row" style="display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="window.openUserOnboardingModal()">
+          <div class="user-avatar-circle" style="width: 32px; height: 32px; border-radius: 50%; background: #e05624; color: #ffffff; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center;">A</div>
+          <div class="user-info-stack" style="display: flex; flex-direction: column;">
+            <span id="user-display-name" style="font-size: 13px; font-weight: 600; color: #e3e3e3; line-height: 1.2;">Ankita Priyadarshini Pallai</span>
+            <span style="font-size: 11px; color: #8e8e93;">Pro</span>
+          </div>
         </div>
-        <button class="theme-pill-btn" onclick="const current = document.documentElement.getAttribute('data-theme'); const next = current === 'gemini-glow' ? 'claude-obsidian' : (current === 'claude-obsidian' ? 'chatgpt-emerald' : (current === 'chatgpt-emerald' ? 'perplexity-cyan' : 'gemini-glow')); window.applyTheme(next);">✨ Theme</button>
+        <button class="sidebar-settings-btn" onclick="window.activateView('settings')" title="Settings" style="background: transparent; border: none; color: #c4c7c5; cursor: pointer; padding: 4px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
       </div>
     </aside>
 
-    <!-- Main Canvas Area -->
-    <div class="app-main-canvas">
-      <!-- Main Studio View: ChatGPT / Gemini / Claude Workspace -->
-      <section id="view-jarvis" class="view-section active" aria-label="Juno AI Studio Interface">
-        <div class="chatgpt-layout-container">
+    <!-- Main Canvas Area (Google Gemini 1:1) -->
+    <div class="app-main-canvas gemini-main-canvas" style="background: #131314; position: relative; flex: 1; display: flex; flex-direction: column;">
+      
+      <!-- Deep Blue Radial Ambient Center Glow -->
+      <div class="gemini-ambient-glow" style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); width: 600px; height: 400px; background: radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, rgba(15, 23, 42, 0) 70%); pointer-events: none; z-index: 0;"></div>
+
+      <section id="view-jarvis" class="view-section active" style="flex: 1; display: flex; flex-direction: column; z-index: 1;">
+        <div class="chatgpt-layout-container" style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; max-width: 900px; margin: 0 auto; width: 100%; padding: 0 16px;">
           
-          <!-- Main Chat Scrollable Content Area -->
-          <div class="chat-main-workspace">
+          <!-- Centered Hero & Input Deck (Google Gemini 1:1) -->
+          <div id="chat-hero-view" class="chat-hero-view gemini-hero-center" style="width: 100%; max-width: 760px; text-align: center; margin-top: auto; margin-bottom: 24px;">
+            <h1 class="gemini-hero-title" id="user-hero-greeting" style="font-size: 38px; font-weight: 500; color: #e3e3e3; letter-spacing: -0.02em; margin-bottom: 28px; font-family: 'Inter', sans-serif;">Where should we start?</h1>
 
-            <!-- Hero Welcome View (Shown on Empty Thread) -->
-            <div id="chat-hero-view" class="chat-hero-view">
-              
-              <div class="hero-brand-header" style="text-align: center; margin-bottom: 20px;">
-                <div class="hero-logo-badge" style="margin: 0 auto 14px auto; display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 16px;">
-                  <img src="assets/logo.svg" alt="Juno AI Logo" width="36" height="36" style="object-fit: contain;" />
-                </div>
-                <h1 class="gemini-hero-title" id="user-hero-greeting" style="font-size: 32px; font-weight: 700; color: var(--text-primary); letter-spacing: -0.02em; margin-bottom: 8px;">Never lose an idea again.</h1>
-                <p class="gemini-hero-sub" id="user-hero-sub" style="font-size: 14.5px; color: var(--text-secondary); max-width: 560px; margin: 0 auto 18px auto;">Your notes, PDFs, code repos, and chats become one instant, searchable AI memory.</p>
+            <!-- Floating Centered Input Pill Container -->
+            <form id="rag-query-form" class="chat-input-container gemini-floating-pill" onsubmit="window.submitRAGQuery(event); return false;" style="width: 100%; max-width: 720px; margin: 0 auto; background: #1e1f20; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 28px; padding: 8px 16px; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);">
+              <!-- Plus Attach Button -->
+              <button type="button" class="input-action-btn" title="Upload Note or File" onclick="window.triggerQuickUpload('pdf')" style="background: transparent; border: none; color: #c4c7c5; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; padding: 4px;">+</button>
 
-                <!-- 1-Click Quick Import Bar (30-Second Dopamine Moment) -->
-                <div class="quick-import-bar" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 12px;">
-                  <button class="quick-import-pill" onclick="window.triggerQuickUpload('pdf')" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); color: #e2e8f0; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">📄 Upload PDF / Document</button>
-                  <button class="quick-import-pill" onclick="window.triggerQuickUpload('note')" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); color: #e2e8f0; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">📝 Quick Note Capture</button>
-                  <button class="quick-import-pill" onclick="window.triggerQuickUpload('github')" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); color: #e2e8f0; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">💻 Connect GitHub Repo</button>
-                  <button class="quick-import-pill" onclick="window.triggerQuickUpload('url')" style="background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); color: #e2e8f0; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">🔗 Import Web Article</button>
-                </div>
+              <!-- Text Input -->
+              <input type="text" id="rag-query-input" class="chat-textarea" placeholder="Ask Gemini" aria-label="Query Input" style="flex: 1; background: transparent; border: none; color: #e3e3e3; font-size: 16px; outline: none; font-family: inherit;">
+
+              <!-- Model Selector Pill Dropdown (Flash / Pro) -->
+              <div class="gemini-model-selector-pill" style="display: flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.06); padding: 4px 10px; border-radius: 14px; cursor: pointer;" onclick="const select = document.getElementById('model-select-dropdown'); if (select) select.click();">
+                <span class="blue-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #4285F4;"></span>
+                <select id="model-select-dropdown" class="model-select-dropdown" onchange="window.handleModelChange(this.value)" style="background: transparent; border: none; color: #e3e3e3; font-size: 12.5px; font-weight: 500; cursor: pointer; outline: none;">
+                  <option value="gemini-glow" selected>Flash ∨</option>
+                  <option value="claude-obsidian">Pro ∨</option>
+                  <option value="chatgpt-emerald">GPT-4o ∨</option>
+                  <option value="perplexity-cyan">Perplexity ∨</option>
+                </select>
               </div>
 
-              <!-- 4 Workflow Action Cards -->
-              <div class="prompt-cards-grid">
-                <div class="prompt-card-item" onclick="window.triggerSampleQuery('Summarize uploaded research PDFs and technical whitepapers with source citations')">
-                  <div class="prompt-card-icon">📄</div>
-                  <div class="prompt-card-content">
-                    <div class="prompt-card-title">Research Papers &amp; PDFs</div>
-                    <div class="prompt-card-desc">Summarize uploaded PDFs &amp; technical whitepapers</div>
-                  </div>
-                </div>
-                <div class="prompt-card-item" onclick="window.triggerSampleQuery('Ask deep architecture questions about connected GitHub repositories & DIP design patterns')">
-                  <div class="prompt-card-icon">💻</div>
-                  <div class="prompt-card-content">
-                    <div class="prompt-card-title">GitHub Repositories</div>
-                    <div class="prompt-card-desc">Ask questions about codebase architecture</div>
-                  </div>
-                </div>
-                <div class="prompt-card-item" onclick="window.triggerSampleQuery('Synthesize unstructured meeting transcripts & lecture notes into clear key takeaways')">
-                  <div class="prompt-card-icon">📝</div>
-                  <div class="prompt-card-content">
-                    <div class="prompt-card-title">Meeting &amp; Lecture Notes</div>
-                    <div class="prompt-card-desc">Convert transcripts into actionable summaries</div>
-                  </div>
-                </div>
-                <div class="prompt-card-item" onclick="window.triggerSampleQuery('Search across all my saved notes, vector embeddings, and indexed articles instantly')">
-                  <div class="prompt-card-icon">🔍</div>
-                  <div class="prompt-card-content">
-                    <div class="prompt-card-title">Knowledge Vault Search</div>
-                    <div class="prompt-card-desc">Search across all saved memories instantly</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+              <!-- Voice Mic Button -->
+              <button type="button" id="voice-trigger-btn" class="input-action-btn voice-btn" title="Voice Input" onclick="window.toggleVoiceListen()" style="background: transparent; border: none; color: #c4c7c5; cursor: pointer; padding: 4px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+              </button>
 
-
-
-            <!-- Chat Stream Messages Container -->
-            <div id="chat-container" class="chat-stream">
-              <div class="chat-bubble ai-bubble glass-card">
-                <div class="chat-header">
-                  <div class="ai-avatar">✨</div>
-                  <strong style="color: var(--accent-indigo);">Juno AI Agent</strong>
-                </div>
-                <div class="chat-text">
-                  👋 Hi! I'm Juno AI, your elite AI Agent & System Architect. What scale problem or deep technical research shall we tackle today?
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Floating Input Pill Deck -->
-          <div class="chat-bottom-deck">
-            <form id="rag-query-form" class="chat-input-container" onsubmit="window.submitRAGQuery(event); return false;">
-              <div class="input-row">
-                <!-- Attach File/Note Toggle -->
-                <button type="button" class="input-action-btn" title="Attach Note or File" onclick="window.activateView('capture'); window.setCaptureTab('file');">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-                </button>
-
-                <!-- Expanding Textarea -->
-                <textarea id="rag-query-input" class="chat-textarea" placeholder="Ask anything or search your memory..." rows="1" aria-label="Query Input"></textarea>
-
-                <!-- Voice Dictation Mic Button -->
-                <button type="button" id="voice-trigger-btn" class="input-action-btn voice-btn" title="Voice Input" onclick="window.toggleVoiceListen()">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-                </button>
-
-                <!-- Glowing Primary Send Button -->
-                <button type="submit" id="rag-submit-btn" class="chat-send-btn gemini-send-btn" title="Send message (Enter)">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                </button>
-              </div>
-
-              <!-- Deliberate RAG Progress & Diagnostic Feedback Bar -->
-              <div id="rag-progress-bar-container" class="rag-progress-bar-container" style="display: none;">
-                <div class="progress-status-row">
-                  <span id="rag-progress-status-text">⚡ Juno AI: Searching grounded sources...</span>
-                  <span id="rag-progress-percentage">0%</span>
-                </div>
-                <div class="progress-track">
-                  <div id="rag-progress-fill" class="progress-bar-fill"></div>
-                </div>
-              </div>
+              <!-- Hidden Submit Button -->
+              <button type="submit" id="rag-submit-btn" style="display: none;"></button>
             </form>
-            <div class="chat-disclaimer">Juno AI may produce accurate grounded answers based on your saved notes. Verify important information.</div>
           </div>
+
+          <!-- Chat Stream Messages Container (Shown when conversation starts) -->
+          <div id="chat-container" class="chat-stream" style="width: 100%; max-width: 760px; margin: 0 auto; display: none;"></div>
+
+        </div>
+      </section>
 
         </div>
       </section>

@@ -5614,18 +5614,65 @@ body, html {
   color: #94a3b8 !important;
 }
 
-.app-sidebar {
-  background-color: #0d1322 !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+/* ----------------------------------------------------
+   1:1 Google Gemini Flagship Interface System
+   ---------------------------------------------------- */
+.gemini-sidebar {
+  background-color: #131314 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+  padding: 16px 12px !important;
 }
 
-.new-chat-btn {
-  background: rgba(59, 130, 246, 0.12) !important;
-  border: 1px solid rgba(59, 130, 246, 0.3) !important;
-  color: #60a5fa !important;
+.gemini-sidebar .sidebar-menu-item {
+  color: #c4c7c5 !important;
+  font-size: 13.5px !important;
+  border-radius: 18px !important;
 }
 
-.new-chat-btn:hover {
-  background: rgba(59, 130, 246, 0.22) !important;
-  color: #ffffff !important;
+.gemini-sidebar .sidebar-menu-item:hover {
+  background: #28292a !important;
+  color: #e3e3e3 !important;
+}
+
+.gemini-sidebar .sidebar-menu-item.active {
+  background: #004a77 !important;
+  color: #c2e7ff !important;
+}
+
+.gemini-sidebar .sidebar-thread-item {
+  color: #c4c7c5 !important;
+  font-size: 13px !important;
+  border-radius: 16px !important;
+  padding: 8px 12px !important;
+}
+
+.gemini-sidebar .sidebar-thread-item:hover {
+  background: #28292a !important;
+  color: #e3e3e3 !important;
+}
+
+.gemini-hero-title {
+  font-size: 38px !important;
+  font-weight: 500 !important;
+  color: #e3e3e3 !important;
+  font-family: 'Inter', -apple-system, sans-serif !important;
+  background: none !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+.gemini-floating-pill {
+  background: #1e1f20 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.gemini-floating-pill:focus-within {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+.gemini-floating-pill input::placeholder {
+  color: #8e8e93 !important;
 }
