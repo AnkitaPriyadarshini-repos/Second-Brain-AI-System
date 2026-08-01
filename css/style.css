@@ -61,28 +61,28 @@ a, a:hover, a:visited, a:focus, a:active,
    FLAGSHIP AI PLATFORM THEMES (Gemini, Claude, ChatGPT, Perplexity)
    ========================================== */
 
-/* 1. Google Gemini Glow Theme */
+/* 1. Google Gemini Glow Theme (Vibrant Titanium Yellow System) */
 [data-theme="gemini-glow"] {
-  --bg-dark: #080b14;
-  --bg-card: rgba(16, 22, 38, 0.82);
-  --bg-card-hover: rgba(26, 36, 62, 0.9);
-  --bg-card-active: rgba(36, 48, 80, 0.95);
-  --border-color: rgba(99, 102, 241, 0.25);
-  --border-highlight: rgba(168, 85, 247, 0.65);
-  --border-accent: rgba(59, 130, 246, 0.6);
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --accent-primary: #3b82f6;
-  --accent-primary-hover: #2563eb;
-  --accent-primary-light: rgba(59, 130, 246, 0.2);
-  --accent-indigo: #6366f1;
-  --accent-violet: #a855f7;
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-cyan: #06b6d4;
-  --shadow-card: 0 10px 30px -5px rgba(15, 23, 42, 0.8);
-  --shadow-glow: 0 0 35px rgba(59, 130, 246, 0.35);
+  --bg-dark: #0d1018;
+  --bg-card: rgba(20, 24, 36, 0.88);
+  --bg-card-hover: rgba(30, 36, 54, 0.9);
+  --bg-card-active: rgba(40, 48, 72, 0.95);
+  --border-color: rgba(255, 230, 0, 0.3);
+  --border-highlight: rgba(255, 230, 0, 0.7);
+  --border-accent: rgba(255, 230, 0, 0.5);
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --accent-primary: #ffe600;
+  --accent-primary-hover: #ffd600;
+  --accent-primary-light: rgba(255, 230, 0, 0.2);
+  --accent-indigo: #818cf8;
+  --accent-violet: #c084fc;
+  --accent-emerald: #34d399;
+  --accent-amber: #ffe600;
+  --accent-cyan: #22d3ee;
+  --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.8);
+  --shadow-glow: 0 0 35px rgba(255, 230, 0, 0.35);
 }
 
 /* 2. Claude 3.5 Warm Obsidian Theme */
@@ -4498,15 +4498,14 @@ kbd {
 }
 
 .gemini-hero-title {
-  font-size: 42px !important;
+  font-size: 44px !important;
   font-weight: 800 !important;
-  background: linear-gradient(90deg, #3e2723 0%, #d68910 45%, #f5b041 85%) !important;
-  background-size: 200% auto !important;
+  background: linear-gradient(135deg, #ffffff 0%, #ffea00 40%, #ffd600 75%, #ffab00 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
-  animation: geminiGradientShift 5s ease infinite alternate !important;
+  filter: drop-shadow(0 2px 24px rgba(255, 230, 0, 0.5)) !important;
   margin-bottom: 10px !important;
-  letter-spacing: -0.8px !important;
+  letter-spacing: -0.025em !important;
 }
 
 [data-theme="platinum-gold"] .gemini-hero-title,
