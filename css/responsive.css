@@ -592,6 +592,42 @@ html, body {
     z-index: 999999;
   }
 
+  /* Mobile Background Cleaning & Safety */
+  .ambient-orbs-container,
+  .orb-3d,
+  .gemini-ambient-glow {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* View Section Mobile Layout */
+  .view-section {
+    width: 100% !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    padding: 8px 10px 80px 10px !important;
+  }
+
+  .glass-card,
+  .settings-card,
+  .capture-card-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 14px 12px !important;
+    margin: 8px 0 !important;
+  }
+
+  .setting-item {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
   /* Hero Section Mobile Cleanup */
   .chat-hero-view {
     margin: 12px auto 16px auto !important;
