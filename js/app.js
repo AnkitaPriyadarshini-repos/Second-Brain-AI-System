@@ -201,16 +201,27 @@
     window.triggerSampleQuery = function(queryText) {
       if (!queryText) return;
       const cleanQuery = queryText.replace(/^["']|["']$/g, '');
-      window.activateView('jarvis');
+      if (typeof window.activateView === 'function') window.activateView('jarvis');
       const inputEl = document.getElementById('rag-query-input');
       if (inputEl) inputEl.value = cleanQuery;
-      if (typeof handleRAGQuery === 'function') handleRAGQuery(cleanQuery);
+      if (typeof window.handleRAGQuery === 'function') {
+        window.handleRAGQuery(cleanQuery);
+      } else if (typeof handleRAGQuery === 'function') {
+        handleRAGQuery(cleanQuery);
+      }
     };
     window.submitRAGQuery = function(e) {
       if (e && e.preventDefault) e.preventDefault();
       const inputEl = document.getElementById('rag-query-input');
       const query = inputEl ? inputEl.value.trim() : '';
-      if (query && typeof handleRAGQuery === 'function') handleRAGQuery(query);
+      if (query) {
+        if (typeof window.handleRAGQuery === 'function') {
+          window.handleRAGQuery(query);
+        } else if (typeof handleRAGQuery === 'function') {
+          handleRAGQuery(query);
+        }
+      }
+      return false;
     };
 
     let currentSessionOTP = '582914';
