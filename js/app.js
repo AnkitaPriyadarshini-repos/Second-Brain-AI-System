@@ -906,12 +906,16 @@
 
       window.handleRAGQuery = handleRAGQuery;
 
+      if (typeof window.activateView === 'function') {
+        window.activateView('jarvis');
+      }
+
       let rag = typeof RAGEngine !== 'undefined' ? RAGEngine : (typeof window !== 'undefined' ? window.RAGEngine : null);
       const queryStartTimeMs = typeof performance !== 'undefined' ? performance.now() : Date.now();
 
       // Get selected model
-      const modelSelector = document.getElementById('ai-model-selector');
-      const selectedModel = modelSelector ? modelSelector.value : 'gemini-1.5-flash';
+      const modelSelector = document.getElementById('model-select-dropdown') || document.getElementById('ai-model-selector');
+      const selectedModel = modelSelector ? modelSelector.value : 'golden-harmony';
 
       // RAG Progress Bar Elements
       const progressBarContainer = document.getElementById('rag-progress-bar-container');
@@ -937,7 +941,9 @@
 
       // Render user message card immediately
       appendChatMessage('user', query);
-      if (ragQueryInput) ragQueryInput.value = '';
+      const inputEl = document.getElementById('rag-query-input');
+      if (inputEl) inputEl.value = '';
+      if (typeof ragQueryInput !== 'undefined' && ragQueryInput) ragQueryInput.value = '';
 
       // Set UI controls
       const submitBtn = document.getElementById('rag-submit-btn');
