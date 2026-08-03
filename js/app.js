@@ -898,6 +898,30 @@
       if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
     };
 
+    const ragQueryForm = document.getElementById('rag-query-form');
+    if (ragQueryForm) {
+      ragQueryForm.addEventListener('submit', (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+        window.submitRAGQuery(e);
+      });
+    }
+
+    if (ragSubmitBtn) {
+      ragSubmitBtn.addEventListener('click', (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+        window.submitRAGQuery(e);
+      });
+    }
+
+    if (ragQueryInput) {
+      ragQueryInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          if (e && e.preventDefault) e.preventDefault();
+          window.submitRAGQuery(e);
+        }
+      });
+    }
+
     if (voiceTriggerBtn) {
       voiceTriggerBtn.addEventListener('click', () => {
         if (typeof VoiceEngine !== 'undefined') {
