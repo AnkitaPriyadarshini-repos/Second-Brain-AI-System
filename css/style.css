@@ -3629,14 +3629,14 @@ kbd {
 .sidebar-menu-item:hover,
 .sidebar-menu-item:hover span {
   background: rgba(255, 255, 255, 0.08);
-  color: #ffffff !important;
+  color: inherit;
 }
 
 .sidebar-menu-item.active,
 .sidebar-menu-item.active span {
   background: linear-gradient(90deg, var(--accent-primary-light, rgba(251, 191, 36, 0.16)) 0%, rgba(255, 255, 255, 0.04) 100%) !important;
   border: 1px solid var(--border-highlight, rgba(251, 191, 36, 0.4)) !important;
-  color: #ffffff !important;
+  color: inherit;
   font-weight: 700 !important;
   box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.4), 0 0 12px var(--accent-primary-light) !important;
   position: relative;
@@ -5683,35 +5683,57 @@ body, html {
   padding: 16px 12px !important;
 }
 
-.gemini-sidebar .sidebar-menu-item {
-  color: #4A2E00 !important;
+.gemini-sidebar .sidebar-menu-item,
+.gemini-sidebar .sidebar-menu-item span {
+  color: #2C1D00 !important;
   font-size: 13.5px !important;
-  font-weight: 600 !important;
-  border-radius: 18px !important;
+  font-weight: 700 !important;
 }
 
-.gemini-sidebar .sidebar-menu-item:hover {
+.gemini-sidebar .sidebar-menu-item svg {
+  stroke: #2C1D00 !important;
+}
+
+.gemini-sidebar .sidebar-menu-item:hover,
+.gemini-sidebar .sidebar-menu-item:hover span {
   background: #FFE156 !important;
   color: #2C1D00 !important;
 }
 
-.gemini-sidebar .sidebar-menu-item.active {
+.gemini-sidebar .sidebar-menu-item:hover svg {
+  stroke: #2C1D00 !important;
+}
+
+.gemini-sidebar .sidebar-menu-item.active,
+.gemini-sidebar .sidebar-menu-item.active span {
   background: #FBC02D !important;
   color: #2C1D00 !important;
   font-weight: 800 !important;
   box-shadow: 0 4px 14px rgba(251, 192, 45, 0.4) !important;
 }
 
-.gemini-sidebar .sidebar-thread-item {
+.gemini-sidebar .sidebar-menu-item.active svg {
+  stroke: #2C1D00 !important;
+}
+
+.gemini-sidebar .sidebar-thread-item,
+.gemini-sidebar .sidebar-thread-item span {
   color: #4A2E00 !important;
   font-size: 13px !important;
   border-radius: 16px !important;
   padding: 8px 12px !important;
 }
 
-.gemini-sidebar .sidebar-thread-item:hover {
+.gemini-sidebar .sidebar-thread-item:hover,
+.gemini-sidebar .sidebar-thread-item:hover span {
   background: #FFE156 !important;
   color: #2C1D00 !important;
+}
+
+.gemini-sidebar .history-section-label,
+.gemini-sidebar .gemini-notebooks-section div {
+  color: #5D4037 !important;
+  font-weight: 800 !important;
 }
 
 .gemini-hero-title {
