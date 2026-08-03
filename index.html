@@ -127,6 +127,21 @@
     <!-- Main Canvas Area (Golden Harmony System) -->
     <div class="app-main-canvas gemini-main-canvas" style="background: #fff8e1; position: relative; flex: 1; display: flex; flex-direction: column;">
       
+      <!-- Mobile Top Navigation Bar -->
+      <header class="mobile-top-bar" style="display: none;">
+        <button type="button" class="mobile-header-btn" onclick="window.toggleSidebar()" title="Open Navigation Menu" aria-label="Open Navigation Menu" style="background: transparent; border: none; color: #2c1d00; cursor: pointer; padding: 6px; display: flex; align-items: center; justify-content: center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="mobile-header-brand" style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 17px; color: #2c1d00; display: flex; align-items: center; gap: 6px;">
+          <span>Juno AI</span>
+          <span style="font-size: 14px;">🌙</span>
+        </div>
+        <button type="button" class="mobile-header-btn" onclick="window.createNewChatThread()" title="New Session" aria-label="New Session" style="background: #ffd93d; border: 1.5px solid #fbc02d; color: #2c1d00; border-radius: 14px; cursor: pointer; padding: 5px 12px; display: flex; align-items: center; gap: 4px; font-weight: 800; font-size: 12px; box-shadow: 0 2px 8px rgba(251, 192, 45, 0.3);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>New</span>
+        </button>
+      </header>
+
       <!-- Luminous Gold Ambient Glow -->
       <div class="gemini-ambient-glow" style="position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%); width: 680px; height: 440px; background: radial-gradient(circle, rgba(255, 217, 61, 0.45) 0%, rgba(251, 192, 45, 0.22) 50%, rgba(255, 248, 225, 0) 80%); pointer-events: none; z-index: 0;"></div>
 
@@ -1199,6 +1214,10 @@
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
       <span>Vault</span>
     </button>
+    <button class="mobile-nav-btn" onclick="window.toggleSidebar()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      <span>Menu</span>
+    </button>
     <button class="mobile-nav-btn" data-view="settings" onclick="window.activateView('settings')">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       <span>Settings</span>
@@ -1339,17 +1358,6 @@
 
 
 
-  <!-- Fixed Native Mobile Bottom Tab Bar (iOS/Android Native Style) -->
-  <nav class="bottom-mobile-nav" aria-label="Mobile Navigation">
-    <button class="mobile-nav-btn active" data-view="jarvis" onclick="window.activateView('jarvis')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <span>Chat</span>
-    </button>
-    <button class="mobile-nav-btn" data-view="settings" onclick="window.activateView('settings')">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      <span>Settings</span>
-    </button>
-  </nav>
 
   <!-- JavaScript Modules -->
   <script src="js/utils.js?v=51.0"></script>
