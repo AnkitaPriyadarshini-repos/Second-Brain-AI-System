@@ -2508,6 +2508,26 @@
       try { localStorage.setItem('juno_pwa_dismissed', 'true'); } catch (e) {}
     };
 
+    window.openPWAInstallGuideModal = function() {
+      const guideModal = document.getElementById('pwa-guide-modal');
+      if (guideModal) guideModal.style.display = 'flex';
+    };
+
+    window.triggerPWAInstall = async function() {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+      window.dismissPWAPopup();
+      if (deferredPWAInstallPrompt) {
+        deferredPWAInstallPrompt.prompt();
+        const { outcome } = await deferredPWAInstallPrompt.userChoice;
+        if (outcome === 'accepted') {
+          showToast('Thank you for installing Juno AI App! 🎉');
+        }
+        deferredPWAInstallPrompt = null;
+      } else {
+        window.openPWAInstallGuideModal();
+      }
+    };
+
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPWAInstallPrompt = e;
@@ -2527,20 +2547,7 @@
     }, 1500);
 
     if (pwaInstallBtn) {
-      pwaInstallBtn.addEventListener('click', async () => {
-        if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
-        window.dismissPWAPopup();
-        if (deferredPWAInstallPrompt) {
-          deferredPWAInstallPrompt.prompt();
-          const { outcome } = await deferredPWAInstallPrompt.userChoice;
-          if (outcome === 'accepted') {
-            showToast('Thank you for installing Second Brain AI System!');
-          }
-          deferredPWAInstallPrompt = null;
-        } else {
-          showToast('App is ready! Add to Home Screen via browser menu 📲');
-        }
-      });
+      pwaInstallBtn.addEventListener('click', () => window.triggerPWAInstall());
     }
 
     // Universal UI Click Sound Feedback

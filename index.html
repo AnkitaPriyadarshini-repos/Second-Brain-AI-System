@@ -178,10 +178,14 @@
                 <button type="button" id="voice-trigger-btn" class="input-action-btn voice-btn" title="Voice Input" onclick="window.toggleVoiceListen()" style="background: transparent; border: none; color: #e65100; cursor: pointer; padding: 4px;">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
                 </button>
+                <!-- Send Submit Button -->
+                <button type="submit" id="rag-submit-btn" class="input-action-btn send-btn" title="Send Message" style="background: linear-gradient(135deg, #FFD93D 0%, #FBC02D 100%); border: 1.5px solid #FBC02D; color: #2C1D00; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(251, 192, 45, 0.45); transition: all 0.2s ease; margin-left: 4px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                  </svg>
+                </button>
               </div>
-
-              <!-- Hidden Submit Button -->
-              <button type="submit" id="rag-submit-btn" style="display: none;"></button>
             </form>
           </div>
 
@@ -1153,6 +1157,28 @@
         <button id="pwa-popup-close-btn" class="pwa-btn-dismiss" onclick="window.dismissPWAPopup()">Later</button>
         <button id="pwa-popup-install-btn" class="pwa-btn-install" onclick="window.triggerPWAInstall()">📲 Install</button>
       </div>
+    </div>
+  </div>
+
+  <!-- PWA Install Interactive Guide Modal -->
+  <div id="pwa-guide-modal" class="modal-backdrop" style="display: none; z-index: 9999999; align-items: center; justify-content: center;">
+    <div class="glass-card modal-content" style="max-width: 420px; width: 92%; padding: 24px; text-align: center; border: 2px solid #FBC02D; margin: auto;">
+      <div style="font-size: 38px; margin-bottom: 8px;">📲</div>
+      <h2 style="font-size: 20px; font-weight: 800; color: #2C1D00; margin-bottom: 8px;">Install Juno AI App</h2>
+      <p style="font-size: 13px; color: #5D4037; line-height: 1.5; margin-bottom: 20px;">
+        Add Juno AI to your mobile Home Screen or Desktop for instant full-screen access, air-gapped performance, and offline support.
+      </p>
+
+      <div style="background: rgba(255, 248, 225, 0.9); border: 1.5px solid #FFE156; border-radius: 14px; padding: 14px; text-align: left; margin-bottom: 20px; font-size: 13px; color: #2C1D00;">
+        <div style="margin-bottom: 8px; font-weight: 700;">📱 For Mobile Browsers (Chrome / Safari / Edge):</div>
+        <ol style="margin: 0; padding-left: 18px; line-height: 1.6;">
+          <li>Tap your browser's <b>Menu (⋮)</b> or <b>Share (⎋)</b> icon.</li>
+          <li>Select <b>"Add to Home Screen"</b> or <b>"Install App"</b>.</li>
+          <li>Launch Juno AI anytime right from your home screen!</li>
+        </ol>
+      </div>
+
+      <button class="btn btn-primary" onclick="document.getElementById('pwa-guide-modal').style.display='none';" style="width: 100%; background: linear-gradient(135deg, #FFD93D, #FBC02D); color: #2C1D00; font-weight: 800; font-size: 14px; padding: 10px 0; border-radius: 14px; border: none; cursor: pointer;">Got It!</button>
     </div>
   </div>
 
