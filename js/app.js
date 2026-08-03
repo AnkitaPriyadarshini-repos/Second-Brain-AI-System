@@ -963,8 +963,10 @@
         </div>
       `;
 
-      const targetContainer = document.getElementById('chat-container') || chatContainer || document.querySelector('.chat-card-wrapper');
+      const targetContainer = document.getElementById('chat-container') || document.querySelector('.chat-stream') || document.querySelector('.chat-card-wrapper');
       if (targetContainer) {
+        targetContainer.style.display = 'flex';
+        targetContainer.style.flexDirection = 'column';
         targetContainer.appendChild(thinkingCard);
         targetContainer.scrollTop = targetContainer.scrollHeight;
       }
@@ -995,9 +997,9 @@
           });
         }
 
-        const answerText = aiResult ? aiResult.text : (ragRes ? ragRes.answer : 'No response generated.');
+        const answerText = aiResult ? aiResult.text : (ragRes ? ragRes.answer : 'Hello! I am Juno AI. How can I assist you with your knowledge vault today?');
         const citations = (ragRes && ragRes.citations) ? ragRes.citations : [];
-        const providerName = aiResult ? aiResult.provider : 'Juno On-Device Intelligence Engine';
+        const providerName = aiResult ? aiResult.provider : 'Juno Intelligence Engine';
 
         const latencyMs = (typeof DeveloperHUDEngine !== 'undefined') ? DeveloperHUDEngine.recordQueryLatency(queryStartTimeMs) : 15;
 
@@ -1012,7 +1014,7 @@
           thinkingCard.remove();
         }
 
-        const RAG_SEND_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
+        const RAG_SEND_SVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
 
         if (submitBtn) {
           submitBtn.disabled = false;
@@ -1050,7 +1052,7 @@
           VoiceEngine.speak(answerText);
         }
 
-        if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+        if (targetContainer) targetContainer.scrollTop = targetContainer.scrollHeight;
 
         setTimeout(() => {
           if (progressBarContainer) progressBarContainer.style.display = 'none';
@@ -1059,15 +1061,18 @@
       } catch (err) {
         console.error('Error during AI synthesis:', err);
         if (thinkingCard && thinkingCard.parentNode) thinkingCard.remove();
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`; }
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`; }
         if (progressBarContainer) progressBarContainer.style.display = 'none';
         appendChatMessage('ai', `⚠️ **AI Completion Error**: ${err.message}\n\nPlease check your API key settings or switch to **Juno Local RAG** model.`, [], false, query);
       }
     }
 
-    function appendChatMessage(sender, text, citations = [], isGeneralKnowledge = false, queryStr = '') {
-      const targetContainer = document.getElementById('chat-container') || chatContainer || document.querySelector('.chat-card-wrapper');
+    function appendChatMessage(sender, text, citations = [], isGeneralKnowledge = false, queryStr = '', customProvider = '') {
+      const targetContainer = document.getElementById('chat-container') || document.querySelector('.chat-stream') || document.querySelector('.chat-card-wrapper');
       if (!targetContainer) return;
+
+      targetContainer.style.display = 'flex';
+      targetContainer.style.flexDirection = 'column';
 
       const heroView = document.getElementById('chat-hero-view');
       if (heroView) heroView.style.display = 'none';
@@ -1100,7 +1105,7 @@
 
         msgCard.innerHTML = `<div class="chat-header">
           <div class="ai-avatar">•</div>
-          <strong style="color: var(--accent-indigo);">Second Brain AI Assistant</strong>
+          <strong style="color: var(--accent-indigo);">${escapeHTML(customProvider || 'Second Brain AI Assistant')}</strong>
         </div>
         <div class="chat-text">${formatMarkdownText(text)}</div>
         ${citationsHTML}
@@ -1112,8 +1117,8 @@
         }
       }
 
-      chatContainer.appendChild(msgCard);
-      chatContainer.scrollTop = chatContainer.scrollHeight;
+      targetContainer.appendChild(msgCard);
+      targetContainer.scrollTop = targetContainer.scrollHeight;
       setTimeout(() => {
         msgCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }, 50);
