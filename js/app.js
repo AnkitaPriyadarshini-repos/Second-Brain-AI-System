@@ -211,15 +211,25 @@
       }
     };
     window.submitRAGQuery = function(e) {
-      if (e && e.preventDefault) e.preventDefault();
-      const inputEl = document.getElementById('rag-query-input');
-      const query = inputEl ? inputEl.value.trim() : '';
-      if (query) {
-        if (typeof window.handleRAGQuery === 'function') {
-          window.handleRAGQuery(query);
-        } else if (typeof handleRAGQuery === 'function') {
-          handleRAGQuery(query);
+      try {
+        if (e) {
+          if (typeof e.preventDefault === 'function') e.preventDefault();
+          if (typeof e.stopPropagation === 'function') e.stopPropagation();
         }
+      } catch (err) {}
+
+      try {
+        const inputEl = document.getElementById('rag-query-input');
+        const query = inputEl ? inputEl.value.trim() : '';
+        if (query) {
+          if (typeof window.handleRAGQuery === 'function') {
+            window.handleRAGQuery(query);
+          } else if (typeof handleRAGQuery === 'function') {
+            handleRAGQuery(query);
+          }
+        }
+      } catch (err) {
+        console.error('Error in submitRAGQuery:', err);
       }
       return false;
     };
@@ -1049,19 +1059,26 @@
 
         // Save into current Chat Thread
         if (typeof Store !== 'undefined' && Store.saveChatThread) {
-          const activeId = Store.getActiveThreadId();
-          const threads = Store.getChatThreads();
-          let currentThread = threads.find(t => t.id === activeId);
-          if (!currentThread) {
-            currentThread = { id: activeId, title: query.substring(0, 30), createdAt: Date.now(), messages: [] };
+          try {
+            const activeId = Store.getActiveThreadId();
+            const threads = Store.getChatThreads() || [];
+            let currentThread = threads.find(t => t && t.id === activeId);
+            if (!currentThread) {
+              currentThread = { id: activeId || `thread-${Date.now()}`, title: query.substring(0, 30), createdAt: Date.now(), messages: [] };
+            }
+            if (!Array.isArray(currentThread.messages)) {
+              currentThread.messages = [];
+            }
+            if (currentThread.messages.length === 1 && currentThread.messages[0] && currentThread.messages[0].id === 'msg-welcome') {
+              currentThread.title = query.substring(0, 32);
+            }
+            currentThread.messages.push({ id: `msg-u-${Date.now()}`, role: 'user', content: query, timestamp: Date.now() });
+            currentThread.messages.push({ id: `msg-a-${Date.now()}`, role: 'assistant', content: answerText, timestamp: Date.now(), provider: providerName });
+            Store.saveChatThread(currentThread);
+            if (typeof renderChatThreadsList === 'function') renderChatThreadsList();
+          } catch (threadErr) {
+            console.warn('Error saving chat thread:', threadErr);
           }
-          if (currentThread.messages.length === 1 && currentThread.messages[0].id === 'msg-welcome') {
-            currentThread.title = query.substring(0, 32);
-          }
-          currentThread.messages.push({ id: `msg-u-${Date.now()}`, role: 'user', content: query, timestamp: Date.now() });
-          currentThread.messages.push({ id: `msg-a-${Date.now()}`, role: 'assistant', content: answerText, timestamp: Date.now(), provider: providerName });
-          Store.saveChatThread(currentThread);
-          renderChatThreadsList();
         }
 
         // Speak response aloud if TTS enabled
