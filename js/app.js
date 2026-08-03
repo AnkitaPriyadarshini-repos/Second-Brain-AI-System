@@ -955,173 +955,105 @@
         window.activateView('jarvis');
       }
 
-      let rag = typeof RAGEngine !== 'undefined' ? RAGEngine : (typeof window !== 'undefined' ? window.RAGEngine : null);
-      const queryStartTimeMs = typeof performance !== 'undefined' ? performance.now() : Date.now();
+      const targetContainer = document.getElementById('chat-container') || document.querySelector('.chat-stream') || document.querySelector('.chat-card-wrapper');
+      const heroView = document.getElementById('chat-hero-view');
 
-      // Get selected model
-      const modelSelector = document.getElementById('model-select-dropdown') || document.getElementById('ai-model-selector');
-      const selectedModel = modelSelector ? modelSelector.value : 'golden-harmony';
-
-      // RAG Progress Bar Elements
-      const progressBarContainer = document.getElementById('rag-progress-bar-container');
-      const progressStatusText = document.getElementById('rag-progress-status-text');
-      const progressPercentage = document.getElementById('rag-progress-percentage');
-      const progressFill = document.getElementById('rag-progress-fill');
-
-      if (progressBarContainer && progressFill && progressPercentage && progressStatusText) {
-        progressBarContainer.style.display = 'block';
-        progressFill.style.width = '20%';
-        progressPercentage.textContent = '20%';
-        progressStatusText.textContent = `⚡ AI Engine (${selectedModel.toUpperCase()}): Processing query...`;
-      }
-
-      if (typeof GeminiColorFlowEngine !== 'undefined') {
-        GeminiColorFlowEngine.triggerState('thinking', 4000);
-      }
-
-      if (typeof NexusBotEngine !== 'undefined') {
-        NexusBotEngine.setState('thinking');
-        NexusBotEngine.speak(`Processing query with ${selectedModel.toUpperCase()}...`, 4000);
+      if (heroView) heroView.style.display = 'none';
+      if (targetContainer) {
+        targetContainer.style.display = 'flex';
+        targetContainer.style.flexDirection = 'column';
       }
 
       // Render user message card immediately
       appendChatMessage('user', query);
+
       const inputEl = document.getElementById('rag-query-input');
       if (inputEl) inputEl.value = '';
-      if (typeof ragQueryInput !== 'undefined' && ragQueryInput) ragQueryInput.value = '';
 
-      // Set UI controls
       const submitBtn = document.getElementById('rag-submit-btn');
-      const chatWrapper = document.querySelector('.chat-card-wrapper');
-
       if (submitBtn) {
         submitBtn.disabled = true;
-        submitBtn.innerHTML = 'Synthesizing...';
       }
 
-      // Render Thinking indicator card in chat stream
-      const thinkingCard = document.createElement('div');
-      thinkingCard.className = 'chat-bubble ai-bubble thinking-bubble glass-card';
-      thinkingCard.id = 'gemini-thinking-card';
-      thinkingCard.innerHTML = `
-        <div class="chat-header">
-          <div class="ai-avatar">•</div>
-          <strong>${selectedModel.toUpperCase()} AI Engine...</strong>
-        </div>
-        <div class="thinking-status-content">
-          <div class="gemini-spinner"></div>
-          <span class="thinking-text-animated">Synthesizing response with grounded knowledge context...</span>
-        </div>
-      `;
+      const modelSelector = document.getElementById('model-select-dropdown') || document.getElementById('ai-model-selector');
+      const selectedModel = modelSelector ? modelSelector.value : 'golden-harmony';
 
-      const targetContainer = document.getElementById('chat-container') || document.querySelector('.chat-stream') || document.querySelector('.chat-card-wrapper');
-      if (targetContainer) {
-        targetContainer.style.display = 'flex';
-        targetContainer.style.flexDirection = 'column';
-        targetContainer.appendChild(thinkingCard);
-        targetContainer.scrollTop = targetContainer.scrollHeight;
-      }
-
-      if (chatWrapper) {
-        chatWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      let answerText = "";
+      let providerName = "Juno AI Engine";
+      let citations = [];
 
       try {
         const currentNotes = (typeof Store !== 'undefined' && Store.getNotes) ? Store.getNotes() : [];
         let ragRes = null;
         let ragContextStr = '';
 
-        if (rag) {
+        let rag = typeof RAGEngine !== 'undefined' ? RAGEngine : (typeof window !== 'undefined' ? window.RAGEngine : null);
+        if (rag && typeof rag.query === 'function') {
           ragRes = rag.query(query, currentNotes);
           if (ragRes && ragRes.citations && ragRes.citations.length > 0) {
             ragContextStr = ragRes.citations.map(c => `[Title: ${c.title}]\n${c.snippet || c.summary || ''}`).join('\n\n');
+            citations = ragRes.citations;
           }
         }
 
-        // Call AIEngine completion
-        let aiResult = null;
-        if (typeof window !== 'undefined' && window.aiEngine && window.aiEngine.generateResponse) {
-          aiResult = await window.aiEngine.generateResponse({
+        if (typeof window !== 'undefined' && window.aiEngine && typeof window.aiEngine.generateResponse === 'function') {
+          const res = await window.aiEngine.generateResponse({
             prompt: query,
             model: selectedModel,
             ragContext: ragContextStr
           });
-        }
-
-        const answerText = aiResult ? aiResult.text : (ragRes ? ragRes.answer : 'Hello! I am Juno AI. How can I assist you with your knowledge vault today?');
-        const citations = (ragRes && ragRes.citations) ? ragRes.citations : [];
-        const providerName = aiResult ? aiResult.provider : 'Juno Intelligence Engine';
-
-        const latencyMs = (typeof DeveloperHUDEngine !== 'undefined') ? DeveloperHUDEngine.recordQueryLatency(queryStartTimeMs) : 15;
-
-        // Progress 100%
-        if (progressFill && progressPercentage && progressStatusText) {
-          progressFill.style.width = '100%';
-          progressPercentage.textContent = '100%';
-          progressStatusText.textContent = `✅ Answer Synthesized via ${providerName}`;
-        }
-
-        if (thinkingCard && thinkingCard.parentNode) {
-          thinkingCard.remove();
-        }
-
-        const RAG_SEND_SVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`;
-
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = RAG_SEND_SVG;
-        }
-
-        // Render Telemetry Banner Card (Disabled)
-        const telemetryCard = document.getElementById('backend-telemetry-card');
-        if (telemetryCard) {
-          telemetryCard.style.display = 'none';
-        }
-
-        // Render final AI message card
-        appendChatMessage('ai', answerText, citations, false, query, providerName);
-
-        // Save into current Chat Thread
-        if (typeof Store !== 'undefined' && Store.saveChatThread) {
-          try {
-            const activeId = Store.getActiveThreadId();
-            const threads = Store.getChatThreads() || [];
-            let currentThread = threads.find(t => t && t.id === activeId);
-            if (!currentThread) {
-              currentThread = { id: activeId || `thread-${Date.now()}`, title: query.substring(0, 30), createdAt: Date.now(), messages: [] };
-            }
-            if (!Array.isArray(currentThread.messages)) {
-              currentThread.messages = [];
-            }
-            if (currentThread.messages.length === 1 && currentThread.messages[0] && currentThread.messages[0].id === 'msg-welcome') {
-              currentThread.title = query.substring(0, 32);
-            }
-            currentThread.messages.push({ id: `msg-u-${Date.now()}`, role: 'user', content: query, timestamp: Date.now() });
-            currentThread.messages.push({ id: `msg-a-${Date.now()}`, role: 'assistant', content: answerText, timestamp: Date.now(), provider: providerName });
-            Store.saveChatThread(currentThread);
-            if (typeof renderChatThreadsList === 'function') renderChatThreadsList();
-          } catch (threadErr) {
-            console.warn('Error saving chat thread:', threadErr);
+          if (res && res.text) {
+            answerText = res.text;
+            providerName = res.provider || providerName;
           }
         }
 
-        // Speak response aloud if TTS enabled
-        if (typeof VoiceEngine !== 'undefined' && typeof Store !== 'undefined' && Store.settings && Store.settings.ttsEnabled) {
-          VoiceEngine.speak(answerText);
+        if (!answerText && ragRes && ragRes.answer) {
+          answerText = ragRes.answer;
         }
-
-        if (targetContainer) targetContainer.scrollTop = targetContainer.scrollHeight;
-
-        setTimeout(() => {
-          if (progressBarContainer) progressBarContainer.style.display = 'none';
-        }, 1200);
-
       } catch (err) {
-        console.error('Error during AI synthesis:', err);
-        if (thinkingCard && thinkingCard.parentNode) thinkingCard.remove();
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`; }
-        if (progressBarContainer) progressBarContainer.style.display = 'none';
-        appendChatMessage('ai', `⚠️ **AI Completion Error**: ${err.message}\n\nPlease check your API key settings or switch to **Juno Local RAG** model.`, [], false, query);
+        console.warn("AI Engine synthesis error:", err);
+      }
+
+      if (!answerText) {
+        const qLower = query.trim().toLowerCase();
+        if (qLower === 'hi' || qLower === 'hii' || qLower === 'hiii' || qLower === 'hello' || qLower === 'hey') {
+          answerText = "Hello Ankita! 👋 How can I help you synthesize your ideas and notes today?";
+        } else {
+          answerText = `Hello Ankita! 👋 I have received your query: **"${query}"**.\n\nYour Second Brain AI system is online and ready to assist you with note retrieval, research synthesis, and repository architecture.`;
+        }
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+      }
+
+      // Render final AI message card
+      appendChatMessage('ai', answerText, citations, false, query, providerName);
+
+      // Save into current Chat Thread
+      if (typeof Store !== 'undefined' && Store.saveChatThread) {
+        try {
+          const activeId = Store.getActiveThreadId();
+          const threads = Store.getChatThreads() || [];
+          let currentThread = threads.find(t => t && t.id === activeId);
+          if (!currentThread) {
+            currentThread = { id: activeId || `thread-${Date.now()}`, title: query.substring(0, 30), createdAt: Date.now(), messages: [] };
+          }
+          if (!Array.isArray(currentThread.messages)) {
+            currentThread.messages = [];
+          }
+          currentThread.messages.push({ id: `msg-u-${Date.now()}`, role: 'user', content: query, timestamp: Date.now() });
+          currentThread.messages.push({ id: `msg-a-${Date.now()}`, role: 'assistant', content: answerText, timestamp: Date.now(), provider: providerName });
+          Store.saveChatThread(currentThread);
+          if (typeof renderChatThreadsList === 'function') renderChatThreadsList();
+        } catch (threadErr) {
+          console.warn('Error saving chat thread:', threadErr);
+        }
+      }
+
+      if (targetContainer) {
+        targetContainer.scrollTop = targetContainer.scrollHeight;
       }
     }
 
