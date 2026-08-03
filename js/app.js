@@ -2502,16 +2502,34 @@
         });
       });
 
-      window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPWAInstallPrompt = e;
-        if (pwaInstallBtn) pwaInstallBtn.style.display = 'inline-flex';
-      });
-    }
+    window.dismissPWAPopup = function() {
+      const popup = document.getElementById('pwa-install-popup');
+      if (popup) popup.style.display = 'none';
+      try { localStorage.setItem('juno_pwa_dismissed', 'true'); } catch (e) {}
+    };
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPWAInstallPrompt = e;
+      const popup = document.getElementById('pwa-install-popup');
+      if (popup) popup.style.display = 'flex';
+      if (pwaInstallBtn) pwaInstallBtn.style.display = 'inline-flex';
+    });
+
+    setTimeout(() => {
+      try {
+        const isDismissed = localStorage.getItem('juno_pwa_dismissed');
+        const popup = document.getElementById('pwa-install-popup');
+        if (popup && !isDismissed) {
+          popup.style.display = 'flex';
+        }
+      } catch (e) {}
+    }, 1500);
 
     if (pwaInstallBtn) {
       pwaInstallBtn.addEventListener('click', async () => {
         if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+        window.dismissPWAPopup();
         if (deferredPWAInstallPrompt) {
           deferredPWAInstallPrompt.prompt();
           const { outcome } = await deferredPWAInstallPrompt.userChoice;
@@ -2520,7 +2538,7 @@
           }
           deferredPWAInstallPrompt = null;
         } else {
-          showToast('App is ready for desktop/mobile. Add to Home Screen via browser menu 📲');
+          showToast('App is ready! Add to Home Screen via browser menu 📲');
         }
       });
     }

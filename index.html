@@ -1139,6 +1139,23 @@
 
 
 
+  <!-- Premium PWA App Install Banner Popup -->
+  <div id="pwa-install-popup" class="pwa-install-popup" style="display: none;">
+    <div class="pwa-popup-content">
+      <div class="pwa-popup-badge">
+        <span class="pwa-icon">📲</span>
+        <div>
+          <div class="pwa-popup-title">Install Juno AI App</div>
+          <div class="pwa-popup-sub">Fast on-device access &amp; instant local RAG</div>
+        </div>
+      </div>
+      <div class="pwa-popup-actions">
+        <button id="pwa-popup-close-btn" class="pwa-btn-dismiss" onclick="window.dismissPWAPopup()">Later</button>
+        <button id="pwa-popup-install-btn" class="pwa-btn-install" onclick="window.triggerPWAInstall()">📲 Install</button>
+      </div>
+    </div>
+  </div>
+
   <!-- JavaScript Modules -->
   <script src="js/utils.js?v=51.0"></script>
   <script src="js/nlp-engine.js?v=51.0"></script>
