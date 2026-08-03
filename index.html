@@ -149,32 +149,36 @@
         <div class="chatgpt-layout-container" style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; max-width: 900px; margin: 0 auto; width: 100%; padding: 0 16px;">
           
           <!-- Centered Superior Hero & Input Deck -->
-          <div id="chat-hero-view" class="chat-hero-view gemini-hero-center" style="width: 100%; max-width: 780px; text-align: center; margin-top: auto; margin-bottom: 24px;">
-            <h1 class="gemini-hero-title" id="user-hero-greeting" style="font-size: 42px; font-weight: 800; background: linear-gradient(135deg, #d84315 0%, #e65100 35%, #f57f17 70%, #fbc02d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.025em; margin-bottom: 28px; font-family: 'Inter', sans-serif; filter: drop-shadow(0 2px 20px rgba(251, 192, 45, 0.45));">What will we synthesize today, Ankita?</h1>
+          <div id="chat-hero-view" class="chat-hero-view gemini-hero-center">
+            <h1 class="gemini-hero-title" id="user-hero-greeting">What will we synthesize today, Ankita?</h1>
 
             <!-- Floating Centered Input Pill Container -->
-            <form id="rag-query-form" class="chat-input-container gemini-floating-pill" onsubmit="window.submitRAGQuery(event); return false;" style="width: 100%; max-width: 740px; margin: 0 auto; background: rgba(255, 255, 255, 0.95); border: 2px solid #fbc02d; border-radius: 28px; padding: 8px 18px; display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 36px rgba(251, 192, 45, 0.3);">
-              <!-- Plus Attach Button -->
-              <button type="button" class="input-action-btn" title="Upload Note or File" onclick="window.triggerQuickUpload('pdf')" style="background: transparent; border: none; color: #e65100; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; padding: 4px; font-weight: 800;">+</button>
+            <form id="rag-query-form" class="chat-input-container gemini-floating-pill" onsubmit="window.submitRAGQuery(event); return false;">
+              <div class="rag-input-main-row">
+                <!-- Plus Attach Button -->
+                <button type="button" class="input-action-btn" title="Upload Note or File" onclick="window.triggerQuickUpload('pdf')" style="background: transparent; border: none; color: #e65100; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; padding: 4px; font-weight: 800;">+</button>
 
-              <!-- Text Input -->
-              <input type="text" id="rag-query-input" class="chat-textarea" placeholder="Ask Juno anything, search documents, or generate code..." aria-label="Query Input" style="flex: 1; background: transparent; border: none; color: #2c1d00; font-size: 15.5px; font-weight: 600; outline: none; font-family: inherit;">
-
-              <!-- Model Selector Pill Dropdown -->
-              <div class="gemini-model-selector-pill" style="display: flex; align-items: center; gap: 6px; background: #ffe156; border: 1.5px solid #fbc02d; padding: 4px 10px; border-radius: 14px; cursor: pointer;" onclick="const select = document.getElementById('model-select-dropdown'); if (select) select.click();">
-                <span class="yellow-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #fbc02d; box-shadow: 0 0 8px #fbc02d;"></span>
-                <select id="model-select-dropdown" class="model-select-dropdown" onchange="window.handleModelChange(this.value)" style="background: transparent; border: none; color: #2c1d00; font-size: 12.5px; font-weight: 700; cursor: pointer; outline: none;">
-                  <option value="golden-harmony" selected>🌼 Golden Harmony ∨</option>
-                  <option value="sunflower-sunrise">🌻 Sunflower Sunrise ∨</option>
-                  <option value="gemini-glow">✨ Juno Ultra 1.5 ∨</option>
-                  <option value="perplexity-cyan">💻 Code Architect ∨</option>
-                </select>
+                <!-- Text Input -->
+                <input type="text" id="rag-query-input" class="chat-textarea" placeholder="Ask Juno anything, search documents, or generate code..." aria-label="Query Input" style="flex: 1; min-width: 0; background: transparent; border: none; color: #2c1d00; font-size: 15.5px; font-weight: 600; outline: none; font-family: inherit;">
               </div>
 
-              <!-- Voice Mic Button -->
-              <button type="button" id="voice-trigger-btn" class="input-action-btn voice-btn" title="Voice Input" onclick="window.toggleVoiceListen()" style="background: transparent; border: none; color: #e65100; cursor: pointer; padding: 4px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-              </button>
+              <div class="rag-input-tools-row">
+                <!-- Model Selector Pill Dropdown -->
+                <div class="gemini-model-selector-pill" style="display: flex; align-items: center; gap: 6px; background: #ffe156; border: 1.5px solid #fbc02d; padding: 4px 10px; border-radius: 14px; cursor: pointer;" onclick="const select = document.getElementById('model-select-dropdown'); if (select) select.click();">
+                  <span class="yellow-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #fbc02d; box-shadow: 0 0 8px #fbc02d;"></span>
+                  <select id="model-select-dropdown" class="model-select-dropdown" onchange="window.handleModelChange(this.value)" style="background: transparent; border: none; color: #2c1d00; font-size: 12.5px; font-weight: 700; cursor: pointer; outline: none;">
+                    <option value="golden-harmony" selected>🌼 Golden Harmony ∨</option>
+                    <option value="sunflower-sunrise">🌻 Sunflower Sunrise ∨</option>
+                    <option value="gemini-glow">✨ Juno Ultra 1.5 ∨</option>
+                    <option value="perplexity-cyan">💻 Code Architect ∨</option>
+                  </select>
+                </div>
+
+                <!-- Voice Mic Button -->
+                <button type="button" id="voice-trigger-btn" class="input-action-btn voice-btn" title="Voice Input" onclick="window.toggleVoiceListen()" style="background: transparent; border: none; color: #e65100; cursor: pointer; padding: 4px;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                </button>
+              </div>
 
               <!-- Hidden Submit Button -->
               <button type="submit" id="rag-submit-btn" style="display: none;"></button>

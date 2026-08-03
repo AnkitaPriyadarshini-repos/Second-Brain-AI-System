@@ -595,23 +595,75 @@ html, body {
   /* Hero Section Mobile Cleanup */
   .chat-hero-view {
     margin: 12px auto 16px auto !important;
-    padding: 0 8px !important;
+    padding: 0 4px !important;
     width: 100% !important;
+    max-width: 100% !important;
     box-sizing: border-box !important;
   }
 
   .gemini-hero-title {
     font-size: 22px !important;
-    line-height: 1.25 !important;
+    line-height: 1.3 !important;
     margin-top: 8px !important;
+    margin-bottom: 16px !important;
     text-align: center !important;
     font-weight: 800 !important;
+    word-break: break-word !important;
+    letter-spacing: -0.01em !important;
   }
 
   .gemini-hero-sub {
     font-size: 12.5px !important;
     text-align: center !important;
     margin-bottom: 16px !important;
+  }
+
+  /* Mobile Responsive Floating Input Box */
+  .gemini-floating-pill,
+  .chat-input-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    border-radius: 20px !important;
+    padding: 10px 12px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    box-shadow: 0 6px 20px rgba(251, 192, 45, 0.25) !important;
+  }
+
+  .rag-input-main-row {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    box-sizing: border-box !important;
+  }
+
+  .rag-input-tools-row {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-top: 2px !important;
+    padding-top: 6px !important;
+    border-top: 1px solid rgba(251, 192, 45, 0.3) !important;
+    box-sizing: border-box !important;
+  }
+
+  .gemini-model-selector-pill {
+    padding: 4px 8px !important;
+    border-radius: 12px !important;
+    max-width: 175px !important;
+  }
+
+  .model-select-dropdown {
+    font-size: 11.5px !important;
+    max-width: 140px !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
   }
 
   /* Mobile Prompt Chips */
@@ -645,18 +697,13 @@ html, body {
     color: #5d4037 !important;
   }
 
-  /* Fixed Bottom Chat Input Container & Bottom Nav Bar */
-  .chat-input-container {
-    max-width: 100% !important;
-    border-radius: 20px !important;
-    padding: 6px 12px !important;
-  }
-
   .chat-textarea {
     font-size: 16px !important; /* Prevents iOS auto-zoom */
     max-height: 85px !important;
-    padding: 8px 6px !important;
+    padding: 4px 2px !important;
     color: #2c1d00 !important;
+    width: 100% !important;
+    min-width: 0 !important;
   }
 
   .bottom-mobile-nav {
