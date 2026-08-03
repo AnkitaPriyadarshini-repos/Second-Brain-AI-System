@@ -3,32 +3,32 @@
   Inspired by Apple, Linear, Stripe, Notion, Vercel & Raycast
 */
 :root {
-  /* Vibrant Titanium Slate Canvas */
-  --bg-dark: #0d1018;
-  --bg-card: rgba(20, 24, 36, 0.88);
-  --bg-card-hover: rgba(30, 36, 54, 0.9);
-  --bg-card-active: rgba(40, 48, 72, 0.95);
-  --border-color: rgba(255, 230, 0, 0.25);
-  --border-highlight: rgba(255, 230, 0, 0.7);
-  --border-accent: rgba(255, 230, 0, 0.5);
+  /* Golden Harmony All-Yellow Luminous System (Zero Black Background) */
+  --bg-dark: #FFF8E1;
+  --bg-card: rgba(255, 255, 255, 0.94);
+  --bg-card-hover: #FFF9C4;
+  --bg-card-active: #FFF59D;
+  --border-color: rgba(251, 192, 45, 0.45);
+  --border-highlight: #FBC02D;
+  --border-accent: #FFB300;
 
-  /* Typography Colors */
-  --text-primary: #ffffff;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
+  /* Crisp Deep Bronze Typography for High Contrast on Yellow */
+  --text-primary: #2C1D00;
+  --text-secondary: #5D4037;
+  --text-muted: #8C5A00;
 
-  /* Vibrant Titanium Yellow Accent Palette */
-  --accent-primary: #ffe600;
-  --accent-primary-hover: #ffd600;
-  --accent-primary-light: rgba(255, 230, 0, 0.2);
+  /* Vibrant Golden Harmony Yellow Palette (Pinterest Inspired) */
+  --accent-primary: #FBC02D;
+  --accent-primary-hover: #FFB300;
+  --accent-primary-light: rgba(255, 225, 86, 0.4);
   
-  --accent-indigo: #ffe600;
-  --accent-violet: #ffab00;
-  --accent-emerald: #ffe600;
-  --accent-amber: #ffe600;
-  --accent-pink: #ffd600;
-  --accent-blue: #ffe600;
-  --accent-cyan: #ffd600;
+  --accent-indigo: #FBC02D;
+  --accent-violet: #FFB300;
+  --accent-emerald: #FBC02D;
+  --accent-amber: #FBC02D;
+  --accent-pink: #FFD93D;
+  --accent-blue: #FBC02D;
+  --accent-cyan: #FFE156;
 
   /* Typography Stack */
   --font-main: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
@@ -41,9 +41,9 @@
   --radius-full: 9999px;
   
   /* Shadows & Transitions */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.8);
-  --shadow-glow: 0 0 35px rgba(255, 230, 0, 0.35);
+  --shadow-sm: 0 1px 2px 0 rgba(251, 192, 45, 0.2);
+  --shadow-card: 0 10px 30px -5px rgba(251, 192, 45, 0.22);
+  --shadow-glow: 0 0 35px rgba(251, 192, 45, 0.4);
   --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -56,44 +56,40 @@ a, a:hover, a:visited, a:focus, a:active,
 }
 
 /* ==========================================
-   FLAGSHIP AI PLATFORM THEMES (Gemini, Claude, ChatGPT, Perplexity)
+   FLAGSHIP AI PLATFORM THEMES (Golden Harmony Yellow Theme Default)
    ========================================== */
 
-/* 1. Google Gemini Glow Theme (Vibrant Titanium Yellow System) */
+[data-theme="golden-harmony"],
+[data-theme="sunflower-sunrise"],
 [data-theme="gemini-glow"],
 [data-theme="claude-obsidian"],
 [data-theme="chatgpt-emerald"],
 [data-theme="perplexity-cyan"],
 [data-theme="grey-titanium"],
-[data-theme="gemini-dark"],
-[data-theme="obsidian"],
 [data-theme="emerald-luxe"],
 [data-theme="sapphire-platinum"],
 [data-theme="platinum-gold"],
 [data-theme="gemini-light"] {
-  --bg-dark: #0d1018;
-  --bg-card: rgba(20, 24, 36, 0.88);
-  --bg-card-hover: rgba(30, 36, 54, 0.9);
-  --bg-card-active: rgba(40, 48, 72, 0.95);
-  --border-color: rgba(255, 230, 0, 0.3);
-  --border-highlight: rgba(255, 230, 0, 0.7);
-  --border-accent: rgba(255, 230, 0, 0.5);
-  --text-primary: #ffffff;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --accent-primary: #ffe600;
-  --accent-primary-hover: #ffd600;
-  --accent-primary-light: rgba(255, 230, 0, 0.2);
-  --accent-indigo: #ffe600;
-  --accent-violet: #ffab00;
-  --accent-emerald: #ffe600;
-  --accent-amber: #ffe600;
-  --accent-cyan: #ffd600;
-  --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.8);
-  --shadow-glow: 0 0 35px rgba(255, 230, 0, 0.35);
-}
-
-  --shadow-glow: 0 4px 25px 0 rgba(245, 158, 11, 0.2);
+  --bg-dark: #FFF8E1;
+  --bg-card: rgba(255, 255, 255, 0.94);
+  --bg-card-hover: #FFF9C4;
+  --bg-card-active: #FFF59D;
+  --border-color: rgba(251, 192, 45, 0.45);
+  --border-highlight: #FBC02D;
+  --border-accent: #FFB300;
+  --text-primary: #2C1D00;
+  --text-secondary: #5D4037;
+  --text-muted: #8C5A00;
+  --accent-primary: #FBC02D;
+  --accent-primary-hover: #FFB300;
+  --accent-primary-light: rgba(255, 225, 86, 0.4);
+  --accent-indigo: #FBC02D;
+  --accent-violet: #FFB300;
+  --accent-emerald: #FBC02D;
+  --accent-amber: #FBC02D;
+  --accent-cyan: #FFE156;
+  --shadow-card: 0 10px 30px -5px rgba(251, 192, 45, 0.25);
+  --shadow-glow: 0 0 35px rgba(251, 192, 45, 0.4);
 }
 
 /* Hide floating robot widget overlay to keep UI ultra-clean */
@@ -5133,7 +5129,7 @@ kbd {
 }
 
 .model-select-dropdown {
-  background: #131b2e !important;
+  background: #FFF59D !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
   color: #f8fafc !important;
   font-weight: 600 !important;
@@ -5328,7 +5324,7 @@ kbd {
 }
 
 .model-select-dropdown {
-  background: #131b2e !important;
+  background: #FFF59D !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
   color: #f8fafc !important;
   font-weight: 600 !important;
@@ -5523,7 +5519,7 @@ kbd {
 }
 
 .model-select-dropdown {
-  background: #131b2e !important;
+  background: #FFF59D !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
   color: #f8fafc !important;
   font-weight: 600 !important;
@@ -5593,164 +5589,204 @@ kbd {
   font-size: 12px !important;
 }
 
-/* Floating Input Box */
+/* Floating Input Box & Top Controls - Golden Harmony All-Yellow System */
 .chat-input-wrapper, .chat-input-bar {
-  background: rgba(20, 24, 36, 0.9) !important;
-  border: 1px solid rgba(255, 230, 0, 0.3) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 2px solid #FBC02D !important;
   backdrop-filter: blur(18px) !important;
   border-radius: 16px !important;
-  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.75) !important;
+  box-shadow: 0 10px 32px rgba(251, 192, 45, 0.3) !important;
 }
 
 .chat-input-field {
-  color: #ffffff !important;
+  color: #2C1D00 !important;
   font-size: 14px !important;
+  font-weight: 600 !important;
 }
 
-.chat-input-field::placeholder {
-  color: #94a3b8 !important;
+.chat-top-bar {
+  background: rgba(255, 248, 225, 0.95) !important;
+  backdrop-filter: blur(16px) !important;
+  border-bottom: 1.5px solid rgba(251, 192, 45, 0.4) !important;
+}
+
+.model-select-dropdown {
+  background: #FFF59D !important;
+  border: 1.5px solid #FBC02D !important;
+  color: #2C1D00 !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+}
+
+.inspector-body {
+  padding: 18px;
+  background: #FFFDE7;
+  color: #2C1D00;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.inspector-code-block {
+  margin: 0;
+  font-family: 'Fira Code', var(--font-code, monospace);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #2C1D00;
 }
 
 .send-prompt-btn {
-  background: #ffe600 !important;
-  color: #000000 !important;
-  font-weight: 700 !important;
+  background: linear-gradient(135deg, #FFD93D, #FBC02D) !important;
+  color: #2C1D00 !important;
+  font-weight: 800 !important;
   border-radius: 10px !important;
-  border: none !important;
-  box-shadow: 0 2px 12px rgba(255, 230, 0, 0.45) !important;
+  border: 1px solid #FFB300 !important;
+  box-shadow: 0 4px 14px rgba(251, 192, 45, 0.4) !important;
 }
 
-.send-prompt-btn:hover {
-  background: #ffd600 !important;
-  transform: scale(1.04);
-}
-
-/* HIGH-CONTRAST DARK MODE OVERRIDES */
+/* ALL-YELLOW GOLDEN HARMONY BASE OVERRIDES (NO BLACK BACKGROUND ANYWHERE) */
 body, html {
-  background-color: #0b0f17 !important;
-  color: #f8fafc !important;
+  background-color: #FFF8E1 !important;
+  background: #FFF8E1 !important;
+  color: #2C1D00 !important;
 }
 
 .gemini-hero-title {
-  color: #f8fafc !important;
-  background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%) !important;
+  color: #2C1D00 !important;
+  background: linear-gradient(135deg, #D84315 0%, #E65100 30%, #F57F17 65%, #FBC02D 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
 }
 
 .gemini-hero-sub {
-  color: #94a3b8 !important;
+  color: #6D4C41 !important;
 }
 
 .prompt-card-title {
-  color: #f8fafc !important;
+  color: #2C1D00 !important;
 }
 
 .prompt-card-desc {
-  color: #94a3b8 !important;
+  color: #6D4C41 !important;
 }
 
 /* ----------------------------------------------------
    1:1 Google Gemini Flagship Interface System
    ---------------------------------------------------- */
+/* ----------------------------------------------------
+   Golden Harmony Flagship All-Yellow Interface System (Zero Black Background)
+   ---------------------------------------------------- */
 .gemini-sidebar {
-  background-color: #131314 !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+  background: linear-gradient(180deg, #FFF8E1 0%, #FFF3C0 100%) !important;
+  border-right: 1.5px solid rgba(251, 192, 45, 0.45) !important;
   padding: 16px 12px !important;
 }
 
 .gemini-sidebar .sidebar-menu-item {
-  color: #c4c7c5 !important;
+  color: #4A2E00 !important;
   font-size: 13.5px !important;
+  font-weight: 600 !important;
   border-radius: 18px !important;
 }
 
 .gemini-sidebar .sidebar-menu-item:hover {
-  background: #28292a !important;
-  color: #e3e3e3 !important;
+  background: #FFE156 !important;
+  color: #2C1D00 !important;
 }
 
 .gemini-sidebar .sidebar-menu-item.active {
-  background: #004a77 !important;
-  color: #c2e7ff !important;
+  background: #FBC02D !important;
+  color: #2C1D00 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px rgba(251, 192, 45, 0.4) !important;
 }
 
 .gemini-sidebar .sidebar-thread-item {
-  color: #c4c7c5 !important;
+  color: #4A2E00 !important;
   font-size: 13px !important;
   border-radius: 16px !important;
   padding: 8px 12px !important;
 }
 
 .gemini-sidebar .sidebar-thread-item:hover {
-  background: #28292a !important;
-  color: #e3e3e3 !important;
+  background: #FFE156 !important;
+  color: #2C1D00 !important;
 }
 
-/* ----------------------------------------------------
-   Vibrant Titanium Collection System (Pinterest Inspired)
-   ---------------------------------------------------- */
 .gemini-hero-title {
   font-size: 44px !important;
   font-weight: 800 !important;
   font-family: 'Inter', -apple-system, sans-serif !important;
-  background: linear-gradient(135deg, #ffffff 0%, #ffea00 40%, #ffd600 75%, #ffab00 100%) !important;
+  background: linear-gradient(135deg, #D84315 0%, #E65100 30%, #F57F17 65%, #FBC02D 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   letter-spacing: -0.025em !important;
-  filter: drop-shadow(0 2px 24px rgba(255, 230, 0, 0.5)) !important;
-}
-
-.gemini-sidebar {
-  background: rgba(13, 16, 24, 0.96) !important;
-  backdrop-filter: blur(20px) !important;
-  border-right: 1px solid rgba(255, 230, 0, 0.25) !important;
+  filter: drop-shadow(0 2px 20px rgba(251, 192, 45, 0.45)) !important;
 }
 
 .gemini-main-canvas {
-  background: #0d1018 !important;
+  background: #FFF8E1 !important;
 }
 
 .gemini-ambient-glow {
-  background: radial-gradient(circle, rgba(255, 230, 0, 0.26) 0%, rgba(255, 171, 0, 0.16) 45%, rgba(13, 16, 24, 0) 75%) !important;
+  background: radial-gradient(circle, rgba(255, 217, 61, 0.5) 0%, rgba(251, 192, 45, 0.28) 50%, rgba(255, 248, 225, 0) 80%) !important;
 }
 
 .gemini-floating-pill {
-  background: rgba(20, 24, 36, 0.9) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
   backdrop-filter: blur(28px) saturate(190%) !important;
   -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
-  border: 1.5px solid rgba(255, 230, 0, 0.55) !important;
+  border: 2px solid #FBC02D !important;
   border-radius: 9999px !important;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 0 32px rgba(255, 230, 0, 0.3) !important;
+  box-shadow: 0 10px 36px rgba(251, 192, 45, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.9) !important;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 .gemini-floating-pill:focus-within {
-  border-color: #ffe600 !important;
-  box-shadow: 0 0 38px rgba(255, 230, 0, 0.65), 0 14px 50px rgba(0, 0, 0, 0.85) !important;
+  border-color: #FFB300 !important;
+  box-shadow: 0 0 38px rgba(255, 179, 0, 0.55), 0 14px 45px rgba(251, 192, 45, 0.4) !important;
 }
 
 .gemini-floating-pill input {
-  color: #ffffff !important;
+  color: #2C1D00 !important;
   font-size: 15.5px !important;
+  font-weight: 600 !important;
 }
 
 .gemini-floating-pill input::placeholder {
-  color: #94a3b8 !important;
+  color: #8C5A00 !important;
 }
 
-/* Glassmorphism Cards System */
-.prompt-card-item, .chat-bubble.glass-card, .quick-import-pill {
-  background: rgba(24, 28, 44, 0.7) !important;
+/* Glassmorphism Cards System - Golden Harmony */
+.prompt-card-item, .chat-bubble.glass-card, .quick-import-pill, .glass-card, .note-drawer, .spec-modal-card {
+  background: rgba(255, 255, 255, 0.94) !important;
   backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(255, 230, 0, 0.28) !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+  border: 1.5px solid rgba(251, 192, 45, 0.45) !important;
+  box-shadow: 0 8px 24px rgba(251, 192, 45, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.9) !important;
+  color: #2C1D00 !important;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-.prompt-card-item:hover, .quick-import-pill:hover {
-  background: rgba(36, 42, 64, 0.9) !important;
-  border-color: rgba(255, 230, 0, 0.75) !important;
+.prompt-card-item:hover, .quick-import-pill:hover, .glass-card:hover {
+  background: #FFF9C4 !important;
+  border-color: #FBC02D !important;
   transform: translateY(-2px) scale(1.01) !important;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65), 0 0 26px rgba(255, 230, 0, 0.45) !important;
+  box-shadow: 0 12px 30px rgba(251, 192, 45, 0.35), 0 0 24px rgba(255, 217, 61, 0.4) !important;
 }
+
+/* Modal Backdrops - Soft Warm Glow */
+.modal-backdrop, .spec-modal-overlay {
+  background: rgba(255, 248, 225, 0.85) !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+
+/* Permanently hide Yellow Robot Helper floating AI assistant widget */
+#nexus-bot-widget, .nexus-bot-widget {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+

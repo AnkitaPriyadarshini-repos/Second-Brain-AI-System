@@ -10,7 +10,7 @@
     canvas: null,
     ctx: null,
     animId: null,
-    theme: 'royal-gold', // 'royal-gold' | 'emerald-luxe' | 'sapphire-platinum' | 'gemini-dark' | 'obsidian' | 'gemini-light'
+    theme: 'sunflower-sunrise', // 'sunflower-sunrise' | 'gemini-glow' | 'gold-glassmorphism' | 'emerald-luxe' | 'sapphire-platinum' | 'gemini-dark' | 'obsidian'
     speedPreset: 'swift',  // 'gentle' | 'swift' | 'hyper'
     speedMultiplier: 1.2,
     currentState: 'idle',  // 'idle' | 'listening' | 'thinking' | 'responding'
@@ -21,12 +21,27 @@
 
     // Color palettes for different themes tailored for Juno AI Yellow Moon & Premium Aesthetics
     palettes: {
+      'golden-harmony': [
+        { r: 255, g: 225, b: 86,  a: 0.60 }, // #FFE156 (Light bright lemon yellow)
+        { r: 255, g: 217, b: 61,  a: 0.65 }, // #FFD93D (Warm cheerful yellow)
+        { r: 251, g: 192, b: 45,  a: 0.70 }, // #FBC02D (Vibrant golden yellow)
+        { r: 255, g: 179, b: 0,   a: 0.65 }, // #FFB300 (Warm amber yellow)
+        { r: 255, g: 160, b: 0,   a: 0.60 }  // #FFA000 (Golden sunrise orange yellow)
+      ],
+      'sunflower-sunrise': [
+        { r: 255, g: 245, b: 157, a: 0.85 }, // #FFF59D (Light Morning Yellow)
+        { r: 255, g: 227, b: 110, a: 0.90 }, // #FFE36E (Warm Canary Yellow)
+        { r: 255, g: 209, b: 64,  a: 0.95 }, // #FFD140 (Golden Sunflower Accent)
+        { r: 255, g: 190, b: 0,   a: 0.85 }, // #FFBE00 (Deep Amber Gold)
+        { r: 255, g: 173, b: 1,   a: 0.80 }, // #FFAD01 (Vibrant Amber Orange)
+        { r: 255, g: 160, b: 0,   a: 0.90 }  // #FFA000 (Rich Sunflower Sunrise Orange)
+      ],
       'gold-glassmorphism': [
-        { r: 245, g: 176, b: 65,  a: 0.85 }, // Warm 3D Amber Orb Core
-        { r: 214, g: 137, b: 16,  a: 0.90 }, // Rich Golden Sphere Shadow
-        { r: 255, g: 230, b: 153, a: 0.95 }, // Specular Gold Highlight
-        { r: 230, g: 126, b: 34,  a: 0.80 }, // Warm Amber Glow
-        { r: 242, g: 230, b: 198, a: 1.00 }  // Warm Golden Champagne Canvas
+        { r: 255, g: 245, b: 157, a: 0.85 },
+        { r: 255, g: 209, b: 64,  a: 0.90 },
+        { r: 255, g: 190, b: 0,   a: 0.95 },
+        { r: 255, g: 160, b: 0,   a: 0.80 },
+        { r: 242, g: 230, b: 198, a: 1.00 }
       ],
       'atlassian-azure': [
         { r: 245, g: 176, b: 65,  a: 0.85 }, // Warm 3D Amber Orb Core
@@ -246,19 +261,17 @@
       this.time += effectiveSpeed;
 
       // Base background color depending on theme
-      if (this.theme === 'gemini-light') {
-        ctx.fillStyle = '#fffdf7';
-      } else if (this.theme === 'gemini-dark') {
-        ctx.fillStyle = '#0f172a';
+      if (this.theme === 'obsidian' || this.theme === 'gemini-dark') {
+        ctx.fillStyle = '#0d1018';
+        ctx.globalCompositeOperation = 'screen';
       } else {
-        ctx.fillStyle = '#04060a';
+        ctx.fillStyle = '#FFF8E1'; // Golden Harmony Luminous Yellow Canvas
+        ctx.globalCompositeOperation = 'source-over';
       }
       ctx.fillRect(0, 0, width, height);
 
       // Render blended floating radial gradient nodes
       const maxDim = Math.max(width, height);
-
-      ctx.globalCompositeOperation = this.theme === 'gemini-light' ? 'source-over' : 'screen';
 
       this.nodes.forEach((node, i) => {
         const sineOffsetX = Math.sin(this.time + node.phase) * 0.22 * maxDim;

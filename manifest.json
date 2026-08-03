@@ -4,8 +4,8 @@
   "description": "Zero-Friction Capture & Conversational RAG Retrieval Platform",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#6366f1",
+  "background_color": "#FFF8E1",
+  "theme_color": "#FBC02D",
   "orientation": "any",
   "icons": [
     {
