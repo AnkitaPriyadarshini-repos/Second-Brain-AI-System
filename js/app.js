@@ -1100,18 +1100,29 @@
         <div class="chat-text">${formatMarkdownText(text)}</div>
         ${citationsHTML}
         ${actionsHTML}`;
-
-        if (typeof NexusBotEngine !== 'undefined' && NexusBotEngine.speak) {
-          const summarySnippet = text.replace(/###|####|>|\*|`/g, '').trim().substring(0, 160);
-          NexusBotEngine.speak(`🌼 ${summarySnippet}...`, 8000);
-        }
       }
 
+      // Always append message card to DOM first!
       targetContainer.appendChild(msgCard);
       targetContainer.scrollTop = targetContainer.scrollHeight;
+
       setTimeout(() => {
-        msgCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        try {
+          msgCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } catch (e) {}
       }, 50);
+
+      // Safe optional audio speech announcement
+      if (sender !== 'user') {
+        try {
+          if (typeof NexusBotEngine !== 'undefined' && typeof NexusBotEngine.speak === 'function') {
+            const summarySnippet = text.replace(/###|####|>|\*|`/g, '').trim().substring(0, 160);
+            NexusBotEngine.speak(`🌼 ${summarySnippet}...`, 8000);
+          }
+        } catch (botErr) {
+          console.warn('NexusBotEngine audio announcement skipped:', botErr);
+        }
+      }
 
       // Bind citation clicks to open note drawer
       msgCard.querySelectorAll('.citation-pill').forEach(pill => {
