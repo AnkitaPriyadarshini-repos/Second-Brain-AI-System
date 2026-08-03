@@ -3973,15 +3973,16 @@ kbd {
 
 .user-bubble {
   align-self: flex-end;
-  background: var(--accent-primary-light);
-  color: var(--text-primary) !important;
-  border: 1px solid var(--border-accent);
-  max-width: 80%;
-  border-bottom-right-radius: 4px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-  white-space: pre-wrap;
-  word-break: break-word;
-  animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  align-self: flex-end !important;
+  background: #FFF9C4 !important;
+  color: #2C1D00 !important;
+  border: 1.5px solid #FBC02D !important;
+  max-width: 85% !important;
+  border-bottom-right-radius: 4px !important;
+  box-shadow: 0 4px 14px rgba(251, 192, 45, 0.3) !important;
+  white-space: pre-wrap !important;
+  word-break: break-word !important;
+  animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 @keyframes slideInUp {
@@ -4007,28 +4008,40 @@ kbd {
 }
 
 .user-bubble .chat-header {
-  color: rgba(255,255,255,0.9);
-  font-size: 12px;
-  margin-bottom: 4px;
+  color: #5D4037 !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  margin-bottom: 4px !important;
+}
+
+.user-bubble .chat-text {
+  color: #2C1D00 !important;
+  font-weight: 600 !important;
 }
 
 .ai-bubble {
-  align-self: flex-start;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  width: 100%;
-  max-width: 100%;
-  border-bottom-left-radius: 4px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  align-self: flex-start !important;
+  background: #FFFFFF !important;
+  border: 1.5px solid rgba(251, 192, 45, 0.45) !important;
+  color: #2C1D00 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  border-bottom-left-radius: 4px !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08) !important;
 }
 
 .ai-bubble .chat-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  margin-bottom: 10px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #2C1D00 !important;
+}
+
+.ai-bubble .chat-text {
+  color: #2C1D00 !important;
+  line-height: 1.6 !important;
 }
 
 .ai-avatar {

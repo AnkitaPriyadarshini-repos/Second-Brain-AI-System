@@ -601,6 +601,33 @@ html, body {
     pointer-events: none !important;
   }
 
+  /* Chat Stream & Bubbles Mobile Optimization */
+  #chat-container,
+  .chat-stream {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 10px 6px 20px 6px !important;
+    box-sizing: border-box !important;
+  }
+
+  .chat-bubble {
+    max-width: 90% !important;
+    padding: 14px 16px !important;
+    font-size: 14px !important;
+    box-sizing: border-box !important;
+  }
+
+  .ai-bubble {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .chat-input-sticky-container {
+    width: 100% !important;
+    padding: 4px 6px 12px 6px !important;
+    box-sizing: border-box !important;
+  }
+
   /* View Section Mobile Layout */
   .view-section {
     width: 100% !important;
