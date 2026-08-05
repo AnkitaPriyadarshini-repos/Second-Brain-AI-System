@@ -190,16 +190,16 @@ export function HydratedComponent({ data }) {
     
     // Natural Conversational Greetings
     if (qClean === 'hi' || qClean === 'hii' || qClean === 'hiii') {
-      return { text: "Hello! I am your Google Gemini assistant. How can I help you today?", provider: 'Google Gemini 2.5 Flash', grounded: false };
+      return { text: "Hello! I am your Juno AI assistant. How can I help you today?", provider: 'Juno 2.5 Flash', grounded: false };
     }
     if (qClean === 'hello') {
-      return { text: "Hello! How can I assist you today?", provider: 'Google Gemini 2.5 Flash', grounded: false };
+      return { text: "Hello! How can I assist you today?", provider: 'Juno 2.5 Flash', grounded: false };
     }
     if (qClean === 'hey' || qClean === 'heyy' || qClean === 'yo' || qClean === 'sup') {
-      return { text: "Hey there! What's on your mind today?", provider: 'Google Gemini 2.5 Flash', grounded: false };
+      return { text: "Hey there! What's on your mind today?", provider: 'Juno 2.5 Flash', grounded: false };
     }
     if (qClean.includes('how are you') || qClean.includes('how r u')) {
-      return { text: "I'm doing great, thank you! How can I help you today?", provider: 'Google Gemini 2.5 Flash', grounded: false };
+      return { text: "I'm doing great, thank you! How can I help you today?", provider: 'Juno 2.5 Flash', grounded: false };
     }
 
     // Detect Image Generation Request Intent (Imagen 3 simulation/rendering)
@@ -235,19 +235,19 @@ export function HydratedComponent({ data }) {
     const encodedPrompt = encodeURIComponent(cleanSubject);
     const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=800&height=500&seed=${Math.floor(Math.random() * 99999)}&nologo=true`;
 
-    const markdownOutput = `### 🎨 Gemini Imagen 3 Generation\n\n` +
+    const markdownOutput = `### 🎨 Juno Imagen 3 Generation\n\n` +
       `Here is the AI generated artwork based on your prompt: **"${cleanSubject}"**\n\n` +
       `<div class="gemini-generated-image-card" style="margin: 14px 0; background: rgba(0,0,0,0.2); border: 1.5px solid var(--border-color, #fbc02d); border-radius: 16px; padding: 12px; text-align: center;">\n` +
       `  <img src="${imageUrl}" alt="${cleanSubject}" style="width: 100%; max-width: 700px; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);" loading="lazy" onerror="this.onerror=null; this.src='assets/pinterest_color.jpg';">\n` +
       `  <div style="margin-top: 10px; display: flex; gap: 8px; justify-content: center;">\n` +
-      `    <a href="${imageUrl}" target="_blank" download="gemini_artwork.jpg" class="chat-action-btn" style="text-decoration: none; padding: 6px 14px; background: #ffd93d; color: #2c1d00; font-weight: 700; border-radius: 10px;">📥 Download Image</a>\n` +
+      `    <a href="${imageUrl}" target="_blank" download="juno_artwork.jpg" class="chat-action-btn" style="text-decoration: none; padding: 6px 14px; background: #ffd93d; color: #2c1d00; font-weight: 700; border-radius: 10px;">📥 Download Image</a>\n` +
       `  </div>\n` +
       `</div>\n\n` +
-      `*Generated with Google Gemini Imagen 3 Engine.*`;
+      `*Generated with Juno AI Imagen 3 Engine.*`;
 
     return {
       text: markdownOutput,
-      provider: 'Google Gemini Imagen 3',
+      provider: 'Juno Imagen 3',
       grounded: false
     };
   }
@@ -297,16 +297,16 @@ export function HydratedComponent({ data }) {
     });
 
     if (!res.ok) {
-      throw new Error(`Gemini API HTTP Error ${res.status}: ${res.statusText}`);
+      throw new Error(`Juno API HTTP Error ${res.status}: ${res.statusText}`);
     }
 
     const data = await res.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error('Invalid or empty response structure from Gemini API');
+    if (!text) throw new Error('Invalid or empty response structure from Juno API');
 
     return {
       text: text,
-      provider: 'Google Gemini API (' + endpointModel + ')',
+      provider: 'Juno Ultra (' + endpointModel + ')',
       grounded: !!ragContext
     };
   }

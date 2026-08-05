@@ -980,7 +980,7 @@
       if (iconEl) iconEl.textContent = newTheme === 'gemini-dark' ? '☀️' : '🌙';
 
       if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) SoundEngine.playClick();
-      if (typeof showToast === 'function') showToast(`✨ Theme switched to: ${newTheme === 'gemini-dark' ? 'Gemini Dark' : 'Gemini Light'}`);
+      if (typeof showToast === 'function') showToast(`✨ Theme switched to: ${newTheme === 'gemini-dark' ? 'Juno Dark' : 'Juno Light'}`);
     };
 
     window.runInCanvas = function(codeText) {
@@ -1008,7 +1008,7 @@
       iframe.srcdoc = htmlDoc;
       modal.style.display = 'flex';
       if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) SoundEngine.playClick();
-      if (typeof showToast === 'function') showToast('🚀 Gemini Canvas: Executing live interactive web sandbox!');
+      if (typeof showToast === 'function') showToast('🚀 Juno Canvas: Executing live interactive web sandbox!');
     };
 
     window.closeCanvasModal = function() {
@@ -1180,7 +1180,7 @@
       const selectedModel = modelSelector ? modelSelector.value : 'gemini-2.5-flash';
 
       let answerText = "";
-      let providerName = "Google Gemini 2.5 Flash";
+      let providerName = "Juno 2.5 Flash";
       let citations = [];
 
       try {

@@ -169,7 +169,7 @@
               <button type="button" class="input-action-btn" title="Upload Image, Note, or File" onclick="document.getElementById('prompt-file-attach-input').click()" style="background: transparent; border: none; color: #e65100; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; padding: 4px; font-weight: 800;">+</button>
 
               <!-- Text Input -->
-              <input type="text" id="rag-query-input" class="chat-textarea" placeholder="Ask Gemini anything, upload images, generate code, or search documents..." aria-label="Query Input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex: 1; min-width: 0; background: transparent; border: none; color: #2c1d00; font-size: 15px; font-weight: 600; outline: none; font-family: inherit;">
+              <input type="text" id="rag-query-input" class="chat-textarea" placeholder="Ask Juno anything, upload images, generate code, or search documents..." aria-label="Query Input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex: 1; min-width: 0; background: transparent; border: none; color: #2c1d00; font-size: 15px; font-weight: 600; outline: none; font-family: inherit;">
             </div>
 
             <div class="rag-input-tools-row" style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px;">
@@ -177,9 +177,9 @@
               <div class="gemini-model-selector-pill" style="display: flex; align-items: center; gap: 6px; background: #ffe156; border: 1.5px solid #fbc02d; padding: 4px 10px; border-radius: 14px; cursor: pointer;" onclick="const select = document.getElementById('model-select-dropdown'); if (select) select.click();">
                 <span class="yellow-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #fbc02d; box-shadow: 0 0 8px #fbc02d;"></span>
                 <select id="model-select-dropdown" class="model-select-dropdown" onchange="window.handleModelChange(this.value)" style="background: transparent; border: none; color: #2c1d00; font-size: 12.5px; font-weight: 700; cursor: pointer; outline: none;">
-                  <option value="gemini-2.5-flash" selected>✨ Gemini 2.5 Flash ∨</option>
-                  <option value="gemini-2.5-pro">🧠 Gemini 2.5 Pro (Deep Thinking) ∨</option>
-                  <option value="gemini-2.0-flash">⚡ Gemini 2.0 Flash Thinking ∨</option>
+                  <option value="gemini-2.5-flash" selected>✨ Juno 2.5 Flash ∨</option>
+                  <option value="gemini-2.5-pro">🧠 Juno 2.5 Pro (Deep Thinking) ∨</option>
+                  <option value="gemini-2.0-flash">⚡ Juno 2.0 Flash Thinking ∨</option>
                   <option value="perplexity-cyan">💻 Code Architect & Canvas ∨</option>
                   <option value="web-search-grounding">🔍 Web Search Grounding ∨</option>
                   <option value="golden-harmony">🧠 Grounded Vault RAG ∨</option>
@@ -187,8 +187,8 @@
               </div>
 
               <div style="display: flex; align-items: center; gap: 6px;">
-                <!-- Gemini Dark / Light Theme Toggle Pill -->
-                <button type="button" class="input-action-btn theme-toggle-btn" title="Toggle Gemini Dark / Light Mode" onclick="window.toggleGeminiDarkTheme()" style="background: rgba(251, 192, 45, 0.2); border: 1px solid #fbc02d; color: #2c1d00; border-radius: 12px; padding: 4px 8px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                <!-- Juno Dark / Light Theme Toggle Pill -->
+                <button type="button" class="input-action-btn theme-toggle-btn" title="Toggle Juno Dark / Light Mode" onclick="window.toggleGeminiDarkTheme()" style="background: rgba(251, 192, 45, 0.2); border: 1px solid #fbc02d; color: #2c1d00; border-radius: 12px; padding: 4px 8px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;">
                   <span id="theme-toggle-icon">🌙</span> <span id="theme-toggle-text">Dark</span>
                 </button>
 
@@ -1199,7 +1199,7 @@
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 20px;">🚀</span>
           <div>
-            <h3 style="font-size: 15px; font-weight: 800; margin: 0; line-height: 1.2;">Gemini Canvas Live Preview</h3>
+            <h3 style="font-size: 15px; font-weight: 800; margin: 0; line-height: 1.2;">Juno Canvas Live Preview</h3>
             <span style="font-size: 11px; opacity: 0.85; font-weight: 600;">Interactive Sandboxed Web Execution</span>
           </div>
         </div>
