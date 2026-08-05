@@ -161,41 +161,48 @@
             <!-- Attachment Preview Chip Container -->
             <div id="prompt-attachment-preview-container" class="prompt-attachment-preview" style="display: none; padding: 6px 12px; border-bottom: 1px solid rgba(251, 192, 45, 0.3); gap: 8px; align-items: center; width: 100%; box-sizing: border-box;"></div>
 
-            <div class="rag-input-main-row" style="display: flex; align-items: center; width: 100%; gap: 8px;">
+            <!-- Top Row: Full-width Text Input -->
+            <div class="rag-input-main-row" style="display: flex; align-items: center; width: 100%;">
               <!-- Hidden File Input for Prompt Attachments -->
               <input type="file" id="prompt-file-attach-input" accept="image/*,.pdf,.txt,.js,.json" style="display: none;" onchange="window.handlePromptFileSelected(this.files)">
-              
-              <!-- Plus Attach Button -->
-              <button type="button" class="input-action-btn" title="Upload Image, Note, or File" onclick="document.getElementById('prompt-file-attach-input').click()" style="background: transparent; border: none; color: #e65100; cursor: pointer; font-size: 22px; display: flex; align-items: center; justify-content: center; padding: 4px; font-weight: 800;">+</button>
 
               <!-- Text Input -->
-              <input type="text" id="rag-query-input" class="chat-textarea" placeholder="Ask Juno anything, upload images, generate code, or search documents..." aria-label="Query Input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex: 1; min-width: 0; background: transparent; border: none; color: #2c1d00; font-size: 15px; font-weight: 600; outline: none; font-family: inherit;">
+              <input type="text" id="rag-query-input" class="chat-textarea" placeholder="Ask Juno anything, upload images, generate code, or search documents..." aria-label="Query Input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex: 1; width: 100%; min-width: 0; background: transparent; border: none; color: #2c1d00; font-size: 15px; font-weight: 600; outline: none; font-family: inherit; padding: 4px 0;">
             </div>
 
-            <div class="rag-input-tools-row" style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px;">
-              <!-- Model Selector Pill Dropdown -->
-              <div class="gemini-model-selector-pill" style="display: flex; align-items: center; gap: 6px; background: #ffe156; border: 1.5px solid #fbc02d; padding: 4px 10px; border-radius: 14px; cursor: pointer;" onclick="const select = document.getElementById('model-select-dropdown'); if (select) select.click();">
-                <span class="yellow-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #fbc02d; box-shadow: 0 0 8px #fbc02d;"></span>
-                <select id="model-select-dropdown" class="model-select-dropdown" onchange="window.handleModelChange(this.value)" style="background: transparent; border: none; color: #2c1d00; font-size: 12.5px; font-weight: 700; cursor: pointer; outline: none;">
-                  <option value="gemini-2.5-flash" selected>✨ Juno 2.5 Flash ∨</option>
-                  <option value="gemini-2.5-pro">🧠 Juno 2.5 Pro (Deep Thinking) ∨</option>
-                  <option value="gemini-2.0-flash">⚡ Juno 2.0 Flash Thinking ∨</option>
-                  <option value="perplexity-cyan">💻 Code Architect & Canvas ∨</option>
-                  <option value="web-search-grounding">🔍 Web Search Grounding ∨</option>
-                  <option value="golden-harmony">🧠 Grounded Vault RAG ∨</option>
-                </select>
+            <!-- Bottom Row: Tools Bar (Attach + Model selector on Left | Theme + Mic + Send on Right) -->
+            <div class="rag-input-tools-row" style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px; flex-wrap: wrap;">
+              <!-- Left Tools: Plus Attach + Model Selector Pill -->
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <!-- Plus Attach Button -->
+                <button type="button" class="input-action-btn" title="Upload Image, Note, or File" onclick="document.getElementById('prompt-file-attach-input').click()" style="background: rgba(251, 192, 45, 0.2); border: 1.5px solid #fbc02d; color: #e65100; cursor: pointer; font-size: 18px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800;">+</button>
+
+                <!-- Model Selector Pill Dropdown -->
+                <div class="gemini-model-selector-pill" style="display: flex; align-items: center; gap: 6px; background: #ffe156; border: 1.5px solid #fbc02d; padding: 5px 12px; border-radius: 18px; cursor: pointer;" onclick="const select = document.getElementById('model-select-dropdown'); if (select) select.click();">
+                  <span class="yellow-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #fbc02d; box-shadow: 0 0 8px #fbc02d;"></span>
+                  <select id="model-select-dropdown" class="model-select-dropdown" onchange="window.handleModelChange(this.value)" style="background: transparent; border: none; color: #2c1d00; font-size: 13px; font-weight: 700; cursor: pointer; outline: none;">
+                    <option value="gemini-2.5-flash" selected>✨ Juno 2.5 Flash ∨</option>
+                    <option value="gemini-2.5-pro">🧠 Juno 2.5 Pro (Deep Thinking) ∨</option>
+                    <option value="gemini-2.0-flash">⚡ Juno 2.0 Flash Thinking ∨</option>
+                    <option value="perplexity-cyan">💻 Code Architect & Canvas ∨</option>
+                    <option value="web-search-grounding">🔍 Web Search Grounding ∨</option>
+                    <option value="golden-harmony">🧠 Grounded Vault RAG ∨</option>
+                  </select>
+                </div>
               </div>
 
-              <div style="display: flex; align-items: center; gap: 6px;">
+              <!-- Right Controls: Theme Toggle + Voice Mic + Submit Button -->
+              <div style="display: flex; align-items: center; gap: 8px;">
                 <!-- Juno Dark / Light Theme Toggle Pill -->
-                <button type="button" class="input-action-btn theme-toggle-btn" title="Toggle Juno Dark / Light Mode" onclick="window.toggleGeminiDarkTheme()" style="background: rgba(251, 192, 45, 0.2); border: 1px solid #fbc02d; color: #2c1d00; border-radius: 12px; padding: 4px 8px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                <button type="button" class="input-action-btn theme-toggle-btn" title="Toggle Juno Dark / Light Mode" onclick="window.toggleGeminiDarkTheme()" style="background: rgba(251, 192, 45, 0.2); border: 1.5px solid #fbc02d; color: #2c1d00; border-radius: 16px; padding: 5px 10px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;">
                   <span id="theme-toggle-icon">🌙</span> <span id="theme-toggle-text">Dark</span>
                 </button>
 
                 <!-- Voice Mic Button -->
-                <button type="button" id="voice-trigger-btn" class="input-action-btn voice-btn" title="Voice Input" onclick="window.toggleVoiceListen()" style="background: transparent; border: none; color: #e65100; cursor: pointer; padding: 4px;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                <button type="button" id="voice-trigger-btn" class="input-action-btn voice-btn" title="Voice Input" onclick="window.toggleVoiceListen()" style="background: rgba(251, 192, 45, 0.2); border: 1.5px solid #fbc02d; color: #e65100; cursor: pointer; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
                 </button>
+
                 <!-- Send Submit Button -->
                 <button type="submit" id="rag-submit-btn" class="input-action-btn send-btn" title="Send Message" onclick="window.submitRAGQuery(event);" style="background: linear-gradient(135deg, #FFD93D 0%, #FBC02D 100%); border: 1.5px solid #FBC02D; color: #2C1D00; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(251, 192, 45, 0.45); transition: all 0.2s ease;">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">

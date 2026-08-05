@@ -4171,30 +4171,50 @@ kbd {
   opacity: 0.8;
   letter-spacing: 0.2px;
 }
-
 .chat-input-container {
   width: 100%;
   max-width: 800px;
-  background: rgba(18, 22, 33, 0.92) !important;
+  background: #ffffff !important;
   backdrop-filter: blur(25px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
-  border: 1.5px solid rgba(245, 158, 11, 0.45) !important;
-  border-radius: 9999px !important;
-  padding: 8px 18px !important;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 0 24px rgba(245, 158, 11, 0.25) !important;
+  border: 1.5px solid #fbc02d !important;
+  border-radius: 28px !important;
+  padding: 14px 18px !important;
+  box-shadow: 0 8px 32px rgba(251, 192, 45, 0.22) !important;
   transition: all 0.2s ease !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
 }
 
-[data-theme="platinum-gold"] .chat-input-container,
-[data-theme="gemini-light"] .chat-input-container {
-  background: rgba(18, 22, 33, 0.92) !important;
-  border: 1.5px solid rgba(245, 158, 11, 0.45) !important;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(245, 158, 11, 0.25) !important;
+[data-theme="gemini-dark"] .chat-input-container {
+  background: #1e1e1f !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6) !important;
+}
+
+[data-theme="gemini-dark"] .chat-textarea {
+  color: #e3e3e3 !important;
+}
+
+[data-theme="gemini-dark"] .gemini-model-selector-pill {
+  background: #282a2c !important;
+  border-color: #fbc02d !important;
+}
+
+[data-theme="gemini-dark"] .model-select-dropdown {
+  color: #e3e3e3 !important;
+}
+
+[data-theme="gemini-dark"] .theme-toggle-btn {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #e3e3e3 !important;
 }
 
 .chat-input-container:focus-within {
   border-color: #fbbf24 !important;
-  box-shadow: 0 0 24px rgba(251, 191, 36, 0.45), 0 12px 48px rgba(0, 0, 0, 0.7) !important;
+  box-shadow: 0 0 24px rgba(251, 191, 36, 0.45), 0 12px 48px rgba(0, 0, 0, 0.2) !important;
 }
 
 .input-row {
