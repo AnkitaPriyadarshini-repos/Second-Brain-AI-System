@@ -821,6 +821,9 @@
     renderResurfacingDigest();
     initFlashcards();
     renderDashboard();
+    if (typeof window.renderChatThreadsList === 'function') {
+      window.renderChatThreadsList();
+    }
 
     // ----------------------------------------------------
     // Event Listeners: Navigation
@@ -1011,6 +1014,133 @@
     window.closeCanvasModal = function() {
       const modal = document.getElementById('canvas-preview-modal');
       if (modal) modal.style.display = 'none';
+    };
+
+    window.renderChatThreadsList = function() {
+      const container = document.getElementById('sidebar-chat-threads-container');
+      if (!container || typeof Store === 'undefined' || !Store.getChatThreads) return;
+
+      const threads = Store.getChatThreads() || [];
+      const activeId = Store.getActiveThreadId();
+
+      if (threads.length === 0) {
+        container.innerHTML = `<div style="font-size: 11.5px; color: var(--text-muted); padding: 6px 8px; font-style: italic;">No recent sessions</div>`;
+        return;
+      }
+
+      container.innerHTML = threads.map(t => {
+        const isActive = t.id === activeId;
+        const titleText = escapeHTML(t.title || 'Untitled Chat');
+        return `<div class="sidebar-thread-item ${isActive ? 'active' : ''}" onclick="window.loadChatThread('${t.id}')" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-radius: 10px; margin-bottom: 3px; cursor: pointer; background: ${isActive ? 'rgba(251, 192, 45, 0.28)' : 'transparent'}; border: ${isActive ? '1px solid #fbc02d' : '1px solid transparent'}; transition: all 0.2s ease;">
+          <div style="display: flex; align-items: center; gap: 8px; overflow: hidden; flex: 1;">
+            <span style="font-size: 13px;">💬</span>
+            <span style="font-size: 12.5px; font-weight: 700; color: #2c1d00; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${titleText}</span>
+          </div>
+          <button type="button" onclick="window.deleteChatThreadItem('${t.id}', event)" title="Delete session" style="background: transparent; border: none; color: #8c5a00; cursor: pointer; font-size: 12px; padding: 2px 4px; border-radius: 4px; line-height: 1; opacity: 0.7;">✕</button>
+        </div>`;
+      }).join('');
+    };
+
+    window.createNewChatThread = function() {
+      if (typeof window.activateView === 'function') {
+        window.activateView('jarvis');
+      }
+
+      if (typeof Store !== 'undefined' && Store.createChatThread) {
+        const newThread = Store.createChatThread('New Session');
+        if (newThread && newThread.id) {
+          Store.setActiveThreadId(newThread.id);
+        }
+      }
+
+      const targetContainer = document.getElementById('chat-container');
+      const heroView = document.getElementById('chat-hero-view');
+      const inputEl = document.getElementById('rag-query-input');
+
+      if (targetContainer) {
+        targetContainer.innerHTML = '';
+        targetContainer.style.display = 'none';
+      }
+      if (heroView) {
+        heroView.style.display = 'block';
+      }
+      if (inputEl) {
+        inputEl.value = '';
+        inputEl.focus();
+      }
+      if (typeof window.clearPromptAttachment === 'function') {
+        window.clearPromptAttachment();
+      }
+
+      if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) {
+        SoundEngine.playClick();
+      }
+      if (typeof window.renderChatThreadsList === 'function') {
+        window.renderChatThreadsList();
+      }
+    };
+
+    window.loadChatThread = function(threadId) {
+      if (!threadId) return;
+
+      if (typeof window.activateView === 'function') {
+        window.activateView('jarvis');
+      }
+
+      if (typeof Store !== 'undefined' && Store.setActiveThreadId) {
+        Store.setActiveThreadId(threadId);
+      }
+
+      const threads = (typeof Store !== 'undefined' && Store.getChatThreads) ? Store.getChatThreads() : [];
+      const targetThread = threads.find(t => t.id === threadId);
+
+      const targetContainer = document.getElementById('chat-container');
+      const heroView = document.getElementById('chat-hero-view');
+
+      if (!targetThread || !targetThread.messages || targetThread.messages.length === 0) {
+        if (targetContainer) {
+          targetContainer.innerHTML = '';
+          targetContainer.style.display = 'none';
+        }
+        if (heroView) heroView.style.display = 'block';
+      } else {
+        if (heroView) heroView.style.display = 'none';
+        if (targetContainer) {
+          targetContainer.innerHTML = '';
+          targetContainer.style.display = 'flex';
+          targetContainer.style.flexDirection = 'column';
+
+          targetThread.messages.forEach(msg => {
+            appendChatMessage(msg.role === 'assistant' ? 'ai' : 'user', msg.content, msg.citations || [], false, '', msg.provider || '');
+          });
+          targetContainer.scrollTop = targetContainer.scrollHeight;
+        }
+      }
+
+      if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) {
+        SoundEngine.playClick();
+      }
+      if (typeof window.renderChatThreadsList === 'function') {
+        window.renderChatThreadsList();
+      }
+    };
+
+    window.deleteChatThreadItem = function(threadId, e) {
+      if (e) {
+        if (typeof e.stopPropagation === 'function') e.stopPropagation();
+        if (typeof e.preventDefault === 'function') e.preventDefault();
+      }
+
+      if (typeof Store !== 'undefined' && Store.deleteChatThread) {
+        const activeId = Store.getActiveThreadId();
+        Store.deleteChatThread(threadId);
+        if (activeId === threadId) {
+          window.createNewChatThread();
+        } else if (typeof window.renderChatThreadsList === 'function') {
+          window.renderChatThreadsList();
+        }
+      }
+      if (typeof showToast === 'function') showToast('🗑️ Session deleted');
     };
 
     async function handleRAGQuery(query) {
