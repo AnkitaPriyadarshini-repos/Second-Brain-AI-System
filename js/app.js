@@ -1171,9 +1171,20 @@
       if (inputEl) inputEl.value = '';
       window.clearPromptAttachment();
 
-      const submitBtn = document.getElementById('rag-submit-btn');
-      if (submitBtn) {
-        submitBtn.disabled = true;
+      // Senior Lead Architect Optimization: Immediate thinking indicator pill
+      const thinkingCard = document.createElement('div');
+      thinkingCard.className = 'chat-bubble ai-bubble glass-card thinking-placeholder';
+      thinkingCard.innerHTML = `<div class="chat-header">
+        <div class="ai-avatar">•</div>
+        <strong style="color: var(--accent-indigo);">Juno 2.5 Flash</strong>
+      </div>
+      <div class="chat-text" style="display: flex; align-items: center; gap: 8px; font-style: italic; color: #8c5a00;">
+        <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #fbc02d; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
+        <span>Synthesizing response...</span>
+      </div>`;
+      if (targetContainer) {
+        targetContainer.appendChild(thinkingCard);
+        targetContainer.scrollTop = targetContainer.scrollHeight;
       }
 
       const modelSelector = document.getElementById('model-select-dropdown') || document.getElementById('ai-model-selector');
@@ -1217,6 +1228,11 @@
         console.warn("AI Engine synthesis error:", err);
       }
 
+      // Remove thinking card before rendering final AI response
+      if (thinkingCard && thinkingCard.parentNode) {
+        thinkingCard.parentNode.removeChild(thinkingCard);
+      }
+
       if (!answerText) {
         const qLower = query.trim().toLowerCase();
         if (qLower === 'hi' || qLower === 'hii' || qLower === 'hiii' || qLower === 'hello' || qLower === 'hey') {
@@ -1230,8 +1246,8 @@
         submitBtn.disabled = false;
       }
 
-      // Render final AI message card
-      appendChatMessage('ai', answerText, citations, false, query, providerName);
+      // Render final AI message card with typewriter streaming
+      appendChatMessage('ai', answerText, citations, false, query, providerName, true);
 
       // Save into current Chat Thread
       if (typeof Store !== 'undefined' && Store.saveChatThread) {
@@ -1260,7 +1276,7 @@
     }
     window.handleRAGQuery = handleRAGQuery;
 
-    function appendChatMessage(sender, text, citations = [], isGeneralKnowledge = false, queryStr = '', customProvider = '') {
+    function appendChatMessage(sender, text, citations = [], isGeneralKnowledge = false, queryStr = '', customProvider = '', streamTypewriter = false) {
       const targetContainer = document.getElementById('chat-container') || document.querySelector('.chat-stream') || document.querySelector('.chat-card-wrapper');
       if (!targetContainer) return;
 
@@ -1300,9 +1316,29 @@
           <div class="ai-avatar">•</div>
           <strong style="color: var(--accent-indigo);">${escapeHTML(customProvider || 'Second Brain AI Assistant')}</strong>
         </div>
-        <div class="chat-text">${formatMarkdownText(text)}</div>
+        <div class="chat-text" id="chat-text-content"></div>
         ${citationsHTML}
         ${actionsHTML}`;
+
+        const textContentEl = msgCard.querySelector('#chat-text-content');
+        if (textContentEl) {
+          if (streamTypewriter && text.length > 20) {
+            const words = text.split(' ');
+            let currentIdx = 0;
+            const timer = setInterval(() => {
+              currentIdx += 2;
+              const chunk = words.slice(0, currentIdx).join(' ');
+              textContentEl.innerHTML = formatMarkdownText(chunk);
+              targetContainer.scrollTop = targetContainer.scrollHeight;
+              if (currentIdx >= words.length) {
+                clearInterval(timer);
+                textContentEl.innerHTML = formatMarkdownText(text);
+              }
+            }, 18);
+          } else {
+            textContentEl.innerHTML = formatMarkdownText(text);
+          }
+        }
       }
 
       // Always append message card to DOM first!
