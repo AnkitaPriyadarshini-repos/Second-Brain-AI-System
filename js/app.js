@@ -1316,11 +1316,11 @@
           <div class="ai-avatar">•</div>
           <strong style="color: var(--accent-indigo);">${escapeHTML(customProvider || 'Second Brain AI Assistant')}</strong>
         </div>
-        <div class="chat-text" id="chat-text-content"></div>
+        <div class="chat-text"></div>
         ${citationsHTML}
         ${actionsHTML}`;
 
-        const textContentEl = msgCard.querySelector('#chat-text-content');
+        const textContentEl = msgCard.querySelector('.chat-text');
         if (textContentEl) {
           if (streamTypewriter && text.length > 20) {
             const words = text.split(' ');
