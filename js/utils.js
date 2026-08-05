@@ -40,14 +40,22 @@ function formatMarkdownText(mdText) {
   if (!mdText) return '';
   let html = mdText;
 
-  // 1. Code blocks with syntax highlighting & copy header
+  // 1. Code blocks with syntax highlighting & copy/canvas header
   html = html.replace(/```([a-zA-Z0-9_]*)\n([\s\S]*?)```/g, (match, lang, code) => {
-    const cleanLang = lang.trim() || 'code';
-    const escapedCode = escapeHTML(code.trim());
+    const cleanLang = lang.trim() || 'html';
+    const rawCode = code.trim();
+    const escapedCode = escapeHTML(rawCode);
+    const isExecutable = /html|xml|svg|js|javascript|css|jsx|tsx|web/i.test(cleanLang) || rawCode.includes('<html') || rawCode.includes('<div') || rawCode.includes('function');
+
+    const canvasBtn = isExecutable ? `<button class="code-copy-btn canvas-run-btn" onclick="window.runInCanvasFromBlock(this)" style="background: linear-gradient(135deg, #ffd93d, #fbc02d); color: #2c1d00; font-weight: 800; border: none; border-radius: 8px; padding: 3px 8px; margin-right: 6px; cursor: pointer;">🚀 Run in Canvas</button>` : '';
+
     return `<div class="code-block-wrapper">
       <div class="code-block-header">
         <span class="code-lang-label">${cleanLang}</span>
-        <button class="code-copy-btn" onclick="window.copyCodeFromBlock(this)">📋 Copy Code</button>
+        <div class="code-header-actions">
+          ${canvasBtn}
+          <button class="code-copy-btn" onclick="window.copyCodeFromBlock(this)">📋 Copy Code</button>
+        </div>
       </div>
       <pre class="code-block-content"><code class="language-${cleanLang}">${escapedCode}</code></pre>
     </div>`;
@@ -88,8 +96,18 @@ function copyCodeFromBlock(btnEl) {
   }
 }
 
+function runInCanvasFromBlock(btnEl) {
+  const wrapper = btnEl.closest('.code-block-wrapper');
+  if (!wrapper) return;
+  const codeEl = wrapper.querySelector('code');
+  if (codeEl && typeof window.runInCanvas === 'function') {
+    window.runInCanvas(codeEl.textContent);
+  }
+}
+
 window.showToast = showToast;
 window.escapeHTML = escapeHTML;
 window.formatMarkdownText = formatMarkdownText;
 window.copyCodeFromBlock = copyCodeFromBlock;
+window.runInCanvasFromBlock = runInCanvasFromBlock;
 

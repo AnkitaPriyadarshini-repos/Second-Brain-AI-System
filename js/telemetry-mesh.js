@@ -73,11 +73,19 @@
     }
   };
 
-  window.TelemetryMeshEngine = TelemetryMeshEngine;
+  if (typeof window !== 'undefined') {
+    window.TelemetryMeshEngine = TelemetryMeshEngine;
+  }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => TelemetryMeshEngine.init());
-  } else {
-    TelemetryMeshEngine.init();
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => TelemetryMeshEngine.init());
+    } else {
+      TelemetryMeshEngine.init();
+    }
+  }
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = TelemetryMeshEngine;
   }
 })();

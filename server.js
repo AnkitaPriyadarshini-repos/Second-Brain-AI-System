@@ -89,7 +89,7 @@ nextApp.prepare().then(() => {
             ...result.ack
           }));
 
-          // 2. Broadcast message to all connected clients in room
+          // 2. Broadcast user message to all connected clients in room
           wss.clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
               client.send(JSON.stringify({
@@ -98,6 +98,21 @@ nextApp.prepare().then(() => {
               }));
             }
           });
+
+          // 3. Generate and broadcast AI Assistant response
+          setTimeout(() => {
+            const aiMsg = chatController.generateAIResponse(result.message);
+            if (aiMsg) {
+              wss.clients.forEach((client) => {
+                if (client.readyState === WebSocket.OPEN) {
+                  client.send(JSON.stringify({
+                    type: 'NEW_MESSAGE',
+                    message: aiMsg
+                  }));
+                }
+              });
+            }
+          }, 350);
         }
       } catch (err) {
         console.error('[WebSocket] Error processing message:', err);

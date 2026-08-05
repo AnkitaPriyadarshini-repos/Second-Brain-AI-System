@@ -150,6 +150,13 @@
       step();
     },
 
+    stopSimulation: function () {
+      if (this.animId) {
+        cancelAnimationFrame(this.animId);
+        this.animId = null;
+      }
+    },
+
     updatePhysics: function () {
       const width = this.cssWidth || 800;
       const height = this.cssHeight || 600;

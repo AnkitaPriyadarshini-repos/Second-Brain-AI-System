@@ -113,6 +113,25 @@
     if (typeof AIAgentFleetEngine !== 'undefined' && AIAgentFleetEngine.init) {
       AIAgentFleetEngine.init();
     }
+    if (typeof VoiceEngine !== 'undefined' && VoiceEngine.init) {
+      VoiceEngine.init({
+        onTranscript: (text, isFinal) => {
+          if (ragQueryInput) ragQueryInput.value = text;
+          if (isFinal && text) {
+            handleRAGQuery(text);
+          }
+        },
+        onStateChange: (state) => {
+          if (voiceTriggerBtn) {
+            voiceTriggerBtn.style.color = state === 'listening' ? '#10b981' : '#e65100';
+          }
+          if (typeof SoundEngine !== 'undefined' && state === 'listening') {
+            SoundEngine.playClick();
+          }
+        }
+      });
+      if (waveCanvas) VoiceEngine.startWaveformAnimation(waveCanvas);
+    }
 
     // Navigation View Activation Helper
     function activateView(targetView) {
@@ -141,7 +160,7 @@
       allViewSections.forEach(sec => {
         const isTarget = sec.id === `view-${targetView}`;
         if (isTarget) {
-          sec.style.display = 'block';
+          sec.style.display = sec.id === 'view-jarvis' ? 'flex' : 'block';
           sec.classList.add('active');
         } else {
           sec.style.display = 'none';
@@ -161,12 +180,17 @@
             GraphVisualizer.buildGraph(Store.getNotes());
           }
         }, 50);
-      } else if (targetView === 'flashcards') {
-        initFlashcards();
-      } else if (targetView === 'dashboard') {
-        renderDashboard();
-      } else if (targetView === 'goals') {
-        renderGoals();
+      } else {
+        if (typeof GraphVisualizer !== 'undefined' && typeof GraphVisualizer.stopSimulation === 'function') {
+          GraphVisualizer.stopSimulation();
+        }
+        if (targetView === 'flashcards') {
+          initFlashcards();
+        } else if (targetView === 'dashboard') {
+          renderDashboard();
+        } else if (targetView === 'goals') {
+          renderGoals();
+        }
       }
     }
 
@@ -578,53 +602,21 @@
 
     window.triggerQuickUpload = function(type) {
       if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) SoundEngine.playClick();
-      
-      if (type === 'pdf') {
-        const title = prompt('📄 Upload PDF / Document Title:', 'System Design Architecture Whitepaper.pdf');
-        if (title) {
-          Store.addNote({
-            title: title,
-            content: `Document Summary: Comprehensive analysis of distributed caching, LSM-tree storage engines, and Raft consensus protocols.\nIndexed 120 vector chunks into local RAG memory.`,
-            sourceType: 'pdf'
-          });
-          alert(`⚡ Success! "${title}" indexed into Juno Local RAG memory. Try asking: "Summarize the distributed caching architecture".`);
-          refreshAllViews();
-        }
-      } else if (type === 'note') {
-        const text = prompt('📝 Quick Note / Idea Capture:');
-        if (text) {
-          Store.addNote({
-            title: text.substring(0, 30) + '...',
-            content: text,
-            sourceType: 'typing'
-          });
-          alert('⚡ Idea saved and indexed into your AI Memory!');
-          refreshAllViews();
-        }
-      } else if (type === 'github') {
-        const repo = prompt('💻 Enter GitHub Repository URL:', 'https://github.com/AnkitaPriyadarshini-repos/Second-Brain-AI-System');
-        if (repo) {
-          Store.addNote({
-            title: 'GitHub: ' + repo.split('/').pop(),
-            content: `Repository ${repo} indexed. Analyzed low-level architecture, DIP design patterns, SQLite transactional migrations, and WebSockets signaling.`,
-            sourceType: 'github',
-            sourceUrl: repo
-          });
-          alert(`⚡ Repository "${repo}" indexed into Juno Memory!`);
-          refreshAllViews();
-        }
-      } else if (type === 'url') {
-        const url = prompt('🔗 Enter Web Article URL:', 'https://arxiv.org/abs/1706.03762');
-        if (url) {
-          Store.addNote({
-            title: 'Article: ' + url,
-            content: `Web Article ${url} fetched and indexed into Local RAG vector store.`,
-            sourceType: 'url',
-            sourceUrl: url
-          });
-          alert('⚡ Article indexed into Local RAG memory!');
-          refreshAllViews();
-        }
+      if (typeof activateView === 'function') {
+        activateView('capture');
+      }
+      const targetTab = (type === 'github' || type === 'url' || type === 'pdf') ? 'file' : (type === 'note' ? 'type' : 'file');
+      if (typeof window.setCaptureTab === 'function') {
+        window.setCaptureTab(targetTab);
+      }
+      if (typeof showToast === 'function') {
+        const labels = {
+          'pdf': '📄 Document & PDF Research Synthesis Hub Ready',
+          'github': '💻 GitHub Repository Architect Hub Ready',
+          'note': '📝 Quick Note & Idea Capture Ready',
+          'url': '🌐 Web Clipper & Article Reader Ready'
+        };
+        showToast(labels[type] || '⚡ Capture Hub Activated');
       }
     };
 
@@ -846,9 +838,24 @@
     const ragQueryForm = document.getElementById('rag-query-form');
     if (ragQueryForm) {
       ragQueryForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const query = ragQueryInput ? ragQueryInput.value.trim() : '';
-        if (query) handleRAGQuery(query);
+        if (e && e.preventDefault) e.preventDefault();
+        window.submitRAGQuery(e);
+      });
+    }
+
+    if (ragSubmitBtn) {
+      ragSubmitBtn.addEventListener('click', (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+        window.submitRAGQuery(e);
+      });
+    }
+
+    if (ragQueryInput) {
+      ragQueryInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          if (e && e.preventDefault) e.preventDefault();
+          window.submitRAGQuery(e);
+        }
       });
     }
 
@@ -865,16 +872,6 @@
         showToast(`AI Model Active: ${btn.innerText}`);
       });
     });
-
-    if (ragQueryInput) {
-      ragQueryInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.keyCode === 13) {
-          e.preventDefault();
-          const query = ragQueryInput.value.trim();
-          if (query) handleRAGQuery(query);
-        }
-      });
-    }
 
     window.submitCircularPrompt = function() {
       const input = document.getElementById('circular-ai-prompt-input');
@@ -897,30 +894,6 @@
       if (modal) modal.classList.add('active');
       if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
     };
-
-    const ragQueryForm = document.getElementById('rag-query-form');
-    if (ragQueryForm) {
-      ragQueryForm.addEventListener('submit', (e) => {
-        if (e && e.preventDefault) e.preventDefault();
-        window.submitRAGQuery(e);
-      });
-    }
-
-    if (ragSubmitBtn) {
-      ragSubmitBtn.addEventListener('click', (e) => {
-        if (e && e.preventDefault) e.preventDefault();
-        window.submitRAGQuery(e);
-      });
-    }
-
-    if (ragQueryInput) {
-      ragQueryInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          if (e && e.preventDefault) e.preventDefault();
-          window.submitRAGQuery(e);
-        }
-      });
-    }
 
     if (voiceTriggerBtn) {
       voiceTriggerBtn.addEventListener('click', () => {
@@ -946,10 +919,102 @@
       }
     });
 
-    async function handleRAGQuery(query) {
-      if (!query) return;
+    // Gemini Multimodal Attachment & Theme State
+    let activePromptAttachment = null;
 
-      window.handleRAGQuery = handleRAGQuery;
+    window.handlePromptFileSelected = function(files) {
+      if (!files || files.length === 0) return;
+      const file = files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        activePromptAttachment = {
+          name: file.name,
+          mimeType: file.type,
+          base64: e.target.result,
+          isImage: file.type.startsWith('image/')
+        };
+
+        const container = document.getElementById('prompt-attachment-preview-container');
+        if (container) {
+          container.style.display = 'flex';
+          let previewContent = '';
+          if (activePromptAttachment.isImage) {
+            previewContent = `<img src="${activePromptAttachment.base64}" style="width: 32px; height: 32px; object-fit: cover; border-radius: 6px; border: 1px solid #fbc02d;">`;
+          } else {
+            previewContent = `<span style="font-size: 18px;">📄</span>`;
+          }
+          container.innerHTML = `${previewContent} <span style="font-size: 12px; font-weight: 700; color: #2c1d00; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHTML(file.name)}</span> <button type="button" onclick="window.clearPromptAttachment()" style="background: transparent; border: none; color: #e65100; font-weight: 800; cursor: pointer; font-size: 14px;">✕</button>`;
+        }
+        if (typeof showToast === 'function') showToast(`📎 Attached: ${file.name}`);
+      };
+      reader.readAsDataURL(file);
+    };
+
+    window.clearPromptAttachment = function() {
+      activePromptAttachment = null;
+      const container = document.getElementById('prompt-attachment-preview-container');
+      if (container) {
+        container.style.display = 'none';
+        container.innerHTML = '';
+      }
+      const fileInput = document.getElementById('prompt-file-attach-input');
+      if (fileInput) fileInput.value = '';
+    };
+
+    window.toggleGeminiDarkTheme = function() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'golden-harmony';
+      const newTheme = currentTheme === 'gemini-dark' ? 'golden-harmony' : 'gemini-dark';
+      
+      if (typeof window.applyTheme === 'function') {
+        window.applyTheme(newTheme);
+      } else {
+        document.documentElement.setAttribute('data-theme', newTheme);
+      }
+
+      const textEl = document.getElementById('theme-toggle-text');
+      const iconEl = document.getElementById('theme-toggle-icon');
+      if (textEl) textEl.textContent = newTheme === 'gemini-dark' ? 'Light' : 'Dark';
+      if (iconEl) iconEl.textContent = newTheme === 'gemini-dark' ? '☀️' : '🌙';
+
+      if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) SoundEngine.playClick();
+      if (typeof showToast === 'function') showToast(`✨ Theme switched to: ${newTheme === 'gemini-dark' ? 'Gemini Dark' : 'Gemini Light'}`);
+    };
+
+    window.runInCanvas = function(codeText) {
+      if (!codeText) return;
+      const modal = document.getElementById('canvas-preview-modal');
+      const iframe = document.getElementById('canvas-preview-iframe');
+      if (!modal || !iframe) return;
+
+      let htmlDoc = codeText.trim();
+      if (!htmlDoc.includes('<html') && !htmlDoc.includes('<!DOCTYPE')) {
+        htmlDoc = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: 'Segoe UI', system-ui, sans-serif; padding: 20px; background: #ffffff; color: #1f2937; margin: 0; }
+  </style>
+</head>
+<body>
+  ${htmlDoc}
+</body>
+</html>`;
+      }
+
+      iframe.srcdoc = htmlDoc;
+      modal.style.display = 'flex';
+      if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) SoundEngine.playClick();
+      if (typeof showToast === 'function') showToast('🚀 Gemini Canvas: Executing live interactive web sandbox!');
+    };
+
+    window.closeCanvasModal = function() {
+      const modal = document.getElementById('canvas-preview-modal');
+      if (modal) modal.style.display = 'none';
+    };
+
+    async function handleRAGQuery(query) {
+      if (!query && !activePromptAttachment) return;
 
       if (typeof window.activateView === 'function') {
         window.activateView('jarvis');
@@ -964,11 +1029,17 @@
         targetContainer.style.flexDirection = 'column';
       }
 
-      // Render user message card immediately
-      appendChatMessage('user', query);
+      // Render user message card immediately (including attachment badge if present)
+      let userDisplayQuery = query;
+      const attachmentToPass = activePromptAttachment;
+      if (attachmentToPass) {
+        userDisplayQuery = `[📎 Attached: ${attachmentToPass.name}]\n${query}`;
+      }
+      appendChatMessage('user', userDisplayQuery);
 
       const inputEl = document.getElementById('rag-query-input');
       if (inputEl) inputEl.value = '';
+      window.clearPromptAttachment();
 
       const submitBtn = document.getElementById('rag-submit-btn');
       if (submitBtn) {
@@ -976,10 +1047,10 @@
       }
 
       const modelSelector = document.getElementById('model-select-dropdown') || document.getElementById('ai-model-selector');
-      const selectedModel = modelSelector ? modelSelector.value : 'golden-harmony';
+      const selectedModel = modelSelector ? modelSelector.value : 'gemini-2.5-flash';
 
       let answerText = "";
-      let providerName = "Juno AI Engine";
+      let providerName = "Google Gemini 2.5 Flash";
       let citations = [];
 
       try {
@@ -1000,7 +1071,8 @@
           const res = await window.aiEngine.generateResponse({
             prompt: query,
             model: selectedModel,
-            ragContext: ragContextStr
+            ragContext: ragContextStr,
+            imageAttachment: attachmentToPass
           });
           if (res && res.text) {
             answerText = res.text;
@@ -1056,6 +1128,7 @@
         targetContainer.scrollTop = targetContainer.scrollHeight;
       }
     }
+    window.handleRAGQuery = handleRAGQuery;
 
     function appendChatMessage(sender, text, citations = [], isGeneralKnowledge = false, queryStr = '', customProvider = '') {
       const targetContainer = document.getElementById('chat-container') || document.querySelector('.chat-stream') || document.querySelector('.chat-card-wrapper');
@@ -1428,7 +1501,7 @@
                     <span style="font-size: 11px; color: var(--text-secondary);">${(file.size / 1024).toFixed(1)} KB</span>
                   </div>
                   <h4 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">${newNote.title}</h4>
-                  <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 10px;">${newNote.summary}</p>
+                  <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 10px;">${newNote.summary || (newNote.content ? newNote.content.substring(0, 140) + '...' : '')}</p>
                   <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 14px;" onclick="window.activateView('vault')">📚 View in Knowledge Vault</button>
                 </div>
               `;
@@ -2396,7 +2469,10 @@
       toast.className = 'toast-notification glass-card';
       toast.textContent = msg;
       toastContainer.appendChild(toast);
-      setTimeout(() => toast.remove(), 3500);
+      setTimeout(() => {
+        if (typeof toast.remove === 'function') toast.remove();
+        else if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 3500);
     }
 
     function escapeHTML(str) {
@@ -2409,32 +2485,9 @@
     function cleanRogueText(text) {
       if (!text) return '';
       let cleaned = text
-        .replace(/###?\s*✨?\s*Juno AI Assistant.*(?=\n|$)/gi, '')
-        .replace(/###?\s*Grounded Insight from Your Second Brain.*(?=\n|$)/gi, '')
-        .replace(/Based on your saved note.*(?=\n|$)/gi, '')
-        .replace(/Found \d+ relevant notes.*(?=\n|$)/gi, '')
-        .replace(/####?\s*\d+\.\s+.*(?=\n|$)/gi, '')
-        .replace(/Thank you for your prompt:.*(?=\n|$)/gi, '')
-        .replace(/^#\s*$/gm, '')
         .replace(/\(Ref item \d+: [^)]+\)/gi, '')
-        .replace(/\*?Tags:\*?.*(?=\n|$)/gi, '')
-        .replace(/---?\s*####?\s*Actionable Takeaways:[\s\S]*/gi, '')
-        .replace(/•\s*\*\*Core Concept\*\*:[\s\S]*/gi, '')
-        .replace(/•\s*\*\*Surfaces Ingested\*\*:[\s\S]*/gi, '')
-        .replace(/•\s*\*\*Next Steps\*\*:[\s\S]*/gi, '')
-        .replace(/####?\s*💡?\s*Key Architectural Takeaways:[\s\S]*/gi, '')
-        .replace(/•\s*\*\*Autonomous Agent Execution\*\*:[\s\S]*/gi, '')
-        .replace(/•\s*\*\*High Throughput\*\*:[\s\S]*/gi, '')
-        .replace(/•\s*\*\*Live Cloud Integration\*\*:[\s\S]*/gi, '')
         .replace(/\.\s*\./g, '.')
         .trim();
-
-      if (cleaned.includes('\n\n')) {
-        const paragraphs = cleaned.split('\n\n').map(p => p.trim()).filter(Boolean);
-        if (paragraphs.length > 1 && (paragraphs[0].startsWith('Urban density') || paragraphs[1].startsWith('During non-REM'))) {
-          cleaned = paragraphs[0];
-        }
-      }
 
       return cleaned;
     }
@@ -2442,14 +2495,41 @@
     function formatMarkdownText(text) {
       if (!text) return '';
       const cleaned = cleanRogueText(text);
-      return escapeHTML(cleaned)
-        .replace(/### (.*?)(?=<br>|\n|$)/g, '<h3 style="color: var(--accent-indigo); margin: 12px 0 6px;">$1</h3>')
-        .replace(/#### (.*?)(?=<br>|\n|$)/g, '<h4 style="color: var(--text-primary); margin: 10px 0 4px;">$1</h4>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/`([^`]+)`/g, '<code style="background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; font-family: var(--font-code); font-size: 0.85em;">$1</code>')
-        .replace(/\n/g, '<br>')
-        .replace(/• (.*?)(?=<br>|$)/g, '• $1');
+      if (typeof window !== 'undefined' && typeof window.formatMarkdownText === 'function' && window.formatMarkdownText !== formatMarkdownText) {
+        return window.formatMarkdownText(cleaned);
+      }
+      
+      let html = cleaned;
+      // 1. Code blocks with syntax highlighting & copy header
+      html = html.replace(/```([a-zA-Z0-9_]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+        const cleanLang = lang.trim() || 'code';
+        const escapedCode = escapeHTML(code.trim());
+        return `<div class="code-block-wrapper">
+          <div class="code-block-header">
+            <span class="code-lang-label">${cleanLang}</span>
+            <button class="code-copy-btn" onclick="window.copyCodeFromBlock(this)">📋 Copy Code</button>
+          </div>
+          <pre class="code-block-content"><code class="language-${cleanLang}">${escapedCode}</code></pre>
+        </div>`;
+      });
+
+      // 2. Inline code
+      html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+
+      // 3. Headings
+      html = html.replace(/^#### (.*$)/gim, '<h4 style="color: var(--text-primary); margin: 10px 0 4px;">$1</h4>');
+      html = html.replace(/^### (.*$)/gim, '<h3 style="color: var(--accent-indigo); margin: 12px 0 6px;">$1</h3>');
+      html = html.replace(/^## (.*$)/gim, '<h2 style="color: var(--accent-indigo); margin: 14px 0 8px;">$1</h2>');
+
+      // 4. Bold & Italic
+      html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+
+      // 5. Paragraph line breaks
+      html = html.replace(/\n\n/g, '<br><br>');
+      html = html.replace(/\n/g, '<br>');
+
+      return html;
     }
 
     // ----------------------------------------------------
@@ -2507,6 +2587,7 @@
           console.warn('Service Worker registration skipped:', err);
         });
       });
+    }
 
     window.dismissPWAPopup = function() {
       const popup = document.getElementById('pwa-install-popup');
@@ -2614,11 +2695,22 @@
     };
 
     window.createNewChatThread = function() {
-      if (typeof Store !== 'undefined' && Store.clearAllChatMessages) {
-        Store.clearAllChatMessages();
-      }
       if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
-      window.location.reload();
+      if (typeof Store !== 'undefined' && typeof Store.createChatThread === 'function') {
+        const newThread = Store.createChatThread('New Session');
+        if (typeof window.switchChatThread === 'function') {
+          window.switchChatThread(newThread.id);
+        }
+      } else {
+        const heroView = document.getElementById('chat-hero-view');
+        const chatContainer = document.getElementById('chat-container');
+        if (chatContainer) {
+          chatContainer.innerHTML = '';
+          chatContainer.style.display = 'none';
+        }
+        if (heroView) heroView.style.display = 'flex';
+      }
+      if (typeof showToast === 'function') showToast('✨ New Chat Session started.');
     };
 
     window.switchChatThread = function(threadId) {
@@ -2740,6 +2832,24 @@
       items.forEach(item => {
         item.style.display = item.textContent.toLowerCase().includes(q) ? 'flex' : 'none';
       });
+    };
+
+    window.toggleNeuralLabMode = function(btnEl) {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+      const tabBtns = document.querySelectorAll('.gemini-tab-btn');
+      tabBtns.forEach(b => {
+        b.classList.remove('active');
+        b.style.background = 'transparent';
+        b.style.boxShadow = 'none';
+      });
+      if (btnEl) {
+        btnEl.classList.add('active');
+        btnEl.style.background = '#fbc02d';
+        btnEl.style.boxShadow = '0 2px 8px rgba(251, 192, 45, 0.4)';
+      }
+      if (typeof showToast === 'function') {
+        showToast('🧬 Neural Lab v2.5 Cognitive Reasoning Mode Online.');
+      }
     };
 
     window.toggleRAGMode = function() {

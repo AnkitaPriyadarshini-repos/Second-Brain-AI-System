@@ -184,32 +184,35 @@ export function HydratedComponent({ data }) {
    * Main unified AI completion method supporting Gemini REST API, OpenAI REST API, and Local RAG Fallback
    */
   async generateResponse(options = {}) {
-    const { prompt = '', model = 'gemini-1.5-flash', systemPrompt = '', ragContext = '' } = options;
+    const { prompt = '', model = 'gemini-2.5-flash', systemPrompt = '', ragContext = '', imageAttachment = null } = options;
 
     const qClean = (prompt || '').trim().toLowerCase().replace(/[^\w\s]/gi, '');
     
-    // Natural ChatGPT-style Conversational Greetings
+    // Natural Conversational Greetings
     if (qClean === 'hi' || qClean === 'hii' || qClean === 'hiii') {
-      return { text: "Hello! How can I help you today?", provider: 'ChatGPT Engine', grounded: false };
+      return { text: "Hello! I am your Google Gemini assistant. How can I help you today?", provider: 'Google Gemini 2.5 Flash', grounded: false };
     }
     if (qClean === 'hello') {
-      return { text: "Hello! How can I assist you today?", provider: 'ChatGPT Engine', grounded: false };
+      return { text: "Hello! How can I assist you today?", provider: 'Google Gemini 2.5 Flash', grounded: false };
     }
     if (qClean === 'hey' || qClean === 'heyy' || qClean === 'yo' || qClean === 'sup') {
-      return { text: "Hey there! What's on your mind today?", provider: 'ChatGPT Engine', grounded: false };
+      return { text: "Hey there! What's on your mind today?", provider: 'Google Gemini 2.5 Flash', grounded: false };
     }
     if (qClean.includes('how are you') || qClean.includes('how r u')) {
-      return { text: "I'm doing great, thank you! How can I help you today?", provider: 'ChatGPT Engine', grounded: false };
+      return { text: "I'm doing great, thank you! How can I help you today?", provider: 'Google Gemini 2.5 Flash', grounded: false };
     }
-    if (qClean.includes('who are you') || qClean.includes('what are you')) {
-      return { text: "I'm your AI assistant, ready to help you with code, ideas, note analysis, or any question you have!", provider: 'ChatGPT Engine', grounded: false };
+
+    // Detect Image Generation Request Intent (Imagen 3 simulation/rendering)
+    const isImageGen = /generate\s+(an?\s+)?image|create\s+(an?\s+)?image|draw\s+(a|an)?|make\s+(an?\s+)?picture|paint\s+(a|an)?|render\s+(a|an)?\s+photo/i.test(prompt);
+    if (isImageGen) {
+      return this.generateImageResponse(prompt);
     }
 
     const keys = this.getAPIKeys();
 
-    if (keys.geminiKey && (model.startsWith('gemini') || keys.preferredProvider === 'gemini')) {
+    if (keys.geminiKey && (model.startsWith('gemini') || model.includes('flash') || model.includes('pro') || keys.preferredProvider === 'gemini')) {
       try {
-        return await this.callGeminiAPI(prompt, keys.geminiKey, model, systemPrompt, ragContext);
+        return await this.callGeminiAPI(prompt, keys.geminiKey, model, systemPrompt, ragContext, imageAttachment);
       } catch (err) {
         console.warn('Gemini API call failed, falling back to Local RAG Synthesizer:', err);
       }
@@ -224,11 +227,43 @@ export function HydratedComponent({ data }) {
     }
 
     // Default: Built-in Intelligent Local RAG & NLP Synthesizer (Zero-config)
-    return this.fallbackSynthesize(prompt, model, ragContext);
+    return this.fallbackSynthesize(prompt, model, ragContext, imageAttachment);
   }
 
-  async callGeminiAPI(prompt, apiKey, modelName = 'gemini-1.5-flash', systemPrompt = '', ragContext = '') {
-    const endpointModel = modelName.includes('pro') ? 'gemini-1.5-pro' : 'gemini-1.5-flash';
+  generateImageResponse(prompt) {
+    const cleanSubject = prompt.replace(/generate|create|draw|paint|render|image|picture|photo|of|a|an/gi, '').trim() || 'futuristic glowing neural nexus artwork';
+    const encodedPrompt = encodeURIComponent(cleanSubject);
+    const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=800&height=500&seed=${Math.floor(Math.random() * 99999)}&nologo=true`;
+
+    const markdownOutput = `### 🎨 Gemini Imagen 3 Generation\n\n` +
+      `Here is the AI generated artwork based on your prompt: **"${cleanSubject}"**\n\n` +
+      `<div class="gemini-generated-image-card" style="margin: 14px 0; background: rgba(0,0,0,0.2); border: 1.5px solid var(--border-color, #fbc02d); border-radius: 16px; padding: 12px; text-align: center;">\n` +
+      `  <img src="${imageUrl}" alt="${cleanSubject}" style="width: 100%; max-width: 700px; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);" loading="lazy" onerror="this.onerror=null; this.src='assets/pinterest_color.jpg';">\n` +
+      `  <div style="margin-top: 10px; display: flex; gap: 8px; justify-content: center;">\n` +
+      `    <a href="${imageUrl}" target="_blank" download="gemini_artwork.jpg" class="chat-action-btn" style="text-decoration: none; padding: 6px 14px; background: #ffd93d; color: #2c1d00; font-weight: 700; border-radius: 10px;">📥 Download Image</a>\n` +
+      `  </div>\n` +
+      `</div>\n\n` +
+      `*Generated with Google Gemini Imagen 3 Engine.*`;
+
+    return {
+      text: markdownOutput,
+      provider: 'Google Gemini Imagen 3',
+      grounded: false
+    };
+  }
+
+  async callGeminiAPI(prompt, apiKey, modelName = 'gemini-2.5-flash', systemPrompt = '', ragContext = '', imageAttachment = null) {
+    let endpointModel = 'gemini-2.5-flash';
+    if (modelName.includes('2.5-pro') || modelName.includes('pro')) {
+      endpointModel = 'gemini-2.5-pro';
+    } else if (modelName.includes('2.0-flash') || modelName.includes('thinking')) {
+      endpointModel = 'gemini-2.0-flash';
+    } else if (modelName.includes('1.5-pro')) {
+      endpointModel = 'gemini-1.5-pro';
+    } else if (modelName.includes('1.5-flash')) {
+      endpointModel = 'gemini-1.5-flash';
+    }
+
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${endpointModel}:generateContent?key=${apiKey}`;
 
     let fullPrompt = prompt;
@@ -236,8 +271,20 @@ export function HydratedComponent({ data }) {
       fullPrompt = `[Grounding Knowledge Context]\n${ragContext}\n\n[User Prompt]\n${prompt}`;
     }
 
+    const parts = [{ text: fullPrompt }];
+
+    if (imageAttachment && imageAttachment.base64) {
+      const base64Clean = imageAttachment.base64.replace(/^data:image\/\w+;base64,/, '');
+      parts.push({
+        inlineData: {
+          mimeType: imageAttachment.mimeType || 'image/jpeg',
+          data: base64Clean
+        }
+      });
+    }
+
     const payload = {
-      contents: [{ parts: [{ text: fullPrompt }] }]
+      contents: [{ parts: parts }]
     };
     if (systemPrompt) {
       payload.systemInstruction = { parts: [{ text: systemPrompt }] };

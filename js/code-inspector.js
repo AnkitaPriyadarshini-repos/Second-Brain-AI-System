@@ -155,11 +155,19 @@ function submitJunoQuery(prompt) {
     }
   };
 
-  window.CodeInspectorEngine = CodeInspectorEngine;
+  if (typeof window !== 'undefined') {
+    window.CodeInspectorEngine = CodeInspectorEngine;
+  }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => CodeInspectorEngine.init());
-  } else {
-    CodeInspectorEngine.init();
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => CodeInspectorEngine.init());
+    } else {
+      CodeInspectorEngine.init();
+    }
+  }
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = CodeInspectorEngine;
   }
 })();

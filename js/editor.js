@@ -88,4 +88,9 @@ ${this.preview.innerHTML}
   }
 }
 
-window.markdownEditor = new MarkdownEditor('editor-textarea', 'editor-preview');
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  window.markdownEditor = new MarkdownEditor('editor-textarea', 'editor-preview');
+}
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = MarkdownEditor;
+}

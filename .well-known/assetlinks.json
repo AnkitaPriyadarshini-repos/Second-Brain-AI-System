@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.vercel.second_brain_ai_system.twa",
+      "sha256_cert_fingerprints": [
+        "89:08:B7:FA:F1:E9:C7:A2:25:62:AB:34:08:9C:D8:2F:8A:2B:0E:6F:79:6F:00:01:AE:D0:7E:0A:A4:C4:F1:8B"
+      ]
+    }
+  }
+]

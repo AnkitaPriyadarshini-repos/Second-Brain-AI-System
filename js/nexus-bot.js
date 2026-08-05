@@ -303,13 +303,17 @@
 
       feedEl.innerHTML = html;
 
-      // Add click listeners to feed pills
-      feedEl.querySelectorAll('.nexus-feed-pill').forEach(pill => {
-        pill.addEventListener('click', () => {
-          const q = pill.getAttribute('data-query');
-          if (q) this.handleQuickCaptureOrQuery(q);
+      // Event delegation for feed pills
+      if (!feedEl._hasDelegatedListener) {
+        feedEl._hasDelegatedListener = true;
+        feedEl.addEventListener('click', (e) => {
+          const pill = e.target.closest('.nexus-feed-pill');
+          if (pill) {
+            const q = pill.getAttribute('data-query');
+            if (q) this.handleQuickCaptureOrQuery(q);
+          }
         });
-      });
+      }
     }
   };
 

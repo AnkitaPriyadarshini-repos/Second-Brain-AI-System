@@ -71,11 +71,19 @@
     }
   };
 
-  window.ParticlesEngine = ParticlesEngine;
+  if (typeof window !== 'undefined') {
+    window.ParticlesEngine = ParticlesEngine;
+  }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => ParticlesEngine.init());
-  } else {
-    ParticlesEngine.init();
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => ParticlesEngine.init());
+    } else {
+      ParticlesEngine.init();
+    }
+  }
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = ParticlesEngine;
   }
 })();

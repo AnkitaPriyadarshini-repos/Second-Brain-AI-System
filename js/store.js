@@ -663,6 +663,21 @@
       return [defaultThread];
     },
 
+    createChatThread: function (title = 'New Session') {
+      const threads = this.getChatThreads();
+      const newThread = {
+        id: `thread-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        title: title,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        messages: []
+      };
+      threads.unshift(newThread);
+      this._setItem('second_brain_chat_threads_v2', JSON.stringify(threads));
+      this._setItem('second_brain_active_thread_v2', newThread.id);
+      return newThread;
+    },
+
     saveChatThread: function (thread) {
       if (!thread || !thread.id) return;
       const threads = this.getChatThreads();

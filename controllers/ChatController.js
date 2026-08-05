@@ -39,6 +39,14 @@
         return { error: err.message, status: 'FAILED' };
       }
     }
+
+    generateAIResponse(messagePayload) {
+      try {
+        return this.chatService.generateAIResponse(messagePayload);
+      } catch (err) {
+        return null;
+      }
+    }
   }
 
   if (typeof module !== 'undefined' && module.exports) {

@@ -140,6 +140,13 @@
     },
 
     /**
+     * Alias for generateSummary
+     */
+    summarize: function (text) {
+      return this.generateSummary(text);
+    },
+
+    /**
      * Tokenizes text into normalized word tokens (excluding stop words)
      * @param {string} text 
      * @returns {string[]}

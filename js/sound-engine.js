@@ -35,8 +35,11 @@
     },
 
     resumeCtx: function () {
+      if (!this.audioCtx) {
+        this.init();
+      }
       if (this.audioCtx && this.audioCtx.state === 'suspended') {
-        this.audioCtx.resume();
+        this.audioCtx.resume().catch(() => {});
       }
     },
 

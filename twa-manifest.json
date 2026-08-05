@@ -1,0 +1,49 @@
+{
+  "packageId": "app.vercel.second_brain_ai_system.twa",
+  "host": "second-brain-ai-system.vercel.app",
+  "name": "Second Brain AI System",
+  "launcherName": "Juno AI",
+  "display": "standalone",
+  "themeColor": "#FBC02D",
+  "themeColorDark": "#000000",
+  "navigationColor": "#FFF8E1",
+  "navigationColorDark": "#FFF8E1",
+  "navigationDividerColor": "#FBC02D",
+  "navigationDividerColorDark": "#FBC02D",
+  "backgroundColor": "#FFF8E1",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://second-brain-ai-system.vercel.app/assets/nexus_yellow_bot.png",
+  "maskableIconUrl": "https://second-brain-ai-system.vercel.app/assets/nexus_yellow_bot.png",
+  "signingKey": {
+    "path": "./android-release-key.keystore",
+    "alias": "second-brain-key-alias"
+  },
+  "appVersionName": "Y",
+  "appVersionCode": 2,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://second-brain-ai-system.vercel.app/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": false
+    },
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "minSdkVersion": 21,
+  "orientation": "default",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "displayOverride": [],
+  "appVersion": "Y"
+}

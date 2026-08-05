@@ -92,6 +92,55 @@ a, a:hover, a:visited, a:focus, a:active,
   --shadow-glow: 0 0 35px rgba(251, 192, 45, 0.4);
 }
 
+[data-theme="gemini-dark"] {
+  --bg-dark: #131314;
+  --bg-card: #1e1e1f;
+  --bg-card-hover: #282a2c;
+  --bg-card-active: #333538;
+  --border-color: rgba(255, 255, 255, 0.12);
+  --border-highlight: #a8c7fa;
+  --border-accent: #7cacf8;
+  --text-primary: #e3e3e3;
+  --text-secondary: #c4c7c5;
+  --text-muted: #8e918f;
+  --accent-primary: #a8c7fa;
+  --accent-primary-hover: #7cacf8;
+  --accent-primary-light: rgba(168, 199, 250, 0.2);
+  --accent-indigo: #a8c7fa;
+  --accent-violet: #d3e3fd;
+  --accent-emerald: #c4eed0;
+  --accent-amber: #fde293;
+  --accent-cyan: #a8c7fa;
+  --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 35px rgba(168, 199, 250, 0.25);
+}
+
+[data-theme="gemini-dark"] body,
+[data-theme="gemini-dark"] .app-main-canvas {
+  background: #131314 !important;
+  color: #e3e3e3 !important;
+}
+
+[data-theme="gemini-dark"] .app-sidebar {
+  background: #1e1e1f !important;
+  border-right-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="gemini-dark"] .sidebar-menu-item,
+[data-theme="gemini-dark"] .sidebar-menu-item span,
+[data-theme="gemini-dark"] .brand-name,
+[data-theme="gemini-dark"] #user-display-name,
+[data-theme="gemini-dark"] .gemini-hero-title,
+[data-theme="gemini-dark"] .chat-textarea {
+  color: #e3e3e3 !important;
+}
+
+[data-theme="gemini-dark"] .gemini-floating-pill {
+  background: #1e1e1f !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+}
+
 /* Hide floating robot widget overlay to keep UI ultra-clean */
 #nexus-bot-widget {
   display: none !important;

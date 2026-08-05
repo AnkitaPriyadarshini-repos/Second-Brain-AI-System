@@ -22,7 +22,7 @@
      * Executes RAG Query against local note vault or generative AI model
      */
     query: function (queryText, notes, options = {}) {
-      if (!queryText || !Array.isArray(notes) || notes.length === 0) {
+      if (!queryText || typeof queryText !== 'string' || !queryText.trim()) {
         return {
           answer: "Please enter a valid search query to retrieve grounded insights from your Second Brain.",
           citations: [],
@@ -31,6 +31,8 @@
           modelUsed: this.activeModel
         };
       }
+
+      const safeNotes = Array.isArray(notes) ? notes : [];
 
       // Intercept Casual Conversational Greetings ('hi', 'hello', 'hey', 'how are you') FIRST
       const qClean = queryText.trim().toLowerCase().replace(/[^\w\s]/gi, '');
@@ -61,7 +63,7 @@
       const queryVector = nlp ? nlp.createTFVector(effectiveQuery) : null;
 
       // Calculate semantic similarity scores & keyword matches for all notes
-      const scoredNotes = notes.map(note => {
+      const scoredNotes = safeNotes.map(note => {
         const fullText = `${note.title} ${note.summary || ''} ${note.content} ${(note.tags || []).join(' ')}`;
         const noteVector = nlp ? nlp.createTFVector(fullText) : null;
         let simScore = (nlp && queryVector && noteVector) ? nlp.cosineSimilarity(queryVector, noteVector) : 0;
