@@ -1418,7 +1418,8 @@
         }
       } catch (mainErr) {
         console.error("Error executing handleRAGQuery:", mainErr);
-        appendChatMessage('ai', "Hello Ankita! 👋 How can I help you synthesize your ideas and notes today?", [], false, query, 'Juno 2.5 Flash', false);
+        const errText = `I encountered a temporary issue processing your request for: **"${query}"**.\n\nPlease try resubmitting your message or select another model from the dropdown.`;
+        appendChatMessage('ai', errText, [], false, query, 'Juno 2.5 Flash', false);
       }
     }
     function generateWeatherWidgetHTML(query) {
@@ -1498,6 +1499,19 @@
     function appendChatMessage(sender, text, citations = [], isGeneralKnowledge = false, userQuery = '', customProvider = '', streamTypewriter = false) {
       const targetContainer = document.getElementById('chat-container') || document.querySelector('.chat-stream') || document.querySelector('.chat-card-wrapper');
       if (!targetContainer) return;
+
+      // Strict message deduplication check to prevent duplicate chat bubble rendering
+      const lastChild = targetContainer.lastElementChild;
+      if (lastChild && lastChild.classList.contains(sender === 'user' ? 'user-bubble' : 'ai-bubble')) {
+        const lastTextEl = lastChild.querySelector('.chat-text');
+        if (lastTextEl) {
+          const cleanLast = lastTextEl.textContent.trim();
+          const cleanCurrent = text.trim();
+          if (cleanLast === cleanCurrent || (cleanCurrent.length > 10 && cleanLast.startsWith(cleanCurrent.substring(0, 30)))) {
+            return;
+          }
+        }
+      }
 
       targetContainer.style.display = 'flex';
       targetContainer.style.flexDirection = 'column';
@@ -3135,25 +3149,6 @@
 
     window.handleModelChange = function(modelVal) {
       showToast(`Active AI Model switched to: ${modelVal.toUpperCase()}`);
-    };
-
-    window.createNewChatThread = function() {
-      if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
-      if (typeof Store !== 'undefined' && typeof Store.createChatThread === 'function') {
-        const newThread = Store.createChatThread('New Session');
-        if (typeof window.switchChatThread === 'function') {
-          window.switchChatThread(newThread.id);
-        }
-      } else {
-        const heroView = document.getElementById('chat-hero-view');
-        const chatContainer = document.getElementById('chat-container');
-        if (chatContainer) {
-          chatContainer.innerHTML = '';
-          chatContainer.style.display = 'none';
-        }
-        if (heroView) heroView.style.display = 'flex';
-      }
-      if (typeof showToast === 'function') showToast('✨ New Chat Session started.');
     };
 
     window.switchChatThread = function(threadId) {
