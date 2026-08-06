@@ -168,6 +168,11 @@
         }
       });
 
+      const sidebarEl = document.getElementById('app-sidebar');
+      if (sidebarEl && sidebarEl.classList.contains('mobile-open') && typeof window.toggleSidebar === 'function') {
+        window.toggleSidebar();
+      }
+
       if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
