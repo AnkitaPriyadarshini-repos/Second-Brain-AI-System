@@ -246,6 +246,10 @@
         const inputEl = document.getElementById('rag-query-input');
         const query = inputEl ? inputEl.value.trim() : '';
         if (query) {
+          if (inputEl) {
+            inputEl.value = '';
+            inputEl.style.height = 'auto';
+          }
           if (typeof window.handleRAGQuery === 'function') {
             window.handleRAGQuery(query);
           } else if (typeof handleRAGQuery === 'function') {
