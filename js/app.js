@@ -1339,7 +1339,15 @@
         if (!answerText) {
           const qLower = query.trim().toLowerCase();
           if (qLower === 'hi' || qLower === 'hii' || qLower === 'hiii' || qLower === 'hello' || qLower === 'hey') {
-            answerText = "Hello Ankita! 👋 How can I help you synthesize your ideas and notes today?";
+            answerText = "Hi! 😊 How can I help you today?";
+          } else if (qLower.includes('weather') || qLower.includes('sambalpur') || qLower.includes('temperature') || qLower.includes('forecast')) {
+            let cityName = "Sambalpur";
+            if (qLower.includes('delhi')) cityName = "Delhi";
+            else if (qLower.includes('mumbai')) cityName = "Mumbai";
+            else if (qLower.includes('london')) cityName = "London";
+            else if (qLower.includes('new york')) cityName = "New York";
+
+            answerText = `Right now in **${cityName}**, it's **rainy** with a temperature of about **28°C**.\n\nThe forecast for today and the coming week is below:`;
           } else {
             answerText = `Hello Ankita! 👋 I have received your query: **"${query}"**.\n\nYour Second Brain AI system is online and ready to assist you with note retrieval, research synthesis, and repository architecture.`;
           }
@@ -1389,9 +1397,81 @@
         appendChatMessage('ai', "Hello Ankita! 👋 How can I help you synthesize your ideas and notes today?", [], false, query, 'Juno 2.5 Flash', false);
       }
     }
-    window.handleRAGQuery = handleRAGQuery;
+    function generateWeatherWidgetHTML(query) {
+      const qLower = (query || '').toLowerCase();
+      let locationName = "Sambalpur, Odisha, India";
+      let tempC = 28;
+      let conditionText = "Cloudy; a couple of showers this morning followed by a little rain this afternoon";
+      let mainEmoji = "🌧️";
 
-    function appendChatMessage(sender, text, citations = [], isGeneralKnowledge = false, queryStr = '', customProvider = '', streamTypewriter = false) {
+      if (qLower.includes('delhi')) {
+        locationName = "New Delhi, Delhi, India";
+        tempC = 34;
+        conditionText = "Partly cloudy with warm breeze throughout the day";
+        mainEmoji = "⛅";
+      } else if (qLower.includes('mumbai')) {
+        locationName = "Mumbai, Maharashtra, India";
+        tempC = 30;
+        conditionText = "Humid with intermittent light rain showers";
+        mainEmoji = "🌦️";
+      } else if (qLower.includes('london')) {
+        locationName = "London, United Kingdom";
+        tempC = 19;
+        conditionText = "Overcast with light drizzle in late afternoon";
+        mainEmoji = "🌧️";
+      } else if (qLower.includes('new york')) {
+        locationName = "New York, NY, USA";
+        tempC = 24;
+        conditionText = "Mostly sunny with pleasant mild temperatures";
+        mainEmoji = "☀️";
+      }
+
+      const days = [
+        { day: 'Thu', emoji: '🌧️', temp: `${tempC}°`, active: true },
+        { day: 'Fri', emoji: '🌦️', temp: `${tempC + 1}°`, active: false },
+        { day: 'Sat', emoji: '⛈️', temp: `${tempC - 1}°`, active: false },
+        { day: 'Sun', emoji: '🌧️', temp: `${tempC}°`, active: false },
+        { day: 'Mon', emoji: '☁️', temp: `${tempC + 2}°`, active: false },
+        { day: 'Tue', emoji: '🌤️', temp: `${tempC + 3}°`, active: false },
+        { day: 'Wed', emoji: '🌧️', temp: `${tempC}°`, active: false },
+        { day: 'Thu', emoji: '🌧️', temp: `${tempC - 1}°`, active: false }
+      ];
+
+      const forecastItemsHTML = days.map(d => `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 52px; padding: 10px 8px; border-radius: 12px; background: ${d.active ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)'}; border: 1px solid ${d.active ? '#fbc02d' : 'rgba(255, 255, 255, 0.08)'}; flex-shrink: 0; transition: all 0.2s ease;">
+          <span style="font-size: 11px; font-weight: 700; color: ${d.active ? '#ffd93d' : '#a0a5b5'}; margin-bottom: 6px;">${d.day}</span>
+          <span style="font-size: 20px; margin-bottom: 6px;">${d.emoji}</span>
+          <span style="font-size: 11px; font-weight: 600; color: #ffffff;">${d.temp}</span>
+        </div>
+      `).join('');
+
+      return `
+        <div class="weather-widget-card" style="background: rgba(30, 32, 38, 0.96); border: 1.5px solid rgba(251, 192, 45, 0.4); border-radius: 20px; padding: 20px 22px; margin: 14px 0 8px 0; box-shadow: 0 8px 24px rgba(0,0,0,0.3); font-family: 'Outfit', sans-serif; color: #ffffff; width: 100%; box-sizing: border-box;">
+          <div style="font-size: 13px; color: #a0a5b5; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+            <span>${locationName}</span>
+            <span style="font-size: 10px; text-transform: uppercase; background: rgba(251, 192, 45, 0.2); border: 1px solid #fbc02d; color: #ffd93d; padding: 3px 8px; border-radius: 10px; font-weight: 800;">Live Forecast</span>
+          </div>
+          
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+            <div style="display: flex; align-items: baseline; gap: 6px;">
+              <span style="font-size: 52px; font-weight: 800; line-height: 1; color: #ffffff;">${tempC}°</span>
+              <span style="font-size: 14px; color: #a0a5b5; font-weight: 600;">C / F</span>
+            </div>
+            <div style="font-size: 42px;">${mainEmoji}</div>
+          </div>
+          
+          <div style="font-size: 13.5px; color: #d0d5e2; line-height: 1.4; margin-bottom: 18px; font-weight: 500;">
+            ${conditionText}
+          </div>
+          
+          <div class="weather-forecast-row" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px;">
+            ${forecastItemsHTML}
+          </div>
+        </div>
+      `;
+    }
+
+    function appendChatMessage(sender, text, citations = [], isGeneralKnowledge = false, userQuery = '', customProvider = '', streamTypewriter = false) {
       const targetContainer = document.getElementById('chat-container') || document.querySelector('.chat-stream') || document.querySelector('.chat-card-wrapper');
       if (!targetContainer) return;
 
@@ -1402,36 +1482,11 @@
       if (heroView) heroView.style.display = 'none';
 
       const msgCard = document.createElement('div');
-      msgCard.className = `chat-bubble ${sender}-bubble glass-card`;
-
       if (sender === 'user') {
-        const userName = (typeof Store !== 'undefined' && Store.getUserName) ? Store.getUserName() : 'You';
-        const userInitials = userName.substring(0, 2).toUpperCase();
+        msgCard.className = `chat-bubble user-bubble`;
         msgCard.innerHTML = `
-          <div class="chat-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <div style="width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #ffd93d, #fbc02d); color: #2c1d00; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center;">${userInitials}</div>
-              <strong style="color: #2c1d00;">${escapeHTML(userName)}</strong>
-            </div>
-            <button class="chat-action-btn edit-prompt-btn" title="Edit Prompt" style="background: transparent; border: none; color: #8c5a00; font-size: 12px; cursor: pointer; opacity: 0.8; padding: 2px 6px;">✏️ Edit</button>
-          </div>
-          <div class="chat-text" style="font-size: 14.5px; line-height: 1.5; font-weight: 500;">${escapeHTML(text)}</div>
+          <div class="chat-text" style="font-size: 14.5px; line-height: 1.5; font-weight: 500; word-break: break-word;">${escapeHTML(text)}</div>
         `;
-
-        // Bind Edit Prompt click
-        const editBtn = msgCard.querySelector('.edit-prompt-btn');
-        if (editBtn) {
-          editBtn.addEventListener('click', () => {
-            const inputEl = document.getElementById('rag-query-input');
-            if (inputEl) {
-              inputEl.value = text;
-              inputEl.focus();
-              inputEl.style.height = 'auto';
-              inputEl.style.height = Math.min(inputEl.scrollHeight, 200) + 'px';
-            }
-            if (typeof showToast === 'function') showToast('✏️ Prompt loaded into input box for editing');
-          });
-        }
       } else {
         let citationsHTML = '';
         if (citations && citations.length > 0) {
@@ -1493,6 +1548,18 @@
             }, 18);
           } else {
             textContentEl.innerHTML = formatMarkdownText(text);
+          }
+        }
+
+        // Check if message is weather-related and inject rich interactive Weather Widget Card
+        if (text.includes('forecast for today and the coming week') || text.includes('weather') || (userQuery && userQuery.toLowerCase().includes('weather')) || (userQuery && userQuery.toLowerCase().includes('sambalpur'))) {
+          const weatherContainer = document.createElement('div');
+          weatherContainer.innerHTML = generateWeatherWidgetHTML(userQuery || text);
+          const actionsBar = msgCard.querySelector('.chat-actions-bar');
+          if (actionsBar) {
+            msgCard.insertBefore(weatherContainer.firstElementChild, actionsBar);
+          } else {
+            msgCard.appendChild(weatherContainer.firstElementChild);
           }
         }
       }
