@@ -614,7 +614,12 @@
               if (t && Array.isArray(t.messages)) {
                 t.messages = t.messages.filter(m => {
                   if (!m || typeof m.content !== 'string') return false;
-                  if (m.content.includes('Urban density') || m.content.includes('During non-REM') || m.content.includes('neocortical storage') || m.content.includes('hippocampal memories')) {
+                  if (m.content.includes('Urban density') || 
+                      m.content.includes('During non-REM') || 
+                      m.content.includes('neocortical storage') || 
+                      m.content.includes('hippocampal memories') ||
+                      m.content.includes('I encountered a temporary issue processing your request') ||
+                      m.content.includes('Please try resubmitting your message or select another model')) {
                     return false;
                   }
                   return true;

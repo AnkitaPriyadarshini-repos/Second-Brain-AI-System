@@ -1408,11 +1408,13 @@
             if (currentThread.messages.length === 0) {
               currentThread.title = cleanQuery.length > 32 ? cleanQuery.substring(0, 32) + '...' : cleanQuery;
             }
-            currentThread.messages.push({ id: `msg-u-${Date.now()}`, role: 'user', content: cleanQuery, timestamp: Date.now() });
-            currentThread.messages.push({ id: `msg-a-${Date.now()}`, role: 'assistant', content: answerText, timestamp: Date.now(), provider: providerName });
-            Store.saveChatThread(currentThread);
-            if (typeof window.renderChatThreadsList === 'function') {
-              window.renderChatThreadsList();
+            if (answerText && !answerText.includes('I encountered a temporary issue')) {
+              currentThread.messages.push({ id: `msg-u-${Date.now()}`, role: 'user', content: cleanQuery, timestamp: Date.now() });
+              currentThread.messages.push({ id: `msg-a-${Date.now()}`, role: 'assistant', content: answerText, timestamp: Date.now(), provider: providerName });
+              Store.saveChatThread(currentThread);
+              if (typeof window.renderChatThreadsList === 'function') {
+                window.renderChatThreadsList();
+              }
             }
           } catch (threadErr) {
             console.warn('Error saving chat thread:', threadErr);
@@ -3251,7 +3253,12 @@
       const msgs = (thread.messages || []).filter(m => {
         if (!m || !m.content) return false;
         if (m.id === 'msg-welcome') return false;
-        if (m.content.includes('Urban density') || m.content.includes('During non-REM') || m.content.includes('neocortical storage') || m.content.includes('hippocampal memories')) {
+        if (m.content.includes('Urban density') || 
+            m.content.includes('During non-REM') || 
+            m.content.includes('neocortical storage') || 
+            m.content.includes('hippocampal memories') ||
+            m.content.includes('I encountered a temporary issue processing your request') ||
+            m.content.includes('Please try resubmitting your message or select another model')) {
           return false;
         }
         return true;
