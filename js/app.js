@@ -500,13 +500,40 @@
 
     const ragQueryInputEl = document.getElementById('rag-query-input');
     if (ragQueryInputEl) {
+      ragQueryInputEl.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 200) + 'px';
+      });
+
       ragQueryInputEl.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
           window.submitRAGQuery(e);
         }
       });
     }
+
+    // Scroll to bottom floating button handler
+    const chatContainerEl = document.getElementById('chat-container');
+    if (chatContainerEl) {
+      chatContainerEl.addEventListener('scroll', function() {
+        const btn = document.getElementById('scroll-to-bottom-btn');
+        if (!btn) return;
+        const distFromBottom = this.scrollHeight - this.scrollTop - this.clientHeight;
+        if (distFromBottom > 120) {
+          btn.style.display = 'flex';
+        } else {
+          btn.style.display = 'none';
+        }
+      });
+    }
+
+    window.scrollToChatBottom = function() {
+      const container = document.getElementById('chat-container');
+      if (container) {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+      }
+    };
     window.toggleGlobalAudioMute = function() {
       let isMuted = false;
       if (typeof SoundEngine !== 'undefined' && SoundEngine.toggleMute) {
@@ -1143,6 +1170,61 @@
       if (typeof showToast === 'function') showToast('🗑️ Session deleted');
     };
 
+    let activeStreamingTimer = null;
+    let isAIStreaming = false;
+
+    window.stopAIStreaming = function() {
+      if (activeStreamingTimer) {
+        clearInterval(activeStreamingTimer);
+        activeStreamingTimer = null;
+      }
+      isAIStreaming = false;
+      const submitBtn = document.getElementById('rag-submit-btn');
+      if (submitBtn) {
+        submitBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+        submitBtn.title = "Send Message";
+        submitBtn.onclick = null;
+      }
+      if (typeof showToast === 'function') showToast('⏹️ Generation Stopped');
+    };
+
+    window.shareCurrentThread = function() {
+      const activeId = (typeof Store !== 'undefined' && Store.getActiveThreadId) ? Store.getActiveThreadId() : null;
+      const threads = (typeof Store !== 'undefined' && Store.getChatThreads) ? Store.getChatThreads() : [];
+      const currentThread = threads.find(t => t.id === activeId);
+
+      if (!currentThread || !currentThread.messages || currentThread.messages.length === 0) {
+        if (typeof showToast === 'function') showToast('⚠️ No messages in current session to share.');
+        return;
+      }
+
+      let markdown = `# Chat Transcript — ${currentThread.title || 'Juno AI Session'}\n\n`;
+      currentThread.messages.forEach(m => {
+        const sender = m.role === 'assistant' ? '🤖 Juno AI' : '👤 You';
+        markdown += `### ${sender}\n${m.content}\n\n---\n\n`;
+      });
+
+      navigator.clipboard.writeText(markdown);
+      if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) SoundEngine.playClick();
+      if (typeof showToast === 'function') showToast('📋 Full chat session transcript copied to clipboard as Markdown!');
+    };
+
+    window.regenerateLastResponse = function() {
+      const activeId = (typeof Store !== 'undefined' && Store.getActiveThreadId) ? Store.getActiveThreadId() : null;
+      const threads = (typeof Store !== 'undefined' && Store.getChatThreads) ? Store.getChatThreads() : [];
+      const currentThread = threads.find(t => t.id === activeId);
+
+      if (!currentThread || !currentThread.messages || currentThread.messages.length === 0) {
+        if (typeof showToast === 'function') showToast('⚠️ No previous query to regenerate.');
+        return;
+      }
+
+      const lastUserMsg = [...currentThread.messages].reverse().find(m => m.role === 'user');
+      if (lastUserMsg && lastUserMsg.content) {
+        handleRAGQuery(lastUserMsg.content);
+      }
+    };
+
     async function handleRAGQuery(query) {
       if (!query && !activePromptAttachment) return;
 
@@ -1159,7 +1241,7 @@
         targetContainer.style.flexDirection = 'column';
       }
 
-      // Render user message card immediately (including attachment badge if present)
+      // Render user message card immediately
       let userDisplayQuery = query;
       const attachmentToPass = activePromptAttachment;
       if (attachmentToPass) {
@@ -1168,23 +1250,37 @@
       appendChatMessage('user', userDisplayQuery);
 
       const inputEl = document.getElementById('rag-query-input');
-      if (inputEl) inputEl.value = '';
+      if (inputEl) {
+        inputEl.value = '';
+        inputEl.style.height = 'auto';
+      }
       window.clearPromptAttachment();
 
-      // Senior Lead Architect Optimization: Immediate thinking indicator pill
+      // Immediate thinking indicator card
       const thinkingCard = document.createElement('div');
       thinkingCard.className = 'chat-bubble ai-bubble glass-card thinking-placeholder';
-      thinkingCard.innerHTML = `<div class="chat-header">
-        <div class="ai-avatar">•</div>
-        <strong style="color: var(--accent-indigo);">Juno 2.5 Flash</strong>
+      thinkingCard.innerHTML = `<div class="chat-header" style="display: flex; align-items: center; gap: 8px; font-weight: 800;">
+        <div class="ai-avatar" style="width: 24px; height: 24px; border-radius: 50%; background: #ffd93d; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #2c1d00;">✨</div>
+        <strong style="color: #e65100;">Juno Thinking Process</strong>
       </div>
-      <div class="chat-text" style="display: flex; align-items: center; gap: 8px; font-style: italic; color: #8c5a00;">
+      <div class="chat-text" style="display: flex; align-items: center; gap: 8px; font-style: italic; color: #8c5a00; font-size: 13.5px; margin-top: 6px;">
         <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #fbc02d; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
-        <span>Synthesizing response...</span>
+        <span>Synthesizing response & searching knowledge vault...</span>
       </div>`;
       if (targetContainer) {
         targetContainer.appendChild(thinkingCard);
         targetContainer.scrollTop = targetContainer.scrollHeight;
+      }
+
+      // Toggle submit button into Stop Generation button
+      const submitBtn = document.getElementById('rag-submit-btn');
+      if (submitBtn) {
+        submitBtn.innerHTML = `<span style="font-size: 14px; color: #2c1d00; font-weight: 900;">⏹️</span>`;
+        submitBtn.title = "Stop Generating";
+        submitBtn.onclick = function(e) {
+          if (e) e.preventDefault();
+          window.stopAIStreaming();
+        };
       }
 
       const modelSelector = document.getElementById('model-select-dropdown') || document.getElementById('ai-model-selector');
@@ -1242,8 +1338,11 @@
         }
       }
 
+      // Restore submit button icon
       if (submitBtn) {
-        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+        submitBtn.title = "Send Message";
+        submitBtn.onclick = null;
       }
 
       // Render final AI message card with typewriter streaming
@@ -1256,10 +1355,14 @@
           const threads = Store.getChatThreads() || [];
           let currentThread = threads.find(t => t && t.id === activeId);
           if (!currentThread) {
-            currentThread = { id: activeId || `thread-${Date.now()}`, title: query.substring(0, 30), createdAt: Date.now(), messages: [] };
+            currentThread = { id: activeId || `thread-${Date.now()}`, title: query.substring(0, 32), createdAt: Date.now(), messages: [] };
           }
           if (!Array.isArray(currentThread.messages)) {
             currentThread.messages = [];
+          }
+          if (currentThread.messages.length === 0) {
+            // Set smart conversation title from first prompt
+            currentThread.title = query.length > 32 ? query.substring(0, 32) + '...' : query;
           }
           currentThread.messages.push({ id: `msg-u-${Date.now()}`, role: 'user', content: query, timestamp: Date.now() });
           currentThread.messages.push({ id: `msg-a-${Date.now()}`, role: 'assistant', content: answerText, timestamp: Date.now(), provider: providerName });
@@ -1290,7 +1393,33 @@
       msgCard.className = `chat-bubble ${sender}-bubble glass-card`;
 
       if (sender === 'user') {
-        msgCard.innerHTML = `<div class="chat-header"><strong>You</strong></div><div class="chat-text">${escapeHTML(text)}</div>`;
+        const userName = (typeof Store !== 'undefined' && Store.getUserName) ? Store.getUserName() : 'You';
+        const userInitials = userName.substring(0, 2).toUpperCase();
+        msgCard.innerHTML = `
+          <div class="chat-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg, #ffd93d, #fbc02d); color: #2c1d00; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center;">${userInitials}</div>
+              <strong style="color: #2c1d00;">${escapeHTML(userName)}</strong>
+            </div>
+            <button class="chat-action-btn edit-prompt-btn" title="Edit Prompt" style="background: transparent; border: none; color: #8c5a00; font-size: 12px; cursor: pointer; opacity: 0.8; padding: 2px 6px;">✏️ Edit</button>
+          </div>
+          <div class="chat-text" style="font-size: 14.5px; line-height: 1.5; font-weight: 500;">${escapeHTML(text)}</div>
+        `;
+
+        // Bind Edit Prompt click
+        const editBtn = msgCard.querySelector('.edit-prompt-btn');
+        if (editBtn) {
+          editBtn.addEventListener('click', () => {
+            const inputEl = document.getElementById('rag-query-input');
+            if (inputEl) {
+              inputEl.value = text;
+              inputEl.focus();
+              inputEl.style.height = 'auto';
+              inputEl.style.height = Math.min(inputEl.scrollHeight, 200) + 'px';
+            }
+            if (typeof showToast === 'function') showToast('✏️ Prompt loaded into input box for editing');
+          });
+        }
       } else {
         let citationsHTML = '';
         if (citations && citations.length > 0) {
@@ -1307,32 +1436,47 @@
         }
 
         const actionsHTML = `<div class="chat-actions-bar">
+          <button class="chat-action-btn copy-btn" title="Copy answer text">📋 Copy</button>
+          <button class="chat-action-btn regen-btn" title="Regenerate AI response">🔄 Regenerate</button>
           <button class="chat-action-btn speak-btn" title="Listen to AI answer">🔊 Read Aloud</button>
-          <button class="chat-action-btn copy-btn" title="Copy answer">📋 Copy Text</button>
-          <button class="chat-action-btn save-answer-btn" title="Save answer directly to Second Brain Vault">➕ Save to Vault</button>
+          <button class="chat-action-btn thumb-up-btn" title="Good response">👍</button>
+          <button class="chat-action-btn thumb-down-btn" title="Bad response">👎</button>
+          <button class="chat-action-btn save-answer-btn" title="Save answer to Second Brain Vault">💾 Save to Vault</button>
         </div>`;
 
-        msgCard.innerHTML = `<div class="chat-header">
-          <div class="ai-avatar">•</div>
-          <strong style="color: var(--accent-indigo);">${escapeHTML(customProvider || 'Second Brain AI Assistant')}</strong>
-        </div>
-        <div class="chat-text"></div>
-        ${citationsHTML}
-        ${actionsHTML}`;
+        msgCard.innerHTML = `
+          <div class="chat-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <div class="ai-avatar" style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #ffd93d, #fbc02d); color: #2c1d00; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800;">✨</div>
+            <strong style="color: var(--accent-indigo, #e65100); font-weight: 800;">${escapeHTML(customProvider || 'Juno 2.5 Flash')}</strong>
+          </div>
+          <div class="chat-text"></div>
+          ${citationsHTML}
+          ${actionsHTML}
+        `;
 
         const textContentEl = msgCard.querySelector('.chat-text');
         if (textContentEl) {
           if (streamTypewriter && text.length > 20) {
+            isAIStreaming = true;
             const words = text.split(' ');
             let currentIdx = 0;
-            const timer = setInterval(() => {
+            activeStreamingTimer = setInterval(() => {
               currentIdx += 2;
               const chunk = words.slice(0, currentIdx).join(' ');
-              textContentEl.innerHTML = formatMarkdownText(chunk);
+              textContentEl.innerHTML = formatMarkdownText(chunk) + '<span class="typing-cursor"></span>';
               targetContainer.scrollTop = targetContainer.scrollHeight;
+
               if (currentIdx >= words.length) {
-                clearInterval(timer);
+                clearInterval(activeStreamingTimer);
+                activeStreamingTimer = null;
+                isAIStreaming = false;
                 textContentEl.innerHTML = formatMarkdownText(text);
+                const submitBtn = document.getElementById('rag-submit-btn');
+                if (submitBtn) {
+                  submitBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+                  submitBtn.title = "Send Message";
+                  submitBtn.onclick = null;
+                }
               }
             }, 18);
           } else {
@@ -1363,7 +1507,7 @@
         }
       }
 
-      // Bind citation clicks to open note drawer
+      // Bind citation clicks
       msgCard.querySelectorAll('.citation-pill').forEach(pill => {
         pill.addEventListener('click', () => {
           const noteId = pill.getAttribute('data-id');
@@ -1372,7 +1516,7 @@
         });
       });
 
-      // Bind Speak button with instant Stop/Mute toggle for silent environment
+      // Bind Speak button
       const speakBtn = msgCard.querySelector('.speak-btn');
       if (speakBtn) {
         speakBtn.addEventListener('click', () => {
@@ -1396,8 +1540,38 @@
       if (copyBtn) {
         copyBtn.addEventListener('click', () => {
           navigator.clipboard.writeText(text);
+          copyBtn.innerHTML = '✓ Copied!';
           if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
-          showToast('Answer copied to clipboard.');
+          if (typeof showToast === 'function') showToast('📋 Response copied to clipboard!');
+          setTimeout(() => { copyBtn.innerHTML = '📋 Copy'; }, 2000);
+        });
+      }
+
+      // Bind Regenerate button
+      const regenBtn = msgCard.querySelector('.regen-btn');
+      if (regenBtn) {
+        regenBtn.addEventListener('click', () => {
+          if (typeof window.regenerateLastResponse === 'function') {
+            window.regenerateLastResponse();
+          }
+        });
+      }
+
+      // Bind Feedback Buttons
+      const thumbUp = msgCard.querySelector('.thumb-up-btn');
+      const thumbDown = msgCard.querySelector('.thumb-down-btn');
+      if (thumbUp) {
+        thumbUp.addEventListener('click', () => {
+          thumbUp.style.background = '#ffd93d';
+          if (thumbDown) thumbDown.style.background = 'transparent';
+          if (typeof showToast === 'function') showToast('👍 Thank you for your feedback!');
+        });
+      }
+      if (thumbDown) {
+        thumbDown.addEventListener('click', () => {
+          thumbDown.style.background = 'rgba(239, 68, 68, 0.3)';
+          if (thumbUp) thumbUp.style.background = 'transparent';
+          if (typeof showToast === 'function') showToast('👎 Thank you for your feedback! We will refine the output.');
         });
       }
 
@@ -1411,10 +1585,10 @@
             content: text.replace(/###|####|>|\*/g, ''),
             sourceType: 'typing'
           });
+          saveBtn.innerHTML = '✓ Saved!';
           if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
-          showToast('Saved AI answer as a new note in your Second Brain.');
-          refreshAllViews();
-          if (newNote) openNoteDrawer(newNote);
+          if (typeof showToast === 'function') showToast('💾 Saved AI response into Knowledge Vault!');
+          if (typeof refreshAllViews === 'function') refreshAllViews();
         });
       }
     }
