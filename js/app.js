@@ -1232,153 +1232,161 @@
     async function handleRAGQuery(query) {
       if (!query && !activePromptAttachment) return;
 
-      if (typeof window.activateView === 'function') {
-        window.activateView('jarvis');
-      }
-
-      const targetContainer = document.getElementById('chat-container') || document.querySelector('.chat-stream') || document.querySelector('.chat-card-wrapper');
-      const heroView = document.getElementById('chat-hero-view');
-
-      if (heroView) heroView.style.display = 'none';
-      if (targetContainer) {
-        targetContainer.style.display = 'flex';
-        targetContainer.style.flexDirection = 'column';
-      }
-
-      // Render user message card immediately
-      let userDisplayQuery = query;
-      const attachmentToPass = activePromptAttachment;
-      if (attachmentToPass) {
-        userDisplayQuery = `[📎 Attached: ${attachmentToPass.name}]\n${query}`;
-      }
-      appendChatMessage('user', userDisplayQuery);
-
-      const inputEl = document.getElementById('rag-query-input');
-      if (inputEl) {
-        inputEl.value = '';
-        inputEl.style.height = 'auto';
-      }
-      window.clearPromptAttachment();
-
-      // Immediate thinking indicator card
-      const thinkingCard = document.createElement('div');
-      thinkingCard.className = 'chat-bubble ai-bubble glass-card thinking-placeholder';
-      thinkingCard.innerHTML = `<div class="chat-header" style="display: flex; align-items: center; gap: 8px; font-weight: 800;">
-        <div class="ai-avatar" style="width: 24px; height: 24px; border-radius: 50%; background: #ffd93d; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #2c1d00;">✨</div>
-        <strong style="color: #e65100;">Juno Thinking Process</strong>
-      </div>
-      <div class="chat-text" style="display: flex; align-items: center; gap: 8px; font-style: italic; color: #8c5a00; font-size: 13.5px; margin-top: 6px;">
-        <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #fbc02d; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
-        <span>Synthesizing response & searching knowledge vault...</span>
-      </div>`;
-      if (targetContainer) {
-        targetContainer.appendChild(thinkingCard);
-        targetContainer.scrollTop = targetContainer.scrollHeight;
-      }
-
-      // Toggle submit button into Stop Generation button
-      const submitBtn = document.getElementById('rag-submit-btn');
-      if (submitBtn) {
-        submitBtn.innerHTML = `<span style="font-size: 14px; color: #2c1d00; font-weight: 900;">⏹️</span>`;
-        submitBtn.title = "Stop Generating";
-        submitBtn.onclick = function(e) {
-          if (e) e.preventDefault();
-          window.stopAIStreaming();
-        };
-      }
-
-      const modelSelector = document.getElementById('model-select-dropdown') || document.getElementById('ai-model-selector');
-      const selectedModel = modelSelector ? modelSelector.value : 'gemini-2.5-flash';
-
-      let answerText = "";
-      let providerName = "Juno 2.5 Flash";
-      let citations = [];
-
       try {
-        const currentNotes = (typeof Store !== 'undefined' && Store.getNotes) ? Store.getNotes() : [];
-        let ragRes = null;
-        let ragContextStr = '';
-
-        let rag = typeof RAGEngine !== 'undefined' ? RAGEngine : (typeof window !== 'undefined' ? window.RAGEngine : null);
-        if (rag && typeof rag.query === 'function') {
-          ragRes = rag.query(query, currentNotes);
-          if (ragRes && ragRes.citations && ragRes.citations.length > 0) {
-            ragContextStr = ragRes.citations.map(c => `[Title: ${c.title}]\n${c.snippet || c.summary || ''}`).join('\n\n');
-            citations = ragRes.citations;
-          }
+        if (typeof window.activateView === 'function') {
+          window.activateView('jarvis');
         }
 
-        if (typeof window !== 'undefined' && window.aiEngine && typeof window.aiEngine.generateResponse === 'function') {
-          const res = await window.aiEngine.generateResponse({
-            prompt: query,
-            model: selectedModel,
-            ragContext: ragContextStr,
-            imageAttachment: attachmentToPass
-          });
-          if (res && res.text) {
-            answerText = res.text;
-            providerName = res.provider || providerName;
-          }
+        const targetContainer = document.getElementById('chat-container') || document.querySelector('.chat-stream') || document.querySelector('.chat-card-wrapper');
+        const heroView = document.getElementById('chat-hero-view');
+
+        if (heroView) heroView.style.display = 'none';
+        if (targetContainer) {
+          targetContainer.style.display = 'flex';
+          targetContainer.style.flexDirection = 'column';
         }
 
-        if (!answerText && ragRes && ragRes.answer) {
-          answerText = ragRes.answer;
+        // Render user message card immediately
+        let userDisplayQuery = query;
+        const attachmentToPass = activePromptAttachment;
+        if (attachmentToPass) {
+          userDisplayQuery = `[📎 Attached: ${attachmentToPass.name}]\n${query}`;
         }
-      } catch (err) {
-        console.warn("AI Engine synthesis error:", err);
-      }
+        appendChatMessage('user', userDisplayQuery);
 
-      // Remove thinking card before rendering final AI response
-      if (thinkingCard && thinkingCard.parentNode) {
-        thinkingCard.parentNode.removeChild(thinkingCard);
-      }
-
-      if (!answerText) {
-        const qLower = query.trim().toLowerCase();
-        if (qLower === 'hi' || qLower === 'hii' || qLower === 'hiii' || qLower === 'hello' || qLower === 'hey') {
-          answerText = "Hello Ankita! 👋 How can I help you synthesize your ideas and notes today?";
-        } else {
-          answerText = `Hello Ankita! 👋 I have received your query: **"${query}"**.\n\nYour Second Brain AI system is online and ready to assist you with note retrieval, research synthesis, and repository architecture.`;
+        const inputEl = document.getElementById('rag-query-input');
+        if (inputEl) {
+          inputEl.value = '';
+          inputEl.style.height = 'auto';
         }
-      }
+        if (typeof window.clearPromptAttachment === 'function') {
+          window.clearPromptAttachment();
+        }
 
-      // Restore submit button icon
-      if (submitBtn) {
-        submitBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
-        submitBtn.title = "Send Message";
-        submitBtn.onclick = null;
-      }
+        // Immediate thinking indicator card
+        const thinkingCard = document.createElement('div');
+        thinkingCard.className = 'chat-bubble ai-bubble glass-card thinking-placeholder';
+        thinkingCard.innerHTML = `<div class="chat-header" style="display: flex; align-items: center; gap: 8px; font-weight: 800;">
+          <div class="ai-avatar" style="width: 24px; height: 24px; border-radius: 50%; background: #ffd93d; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #2c1d00;">✨</div>
+          <strong style="color: #e65100;">Juno Thinking Process</strong>
+        </div>
+        <div class="chat-text" style="display: flex; align-items: center; gap: 8px; font-style: italic; color: #8c5a00; font-size: 13.5px; margin-top: 6px;">
+          <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #fbc02d; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
+          <span>Synthesizing response & searching knowledge vault...</span>
+        </div>`;
+        if (targetContainer) {
+          targetContainer.appendChild(thinkingCard);
+          targetContainer.scrollTop = targetContainer.scrollHeight;
+        }
 
-      // Render final AI message card with typewriter streaming
-      appendChatMessage('ai', answerText, citations, false, query, providerName, true);
+        // Toggle submit button into Stop Generation button
+        const submitBtn = document.getElementById('rag-submit-btn');
+        if (submitBtn) {
+          submitBtn.innerHTML = `<span style="font-size: 14px; color: #2c1d00; font-weight: 900;">⏹️</span>`;
+          submitBtn.title = "Stop Generating";
+          submitBtn.onclick = function(e) {
+            if (e) e.preventDefault();
+            if (typeof window.stopAIStreaming === 'function') window.stopAIStreaming();
+          };
+        }
 
-      // Save into current Chat Thread
-      if (typeof Store !== 'undefined' && Store.saveChatThread) {
+        const modelSelector = document.getElementById('model-select-dropdown') || document.getElementById('ai-model-selector');
+        const selectedModel = modelSelector ? modelSelector.value : 'gemini-2.5-flash';
+
+        let answerText = "";
+        let providerName = "Juno 2.5 Flash";
+        let citations = [];
+
         try {
-          const activeId = Store.getActiveThreadId();
-          const threads = Store.getChatThreads() || [];
-          let currentThread = threads.find(t => t && t.id === activeId);
-          if (!currentThread) {
-            currentThread = { id: activeId || `thread-${Date.now()}`, title: query.substring(0, 32), createdAt: Date.now(), messages: [] };
-          }
-          if (!Array.isArray(currentThread.messages)) {
-            currentThread.messages = [];
-          }
-          if (currentThread.messages.length === 0) {
-            // Set smart conversation title from first prompt
-            currentThread.title = query.length > 32 ? query.substring(0, 32) + '...' : query;
-          }
-          currentThread.messages.push({ id: `msg-u-${Date.now()}`, role: 'user', content: query, timestamp: Date.now() });
-          currentThread.messages.push({ id: `msg-a-${Date.now()}`, role: 'assistant', content: answerText, timestamp: Date.now(), provider: providerName });
-          Store.saveChatThread(currentThread);
-          if (typeof renderChatThreadsList === 'function') renderChatThreadsList();
-        } catch (threadErr) {
-          console.warn('Error saving chat thread:', threadErr);
-        }
-      }
+          const currentNotes = (typeof Store !== 'undefined' && Store.getNotes) ? Store.getNotes() : [];
+          let ragRes = null;
+          let ragContextStr = '';
 
-      if (targetContainer) {
-        targetContainer.scrollTop = targetContainer.scrollHeight;
+          let rag = typeof RAGEngine !== 'undefined' ? RAGEngine : (typeof window !== 'undefined' ? window.RAGEngine : null);
+          if (rag && typeof rag.query === 'function') {
+            ragRes = rag.query(query, currentNotes);
+            if (ragRes && ragRes.citations && ragRes.citations.length > 0) {
+              ragContextStr = ragRes.citations.map(c => `[Title: ${c.title}]\n${c.snippet || c.summary || ''}`).join('\n\n');
+              citations = ragRes.citations;
+            }
+          }
+
+          if (typeof window !== 'undefined' && window.aiEngine && typeof window.aiEngine.generateResponse === 'function') {
+            const res = await window.aiEngine.generateResponse({
+              prompt: query,
+              model: selectedModel,
+              ragContext: ragContextStr,
+              imageAttachment: attachmentToPass
+            });
+            if (res && res.text) {
+              answerText = res.text;
+              providerName = res.provider || providerName;
+            }
+          }
+
+          if (!answerText && ragRes && ragRes.answer) {
+            answerText = ragRes.answer;
+          }
+        } catch (err) {
+          console.warn("AI Engine synthesis error:", err);
+        }
+
+        // Remove thinking card before rendering final AI response
+        if (thinkingCard && thinkingCard.parentNode) {
+          thinkingCard.parentNode.removeChild(thinkingCard);
+        }
+
+        if (!answerText) {
+          const qLower = query.trim().toLowerCase();
+          if (qLower === 'hi' || qLower === 'hii' || qLower === 'hiii' || qLower === 'hello' || qLower === 'hey') {
+            answerText = "Hello Ankita! 👋 How can I help you synthesize your ideas and notes today?";
+          } else {
+            answerText = `Hello Ankita! 👋 I have received your query: **"${query}"**.\n\nYour Second Brain AI system is online and ready to assist you with note retrieval, research synthesis, and repository architecture.`;
+          }
+        }
+
+        // Restore submit button icon
+        if (submitBtn) {
+          submitBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+          submitBtn.title = "Send Message";
+          submitBtn.onclick = null;
+        }
+
+        // Render final AI message card with typewriter streaming
+        appendChatMessage('ai', answerText, citations, false, query, providerName, true);
+
+        // Save into current Chat Thread
+        if (typeof Store !== 'undefined' && Store.saveChatThread) {
+          try {
+            const activeId = Store.getActiveThreadId();
+            const threads = Store.getChatThreads() || [];
+            let currentThread = threads.find(t => t && t.id === activeId);
+            if (!currentThread) {
+              currentThread = { id: activeId || `thread-${Date.now()}`, title: query.substring(0, 32), createdAt: Date.now(), messages: [] };
+            }
+            if (!Array.isArray(currentThread.messages)) {
+              currentThread.messages = [];
+            }
+            if (currentThread.messages.length === 0) {
+              currentThread.title = query.length > 32 ? query.substring(0, 32) + '...' : query;
+            }
+            currentThread.messages.push({ id: `msg-u-${Date.now()}`, role: 'user', content: query, timestamp: Date.now() });
+            currentThread.messages.push({ id: `msg-a-${Date.now()}`, role: 'assistant', content: answerText, timestamp: Date.now(), provider: providerName });
+            Store.saveChatThread(currentThread);
+            if (typeof window.renderChatThreadsList === 'function') {
+              window.renderChatThreadsList();
+            }
+          } catch (threadErr) {
+            console.warn('Error saving chat thread:', threadErr);
+          }
+        }
+
+        if (targetContainer) {
+          targetContainer.scrollTop = targetContainer.scrollHeight;
+        }
+      } catch (mainErr) {
+        console.error("Error executing handleRAGQuery:", mainErr);
+        appendChatMessage('ai', "Hello Ankita! 👋 How can I help you synthesize your ideas and notes today?", [], false, query, 'Juno 2.5 Flash', false);
       }
     }
     window.handleRAGQuery = handleRAGQuery;
