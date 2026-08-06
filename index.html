@@ -174,8 +174,26 @@
           </div>
         </div>
 
-        <!-- Hero Greeting Banner (Disabled / Removed from main screen) -->
-        <div id="chat-hero-view" class="chat-hero-view gemini-hero-center" style="display: none !important;"></div>
+        <!-- Hero Greeting Banner (ChatGPT Minimalist Style in Signature Yellow) -->
+        <div id="chat-hero-view" class="chat-hero-view gemini-hero-center" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px 16px 20px 16px; margin: auto; max-width: 800px; flex: 1; width: 100%; box-sizing: border-box; overflow-y: auto;">
+          <h1 class="chatgpt-hero-title" style="font-size: 32px; font-weight: 700; color: #2C1D00; margin-bottom: 24px; font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;">What's on your mind today?</h1>
+
+          <!-- ChatGPT Style Quick Action Pills -->
+          <div class="chatgpt-quick-actions" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 4px;">
+            <button type="button" class="chatgpt-action-pill" onclick="window.triggerSampleQuery('Create an image of ')">
+              <span style="font-size: 16px;">🖼️</span>
+              <span>Create an image</span>
+            </button>
+            <button type="button" class="chatgpt-action-pill" onclick="window.triggerSampleQuery('Help me write or edit ')">
+              <span style="font-size: 16px;">✏️</span>
+              <span>Write or edit</span>
+            </button>
+            <button type="button" class="chatgpt-action-pill" onclick="window.triggerSampleQuery('Search the web for ')">
+              <span style="font-size: 16px;">🌐</span>
+              <span>Search the web</span>
+            </button>
+          </div>
+        </div>
 
         <!-- Chat Stream Messages Container -->
         <div id="chat-container" class="chat-stream" style="flex: 1; min-height: 0; overflow-y: auto; width: 100%; max-width: 800px; margin: 0 auto; padding: 12px 14px 20px 14px; display: none; flex-direction: column; gap: 14px; box-sizing: border-box; scroll-behavior: smooth;"></div>

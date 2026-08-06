@@ -1093,7 +1093,7 @@
         targetContainer.style.display = 'none';
       }
       if (heroView) {
-        heroView.style.display = 'block';
+        heroView.style.display = 'flex';
       }
       if (inputEl) {
         inputEl.value = '';
@@ -1133,7 +1133,7 @@
           targetContainer.innerHTML = '';
           targetContainer.style.display = 'none';
         }
-        if (heroView) heroView.style.display = 'block';
+        if (heroView) heroView.style.display = 'flex';
       } else {
         if (heroView) heroView.style.display = 'none';
         if (targetContainer) {
