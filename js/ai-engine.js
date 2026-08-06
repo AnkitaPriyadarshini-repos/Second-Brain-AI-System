@@ -184,13 +184,20 @@ export function HydratedComponent({ data }) {
    * Main unified AI completion method supporting Gemini REST API, OpenAI REST API, and Local RAG Fallback
    */
   async generateResponse(options = {}) {
-    const { prompt = '', model = 'gemini-2.5-flash', systemPrompt = '', ragContext = '', imageAttachment = null } = options;
+    const { 
+      prompt = '', 
+      model = 'gemini-2.5-flash', 
+      systemPrompt = 'You are Juno AI, an intelligent, empathetic, and highly capable AI assistant working like ChatGPT. Answer user questions directly, clearly, and thoughtfully with rich markdown formatting, bold text, code blocks, and structured takeaways. Maintain conversational context across multi-turn chats.', 
+      ragContext = '', 
+      imageAttachment = null,
+      chatHistory = []
+    } = options;
 
     const qClean = (prompt || '').trim().toLowerCase().replace(/[^\w\s]/gi, '');
     
     // Natural Conversational Greetings
     if (qClean === 'hi' || qClean === 'hii' || qClean === 'hiii') {
-      return { text: "Hello! I am your Juno AI assistant. How can I help you today?", provider: 'Juno 2.5 Flash', grounded: false };
+      return { text: "Hi! 😊 How can I help you today?", provider: 'Juno 2.5 Flash', grounded: false };
     }
     if (qClean === 'hello') {
       return { text: "Hello! How can I assist you today?", provider: 'Juno 2.5 Flash', grounded: false };
@@ -212,7 +219,7 @@ export function HydratedComponent({ data }) {
 
     if (keys.geminiKey && (model.startsWith('gemini') || model.includes('flash') || model.includes('pro') || keys.preferredProvider === 'gemini')) {
       try {
-        return await this.callGeminiAPI(prompt, keys.geminiKey, model, systemPrompt, ragContext, imageAttachment);
+        return await this.callGeminiAPI(prompt, keys.geminiKey, model, systemPrompt, ragContext, imageAttachment, chatHistory);
       } catch (err) {
         console.warn('Gemini API call failed, falling back to Local RAG Synthesizer:', err);
       }
@@ -220,14 +227,14 @@ export function HydratedComponent({ data }) {
 
     if (keys.openaiKey && (model.startsWith('gpt') || keys.preferredProvider === 'openai')) {
       try {
-        return await this.callOpenAIAPI(prompt, keys.openaiKey, model, systemPrompt, ragContext);
+        return await this.callOpenAIAPI(prompt, keys.openaiKey, model, systemPrompt, ragContext, chatHistory);
       } catch (err) {
         console.warn('OpenAI API call failed, falling back to Local RAG Synthesizer:', err);
       }
     }
 
-    // Default: Built-in Intelligent Local RAG & NLP Synthesizer (Zero-config)
-    return this.fallbackSynthesize(prompt, model, ragContext, imageAttachment);
+    // Default: Built-in Intelligent ChatGPT Brain & NLP Synthesizer (Zero-config)
+    return this.fallbackSynthesize(prompt, model, ragContext, imageAttachment, chatHistory);
   }
 
   generateImageResponse(prompt) {
@@ -252,7 +259,7 @@ export function HydratedComponent({ data }) {
     };
   }
 
-  async callGeminiAPI(prompt, apiKey, modelName = 'gemini-2.5-flash', systemPrompt = '', ragContext = '', imageAttachment = null) {
+  async callGeminiAPI(prompt, apiKey, modelName = 'gemini-2.5-flash', systemPrompt = '', ragContext = '', imageAttachment = null, chatHistory = []) {
     let endpointModel = 'gemini-2.5-flash';
     if (modelName.includes('2.5-pro') || modelName.includes('pro')) {
       endpointModel = 'gemini-2.5-pro';
@@ -283,9 +290,20 @@ export function HydratedComponent({ data }) {
       });
     }
 
-    const payload = {
-      contents: [{ parts: parts }]
-    };
+    const contents = [];
+    if (Array.isArray(chatHistory) && chatHistory.length > 0) {
+      chatHistory.forEach(msg => {
+        if (msg && msg.content) {
+          contents.push({
+            role: msg.role === 'assistant' ? 'model' : 'user',
+            parts: [{ text: msg.content }]
+          });
+        }
+      });
+    }
+    contents.push({ role: 'user', parts: parts });
+
+    const payload = { contents: contents };
     if (systemPrompt) {
       payload.systemInstruction = { parts: [{ text: systemPrompt }] };
     }
@@ -311,13 +329,24 @@ export function HydratedComponent({ data }) {
     };
   }
 
-  async callOpenAIAPI(prompt, apiKey, modelName = 'gpt-4o-mini', systemPrompt = '', ragContext = '') {
+  async callOpenAIAPI(prompt, apiKey, modelName = 'gpt-4o-mini', systemPrompt = '', ragContext = '', chatHistory = []) {
     const endpointModel = modelName.includes('gpt-4o') ? 'gpt-4o' : 'gpt-4o-mini';
     const url = 'https://api.openai.com/v1/chat/completions';
 
     const messages = [];
     if (systemPrompt) {
       messages.push({ role: 'system', content: systemPrompt });
+    }
+
+    if (Array.isArray(chatHistory) && chatHistory.length > 0) {
+      chatHistory.forEach(msg => {
+        if (msg && msg.content) {
+          messages.push({
+            role: msg.role === 'assistant' ? 'assistant' : 'user',
+            content: msg.content
+          });
+        }
+      });
     }
 
     let userContent = prompt;

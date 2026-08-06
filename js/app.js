@@ -1311,12 +1311,31 @@
             }
           }
 
+          // Extract multi-turn chat memory from current active thread
+          let chatHistory = [];
+          if (typeof Store !== 'undefined' && Store.getActiveThreadId && Store.getChatThreads) {
+            try {
+              const activeId = Store.getActiveThreadId();
+              const threads = Store.getChatThreads() || [];
+              const currentThread = threads.find(t => t && t.id === activeId);
+              if (currentThread && Array.isArray(currentThread.messages)) {
+                chatHistory = currentThread.messages.map(m => ({
+                  role: m.role === 'assistant' ? 'assistant' : 'user',
+                  content: m.content || ''
+                })).slice(-12);
+              }
+            } catch (histErr) {
+              console.warn('Error extracting chat history context:', histErr);
+            }
+          }
+
           if (typeof window !== 'undefined' && window.aiEngine && typeof window.aiEngine.generateResponse === 'function') {
             const res = await window.aiEngine.generateResponse({
               prompt: query,
               model: selectedModel,
               ragContext: ragContextStr,
-              imageAttachment: attachmentToPass
+              imageAttachment: attachmentToPass,
+              chatHistory: chatHistory
             });
             if (res && res.text) {
               answerText = res.text;
