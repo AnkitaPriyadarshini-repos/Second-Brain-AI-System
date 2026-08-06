@@ -808,6 +808,38 @@ html, body {
   pointer-events: none !important;
 }
 
+/* PWA App Install Modal Animation & Dark Mode */
+@keyframes popIn {
+  0% { transform: scale(0.85); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+body[data-theme="gemini-dark"] .pwa-install-card {
+  background: rgba(24, 24, 27, 0.98) !important;
+  border-color: #ffb300 !important;
+  color: #f4f4f5 !important;
+}
+
+body[data-theme="gemini-dark"] .pwa-install-card h2 {
+  color: #ffecb3 !important;
+}
+
+body[data-theme="gemini-dark"] .pwa-install-card p {
+  color: #a1a1aa !important;
+}
+
+@media (max-width: 600px) {
+  #pwa-header-install-btn span:last-child {
+    display: none;
+  }
+  #pwa-header-install-btn {
+    padding: 6px 8px !important;
+  }
+  .pwa-install-card {
+    padding: 22px 18px !important;
+  }
+}
+
 
 
 
