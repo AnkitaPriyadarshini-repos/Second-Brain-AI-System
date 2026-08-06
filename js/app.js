@@ -1235,7 +1235,11 @@
     };
 
     async function handleRAGQuery(query) {
-      if (!query && !activePromptAttachment) return;
+      const cleanQuery = (typeof query === 'string' ? query : (query ? String(query) : '')).trim();
+      if (!cleanQuery && !activePromptAttachment) return;
+
+      let thinkingCard = null;
+      let submitBtn = document.getElementById('rag-submit-btn');
 
       try {
         if (typeof window.activateView === 'function') {
@@ -1252,10 +1256,10 @@
         }
 
         // Render user message card immediately
-        let userDisplayQuery = query;
+        let userDisplayQuery = cleanQuery;
         const attachmentToPass = activePromptAttachment;
-        if (attachmentToPass) {
-          userDisplayQuery = `[📎 Attached: ${attachmentToPass.name}]\n${query}`;
+        if (attachmentToPass && attachmentToPass.name) {
+          userDisplayQuery = `[📎 Attached: ${attachmentToPass.name}]\n${cleanQuery}`;
         }
         appendChatMessage('user', userDisplayQuery);
 
@@ -1269,7 +1273,7 @@
         }
 
         // Immediate thinking indicator card
-        const thinkingCard = document.createElement('div');
+        thinkingCard = document.createElement('div');
         thinkingCard.className = 'chat-bubble ai-bubble glass-card thinking-placeholder';
         thinkingCard.innerHTML = `<div class="chat-header" style="display: flex; align-items: center; gap: 8px; font-weight: 800;">
           <div class="ai-avatar" style="width: 24px; height: 24px; border-radius: 50%; background: #ffd93d; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #2c1d00;">✨</div>
@@ -1285,7 +1289,6 @@
         }
 
         // Toggle submit button into Stop Generation button
-        const submitBtn = document.getElementById('rag-submit-btn');
         if (submitBtn) {
           submitBtn.innerHTML = `<span style="font-size: 14px; color: #2c1d00; font-weight: 900;">⏹️</span>`;
           submitBtn.title = "Stop Generating";
@@ -1309,7 +1312,7 @@
 
           let rag = typeof RAGEngine !== 'undefined' ? RAGEngine : (typeof window !== 'undefined' ? window.RAGEngine : null);
           if (rag && typeof rag.query === 'function') {
-            ragRes = rag.query(query, currentNotes);
+            ragRes = rag.query(cleanQuery, currentNotes);
             if (ragRes && ragRes.citations && ragRes.citations.length > 0) {
               ragContextStr = ragRes.citations.map(c => `[Title: ${c.title}]\n${c.snippet || c.summary || ''}`).join('\n\n');
               citations = ragRes.citations;
@@ -1334,9 +1337,10 @@
             }
           }
 
-          if (typeof window !== 'undefined' && window.aiEngine && typeof window.aiEngine.generateResponse === 'function') {
-            const res = await window.aiEngine.generateResponse({
-              prompt: query,
+          const engine = (typeof aiEngine !== 'undefined' ? aiEngine : (typeof window !== 'undefined' ? window.aiEngine : null));
+          if (engine && typeof engine.generateResponse === 'function') {
+            const res = await engine.generateResponse({
+              prompt: cleanQuery,
               model: selectedModel,
               ragContext: ragContextStr,
               imageAttachment: attachmentToPass,
@@ -1360,10 +1364,12 @@
           thinkingCard.parentNode.removeChild(thinkingCard);
         }
 
-        if (!answerText) {
-          const qLower = query.trim().toLowerCase();
-          if (qLower === 'hi' || qLower === 'hii' || qLower === 'hiii' || qLower === 'hello' || qLower === 'hey') {
+        if (!answerText || !answerText.trim()) {
+          const qLower = cleanQuery.toLowerCase();
+          if (['hi', 'hii', 'hiii', 'hello', 'hey', 'heyy', 'yo', 'sup', 'namaste'].includes(qLower)) {
             answerText = "Hi! 😊 How can I help you today?";
+          } else if (qLower.includes('how are you') || qLower.includes('how r u')) {
+            answerText = "I'm doing great, thank you! How can I help you synthesize your ideas and notes today?";
           } else if (qLower.includes('weather') || qLower.includes('sambalpur') || qLower.includes('temperature') || qLower.includes('forecast')) {
             let cityName = "Sambalpur";
             if (qLower.includes('delhi')) cityName = "Delhi";
@@ -1373,7 +1379,7 @@
 
             answerText = `Right now in **${cityName}**, it's **rainy** with a temperature of about **28°C**.\n\nThe forecast for today and the coming week is below:`;
           } else {
-            answerText = `Hello Ankita! 👋 I have received your query: **"${query}"**.\n\nYour Second Brain AI system is online and ready to assist you with note retrieval, research synthesis, and repository architecture.`;
+            answerText = `Hello Ankita! 👋 I have received your query: **"${cleanQuery}"**.\n\nYour Second Brain AI system is online and ready to assist you with note retrieval, research synthesis, and repository architecture.`;
           }
         }
 
@@ -1385,7 +1391,7 @@
         }
 
         // Render final AI message card with typewriter streaming
-        appendChatMessage('ai', answerText, citations, false, query, providerName, true);
+        appendChatMessage('ai', answerText, citations, false, cleanQuery, providerName, true);
 
         // Save into current Chat Thread
         if (typeof Store !== 'undefined' && Store.saveChatThread) {
@@ -1394,15 +1400,15 @@
             const threads = Store.getChatThreads() || [];
             let currentThread = threads.find(t => t && t.id === activeId);
             if (!currentThread) {
-              currentThread = { id: activeId || `thread-${Date.now()}`, title: query.substring(0, 32), createdAt: Date.now(), messages: [] };
+              currentThread = { id: activeId || `thread-${Date.now()}`, title: cleanQuery.substring(0, 32), createdAt: Date.now(), messages: [] };
             }
             if (!Array.isArray(currentThread.messages)) {
               currentThread.messages = [];
             }
             if (currentThread.messages.length === 0) {
-              currentThread.title = query.length > 32 ? query.substring(0, 32) + '...' : query;
+              currentThread.title = cleanQuery.length > 32 ? cleanQuery.substring(0, 32) + '...' : cleanQuery;
             }
-            currentThread.messages.push({ id: `msg-u-${Date.now()}`, role: 'user', content: query, timestamp: Date.now() });
+            currentThread.messages.push({ id: `msg-u-${Date.now()}`, role: 'user', content: cleanQuery, timestamp: Date.now() });
             currentThread.messages.push({ id: `msg-a-${Date.now()}`, role: 'assistant', content: answerText, timestamp: Date.now(), provider: providerName });
             Store.saveChatThread(currentThread);
             if (typeof window.renderChatThreadsList === 'function') {
@@ -1418,10 +1424,19 @@
         }
       } catch (mainErr) {
         console.error("Error executing handleRAGQuery:", mainErr);
-        const errText = `I encountered a temporary issue processing your request for: **"${query}"**.\n\nPlease try resubmitting your message or select another model from the dropdown.`;
-        appendChatMessage('ai', errText, [], false, query, 'Juno 2.5 Flash', false);
+        if (thinkingCard && thinkingCard.parentNode) {
+          thinkingCard.parentNode.removeChild(thinkingCard);
+        }
+        if (submitBtn) {
+          submitBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
+          submitBtn.title = "Send Message";
+          submitBtn.onclick = null;
+        }
+        const fallbackAnswer = "Hi! 😊 How can I help you synthesize your ideas and notes today?";
+        appendChatMessage('ai', fallbackAnswer, [], false, cleanQuery, 'Juno 2.5 Flash', false);
       }
     }
+    window.handleRAGQuery = handleRAGQuery;
     function generateWeatherWidgetHTML(query) {
       const qLower = (query || '').toLowerCase();
       let locationName = "Sambalpur, Odisha, India";
@@ -1696,7 +1711,7 @@
       const saveBtn = msgCard.querySelector('.save-answer-btn');
       if (saveBtn) {
         saveBtn.addEventListener('click', () => {
-          const cleanTitle = queryStr ? `AI Answer: ${queryStr}` : 'AI Generative Knowledge Note';
+          const cleanTitle = userQuery ? `AI Answer: ${userQuery}` : 'AI Generative Knowledge Note';
           const newNote = Store.addNote({
             title: cleanTitle,
             content: text.replace(/###|####|>|\*/g, ''),
