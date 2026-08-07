@@ -3426,6 +3426,14 @@
       showToast(q);
     };
 
+    // Initialize Claves Adaptive Fusion AI Hero Neural Canvas Visualizer
+    setTimeout(() => {
+      const heroCanvas = document.getElementById('af-hero-neural-canvas');
+      if (heroCanvas && typeof AdaptiveFusionVisualizer !== 'undefined') {
+        window.heroAdaptiveFusionVisualizer = new AdaptiveFusionVisualizer(heroCanvas);
+      }
+    }, 150);
+
     // Global helper accessible via inline onclick fallback
     window.triggerSampleQuery = function(queryText) {
       if (!queryText) return;

@@ -3,35 +3,35 @@
   Inspired by Apple, Linear, Stripe, Notion, Vercel & Raycast
 */
 :root {
-  /* Golden Harmony All-Yellow Luminous System (Zero Black Background) */
-  --bg-dark: #FFF8E1;
-  --bg-card: rgba(255, 255, 255, 0.94);
-  --bg-card-hover: #FFF9C4;
-  --bg-card-active: #FFF59D;
-  --border-color: rgba(251, 192, 45, 0.45);
-  --border-highlight: #FBC02D;
-  --border-accent: #FFB300;
+  /* Claves Adaptive Fusion AI — Flagship Dark Obsidian Space System */
+  --bg-dark: #07090e;
+  --bg-card: rgba(15, 23, 42, 0.88);
+  --bg-card-hover: rgba(30, 41, 59, 0.95);
+  --bg-card-active: rgba(51, 65, 85, 0.95);
+  --border-color: rgba(245, 158, 11, 0.3);
+  --border-highlight: #f59e0b;
+  --border-accent: #a855f7;
 
-  /* Crisp Deep Bronze Typography for High Contrast on Yellow */
-  --text-primary: #2C1D00;
-  --text-secondary: #5D4037;
-  --text-muted: #8C5A00;
+  /* Luminous White & Platinum Typography for High Contrast on Dark Space */
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
 
-  /* Vibrant Golden Harmony Yellow Palette (Pinterest Inspired) */
-  --accent-primary: #FBC02D;
-  --accent-primary-hover: #FFB300;
-  --accent-primary-light: rgba(255, 225, 86, 0.4);
+  /* Multi-Perspective Intelligence Palette */
+  --accent-primary: #f59e0b;
+  --accent-primary-hover: #d97706;
+  --accent-primary-light: rgba(245, 158, 11, 0.2);
   
-  --accent-indigo: #FBC02D;
-  --accent-violet: #FFB300;
-  --accent-emerald: #FBC02D;
-  --accent-amber: #FBC02D;
-  --accent-pink: #FFD93D;
-  --accent-blue: #FBC02D;
-  --accent-cyan: #FFE156;
+  --accent-indigo: #8b5cf6;
+  --accent-violet: #a855f7;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-pink: #ec4899;
+  --accent-blue: #3b82f6;
+  --accent-cyan: #06b6d4;
 
   /* Typography Stack */
-  --font-main: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  --font-main: "Outfit", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   --font-code: "Fira Code", "SF Mono", monospace;
   
   /* Radii */
@@ -41,9 +41,9 @@
   --radius-full: 9999px;
   
   /* Shadows & Transitions */
-  --shadow-sm: 0 1px 2px 0 rgba(251, 192, 45, 0.2);
-  --shadow-card: 0 10px 30px -5px rgba(251, 192, 45, 0.22);
-  --shadow-glow: 0 0 35px rgba(251, 192, 45, 0.4);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 10px 40px -5px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 35px rgba(245, 158, 11, 0.35);
   --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -59,6 +59,7 @@ a, a:hover, a:visited, a:focus, a:active,
    FLAGSHIP AI PLATFORM THEMES (Golden Harmony Yellow Theme Default)
    ========================================== */
 
+[data-theme="claves-adaptive-fusion"],
 [data-theme="golden-harmony"],
 [data-theme="sunflower-sunrise"],
 [data-theme="gemini-glow"],
@@ -70,26 +71,26 @@ a, a:hover, a:visited, a:focus, a:active,
 [data-theme="sapphire-platinum"],
 [data-theme="platinum-gold"],
 [data-theme="gemini-light"] {
-  --bg-dark: #FFF8E1;
-  --bg-card: rgba(255, 255, 255, 0.94);
-  --bg-card-hover: #FFF9C4;
-  --bg-card-active: #FFF59D;
-  --border-color: rgba(251, 192, 45, 0.45);
-  --border-highlight: #FBC02D;
-  --border-accent: #FFB300;
-  --text-primary: #2C1D00;
-  --text-secondary: #5D4037;
-  --text-muted: #8C5A00;
-  --accent-primary: #FBC02D;
-  --accent-primary-hover: #FFB300;
-  --accent-primary-light: rgba(255, 225, 86, 0.4);
-  --accent-indigo: #FBC02D;
-  --accent-violet: #FFB300;
-  --accent-emerald: #FBC02D;
-  --accent-amber: #FBC02D;
-  --accent-cyan: #FFE156;
-  --shadow-card: 0 10px 30px -5px rgba(251, 192, 45, 0.25);
-  --shadow-glow: 0 0 35px rgba(251, 192, 45, 0.4);
+  --bg-dark: #07090e;
+  --bg-card: rgba(15, 23, 42, 0.92);
+  --bg-card-hover: rgba(30, 41, 59, 0.95);
+  --bg-card-active: rgba(51, 65, 85, 0.95);
+  --border-color: rgba(245, 158, 11, 0.35);
+  --border-highlight: #f59e0b;
+  --border-accent: #a855f7;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --accent-primary: #f59e0b;
+  --accent-primary-hover: #d97706;
+  --accent-primary-light: rgba(245, 158, 11, 0.25);
+  --accent-indigo: #8b5cf6;
+  --accent-violet: #a855f7;
+  --accent-emerald: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-cyan: #06b6d4;
+  --shadow-card: 0 10px 40px -5px rgba(0, 0, 0, 0.8);
+  --shadow-glow: 0 0 35px rgba(245, 158, 11, 0.4);
 }
 
 [data-theme="second-brain-dark"],
