@@ -170,12 +170,12 @@
 
       <section id="view-jarvis" class="view-section active" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; max-width: 900px; margin: 0 auto; width: 100%; height: 100%; max-height: 100vh; position: relative; box-sizing: border-box; overflow: hidden; z-index: 1;">
         
-        <!-- Top Header Bar -->
-        <div class="chat-top-header" style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 6px 16px; width: 100%; max-width: 850px; margin: 0 auto; box-sizing: border-box; z-index: 10; flex-shrink: 0;">
+        <!-- Top Header Bar (Ultra-Clean & Minimalist) -->
+        <div class="chat-top-header" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 8px 20px; width: 100%; max-width: 850px; margin: 0 auto; box-sizing: border-box; z-index: 10; flex-shrink: 0;">
           <div class="header-left" style="display: flex; align-items: center; gap: 10px;">
-            <div class="gemini-model-selector-pill" style="display: flex; align-items: center; gap: 8px; background: rgba(15, 23, 42, 0.95); border: 1.5px solid rgba(245, 158, 11, 0.5); padding: 6px 14px; border-radius: 20px; cursor: pointer; backdrop-filter: blur(14px); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 15px rgba(245, 158, 11, 0.25);">
+            <div class="gemini-model-selector-pill" style="display: flex; align-items: center; gap: 8px; background: rgba(15, 23, 42, 0.95); border: 1.5px solid rgba(245, 158, 11, 0.4); padding: 6px 14px; border-radius: 20px; cursor: pointer; backdrop-filter: blur(14px); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);">
               <span class="yellow-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 10px #f59e0b;"></span>
-              <select id="model-select-dropdown" class="model-select-dropdown" onchange="window.handleModelChange(this.value)" style="background: transparent; border: none; color: #f8fafc; font-size: 13.5px; font-weight: 800; cursor: pointer; outline: none; font-family: inherit;">
+              <select id="model-select-dropdown" class="model-select-dropdown" onchange="window.handleModelChange(this.value)" style="background: transparent; border: none; color: #f8fafc; font-size: 13.5px; font-weight: 700; cursor: pointer; outline: none; font-family: inherit;">
                 <option value="claves-adaptive-fusion" selected>🌌 Claves Adaptive Fusion AI ∨</option>
                 <option value="gemini-2.5-flash">✨ Juno 2.5 Flash ∨</option>
                 <option value="gemini-2.5-pro">🧠 Juno 2.5 Pro (Deep Thinking) ∨</option>
@@ -186,83 +186,50 @@
               </select>
             </div>
           </div>
-          <div class="header-right" style="display: flex; align-items: center; gap: 8px;">
-            <button type="button" id="pwa-header-install-btn" class="btn-chat-header-action" onclick="window.triggerPWAInstall()" title="Install App to Home Screen" style="display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); border: 1px solid #fbbf24; color: #000; border-radius: 14px; padding: 6px 12px; font-size: 12.5px; font-weight: 800; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);">
-              <span style="font-size: 14px;">📲</span>
-              <span>Install App</span>
-            </button>
-            <button type="button" class="btn-chat-header-action" onclick="window.createNewChatThread()" title="New Chat" style="display: flex; align-items: center; gap: 6px; background: rgba(30, 41, 59, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #f8fafc; border-radius: 14px; padding: 6px 12px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              <span>+ New Chat</span>
-            </button>
-            <button type="button" class="btn-chat-header-action" onclick="window.shareCurrentThread()" title="Share Chat" style="background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.4); color: #d8b4fe; border-radius: 14px; padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-              <span>Share</span>
+          <div class="header-right" style="display: flex; align-items: center; gap: 10px;">
+            <button type="button" class="btn-chat-header-action" onclick="window.createNewChatThread()" title="New Chat" style="display: flex; align-items: center; gap: 6px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.12); color: #f8fafc; border-radius: 14px; padding: 6px 14px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>New Chat</span>
             </button>
           </div>
         </div>
 
-        <!-- Claves Adaptive Fusion AI Minimalist Hero View -->
-        <div id="chat-hero-view" class="chat-hero-view gemini-hero-center" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px 16px 8px 16px; margin: auto; max-width: 850px; flex: 1; width: 100%; box-sizing: border-box; gap: 10px;">
+        <!-- Claves Adaptive Fusion AI Spacious Hero View -->
+        <div id="chat-hero-view" class="chat-hero-view gemini-hero-center" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 24px 20px; margin: auto; max-width: 760px; flex: 1; width: 100%; box-sizing: border-box; gap: 16px;">
           
-          <!-- Sleek Brand Pill Header -->
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <div class="af-core-icon" style="width: 26px; height: 26px; font-size: 13px;">🌌</div>
-            <span style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 15px; letter-spacing: 0.8px; background: linear-gradient(90deg, #f59e0b, #06b6d4, #a855f7, #fbbf24); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase;">CLAVES ADAPTIVE FUSION AI</span>
+          <!-- Clean Headline -->
+          <div style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
+            <h1 class="gemini-hero-title" style="font-size: 32px; font-weight: 800; color: #f8fafc; margin: 0; font-family: 'Outfit', sans-serif; letter-spacing: -0.6px;">
+              What's on your mind today, Ankita?
+            </h1>
+            <p style="font-size: 14px; color: #94a3b8; margin: 0; font-family: 'Inter', sans-serif; font-weight: 500;">
+              Claves Adaptive Fusion AI • Multi-Perspective Intelligence
+            </p>
           </div>
 
-          <!-- Minimal Clean Headline -->
-          <h1 class="gemini-hero-title" style="font-size: 30px; font-weight: 800; color: #f8fafc; margin: 0; font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;">
-            Where would you like to start today, Ankita?
-          </h1>
-
-          <p style="font-size: 13.5px; color: #94a3b8; margin: 0; font-family: 'Inter', sans-serif;">
-            Multiple forms of intelligence fused into one clear response.
-          </p>
-
-          <!-- Compact Live Neural Canvas -->
-          <div class="af-canvas-wrapper" style="width: 100%; height: 165px; margin: 6px 0; border: 1.5px solid rgba(245, 158, 11, 0.4); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.7), 0 0 20px rgba(245, 158, 11, 0.2);">
+          <!-- Proportional Neural Canvas Visualizer -->
+          <div class="af-canvas-wrapper" style="width: 100%; max-width: 680px; height: 145px; margin: 4px 0; border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 16px; box-shadow: 0 12px 36px rgba(0,0,0,0.7), 0 0 25px rgba(245, 158, 11, 0.15);">
             <canvas id="af-hero-neural-canvas" class="af-neural-canvas"></canvas>
-            <div class="af-canvas-overlay-text">Live Multi-Agent Reasoning Core</div>
+            <div class="af-canvas-overlay-text">Claves Live Neural Core</div>
           </div>
 
-          <!-- 5 Intelligence Chips Grid -->
-          <div class="af-strands-grid" style="width: 100%; margin-bottom: 4px; gap: 8px;">
-            <div class="af-strand-chip active-research" onclick="window.openAdaptiveFusionModal()" style="cursor: pointer; padding: 6px 10px;">
-              <div class="af-strand-name" style="font-size: 11px;">🔍 RESEARCH</div>
-              <div class="af-strand-status" style="font-size: 10px;">Fact-finding</div>
-            </div>
-            <div class="af-strand-chip active-analyze" onclick="window.openAdaptiveFusionModal()" style="cursor: pointer; padding: 6px 10px;">
-              <div class="af-strand-name" style="font-size: 11px;">📊 ANALYZE</div>
-              <div class="af-strand-status" style="font-size: 10px;">Deconstruction</div>
-            </div>
-            <div class="af-strand-chip active-challenge" onclick="window.openAdaptiveFusionModal()" style="cursor: pointer; padding: 6px 10px;">
-              <div class="af-strand-name" style="font-size: 11px;">⚡ CHALLENGE</div>
-              <div class="af-strand-status" style="font-size: 10px;">Stress-testing</div>
-            </div>
-            <div class="af-strand-chip active-audit" onclick="window.openAdaptiveFusionModal()" style="cursor: pointer; padding: 6px 10px;">
-              <div class="af-strand-name" style="font-size: 11px;">🛡️ AUDIT</div>
-              <div class="af-strand-status" style="font-size: 10px;">Verification</div>
-            </div>
-            <div class="af-strand-chip active-fuse" onclick="window.openAdaptiveFusionModal()" style="cursor: pointer; padding: 6px 10px;">
-              <div class="af-strand-name" style="font-size: 11px;">✨ FUSE</div>
-              <div class="af-strand-status" style="font-size: 10px;">Synthesis</div>
-            </div>
-          </div>
-
-          <!-- 4 Instant One-Click Prompt Starters -->
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; width: 100%;">
-            <button onclick="window.triggerSampleQuery('Explain quantum neural networks in simple terms')" style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 8px 12px; color: #cbd5e1; font-size: 12px; font-weight: 600; text-align: left; cursor: pointer; transition: all 0.2s ease;">
-              💡 Quantum Computing basics
+          <!-- 4 Clean, Spacious One-Click Prompt Cards -->
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; max-width: 680px; margin-top: 4px;">
+            <button onclick="window.triggerSampleQuery('Explain quantum neural networks in simple terms')" style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 12px 16px; color: #e2e8f0; font-size: 12.5px; font-weight: 600; text-align: left; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 15px;">💡</span>
+              <span>Explain Quantum Computing</span>
             </button>
-            <button onclick="window.triggerSampleQuery('Write a high-throughput Express REST API server')" style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 8px 12px; color: #cbd5e1; font-size: 12px; font-weight: 600; text-align: left; cursor: pointer; transition: all 0.2s ease;">
-              💻 Production REST API code
+            <button onclick="window.triggerSampleQuery('Write a high-throughput Express REST API server')" style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 12px 16px; color: #e2e8f0; font-size: 12.5px; font-weight: 600; text-align: left; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 15px;">💻</span>
+              <span>Build Express REST API</span>
             </button>
-            <button onclick="window.triggerSampleQuery('Analyze market trends in distributed AI infrastructure')" style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 8px 12px; color: #cbd5e1; font-size: 12px; font-weight: 600; text-align: left; cursor: pointer; transition: all 0.2s ease;">
-              📊 AI Market Analysis
+            <button onclick="window.triggerSampleQuery('Analyze market trends in distributed AI infrastructure')" style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 12px 16px; color: #e2e8f0; font-size: 12.5px; font-weight: 600; text-align: left; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 15px;">📊</span>
+              <span>Analyze AI Market Trends</span>
             </button>
-            <button onclick="window.triggerSampleQuery('Stress-test security & edge cases in my code')" style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 8px 12px; color: #cbd5e1; font-size: 12px; font-weight: 600; text-align: left; cursor: pointer; transition: all 0.2s ease;">
-              ⚡ Security Audit & Stress Test
+            <button onclick="window.triggerSampleQuery('Stress-test security & edge cases in my code')" style="background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 12px 16px; color: #e2e8f0; font-size: 12.5px; font-weight: 600; text-align: left; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 15px;">⚡</span>
+              <span>Audit Code Security</span>
             </button>
           </div>
         </div>
