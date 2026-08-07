@@ -1309,20 +1309,35 @@
           window.clearPromptAttachment();
         }
 
+        const modelSelector = document.getElementById('model-select-dropdown') || document.getElementById('ai-model-selector');
+        const selectedModel = modelSelector ? modelSelector.value : 'claves-adaptive-fusion';
+        const isAdaptiveFusion = (selectedModel === 'claves-adaptive-fusion' || !selectedModel);
+
         // Immediate thinking indicator card
         thinkingCard = document.createElement('div');
         thinkingCard.className = 'chat-bubble ai-bubble glass-card thinking-placeholder';
-        thinkingCard.innerHTML = `<div class="chat-header" style="display: flex; align-items: center; gap: 8px; font-weight: 800;">
-          <div class="ai-avatar" style="width: 24px; height: 24px; border-radius: 50%; background: #ffd93d; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #2c1d00;">✨</div>
-          <strong style="color: #e65100;">Juno Thinking Process</strong>
-        </div>
-        <div class="chat-text" style="display: flex; align-items: center; gap: 8px; font-style: italic; color: #8c5a00; font-size: 13.5px; margin-top: 6px;">
-          <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #fbc02d; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
-          <span>Synthesizing response & searching knowledge vault...</span>
-        </div>`;
-        if (targetContainer) {
-          targetContainer.appendChild(thinkingCard);
-          targetContainer.scrollTop = targetContainer.scrollHeight;
+        const cardId = 'af-card-' + Date.now();
+
+        if (isAdaptiveFusion && window.adaptiveFusionEngine) {
+          thinkingCard.innerHTML = window.adaptiveFusionEngine.createLiveReasoningHTML(cardId, cleanQuery);
+          if (targetContainer) {
+            targetContainer.appendChild(thinkingCard);
+            targetContainer.scrollTop = targetContainer.scrollHeight;
+          }
+          window.adaptiveFusionEngine.startLiveStreamingAnimation(cardId);
+        } else {
+          thinkingCard.innerHTML = `<div class="chat-header" style="display: flex; align-items: center; gap: 8px; font-weight: 800;">
+            <div class="ai-avatar" style="width: 24px; height: 24px; border-radius: 50%; background: #ffd93d; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #2c1d00;">✨</div>
+            <strong style="color: #e65100;">Juno Thinking Process</strong>
+          </div>
+          <div class="chat-text" style="display: flex; align-items: center; gap: 8px; font-style: italic; color: #8c5a00; font-size: 13.5px; margin-top: 6px;">
+            <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #fbc02d; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
+            <span>Synthesizing response & searching knowledge vault...</span>
+          </div>`;
+          if (targetContainer) {
+            targetContainer.appendChild(thinkingCard);
+            targetContainer.scrollTop = targetContainer.scrollHeight;
+          }
         }
 
         // Toggle submit button into Stop Generation button
@@ -1335,11 +1350,8 @@
           };
         }
 
-        const modelSelector = document.getElementById('model-select-dropdown') || document.getElementById('ai-model-selector');
-        const selectedModel = modelSelector ? modelSelector.value : 'gemini-2.5-flash';
-
         let answerText = "";
-        let providerName = "Juno 2.5 Flash";
+        let providerName = isAdaptiveFusion ? "Claves Adaptive Fusion AI" : "Juno 2.5 Flash";
         let citations = [];
 
         try {
@@ -1385,7 +1397,7 @@
             });
             if (res && res.text) {
               answerText = res.text;
-              providerName = res.provider || providerName;
+              providerName = isAdaptiveFusion ? "Claves Adaptive Fusion AI" : (res.provider || providerName);
             }
           }
 
@@ -1394,6 +1406,11 @@
           }
         } catch (err) {
           console.warn("AI Engine synthesis error:", err);
+        }
+
+        // Delay slightly for Adaptive Fusion visual stream completion
+        if (isAdaptiveFusion) {
+          await new Promise(resolve => setTimeout(resolve, 800));
         }
 
         // Remove thinking card before rendering final AI response
@@ -1409,6 +1426,11 @@
           } else {
             answerText = `Here is the response for **"${cleanQuery}"**:\n\nYour Second Brain AI system is online and ready to assist you.`;
           }
+        }
+
+        // Format fused answer if Adaptive Fusion is active
+        if (isAdaptiveFusion && window.adaptiveFusionEngine) {
+          answerText = window.adaptiveFusionEngine.formatFusedMessageOutput(cleanQuery, answerText);
         }
 
         // Restore submit button icon
