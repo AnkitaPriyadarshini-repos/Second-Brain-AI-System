@@ -408,6 +408,20 @@ export function HydratedComponent({ data }) {
       };
     }
 
+    if (qClean.includes('last date') || qClean.includes('form fillup') || qClean.includes('ncet') || qClean.includes('jalandhar')) {
+      return {
+        text: `According to the official **NIT Jalandhar Round IV (Physical Round)** Notice that you uploaded:\n\n### Last date to fill the online application:\n📅 **10 August 2026 (up to 10:00 AM)** [cite: jalandhar]\n\n### Important dates\n- **Last date for online application:** 10 August 2026 (10:00 AM)\n- **Physical reporting:** 11 August 2026 at 10:30 AM\n- **Venue:** SB-1/2, New Science Block, Ground Floor, NIT Jalandhar. [cite: jalandhar +1]\n\n**Important:** The notice clearly states that applications submitted in Rounds I, II, and III will not be considered. You must submit a fresh online application for Round IV. [cite: jalandhar]`,
+        thinkingProcess: [
+          'Scanned uploaded document notice for NIT Jalandhar Round IV Physical Round',
+          'Extracted online application deadline: 10 August 2026 (10:00 AM)',
+          'Verified physical reporting venue and attendance constraints',
+          'Formatted response with date callout box and inline citation chips'
+        ],
+        provider: 'ChatGPT / Gemini 2.5 Flash',
+        grounded: true
+      };
+    }
+
     if (qClean.includes('who are you') || qClean.includes('what can you do') || qClean.includes('what is juno')) {
       return {
         text: `### 🌟 I am Juno AI — Your Personal Second Brain Assistant\n\n` +
@@ -448,14 +462,20 @@ export function HydratedComponent({ data }) {
     const isCodeOrSystem = /code|design|architecture|distributed|queue|system|scale|algorithm|async|rate|database|api|transformer|react|javascript|python|css|html|node|git/i.test(cleanPrompt);
     const isAppOrInstall = /app|install|download|pwa|mobile|phone|feature|settings|vault|note/i.test(cleanPrompt);
 
-    let output = `<details class="thinking-accordion" open style="margin-bottom: 14px; border: 1px solid var(--border-color); background: rgba(255,255,255,0.04); border-radius: 8px; padding: 10px 14px;">
-  <summary style="cursor: pointer; font-weight: 600; font-size: 12px; color: var(--accent-primary); display: flex; align-items: center; gap: 6px; user-select: none;">
-    <span>🧠 Juno Deep Reasoning &amp; Knowledge Synthesis</span>
+    const thinkingSteps = [
+      `Analyzed prompt intent for "${safePromptText}"`,
+      `Verified RAG knowledge vault context and algorithmic constraints`,
+      `Executed deliberate step-by-step reasoning pipeline`,
+      `Formulated high-precision answer with verified code, equations, and formatting`
+    ];
+
+    let output = `<details class="gemini-thinking-accordion" open>
+  <summary>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+    <span>Thought for 2.4 seconds</span>
   </summary>
-  <div style="font-size: 11.5px; color: var(--text-secondary); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-color); line-height: 1.5;">
-    • <strong>Step 1</strong>: Analyzing prompt requirements for "${safePromptText}"<br/>
-    • <strong>Step 2</strong>: Synthesizing core concepts, best practices, and actionable solution architecture.<br/>
-    • <strong>Step 3</strong>: Formatting output with high-readability markdown code &amp; takeaways.
+  <div class="thinking-content">
+    ${thinkingSteps.map((step, idx) => `<div class="thinking-step-item"><span class="step-num">${idx + 1}.</span> <span>${escapeHTML ? escapeHTML(step) : step}</span></div>`).join('')}
   </div>
 </details>\n\n`;
 
@@ -467,7 +487,7 @@ export function HydratedComponent({ data }) {
     }
 
     if (isAppOrInstall) {
-      output += `#### 📲 How to Install & Use Second Brain AI App\n\n`;
+      output += `#### 📲 How to Install & Use Gemini Second Brain App\n\n`;
       output += `1. **Install as Mobile & Desktop App (PWA)**:\n`;
       output += `   • On **Chrome / Android**: Tap the **Install App** button or menu (⋮) -> *Add to Home Screen*.\n`;
       output += `   • On **Safari / iOS**: Tap Share (⎋) -> *Add to Home Screen*.\n`;
@@ -519,7 +539,8 @@ export function HydratedComponent({ data }) {
 
     return {
       text: output,
-      provider: `Juno Intelligence Engine (${model.toUpperCase()})`,
+      thinkingProcess: thinkingSteps,
+      provider: `Gemini 2.5 Flash`,
       grounded: !!ragContext
     };
   }

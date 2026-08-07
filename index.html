@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="golden-harmony">
+<html lang="en" data-theme="gemini-dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -46,85 +46,105 @@
     <!-- Left Vertical Navigation Sidebar (Google Gemini 1:1) -->
     <aside id="app-sidebar" class="app-sidebar gemini-sidebar">
       <div class="sidebar-top">
-        <!-- Brand Header with Collapse Toggle -->
-        <div class="sidebar-brand-header">
-          <div class="brand-title" onclick="window.activateView('jarvis')" style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
-            <div class="brand-sparkle-icon" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z" fill="url(#juno-titanium-gold-grad)"/><defs><linearGradient id="juno-titanium-gold-grad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#fbc02d"/><stop offset="0.5" stop-color="#ffb300"/><stop offset="1" stop-color="#e65100"/></linearGradient></defs></svg>
+        <!-- Brand Header with Collapse Toggle & New Chat Action -->
+        <div class="sidebar-brand-header" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 4px 12px 4px;">
+          <div class="brand-left" style="display: flex; align-items: center; gap: 10px;">
+            <button class="sidebar-collapse-btn" onclick="window.toggleSidebar()" title="Collapse Sidebar" style="background: transparent; border: none; color: #c4c7c5; cursor: pointer; padding: 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s ease;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <div class="brand-title" onclick="window.activateView('jarvis')" style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+              <div class="brand-sparkle-icon" style="width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z" fill="url(#gemini-star-gradient)"/>
+                  <defs>
+                    <linearGradient id="gemini-star-gradient" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stop-color="#4285F4"/>
+                      <stop offset="35%" stop-color="#9B72CB"/>
+                      <stop offset="70%" stop-color="#D96570"/>
+                      <stop offset="100%" stop-color="#F4B400"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <span class="brand-name" style="font-size: 18px; font-weight: 700; color: #e3e3e3; font-family: 'Inter', -apple-system, sans-serif; letter-spacing: -0.2px;">Gemini</span>
             </div>
-            <span class="brand-name" style="font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #d84315 0%, #e65100 50%, #fbc02d 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'Inter', sans-serif;">Juno AI</span>
           </div>
-          <button class="sidebar-collapse-btn" onclick="window.toggleSidebar()" title="Collapse Sidebar" style="background: transparent; border: none; color: #4a2e00; cursor: pointer; padding: 4px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+          <button class="sidebar-top-new-chat-btn" onclick="window.createNewChatThread()" title="New chat" style="background: transparent; border: none; color: #c4c7c5; cursor: pointer; padding: 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
         </div>
 
-        <!-- Superior Mode Switcher Tabs (Studio | Neural Lab) -->
-        <div class="gemini-tab-switcher" style="display: flex; background: #ffe156; border-radius: 20px; padding: 3px; margin: 12px 0 16px 0; border: 1.5px solid #fbc02d;">
-          <button class="gemini-tab-btn active" onclick="window.activateView('jarvis')" style="flex: 1; padding: 6px 12px; border-radius: 16px; border: none; background: #fbc02d; color: #2c1d00; font-size: 13px; font-weight: 800; cursor: pointer; text-align: center; box-shadow: 0 2px 8px rgba(251, 192, 45, 0.4);">Studio</button>
-          <button class="gemini-tab-btn" onclick="window.toggleNeuralLabMode(this)" style="flex: 1; padding: 6px 12px; border-radius: 16px; border: none; background: transparent; color: #5d4037; font-size: 13px; font-weight: 700; cursor: pointer; text-align: center;">Neural Lab <span style="font-size: 9px; color: #e65100; letter-spacing: 0.5px;">v2.5</span></button>
+        <!-- Gemini Mode Switcher Tabs (Chat | Spark BETA) -->
+        <div class="gemini-tab-switcher" style="display: flex; background: #1e1e1f; border-radius: 20px; padding: 3px; margin: 6px 0 14px 0; border: 1px solid rgba(255, 255, 255, 0.08);">
+          <button class="gemini-tab-btn active" onclick="window.activateView('jarvis')" style="flex: 1; padding: 6px 12px; border-radius: 16px; border: none; background: #282a2c; color: #e3e3e3; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center;">Chat</button>
+          <button class="gemini-tab-btn" onclick="window.toggleNeuralLabMode(this)" style="flex: 1; padding: 6px 12px; border-radius: 16px; border: none; background: transparent; color: #c4c7c5; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center; gap: 4px;">
+            <span>Spark</span>
+            <span style="font-size: 9px; background: rgba(168, 199, 250, 0.2); color: #a8c7fa; padding: 1px 4px; border-radius: 4px; font-weight: 700; text-transform: uppercase;">BETA</span>
+          </button>
         </div>
 
-        <!-- + New Chat Button -->
-        <button class="new-chat-btn gemini-new-chat" onclick="window.createNewChatThread()" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 20px; background: #ffd93d; border: 1.5px solid #fbc02d; color: #2c1d00; font-size: 13.5px; font-weight: 800; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(251, 192, 45, 0.3);">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span>New Session</span>
-        </button>
+        <!-- Primary Navigation Links (Google Gemini 1:1) -->
+        <div class="gemini-nav-menu" style="display: flex; flex-direction: column; gap: 3px;">
+          <button class="sidebar-menu-item active" onclick="window.createNewChatThread()" style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 20px; color: #e3e3e3; background: #1e1e1f; border: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer; font-size: 13.5px; font-weight: 600; transition: background 0.2s ease;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>New chat</span>
+          </button>
 
-        <!-- Sidebar Navigation Menu Links -->
-        <div class="gemini-nav-menu" style="margin-top: 14px; display: flex; flex-direction: column; gap: 2px;">
-          <button class="sidebar-menu-item" onclick="window.activateView('vault')" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 10px; color: #2c1d00; background: transparent; border: none; cursor: pointer; font-size: 13.5px; font-weight: 700;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2c1d00" stroke-width="2.2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><circle cx="12" cy="12" r="3"/></svg>
-            <span style="color: #2c1d00 !important; font-weight: 700;">🧠 Neural Memory</span>
+          <button class="sidebar-menu-item" onclick="window.openSearchChatsModal()" style="display: flex; align-items: center; gap: 12px; padding: 9px 14px; border-radius: 20px; color: #c4c7c5; background: transparent; border: none; cursor: pointer; font-size: 13.5px; font-weight: 500;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Search chats</span>
           </button>
-          <button class="sidebar-menu-item" onclick="window.triggerQuickUpload('pdf')" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 10px; color: #2c1d00; background: transparent; border: none; cursor: pointer; font-size: 13.5px; font-weight: 700;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2c1d00" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            <span style="color: #2c1d00 !important; font-weight: 700;">📄 Research Synthesis</span>
+
+          <button class="sidebar-menu-item" onclick="window.activateImagesView()" style="display: flex; align-items: center; gap: 12px; padding: 9px 14px; border-radius: 20px; color: #c4c7c5; background: transparent; border: none; cursor: pointer; font-size: 13.5px; font-weight: 500;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <span>Images</span>
           </button>
-          <button class="sidebar-menu-item" onclick="window.triggerQuickUpload('github')" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 10px; color: #2c1d00; background: transparent; border: none; cursor: pointer; font-size: 13.5px; font-weight: 700;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2c1d00" stroke-width="2.2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-            <span style="color: #2c1d00 !important; font-weight: 700;">💻 Repo Architect</span>
+
+          <button class="sidebar-menu-item" onclick="window.activateVideosView()" style="display: flex; align-items: center; gap: 12px; padding: 9px 14px; border-radius: 20px; color: #c4c7c5; background: transparent; border: none; cursor: pointer; font-size: 13.5px; font-weight: 500;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+            <span>Videos</span>
           </button>
-          <button class="sidebar-menu-item" onclick="window.toggleVoiceListen()" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; border-radius: 10px; color: #2c1d00; background: transparent; border: none; cursor: pointer; font-size: 13.5px; font-weight: 700;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2c1d00" stroke-width="2.2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
-            <span style="color: #2c1d00 !important; font-weight: 700;">🎙️ Voice Studio</span>
+
+          <button class="sidebar-menu-item" onclick="window.activateLibraryView()" style="display: flex; align-items: center; gap: 12px; padding: 9px 14px; border-radius: 20px; color: #c4c7c5; background: transparent; border: none; cursor: pointer; font-size: 13.5px; font-weight: 500;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span>Library</span>
           </button>
         </div>
 
         <!-- Notebooks Section -->
-        <div class="gemini-notebooks-section" style="margin-top: 16px; border-top: 1.5px solid rgba(251, 192, 45, 0.35); padding-top: 12px;">
-          <div style="font-size: 12px; color: #4a2e00; font-weight: 800; margin-bottom: 6px; padding-left: 8px;">Smart Notebooks</div>
-          <button class="sidebar-menu-item" onclick="window.activateView('capture')" style="display: flex; align-items: center; gap: 10px; padding: 6px 12px; border-radius: 8px; color: #2c1d00; background: transparent; border: none; cursor: pointer; font-size: 13px; font-weight: 700;">
-            <span style="font-size: 16px; color: #e65100; font-weight: 800;">+</span>
-            <span style="color: #2c1d00 !important; font-weight: 700;">New notebook</span>
+        <div class="gemini-notebooks-section" style="margin-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 10px;">
+          <div style="font-size: 12px; color: #8e918f; font-weight: 600; margin-bottom: 6px; padding-left: 12px;">Notebooks</div>
+          <button class="sidebar-menu-item" onclick="window.activateView('capture')" style="display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-radius: 16px; color: #c4c7c5; background: transparent; border: none; cursor: pointer; font-size: 13px; font-weight: 500;">
+            <span style="font-size: 16px; color: #a8c7fa; font-weight: 700;">+</span>
+            <span>New notebook</span>
           </button>
         </div>
       </div>
 
-      <!-- Recent Chats List -->
-      <div class="sidebar-chat-history" style="margin-top: 12px;">
-        <div class="history-section-label" style="font-size: 12px; color: #6d4c41; font-weight: 700; margin-bottom: 6px;">Recent Sessions</div>
+      <!-- Recent Chats List (Recents) -->
+      <div class="sidebar-chat-history" style="margin-top: 14px; flex: 1; overflow-y: auto;">
+        <div class="history-section-label" style="font-size: 12px; color: #8e918f; font-weight: 600; margin-bottom: 6px; padding-left: 12px;">Recents</div>
         <div id="sidebar-chat-threads-container" class="sidebar-threads-list">
           <!-- Rendered dynamically -->
         </div>
       </div>
 
       <!-- Bottom Profile Footer -->
-      <div class="sidebar-footer gemini-footer" style="padding: 12px 14px; border-top: 1.5px solid rgba(251, 192, 45, 0.35); display: flex; align-items: center; justify-content: space-between;">
+      <div class="sidebar-footer gemini-footer" style="padding: 12px 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between;">
         <div class="user-profile-row" style="display: flex; align-items: center; gap: 10px; cursor: pointer;" onclick="window.openUserOnboardingModal()">
-          <div class="user-avatar-circle" style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #ffd93d, #fbc02d); color: #2c1d00; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(251, 192, 45, 0.5);">A</div>
+          <div class="user-avatar-circle" style="width: 30px; height: 30px; border-radius: 50%; background: #e65100; color: #ffffff; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center;">A</div>
           <div class="user-info-stack" style="display: flex; flex-direction: column;">
-            <span id="user-display-name" style="font-size: 13px; font-weight: 700; color: #2c1d00; line-height: 1.2;">Ankita Priyadarshini Pallai</span>
-            <span style="font-size: 11px; color: #e65100; font-weight: 700;">Juno Pro Architect</span>
+            <span id="user-display-name" style="font-size: 13px; font-weight: 600; color: #e3e3e3; line-height: 1.2;">Ankita Priyadarshini Pallai</span>
+            <span style="font-size: 11px; color: #8e918f; font-weight: 500;">Pro</span>
           </div>
         </div>
-        <button class="sidebar-settings-btn" onclick="window.activateView('settings')" title="Settings" style="background: transparent; border: none; color: #4a2e00; cursor: pointer; padding: 4px;">
+        <button class="sidebar-settings-btn" onclick="window.activateView('settings')" title="Settings" style="background: transparent; border: none; color: #c4c7c5; cursor: pointer; padding: 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
       </div>
     </aside>
 
-    <!-- Main Canvas Area (Golden Harmony System) -->
+    <!-- Main Canvas Area (Google Gemini 1:1) -->
     <div class="app-main-canvas gemini-main-canvas" style="background: #fff8e1; position: relative; flex: 1; display: flex; flex-direction: column;">
       
       <!-- Mobile Top Navigation Bar -->
@@ -178,73 +198,55 @@
           </div>
         </div>
 
-        <!-- Hero Greeting Banner (ChatGPT Minimalist Style in Signature Yellow) -->
-        <div id="chat-hero-view" class="chat-hero-view gemini-hero-center" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 40px 16px 20px 16px; margin: auto; max-width: 800px; flex: 1; width: 100%; box-sizing: border-box; overflow-y: auto;">
-          <h1 class="chatgpt-hero-title" style="font-size: 32px; font-weight: 700; color: #2C1D00; margin-bottom: 24px; font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;">What's on your mind today?</h1>
-
-          <!-- ChatGPT Style Quick Action Pills -->
-          <div class="chatgpt-quick-actions" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 4px;">
-            <button type="button" class="chatgpt-action-pill" onclick="window.triggerSampleQuery('Create an image of ')">
-              <span style="font-size: 16px;">🖼️</span>
-              <span>Create an image</span>
-            </button>
-            <button type="button" class="chatgpt-action-pill" onclick="window.triggerSampleQuery('Help me write or edit ')">
-              <span style="font-size: 16px;">✏️</span>
-              <span>Write or edit</span>
-            </button>
-            <button type="button" class="chatgpt-action-pill" onclick="window.triggerSampleQuery('Search the web for ')">
-              <span style="font-size: 16px;">🌐</span>
-              <span>Search the web</span>
-            </button>
-          </div>
+        <!-- Hero Greeting Banner (Google Gemini 1:1) -->
+        <div id="chat-hero-view" class="chat-hero-view gemini-hero-center" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 60px 16px 20px 16px; margin: auto; max-width: 800px; flex: 1; width: 100%; box-sizing: border-box;">
+          <h1 class="gemini-hero-title" style="font-size: 32px; font-weight: 500; color: #e3e3e3; margin-bottom: 28px; font-family: 'Inter', -apple-system, sans-serif; letter-spacing: -0.3px;">Hi Ankita, what's on your mind?</h1>
         </div>
 
         <!-- Chat Stream Messages Container -->
-        <div id="chat-container" class="chat-stream" style="flex: 1; min-height: 0; overflow-y: auto; width: 100%; max-width: 800px; margin: 0 auto; padding: 12px 14px 20px 14px; display: none; flex-direction: column; gap: 14px; box-sizing: border-box; scroll-behavior: smooth;"></div>
+        <div id="chat-container" class="chat-stream" style="flex: 1; min-height: 0; overflow-y: auto; width: 100%; max-width: 820px; margin: 0 auto; padding: 12px 14px 20px 14px; display: none; flex-direction: column; gap: 16px; box-sizing: border-box; scroll-behavior: smooth;"></div>
 
         <!-- Scroll to Bottom Floating Button -->
-        <button id="scroll-to-bottom-btn" onclick="window.scrollToChatBottom()" title="Scroll to bottom" style="display: none; position: absolute; bottom: 85px; right: 24px; background: #ffd93d; border: 1.5px solid #fbc02d; color: #2c1d00; width: 36px; height: 36px; border-radius: 50%; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 20; font-weight: 800;">
+        <button id="scroll-to-bottom-btn" onclick="window.scrollToChatBottom()" title="Scroll to bottom" style="display: none; position: absolute; bottom: 90px; right: 24px; background: #282a2c; border: 1px solid rgba(255, 255, 255, 0.15); color: #e3e3e3; width: 36px; height: 36px; border-radius: 50%; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); z-index: 20; font-weight: 700;">
           ↓
         </button>
 
-        <!-- Sticky Bottom Input Deck -->
-        <div class="chat-input-sticky-container" style="width: 100%; max-width: 800px; margin: 0 auto; padding: 8px 12px 16px 12px; box-sizing: border-box; background: transparent; z-index: 10;">
-          <form id="rag-query-form" class="chat-input-container gemini-floating-pill" autocomplete="off" onsubmit="window.submitRAGQuery(event); return false;">
+        <!-- Gemini Floating Input Deck (1:1 Gemini Bar) -->
+        <div class="chat-input-sticky-container" style="width: 100%; max-width: 820px; margin: 0 auto; padding: 8px 16px 24px 16px; box-sizing: border-box; background: transparent; z-index: 10;">
+          <form id="rag-query-form" class="chat-input-container gemini-floating-pill" autocomplete="off" onsubmit="window.submitRAGQuery(event); return false;" style="background: #1e1e1f; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 28px; padding: 10px 16px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); transition: border-color 0.2s ease, box-shadow 0.2s ease;">
             <!-- Attachment Preview Chip Container -->
-            <div id="prompt-attachment-preview-container" class="prompt-attachment-preview" style="display: none; padding: 6px 12px; border-bottom: 1px solid rgba(251, 192, 45, 0.3); gap: 8px; align-items: center; width: 100%; box-sizing: border-box;"></div>
+            <div id="prompt-attachment-preview-container" class="prompt-attachment-preview" style="display: none; padding: 6px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); gap: 8px; align-items: center; width: 100%; box-sizing: border-box;"></div>
 
-            <!-- Top Row: Full-width Textarea Input -->
-            <div class="rag-input-main-row" style="display: flex; align-items: center; width: 100%;">
-              <!-- Hidden File Input for Prompt Attachments -->
+            <!-- Single Line / Multi-line Input Bar with Integrated Left & Right Tools -->
+            <div class="rag-input-main-row" style="display: flex; align-items: center; gap: 12px; width: 100%;">
+              <!-- Left Tool: Plus Attachment Button -->
               <input type="file" id="prompt-file-attach-input" accept="image/*,.pdf,.txt,.js,.json" style="display: none;" onchange="window.handlePromptFileSelected(this.files)">
+              <button type="button" class="input-action-btn" title="Upload file or context" onclick="document.getElementById('prompt-file-attach-input').click()" style="background: transparent; border: none; color: #c4c7c5; cursor: pointer; font-size: 20px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s ease;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
 
-              <!-- Multi-line Auto-resizing Textarea Input -->
-              <textarea id="rag-query-input" class="chat-textarea" placeholder="Message Juno..." aria-label="Query Input" rows="1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex: 1; width: 100%; min-width: 0; background: transparent; border: none; color: #2c1d00; font-size: 15px; font-weight: 600; outline: none; font-family: inherit; padding: 6px 0; resize: none; max-height: 200px; line-height: 1.5;"></textarea>
-            </div>
+              <!-- Textarea Input with Placeholder 'Ask Gemini' -->
+              <textarea id="rag-query-input" class="chat-textarea" placeholder="Ask Gemini" aria-label="Ask Gemini" rows="1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="flex: 1; width: 100%; min-width: 0; background: transparent; border: none; color: #e3e3e3; font-size: 15px; font-weight: 400; outline: none; font-family: 'Inter', -apple-system, sans-serif; padding: 4px 0; resize: none; max-height: 200px; line-height: 1.5;"></textarea>
 
-            <!-- Bottom Row: Tools Bar (Attach + Model selector on Left | Theme + Mic + Send on Right) -->
-            <div class="rag-input-tools-row" style="display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
-              <!-- Left Tools: Plus Attach + Model Selector Pill -->
-              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                <!-- Plus Attach Button -->
-                <button type="button" class="input-action-btn" title="Upload Image, Note, or File" onclick="document.getElementById('prompt-file-attach-input').click()" style="background: rgba(251, 192, 45, 0.2); border: 1.5px solid #fbc02d; color: #e65100; cursor: pointer; font-size: 18px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800;">+</button>
-              </div>
-
-              <!-- Right Controls: Theme Toggle + Voice Mic + Submit Button -->
+              <!-- Right Tools: Model Picker + Voice Mic + Send -->
               <div style="display: flex; align-items: center; gap: 8px;">
-                <!-- Juno Dark / Light Theme Toggle Pill -->
-                <button type="button" class="input-action-btn theme-toggle-btn" title="Toggle Juno Dark / Light Mode" onclick="window.toggleGeminiDarkTheme()" style="background: rgba(251, 192, 45, 0.2); border: 1.5px solid #fbc02d; color: #2c1d00; border-radius: 16px; padding: 5px 10px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px;">
-                  <span id="theme-toggle-icon">🌙</span> <span id="theme-toggle-text">Dark</span>
-                </button>
+                <!-- Model Selector Dropdown Pill -->
+                <div class="gemini-model-selector-pill" style="display: flex; align-items: center; gap: 4px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 4px 10px; border-radius: 16px; cursor: pointer;">
+                  <select id="model-select-dropdown" class="model-select-dropdown" onchange="window.handleModelChange(this.value)" style="background: transparent; border: none; color: #c4c7c5; font-size: 12.5px; font-weight: 500; cursor: pointer; outline: none; font-family: inherit;">
+                    <option value="gemini-2.5-flash" selected>Flash ∨</option>
+                    <option value="gemini-2.5-pro">Pro 🚀 ∨</option>
+                    <option value="gemini-2.0-flash">Deep Think 🧠 ∨</option>
+                  </select>
+                </div>
 
                 <!-- Voice Mic Button -->
-                <button type="button" id="voice-trigger-btn" class="input-action-btn voice-btn" title="Voice Input" onclick="window.toggleVoiceListen()" style="background: rgba(251, 192, 45, 0.2); border: 1.5px solid #fbc02d; color: #e65100; cursor: pointer; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <button type="button" id="voice-trigger-btn" class="input-action-btn voice-btn" title="Use Microphone" onclick="window.toggleVoiceListen()" style="background: transparent; border: none; color: #c4c7c5; cursor: pointer; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
                 </button>
 
-                <!-- Send / Stop Submit Button -->
-                <button type="submit" id="rag-submit-btn" class="input-action-btn send-btn" title="Send Message" style="background: linear-gradient(135deg, #FFD93D 0%, #FBC02D 100%); border: 1.5px solid #FBC02D; color: #2C1D00; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(251, 192, 45, 0.45); transition: all 0.2s ease;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Send Button -->
+                <button type="submit" id="rag-submit-btn" class="input-action-btn send-btn" title="Send message" style="background: #e3e3e3; border: none; color: #131314; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: opacity 0.2s ease;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="22" y1="2" x2="11" y2="13"></line>
                     <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                   </svg>

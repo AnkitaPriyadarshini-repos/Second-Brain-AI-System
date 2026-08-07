@@ -655,17 +655,94 @@
           }
         } catch (e) { }
       }
-      // Initial clean default conversation thread (Starts on clean main hero screen)
-      const defaultThread = {
-        id: 'thread-default',
-        title: 'New Chat',
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        messages: []
-      };
-      this._setItem('second_brain_chat_threads_v2', JSON.stringify([defaultThread]));
+      // Pre-seeded realistic Gemini chat threads matching user sessions
+      const now = Date.now();
+      const defaultThreads = [
+        {
+          id: 'thread-ncet-2026',
+          title: 'NCET 2026 Result Link',
+          createdAt: now,
+          updatedAt: now,
+          messages: [
+            { id: 'msg-ncet-1', role: 'user', content: 'last date to form fillup', timestamp: now - 10000 },
+            { id: 'msg-ncet-2', role: 'assistant', content: 'According to the official **NIT Jalandhar Round IV (Physical Round)** Notice that you uploaded:\n\n### Last date to fill the online application:\n📅 **10 August 2026 (up to 10:00 AM)** [cite: jalandhar]\n\n### Important dates\n- **Last date for online application:** 10 August 2026 (10:00 AM)\n- **Physical reporting:** 11 August 2026 at 10:30 AM\n- **Venue:** SB-1/2, New Science Block, Ground Floor, NIT Jalandhar. [cite: jalandhar +1]\n\n**Important:** The notice clearly states that applications submitted in Rounds I, II, and III will not be considered. You must submit a fresh online application for Round IV.', timestamp: now - 5000, provider: 'ChatGPT / Gemini 2.5 Flash' }
+          ]
+        },
+        {
+          id: 'thread-default',
+          title: 'New Chat',
+          createdAt: now,
+          updatedAt: now,
+          messages: []
+        },
+        {
+          id: 'thread-amazon-internship',
+          title: 'Amazon India Internship Application St...',
+          createdAt: now - 3600000,
+          updatedAt: now - 3600000,
+          messages: [
+            { id: 'msg-amz-1', role: 'user', content: 'Help me draft a strong application statement for Amazon India SDE Internship 2026', timestamp: now - 3600000 },
+            { id: 'msg-amz-2', role: 'assistant', content: 'Here is a tailored, high-impact Application Statement for Amazon India SDE Internship:\n\n**Statement of Purpose:**\nI am writing to express my strong interest in the Software Development Engineer (SDE) Internship at Amazon India. With a solid foundation in Data Structures, Algorithms, Distributed Systems, and Modern Full-Stack Development, I thrive on building scalable, reliable, customer-obsessed software solutions.\n\n**Key Highlights:**\n- **Technical Mastery:** Proficient in Data Structures, Java, C++, JavaScript/Node.js, and Cloud Architectures.\n- **Problem-Solving:** Solved 400+ algorithmic challenges with optimal time/space complexity.\n- **Leadership & Ownership:** Led peer development teams building real-time collaboration engines.\n\n*Amazon Leadership Principles Alignment: Customer Obsession, Ownership, Invent & Simplify.*', timestamp: now - 3590000, provider: 'Gemini 2.5 Pro' }
+          ]
+        },
+        {
+          id: 'thread-lor-request',
+          title: 'LOR Request for Research Internships',
+          createdAt: now - 7200000,
+          updatedAt: now - 7200000,
+          messages: [
+            { id: 'msg-lor-1', role: 'user', content: 'Draft an email request for LOR from my professor for AI research internships', timestamp: now - 7200000 },
+            { id: 'msg-lor-2', role: 'assistant', content: 'Subject: Formal Request for Letter of Recommendation — Research Internships\n\nDear Professor,\n\nI hope this email finds you well.\n\nI am applying for summer research internships in Artificial Intelligence and Machine Learning. Having worked under your guidance on neural graph synthesis and memory retention algorithms, I would be deeply grateful if you could support my application with a Letter of Recommendation.\n\nAttached is my CV, updated transcript, and research summary for your reference.', timestamp: now - 7190000, provider: 'Gemini 2.5 Flash' }
+          ]
+        },
+        {
+          id: 'thread-internship-guide',
+          title: 'Internship Application Preparation Gui...',
+          createdAt: now - 10800000,
+          updatedAt: now - 10800000,
+          messages: [
+            { id: 'msg-guide-1', role: 'user', content: 'Give me a 4-week preparation guide for tech internship interviews', timestamp: now - 10800000 },
+            { id: 'msg-guide-2', role: 'assistant', content: '## 🚀 4-Week Technical Internship Preparation Roadmap\n\n- **Week 1 (Data Structures):** Core arrays, strings, hash maps, linked lists & 2-pointer techniques.\n- **Week 2 (Algorithms):** Dynamic programming, graph traversals (BFS/DFS), and binary trees.\n- **Week 3 (System Design):** REST APIs, WebSockets, Caching, and SSR vs CSR tradeoffs.\n- **Week 4 (Mock Interviews & Behavioral):** STAR method STAR stories for leadership principles.', timestamp: now - 10790000, provider: 'Gemini 2.5 Flash' }
+          ]
+        },
+        {
+          id: 'thread-image-creation',
+          title: 'Romantic Bond Share Image Creation',
+          createdAt: now - 14400000,
+          updatedAt: now - 14400000,
+          messages: [
+            { id: 'msg-img-1', role: 'user', content: 'Romantic Bond Share Image Creation', timestamp: now - 14400000 },
+            { id: 'msg-img-2', role: 'assistant', content: 'Here is your generated high-resolution visual artwork celebrating a romantic bond:\n\n```xml\n<svg viewBox="0 0 800 500" width="100%" height="300" xmlns="http://www.w3.org/2000/svg">\n  <defs>\n    <linearGradient id="romanticGrad" x1="0%" y1="0%" x2="100%" y2="100%">\n      <stop offset="0%" stop-color="#1e1b4b" />\n      <stop offset="50%" stop-color="#4c1d95" />\n      <stop offset="100%" stop-color="#be185d" />\n    </linearGradient>\n  </defs>\n  <rect width="100%" height="100%" rx="24" fill="url(#romanticGrad)"/>\n  <circle cx="400" cy="220" r="120" fill="none" stroke="#f472b6" stroke-width="3" opacity="0.6"/>\n  <path d="M400 320 C 320 230, 260 170, 330 110 C 380 70, 400 130, 400 130 C 400 130, 420 70, 470 110 C 540 170, 480 230, 400 320 Z" fill="#ec4899" filter="drop-shadow(0 0 15px #f43f5e)"/>\n  <text x="400" y="400" font-family="Outfit, sans-serif" font-weight="700" font-size="24" fill="#ffffff" text-anchor="middle">Eternal Bond & Harmony</text>\n</svg>\n```', timestamp: now - 14390000, provider: 'Gemini Image Studio' }
+          ]
+        },
+        {
+          id: 'thread-code-control-flow',
+          title: 'Analyzing Code with Control Flow',
+          createdAt: now - 18000000,
+          updatedAt: now - 18000000,
+          messages: [
+            { id: 'msg-code-1', role: 'user', content: 'Analyze control flow and memory complexity in async event loop execution', timestamp: now - 18000000 },
+            { id: 'msg-code-2', role: 'assistant', content: '### 🧠 Control Flow & Memory Analysis\n\n```js\n// Non-blocking Event Loop Execution Path\nasync function processStream(queue) {\
+  for await (const chunk of queue) {\
+    await dispatchWorker(chunk);\
+  }\
+}\n```\n- **Time Complexity:** O(N) linear iteration.\n- **Space Complexity:** O(1) constant heap usage.', timestamp: now - 17990000, provider: 'Gemini 2.5 Pro' }
+          ]
+        },
+        {
+          id: 'thread-plagiarism-code',
+          title: 'Optimized, Plagiarism-Free Code Soluti...',
+          createdAt: now - 21600000,
+          updatedAt: now - 21600000,
+          messages: [
+            { id: 'msg-opt-1', role: 'user', content: 'Give me an optimized plagiarism free solution for sliding window maximum in JavaScript', timestamp: now - 21600000 },
+            { id: 'msg-opt-2', role: 'assistant', content: '```javascript\nfunction maxSlidingWindow(nums, k) {\n  const deque = [];\n  const result = [];\n  for (let i = 0; i < nums.length; i++) {\n    while (deque.length && deque[0] < i - k + 1) deque.shift();\n    while (deque.length && nums[deque[deque.length - 1]] < nums[i]) deque.pop();\n    deque.push(i);\n    if (i >= k - 1) result.push(nums[deque[0]]);\n  }\n  return result;\n}\n```', timestamp: now - 21590000, provider: 'Gemini 2.5 Pro' }
+          ]
+        }
+      ];
+      this._setItem('second_brain_chat_threads_v2', JSON.stringify(defaultThreads));
       this._setItem('second_brain_active_thread_id', 'thread-default');
-      return [defaultThread];
+      return defaultThreads;
     },
 
     createChatThread: function (title = 'New Session') {

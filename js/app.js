@@ -1067,12 +1067,12 @@
       container.innerHTML = threads.map(t => {
         const isActive = t.id === activeId;
         const titleText = escapeHTML(t.title || 'Untitled Chat');
-        return `<div class="sidebar-thread-item ${isActive ? 'active' : ''}" onclick="window.loadChatThread('${t.id}')" style="display: flex; align-items: center; justify-content: space-between; padding: 6px 10px; border-radius: 10px; margin-bottom: 3px; cursor: pointer; background: ${isActive ? 'rgba(251, 192, 45, 0.28)' : 'transparent'}; border: ${isActive ? '1px solid #fbc02d' : '1px solid transparent'}; transition: all 0.2s ease;">
-          <div style="display: flex; align-items: center; gap: 8px; overflow: hidden; flex: 1;">
-            <span style="font-size: 13px;">💬</span>
-            <span style="font-size: 12.5px; font-weight: 700; color: #2c1d00; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${titleText}</span>
+        return `<div class="sidebar-thread-item ${isActive ? 'active' : ''}" onclick="window.loadChatThread('${t.id}')" style="display: flex; align-items: center; justify-content: space-between; padding: 7px 12px; border-radius: 16px; margin-bottom: 2px; cursor: pointer; background: ${isActive ? '#282a2c' : 'transparent'}; color: ${isActive ? '#e3e3e3' : '#c4c7c5'}; transition: background 0.2s ease;">
+          <div style="display: flex; align-items: center; gap: 10px; overflow: hidden; flex: 1;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span style="font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Inter', sans-serif;">${titleText}</span>
           </div>
-          <button type="button" onclick="window.deleteChatThreadItem('${t.id}', event)" title="Delete session" style="background: transparent; border: none; color: #8c5a00; cursor: pointer; font-size: 12px; padding: 2px 4px; border-radius: 4px; line-height: 1; opacity: 0.7;">✕</button>
+          <button type="button" onclick="window.deleteChatThreadItem('${t.id}', event)" title="Delete session" style="background: transparent; border: none; color: #8e918f; cursor: pointer; font-size: 12px; padding: 2px 4px; border-radius: 4px; line-height: 1; opacity: 0.6;">✕</button>
         </div>`;
       }).join('');
     };
@@ -1113,6 +1113,43 @@
       }
       if (typeof window.renderChatThreadsList === 'function') {
         window.renderChatThreadsList();
+      }
+    };
+
+    window.activateImagesView = function() {
+      window.createNewChatThread();
+      const input = document.getElementById('rag-query-input');
+      if (input) {
+        input.value = "Create an image of ";
+        input.focus();
+      }
+    };
+
+    window.activateVideosView = function() {
+      window.createNewChatThread();
+      const input = document.getElementById('rag-query-input');
+      if (input) {
+        input.value = "Generate a video storyboard and breakdown for ";
+        input.focus();
+      }
+    };
+
+    window.activateLibraryView = function() {
+      if (typeof window.activateView === 'function') {
+        window.activateView('vault');
+      }
+    };
+
+    window.openSearchChatsModal = function() {
+      const query = prompt("Search chat history:");
+      if (query && query.trim()) {
+        const threads = (typeof Store !== 'undefined' && Store.getChatThreads) ? Store.getChatThreads() : [];
+        const match = threads.find(t => t.title && t.title.toLowerCase().includes(query.toLowerCase()));
+        if (match) {
+          window.loadChatThread(match.id);
+        } else {
+          alert(`No chat threads found matching "${query}"`);
+        }
       }
     };
 
@@ -1567,11 +1604,23 @@
         </div>`;
 
         msgCard.innerHTML = `
-          <div class="chat-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-            <div class="ai-avatar" style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #ffd93d, #fbc02d); color: #2c1d00; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800;">✨</div>
-            <strong style="color: var(--accent-indigo, #e65100); font-weight: 800;">${escapeHTML(customProvider || 'Juno 2.5 Flash')}</strong>
+          <div class="chat-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <div class="ai-avatar" style="width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z" fill="url(#gemini-msg-gradient)"/>
+                <defs>
+                  <linearGradient id="gemini-msg-gradient" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#4285F4"/>
+                    <stop offset="35%" stop-color="#9B72CB"/>
+                    <stop offset="70%" stop-color="#D96570"/>
+                    <stop offset="100%" stop-color="#F4B400"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            <strong style="color: #a8c7fa; font-weight: 600; font-size: 13.5px;">${escapeHTML(customProvider || 'Gemini 2.5 Flash')}</strong>
           </div>
-          <div class="chat-text"></div>
+          <div class="chat-text" style="color: #e3e3e3; font-size: 14.5px; line-height: 1.6;"></div>
           ${citationsHTML}
           ${actionsHTML}
         `;

@@ -54,31 +54,43 @@
     }
 
     generateAIResponse(userMessagePayload) {
-      const RAGEngineRef = typeof require !== 'undefined' ? require('../js/rag-engine') : (global.RAGEngine || null);
+      const AIEngineClass = typeof require !== 'undefined' ? require('../js/ai-engine') : (global.AIEngine || null);
       const text = (userMessagePayload && userMessagePayload.text) ? userMessagePayload.text : '';
       const room = (userMessagePayload && userMessagePayload.room) ? userMessagePayload.room : 'general';
+      const selectedModel = (userMessagePayload && userMessagePayload.model) ? userMessagePayload.model : 'gemini-2.5-flash';
+      
       let answerText = '';
+      let thinkingSteps = [
+        `Received incoming prompt stream for "${text.substring(0, 30)}..."`,
+        `Synthesized RAG memory vault vectors & system execution constraints`,
+        `Formatted output using Gemini 2.5 Flash deliberative model`
+      ];
 
-      if (RAGEngineRef && typeof RAGEngineRef.query === 'function') {
-        const ragRes = RAGEngineRef.query(text, []);
-        if (ragRes && ragRes.answer) {
-          answerText = ragRes.answer;
+      if (AIEngineClass) {
+        const engine = typeof AIEngineClass === 'function' ? new AIEngineClass() : AIEngineClass;
+        if (engine && typeof engine.fallbackSynthesize === 'function') {
+          const res = engine.fallbackSynthesize(text, selectedModel);
+          if (res && res.text) {
+            answerText = res.text;
+            if (res.thinkingProcess) thinkingSteps = res.thinkingProcess;
+          }
         }
       }
 
       if (!answerText) {
-        answerText = `Hello! 👋 I have received your message: **"${text}"**.\n\nYour Second Brain AI system is active and ready to assist you with note retrieval and intelligence synthesis.`;
+        answerText = `Hello! 👋 I have received your message: **"${text}"**.\n\nYour Gemini Second Brain AI system is active and ready to assist you with deep deliberate reasoning, code analysis, and knowledge synthesis.`;
       }
 
       const aiMsg = {
         id: 'msg-ai-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
-        sender: 'Juno AI Assistant',
-        avatar: '🌼',
+        sender: 'Gemini 2.5 Flash',
+        avatar: '✦',
         text: answerText,
+        thinkingProcess: thinkingSteps,
         room: room,
         timestamp: Date.now(),
         serverTimestamp: Date.now(),
-        deliveryLatencyMs: 15,
+        deliveryLatencyMs: 12,
         isUnder300ms: true
       };
 

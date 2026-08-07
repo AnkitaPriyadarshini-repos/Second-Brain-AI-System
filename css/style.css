@@ -117,17 +117,29 @@ a, a:hover, a:visited, a:focus, a:active,
 
 [data-theme="gemini-dark"] body,
 [data-theme="gemini-dark"] .app-main-canvas {
-  background: #131314 !important;
+  background: radial-gradient(circle at 50% 40%, #1a233a 0%, #131314 65%) !important;
   color: #e3e3e3 !important;
 }
 
 [data-theme="gemini-dark"] .app-sidebar {
   background: #1e1e1f !important;
-  border-right-color: rgba(255, 255, 255, 0.1) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
-[data-theme="gemini-dark"] .sidebar-menu-item,
-[data-theme="gemini-dark"] .sidebar-menu-item span,
+[data-theme="gemini-dark"] .sidebar-menu-item {
+  color: #c4c7c5 !important;
+}
+
+[data-theme="gemini-dark"] .sidebar-menu-item:hover {
+  background: #282a2c !important;
+  color: #e3e3e3 !important;
+}
+
+[data-theme="gemini-dark"] .sidebar-menu-item.active {
+  background: #282a2c !important;
+  color: #e3e3e3 !important;
+}
+
 [data-theme="gemini-dark"] .brand-name,
 [data-theme="gemini-dark"] #user-display-name,
 [data-theme="gemini-dark"] .gemini-hero-title,
@@ -137,8 +149,139 @@ a, a:hover, a:visited, a:focus, a:active,
 
 [data-theme="gemini-dark"] .gemini-floating-pill {
   background: #1e1e1f !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="gemini-dark"] .gemini-floating-pill:focus-within {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  background: #232427 !important;
+}
+
+/* Gemini Thinking Process Accordion Component */
+.gemini-thinking-accordion {
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.gemini-thinking-accordion summary {
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #a8c7fa;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+  transition: background 0.2s ease;
+}
+
+.gemini-thinking-accordion summary:hover {
+  background: rgba(168, 199, 250, 0.08);
+}
+
+.gemini-thinking-accordion .thinking-content {
+  padding: 10px 14px 12px 14px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: #c4c7c5;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.gemini-thinking-accordion .thinking-step-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.gemini-thinking-accordion .thinking-step-item:last-child {
+  margin-bottom: 0;
+}
+
+.gemini-thinking-accordion .step-num {
+  font-weight: 700;
+  color: #a8c7fa;
+  font-size: 11px;
+}
+
+/* Active Chat Stream & Message Bubble System */
+.chat-bubble {
+  max-width: 85%;
+  word-break: break-word;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.chat-bubble.user-bubble {
+  align-self: flex-end;
+  margin-left: auto;
+  background: #2f2f2f !important;
+  color: #ececec !important;
+  border-radius: 20px 20px 4px 20px !important;
+  padding: 10px 18px !important;
+  font-size: 14.5px !important;
+  line-height: 1.5 !important;
+  font-weight: 500 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.chat-bubble.ai-bubble {
+  align-self: flex-start;
+  margin-right: auto;
+  background: transparent !important;
+  color: #e3e3e3 !important;
+  width: 100%;
+  max-width: 100%;
+  padding: 4px 0 16px 0 !important;
+}
+
+/* Inline Citation Chips (e.g. jalandhar, jalandhar +1) */
+.inline-citation-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #2a2a2a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #c4c7c5;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  margin: 0 4px;
+  vertical-align: middle;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inline-citation-chip:hover {
+  background: #383838;
+  color: #ffffff;
+  border-color: #a8c7fa;
+}
+
+/* Date / Deadline Callout Card */
+.date-callout-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  color: #e3e3e3;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.date-callout-card .date-icon {
+  font-size: 18px;
 }
 
 /* Hide floating robot widget overlay to keep UI ultra-clean */

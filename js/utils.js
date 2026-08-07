@@ -61,24 +61,31 @@ function formatMarkdownText(mdText) {
     </div>`;
   });
 
-  // 2. Inline code
+  // 2. Citation chips [cite: label] or [label]
+  html = html.replace(/\[cite:\s*([^\]]+)\]/g, '<span class="inline-citation-chip">📄 $1</span>');
+  html = html.replace(/\[(jalandhar[^+\]]*(\+\d+)?)\]/gi, '<span class="inline-citation-chip">📄 $1</span>');
+
+  // 3. Inline code
   html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
 
-  // 3. Headings
+  // 4. Headings
   html = html.replace(/^#### (.*$)/gim, '<h4 class="md-h4">$1</h4>');
-  html = html.replace(/^### (.*$)/gim, '<h3 class="md-h3">$1</h3>');
-  html = html.replace(/^## (.*$)/gim, '<h2 class="md-h2">$1</h2>');
+  html = html.replace(/^### (.*$)/gim, '<h3 class="md-h3" style="font-size: 16px; font-weight: 700; color: #e3e3e3; margin: 14px 0 8px 0;">$1</h3>');
+  html = html.replace(/^## (.*$)/gim, '<h2 class="md-h2" style="font-size: 18px; font-weight: 700; color: #e3e3e3; margin: 16px 0 10px 0;">$1</h2>');
 
-  // 4. Bold & Italic
-  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  // 5. Date Callout Box (📅 date highlights)
+  html = html.replace(/📅\s*\*\*([^*]+)\*\*/g, '<div class="date-callout-card"><span class="date-icon">📅</span><span>$1</span></div>');
+
+  // 6. Bold & Italic
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong style="color: #ffffff; font-weight: 700;">$1</strong>');
   html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
 
-  // 5. Bullet lists
-  html = html.replace(/^\s*• (.*$)/gim, '<li class="md-li">• $1</li>');
-  html = html.replace(/^\s*[-*] (.*$)/gim, '<li class="md-li">• $1</li>');
-  html = html.replace(/(<li class="md-li">.*<\/li>\n?)+/g, '<ul class="md-ul">$&</ul>');
+  // 7. Bullet lists
+  html = html.replace(/^\s*• (.*$)/gim, '<li class="md-li" style="margin-bottom: 4px;">• $1</li>');
+  html = html.replace(/^\s*[-*] (.*$)/gim, '<li class="md-li" style="margin-bottom: 4px;">• $1</li>');
+  html = html.replace(/(<li class="md-li">.*<\/li>\n?)+/g, '<ul class="md-ul" style="list-style: none; padding-left: 0; margin: 8px 0;">$&</ul>');
 
-  // 6. Paragraph line breaks
+  // 8. Paragraph line breaks
   html = html.replace(/\n\n/g, '<br><br>');
 
   return html;
