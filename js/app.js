@@ -1402,21 +1402,12 @@
         }
 
         if (!answerText || !answerText.trim()) {
-          const qLower = cleanQuery.toLowerCase();
-          if (['hi', 'hii', 'hiii', 'hello', 'hey', 'heyy', 'yo', 'sup', 'namaste'].includes(qLower)) {
-            answerText = "Hi! 😊 How can I help you today?";
-          } else if (qLower.includes('how are you') || qLower.includes('how r u')) {
-            answerText = "I'm doing great, thank you! How can I help you synthesize your ideas and notes today?";
-          } else if (qLower.includes('weather') || qLower.includes('sambalpur') || qLower.includes('temperature') || qLower.includes('forecast')) {
-            let cityName = "Sambalpur";
-            if (qLower.includes('delhi')) cityName = "Delhi";
-            else if (qLower.includes('mumbai')) cityName = "Mumbai";
-            else if (qLower.includes('london')) cityName = "London";
-            else if (qLower.includes('new york')) cityName = "New York";
-
-            answerText = `Right now in **${cityName}**, it's **rainy** with a temperature of about **28°C**.\n\nThe forecast for today and the coming week is below:`;
+          const engine = (typeof aiEngine !== 'undefined' ? aiEngine : (typeof window !== 'undefined' ? window.aiEngine : null));
+          if (engine && typeof engine.fallbackSynthesize === 'function') {
+            const fallbackRes = engine.fallbackSynthesize(cleanQuery, selectedModel);
+            answerText = fallbackRes ? fallbackRes.text : `Here is the response for **"${cleanQuery}"**:\n\nYour Second Brain AI system is online and ready to assist you.`;
           } else {
-            answerText = `Hello Ankita! 👋 I have received your query: **"${cleanQuery}"**.\n\nYour Second Brain AI system is online and ready to assist you with note retrieval, research synthesis, and repository architecture.`;
+            answerText = `Here is the response for **"${cleanQuery}"**:\n\nYour Second Brain AI system is online and ready to assist you.`;
           }
         }
 
