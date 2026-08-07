@@ -1,4 +1,4 @@
-# 🌙 Juno AI — Research Tool & Real-Time Thinking Partner
+# 🌌 Claves Adaptive Fusion AI — Multi-Perspective Intelligence & Knowledge System
 
 <p align="center">
   <a href="https://second-brain-ai-system.vercel.app">
@@ -19,100 +19,158 @@
 </p>
 
 <p align="center">
-  <b>Never lose an idea again. Your notes, PDFs, code repos, and chats become one instant, searchable AI memory.</b><br />
-  Engineered with Next.js Server-Side Rendering, WebSockets bi-directional streaming, Dependency Inversion Principle (DIP) storage adapters, and Local RAG Vector Search.
+  <b>One conversation. Multiple forms of intelligence. One stronger answer.</b><br />
+  Engineered by <strong>Ankita Priyadarshini Pallai</strong> — Featuring Claves Adaptive Fusion AI, Next.js Server-Side Rendering (SSR), WebSockets Real-Time Bi-Directional Streaming, Dependency Inversion Principle (DIP) Storage Adapters, and Local Grounded RAG Vector Search.
 </p>
 
 <p align="center">
-  <a href="https://second-brain-ai-system.vercel.app/"><strong>🌐 Open Juno AI Live App</strong></a> •
-  <a href="#-quick-start"><strong>🚀 Quick Start</strong></a> •
-  <a href="#-key-features"><strong>✨ Key Features</strong></a> •
-  <a href="#-system-architecture"><strong>🏛️ Architecture</strong></a> •
+  <a href="https://second-brain-ai-system.vercel.app/"><strong>🌐 Open Live App</strong></a> •
+  <a href="#-claves-adaptive-fusion-ai"><strong>🌌 Adaptive Fusion AI</strong></a> •
+  <a href="#-architecture--software-design"><strong>🏛️ Architecture</strong></a> •
+  <a href="#-automated-test-suite"><strong>🧪 Test Suite (39/39)</strong></a> •
   <a href="#-tech-stack"><strong>🛠️ Tech Stack</strong></a>
 </p>
 
 ---
 
-## ✨ Key Features & Technical Specifications
+## 🌌 Claves Adaptive Fusion AI Engine
 
-| Feature | Description | Performance / Spec |
-| :--- | :--- | :--- |
-| 🚀 **Next.js SSR Acceleration** | Pre-renders initial chat history & telemetry on the server for instant First Contentful Paint. | **Server-Side Hydration Pre-Rendering** |
-| ⚡ **Real-Time WebSockets Stream** | Bi-directional streaming channel with client-side ACK tracking and latency telemetry. | **Persistent WebSockets Connection** |
-| 🏗️ **Dependency Inversion (DIP)** | Decouples persistence from services via `INoteRepository`, `IGoalRepository`, `IChatThreadRepository`, and `IMessageRepository`. | **Dynamic Storage Adapters** (`SQLite`, `PostgreSQL`, `InMemory`) |
-| ⚡ **Database Migration Manager** | Automated transactional schema migration runner (`v1` → `v2` → `v3`) with zero downtime. | **Transactional Versioning** |
-| 📱 **Native PWA Installation** | Progressive Web App manifest & Service Worker network-first caching (`sw.js`). | **Installable on iOS, Android & Desktop** |
-| 🌼 **Grounded Local RAG Engine** | Conversational Q&A grounded against unstructured notes & PDFs with source citations. | **Zero Data Exfiltration / 100% Private** |
-| 🔮 **Proactive Resurfacing** | Spaced-repetition algorithms resurfacing forgotten research notes with reason badges. | **SuperMemo-2 Spaced Repetition** |
+Behind a single natural conversation, **Claves Adaptive Fusion AI** researches facts, examines problems from multiple perspectives, challenges weak assumptions, audits important claims, and fuses the strongest work into one clear response.
+
+```
+       [ 🔍 RESEARCH ] ── Amber Strand ───────┐
+       [ 📊 ANALYZE  ] ── Cyan Strand ────────┤
+       [ ⚡ CHALLENGE] ── Purple Strand ──────┼──► [ 🌌 FUSION NUCLEUS ] ──► [ ✨ FUSED ANSWER ]
+       [ 🛡️ AUDIT    ] ── Platinum Strand ────┤
+       [ ✨ FUSE     ] ── Radiant Beam ───────┘
+```
+
+### Key Multi-Perspective Strands:
+1. 🔍 **RESEARCH**: Scans local knowledge vault, indexes entity relationships, and fetches grounded factual citations.
+2. 📊 **ANALYZE**: Deconstructs complex queries across architectural, structural, and operational dimensions.
+3. ⚡ **CHALLENGE**: Stress-tests model assumptions, audits edge cases, and red-teams logic against adversarial inputs.
+4. 🛡️ **AUDIT**: Verifies citation integrity, source accuracy, and validates factual precision with zero hallucination.
+5. ✨ **FUSE**: Synthesizes multi-agent intelligence strands into a single, highly structured, authoritative response.
 
 ---
 
-## 🏛️ System Architecture
+## 🏛️ Architecture & Software Design
+
+The codebase enforces production-grade engineering principles designed for enterprise scale, modularity, and high-throughput execution:
+
+### 1. **Layered Domain Architecture**
+- **Controllers Layer** (`NoteController`, `ChatController`, `GoalController`): Parses DTOs, validates input schemas, and enforces HTTP/WS request boundaries.
+- **Services Layer** (`NoteService`, `ChatService`, `GoalService`): Implements core business logic, RAG retrieval orchestration, and state transforms.
+- **Repositories Layer** (`INoteRepository`, `IChatThreadRepository`): Enforces Dependency Inversion Contracts (`DIP`) to abstract data access.
+
+### 2. **Dependency Inversion Principle (DIP) & Storage Adapters**
+Storage implementations are completely decoupled from business logic via a custom Dependency Injection (DI) Container supporting dynamic hot-swapping:
+- `InMemoryNoteRepositoryAdapter` (Ultra-fast execution)
+- `LocalStorageNoteRepositoryAdapter` (On-device persistence)
+- `DatabaseMigrationManager` (Automated transactional schema migration `v1` ➔ `v2` ➔ `v3`)
+
+### 3. **System Architecture Topology**
 
 ```mermaid
 graph TD
-    Client[Browser Client] -->|HTTP & WebSockets| Controllers[Controllers Layer]
+    Client[Browser Client / PWA] -->|HTTP & WebSockets| Controllers[Controllers Layer]
     Controllers -->|DTO Payload| Services[Domain Services Layer]
     Services -->|DIP Contracts| Repositories[Repository Interface Layer]
     Repositories -->|DI Container| Adapters[Storage Adapters]
-    Adapters -->|Persistence| Storage[(LocalStorage / InMemory / IndexedDB)]
+    Adapters -->|Persistence| Storage[(IndexedDB / LocalStorage / Memory)]
 
-    subgraph Backend Layers
-      Controllers
-      Services
-      Repositories
+    subgraph Backend Services
+      Services --> RAG[Local Vector RAG Engine]
+      Services --> Fusion[Claves Adaptive Fusion Engine]
+      Services --> NLP[NLP Sparse Entity Extraction]
     end
 
-    subgraph Frontend Components
-      Client --> Badges[Badge / Card / Button]
-      Client --> ChatUI[ChatFeed / MessageBubble / ChatInput]
+    subgraph Frontend Real-time UI
+      Client --> Canvas[HTML5 Neural Visualizer Canvas]
+      Client --> Cards[Live Reasoning Cards & Strands]
     end
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## 🧪 Automated Test Suite (39 / 39 Passed Cleanly)
 
-- **Core Framework**: Next.js 14 (Server-Side Rendering), Express.js, React 18, Node.js
-- **Real-Time Communication**: WebSockets (`ws`), Binary/JSON Frames, Heartbeat Ping/Pong & Latency Telemetry
-- **Software Patterns**: Dependency Inversion Principle (DIP), Dependency Injection (DI) Container, Repository Pattern, Layered Architecture
-- **Vector Engine**: TF-IDF Sparse Embeddings + Cosine Similarity Alignment
-- **Storage & Migration**: IndexedDB, LocalStorage Adapters, In-Memory Repository Adapters, Database Migration Manager
-- **Design System**: Golden Amber Dark Glassmorphism, Responsive CSS3 Grid & Flexbox
+The project includes an extensive automated test runner (`npm test`) covering unit tests, real-time WebSocket benchmarks, architectural DIP assertions, and SSR hydration checks:
+
+```bash
+====================================================
+🧠 SECOND BRAIN AI SYSTEM — AUTOMATED SUITE
+====================================================
+Suite 1: Data Store & 100 Notes Pre-Seeding (2/2 Passed)
+Suite 2: NLP Engine & Entity Extraction (2/2 Passed)
+Suite 3: Grounded RAG Engine Vault Search (3/3 Passed)
+Suite 4: Proactive Resurfacing Digest (1/1 Passed)
+Suite 5: Store CRUD & Multi-Surface Ingest (2/2 Passed)
+Suite 6: Audio Presets Module (1/1 Passed)
+Suite 7: Gemini Dynamic Color Flow Engine (2/2 Passed)
+Suite 8: Nexus AI Fairy Bot Engine (3/3 Passed)
+Suite 9: Developer Telemetry & Human Engineering HUD (2/2 Passed)
+Suite 10: Goal & Milestone Management Engine (3/3 Passed)
+Suite 11: AI Engine & Multi-Turn Chat Threads (3/3 Passed)
+
+====================================================
+⚡ REAL-TIME WEBSOCKET & NEXT.JS SSR TEST SUITE
+====================================================
+Suite A: Next.js SSR Performance & Hydration (2/2 Passed)
+Suite B: Real-Time WebSockets Sub-300ms Assertion (3/3 Passed)
+   -> Benchmark: Avg Latency = 6ms | Max Latency = 50ms
+
+====================================================
+🏗️ DEPENDENCY INVERSION & DB MIGRATION TEST SUITE
+====================================================
+Suite A: Abstract Interface Contracts DIP (1/1 Passed)
+Suite B: Dependency Injection Container Swapping (2/2 Passed)
+Suite C: Database Migration Manager Speed Benchmark (2/2 Passed)
+   -> Benchmark: 120 Notes transformed in 0.31ms (389,231 ops/sec)
+
+====================================================
+🏛️ LAYERED ARCHITECTURE & COMPONENT TEST SUITE
+====================================================
+Suite A: Layered Backend Architecture (3/3 Passed)
+Suite B: Reusable Component-Based Frontend Library (2/2 Passed)
+
+SUMMARY: 39 / 39 TESTS PASSED CLEANLY.
+```
 
 ---
 
-## 🚀 Quick Start
+## 🛠️ Tech Stack & Engineering Standards
 
-### 1. Clone & Run Locally
+- **Frontend**: HTML5, Vanilla CSS3 (Dark Obsidian Glassmorphism), Modern JavaScript ES2024, HTML5 Canvas 2D/3D Renderer
+- **Backend & SSR**: Next.js 14, Node.js, Express.js Server
+- **Real-Time Communication**: WebSockets (`ws`) with Client-Side ACK tracking and live latency telemetry
+- **Vector Retrieval**: Local Sparse RAG Vector Index with Cosine Similarity scoring
+- **Testing & Tooling**: Native Node.js Test Harness, Custom Benchmarking Telemetry
+- **PWA & Offline**: Service Worker (`sw.js`) network-first offline strategy, Web App Manifest
+
+---
+
+## 🚀 Quick Start & Local Execution
+
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/AnkitaPriyadarshini-repos/Second-Brain-AI-System.git
 cd Second-Brain-AI-System
 
-# Install dependencies
+# 2. Install dependencies
 npm install
 
-# Start Next.js SSR + Real-Time WebSocket Server
+# 3. Execute full automated test suite (39 Tests)
+npm test
+
+# 4. Start Next.js SSR + Real-Time WebSocket Server
 npm start
 ```
-Open `http://localhost:3000` in your browser.
-
-### 2. Run Comprehensive Test Suite
-```bash
-npm test
-```
-*Executes all 39 automated tests across 4 test suites:*
-1. `run_tests.js`: Core RAG Engine, NLP, Store CRUD, and Resurfacing tests (24/24 Passed).
-2. `run_websocket_ssr_tests.js`: Real-time WebSocket latency (<300ms) and Next.js SSR load speedup tests (5/5 Passed).
-3. `run_dip_repository_tests.js`: Dependency Inversion contracts, container adapter swapping, and migration benchmarks (5/5 Passed).
-4. `run_layered_architecture_tests.js`: Controllers → Services → Data Access layering and reusable UI component tests (5/5 Passed).
+Open **`http://localhost:3000`** in your browser to view the application locally.
 
 ---
 
-## 👤 Author & License
-
-Engineered with care by **Ankita Priyadarshini**  
-GitHub: [https://github.com/AnkitaPriyadarshini-repos/Second-Brain-AI-System](https://github.com/AnkitaPriyadarshini-repos/Second-Brain-AI-System)  
-Live App: [https://second-brain-ai-system.vercel.app](https://second-brain-ai-system.vercel.app)  
-Released under the [MIT License](LICENSE).
+### 👤 Author
+**Ankita Priyadarshini Pallai**  
+- **Live Demo**: [https://second-brain-ai-system.vercel.app/](https://second-brain-ai-system.vercel.app/)  
+- **GitHub**: [@AnkitaPriyadarshini-repos](https://github.com/AnkitaPriyadarshini-repos)

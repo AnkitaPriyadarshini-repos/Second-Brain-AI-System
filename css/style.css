@@ -5872,114 +5872,68 @@ kbd {
   box-shadow: 0 4px 14px rgba(251, 192, 45, 0.4) !important;
 }
 
-/* ALL-YELLOW GOLDEN HARMONY BASE OVERRIDES (NO BLACK BACKGROUND ANYWHERE) */
+/* CLAVES ADAPTIVE FUSION AI — FLAGSHIP DARK OBSIDIAN INTERFACE SYSTEM */
 body, html {
-  background-color: #FFF8E1 !important;
-  background: #FFF8E1 !important;
-  color: #2C1D00 !important;
+  background-color: #07090e !important;
+  background: #07090e !important;
+  color: #f8fafc !important;
 }
 
-.gemini-hero-title {
-  color: #2C1D00 !important;
-  background: linear-gradient(135deg, #D84315 0%, #E65100 30%, #F57F17 65%, #FBC02D 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-}
-
-.gemini-hero-sub {
-  color: #6D4C41 !important;
-}
-
-.prompt-card-title {
-  color: #2C1D00 !important;
-}
-
-.prompt-card-desc {
-  color: #6D4C41 !important;
-}
-
-/* ----------------------------------------------------
-   1:1 Google Gemini Flagship Interface System
-   ---------------------------------------------------- */
-/* ----------------------------------------------------
-   Golden Harmony Flagship All-Yellow Interface System (Zero Black Background)
-   ---------------------------------------------------- */
 .gemini-sidebar {
-  background: linear-gradient(180deg, #FFF8E1 0%, #FFF3C0 100%) !important;
-  border-right: 1.5px solid rgba(251, 192, 45, 0.45) !important;
+  background: #090d16 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
   padding: 16px 12px !important;
 }
 
 .gemini-sidebar .sidebar-menu-item,
 .gemini-sidebar .sidebar-menu-item span {
-  color: #2C1D00 !important;
+  color: #e2e8f0 !important;
   font-size: 13.5px !important;
-  font-weight: 700 !important;
+  font-weight: 600 !important;
 }
 
 .gemini-sidebar .sidebar-menu-item svg {
-  stroke: #2C1D00 !important;
+  stroke: #cbd5e1 !important;
 }
 
 .gemini-sidebar .sidebar-menu-item:hover,
 .gemini-sidebar .sidebar-menu-item:hover span {
-  background: #FFE156 !important;
-  color: #2C1D00 !important;
-}
-
-.gemini-sidebar .sidebar-menu-item:hover svg {
-  stroke: #2C1D00 !important;
+  background: rgba(30, 41, 59, 0.8) !important;
+  color: #ffffff !important;
 }
 
 .gemini-sidebar .sidebar-menu-item.active,
 .gemini-sidebar .sidebar-menu-item.active span {
-  background: #FBC02D !important;
-  color: #2C1D00 !important;
+  background: rgba(30, 41, 59, 0.95) !important;
+  border: 1px solid rgba(245, 158, 11, 0.4) !important;
+  color: #fbbf24 !important;
   font-weight: 800 !important;
-  box-shadow: 0 4px 14px rgba(251, 192, 45, 0.4) !important;
-}
-
-.gemini-sidebar .sidebar-menu-item.active svg {
-  stroke: #2C1D00 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
 }
 
 .gemini-sidebar .sidebar-thread-item,
 .gemini-sidebar .sidebar-thread-item span {
-  color: #4A2E00 !important;
+  color: #94a3b8 !important;
   font-size: 13px !important;
-  border-radius: 16px !important;
-  padding: 8px 12px !important;
 }
 
-.gemini-sidebar .sidebar-thread-item:hover,
-.gemini-sidebar .sidebar-thread-item:hover span {
-  background: #FFE156 !important;
-  color: #2C1D00 !important;
+.gemini-sidebar .sidebar-thread-item:hover {
+  background: rgba(30, 41, 59, 0.6) !important;
+  color: #f8fafc !important;
 }
 
 .gemini-sidebar .history-section-label,
 .gemini-sidebar .gemini-notebooks-section div {
-  color: #5D4037 !important;
-  font-weight: 800 !important;
-}
-
-.gemini-hero-title {
-  font-size: 44px !important;
-  font-weight: 800 !important;
-  font-family: 'Inter', -apple-system, sans-serif !important;
-  background: linear-gradient(135deg, #D84315 0%, #E65100 30%, #F57F17 65%, #FBC02D 100%) !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  letter-spacing: -0.025em !important;
-  filter: drop-shadow(0 2px 20px rgba(251, 192, 45, 0.45)) !important;
+  color: #94a3b8 !important;
+  font-weight: 700 !important;
 }
 
 .gemini-main-canvas {
-  background: #FFF8E1 !important;
+  background: #07090e !important;
 }
 
 .gemini-ambient-glow {
-  background: radial-gradient(circle, rgba(255, 217, 61, 0.5) 0%, rgba(251, 192, 45, 0.28) 50%, rgba(255, 248, 225, 0) 80%) !important;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.28) 0%, rgba(168, 85, 247, 0.18) 35%, rgba(6, 182, 212, 0.12) 65%, rgba(7, 9, 14, 0) 85%) !important;
 }
 
 .chat-hero-view {
