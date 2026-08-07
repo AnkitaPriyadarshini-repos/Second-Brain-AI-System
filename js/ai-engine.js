@@ -543,7 +543,7 @@ export function HydratedComponent({ data }) {
     return {
       text: output,
       thinkingProcess: thinkingSteps,
-      provider: `Gemini 2.5 Flash`,
+      provider: `Second Brain AI (Pro 2.5)`,
       grounded: !!ragContext
     };
   }
