@@ -20,11 +20,19 @@ spotify-remix/
 __pycache__/
 *.pyc
 
+# Gradle & Android Build Caches
+.gradle/
+build/
+app/build/
+*.keystore
+
 # Local helper scripts & unrelated project files
 *.py
 scratch/
+scratch Bart/
 docs/pull_shark_log_*
 docs/optimization_*
+pinterest_color.jpg
 
 .vercel
 .next/
