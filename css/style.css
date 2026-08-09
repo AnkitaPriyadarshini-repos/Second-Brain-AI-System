@@ -130,6 +130,47 @@ a, a:hover, a:visited, a:focus, a:active,
   border-color: rgba(45, 212, 191, 0.5) !important;
 }
 
+/* Aqua Aesthetic Theme (Electric Aqua Cyan + Deep Ocean Navy + Crisp Ice Aqua) */
+[data-theme="aqua-aesthetic"],
+[data-theme="aqua-cyan"] {
+  --bg-dark: #040d1a;
+  --bg-card: rgba(9, 27, 46, 0.92);
+  --bg-card-hover: rgba(15, 41, 68, 0.95);
+  --bg-card-active: rgba(22, 58, 94, 0.95);
+  --border-color: rgba(6, 182, 212, 0.4);
+  --border-highlight: #00f2fe;
+  --border-accent: #22d3ee;
+  --text-primary: #ecfeff;
+  --text-secondary: #cffafe;
+  --text-muted: #67e8f9;
+  --accent-primary: #06b6d4;
+  --accent-primary-hover: #0891b2;
+  --accent-primary-light: rgba(6, 182, 212, 0.25);
+  --accent-indigo: #38bdf8;
+  --accent-violet: #818cf8;
+  --accent-emerald: #22d3ee;
+  --accent-amber: #38bdf8;
+  --accent-cyan: #00f2fe;
+  --shadow-card: 0 10px 40px -5px rgba(0, 0, 0, 0.85);
+  --shadow-glow: 0 0 35px rgba(6, 182, 212, 0.45);
+}
+
+[data-theme="aqua-aesthetic"] .gemini-ambient-glow,
+[data-theme="aqua-cyan"] .gemini-ambient-glow {
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.38) 0%, rgba(34, 211, 238, 0.25) 35%, rgba(56, 189, 248, 0.18) 65%, rgba(4, 13, 26, 0) 85%) !important;
+}
+
+[data-theme="aqua-aesthetic"] .yellow-dot,
+[data-theme="aqua-cyan"] .yellow-dot {
+  background: #00f2fe !important;
+  box-shadow: 0 0 12px #00f2fe !important;
+}
+
+[data-theme="aqua-aesthetic"] .gemini-model-selector-pill,
+[data-theme="aqua-cyan"] .gemini-model-selector-pill {
+  border-color: rgba(6, 182, 212, 0.6) !important;
+}
+
 [data-theme="second-brain-dark"],
 [data-theme="gemini-dark"],
 :root {

@@ -711,16 +711,18 @@
       }
     };
 
-    window.handleModelChange = function(modelVal) {
-      if (!modelVal) return;
-      // Map model value directly to theme
-      let targetTheme = 'gemini-glow';
-      if (modelVal === 'claude-obsidian') targetTheme = 'claude-obsidian';
-      else if (modelVal === 'chatgpt-emerald') targetTheme = 'chatgpt-emerald';
-      else if (modelVal === 'perplexity-cyan') targetTheme = 'perplexity-cyan';
-      else if (modelVal === 'gemini-glow') targetTheme = 'gemini-glow';
-      
-      window.applyTheme(targetTheme);
+      window.handleModelChange = function(modelVal) {
+        if (!modelVal) return;
+        // Map model value directly to theme
+        let targetTheme = 'golden-harmony';
+        if (modelVal === 'aqua-aesthetic' || modelVal === 'aqua-cyan') targetTheme = 'aqua-aesthetic';
+        else if (modelVal === 'summer-ocean') targetTheme = 'summer-ocean';
+        else if (modelVal === 'claude-obsidian') targetTheme = 'claude-obsidian';
+        else if (modelVal === 'chatgpt-emerald') targetTheme = 'chatgpt-emerald';
+        else if (modelVal === 'perplexity-cyan') targetTheme = 'perplexity-cyan';
+        else if (modelVal === 'gemini-glow') targetTheme = 'gemini-glow';
+        
+        window.applyTheme(targetTheme);
       
       if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) {
         SoundEngine.playClick();

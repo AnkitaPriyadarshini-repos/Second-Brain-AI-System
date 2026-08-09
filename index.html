@@ -182,6 +182,7 @@
               <span class="yellow-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 10px #f59e0b;"></span>
               <select id="model-select-dropdown" class="model-select-dropdown" onchange="window.handleModelChange(this.value)" style="background: transparent; border: none; color: #f8fafc; font-size: 13.5px; font-weight: 700; cursor: pointer; outline: none; font-family: inherit;">
                 <option value="claves-adaptive-fusion" selected>🧠 Second Brain Hybrid RAG AI ∨</option>
+                <option value="aqua-aesthetic">💧 Aqua Color Aesthetic ∨</option>
                 <option value="gemini-2.5-flash">✨ Gemini 2.5 Flash ∨</option>
                 <option value="gemini-2.5-pro">🧠 Gemini 2.5 Pro (Deep Thinking) ∨</option>
                 <option value="gemini-2.0-flash">⚡ Gemini 2.0 Flash Thinking ∨</option>
@@ -475,6 +476,30 @@
           <img src="assets/summer_ocean_palette.png" alt="Summer Ocean Palette Moodboard" style="width: 110px; height: 68px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(45, 212, 191, 0.4); flex-shrink: 0;">
           <div style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
             Inspired by Pinterest coastal aesthetic moodboards, this design theme brings a calming, fresh visual tone to your Second Brain prior to launch. High-contrast seafoam green accents, buttery yellow highlights, and soft ivory typography.
+          </div>
+      <!-- Aqua Color Aesthetic Inspiration Card -->
+      <div class="glass-card" style="margin-bottom: 20px; padding: 18px 20px; border: 1.5px solid rgba(6, 182, 212, 0.5); background: linear-gradient(135deg, rgba(9, 27, 46, 0.95), rgba(4, 13, 26, 0.98));">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 24px;">💧</span>
+            <div>
+              <h3 style="font-size: 16px; font-weight: 800; color: #00f2fe; margin: 0;">Aqua Color Aesthetic Palette</h3>
+              <p style="font-size: 12.5px; color: #cffafe; margin: 2px 0 0 0;">Electric Aqua Cyan (#06b6d4) • Neon Turquoise (#00f2fe) • Ice Aqua Platinum (#ecfeff) • Ocean Navy (#040d1a)</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn" onclick="window.applyTheme('aqua-aesthetic')" style="background: linear-gradient(135deg, #06b6d4, #00f2fe); color: #040d1a; font-weight: 800; font-size: 12.5px; padding: 7px 16px; border-radius: 12px; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(6, 182, 212, 0.45);">
+              💧 Activate Aqua Palette
+            </button>
+            <button class="btn" onclick="window.applyTheme('golden-harmony')" style="background: rgba(255, 255, 255, 0.08); color: #cbd5e1; font-weight: 700; font-size: 12.5px; padding: 7px 14px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15); cursor: pointer;">
+              🌌 Reset Theme
+            </button>
+          </div>
+        </div>
+        <div style="display: flex; gap: 14px; align-items: center; background: rgba(0, 0, 0, 0.35); padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(6, 182, 212, 0.3);">
+          <img src="assets/aqua_aesthetic_palette.png" alt="Aqua Color Aesthetic Moodboard" style="width: 110px; height: 68px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(6, 182, 212, 0.5); flex-shrink: 0;">
+          <div style="font-size: 12px; color: #67e8f9; line-height: 1.5;">
+            Inspired by Pinterest Aqua Color Aesthetic search trends, this theme applies electric cyan glows, deep ocean navy contrast, and ice aqua platinum typography to elevate your app interface.
           </div>
         </div>
       </div>
@@ -837,6 +862,25 @@
               By default, Second Brain uses its built-in local vector RAG engine. You can optionally supply your Gemini or OpenAI API key below for cloud generation.
             </p>
             <input type="password" id="api-key-input" class="input-field" placeholder="AIzaSy... or sk-..." style="font-family: var(--font-code);">
+          </div>
+        </div>
+
+        <!-- Theme & Aesthetics Customizer Box -->
+        <div class="setting-item" style="flex-direction: column; align-items: flex-start; gap: 12px; margin-top: 20px;">
+          <div>
+            <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 0 0 4px 0;">🎨 UI Design Theme Selector</h3>
+            <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">Switch between modern aesthetic UI color palettes, including Aqua Color Aesthetic and Summer Ocean.</p>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px;">
+            <button type="button" class="btn theme-pill-btn active" data-theme="golden-harmony" onclick="window.applyTheme('golden-harmony')" style="font-size: 12.5px; padding: 8px 16px; border-radius: 12px; font-weight: 700; background: rgba(245, 158, 11, 0.15); border: 1.5px solid #f59e0b; color: #f59e0b;">
+              🌌 Obsidian Gold (Default)
+            </button>
+            <button type="button" class="btn theme-pill-btn" data-theme="aqua-aesthetic" onclick="window.applyTheme('aqua-aesthetic')" style="font-size: 12.5px; padding: 8px 16px; border-radius: 12px; font-weight: 700; background: rgba(6, 182, 212, 0.15); border: 1.5px solid #00f2fe; color: #00f2fe;">
+              💧 Aqua Color Aesthetic (Electric Cyan + Ocean Navy)
+            </button>
+            <button type="button" class="btn theme-pill-btn" data-theme="summer-ocean" onclick="window.applyTheme('summer-ocean')" style="font-size: 12.5px; padding: 8px 16px; border-radius: 12px; font-weight: 700; background: rgba(45, 212, 191, 0.15); border: 1.5px solid #2dd4bf; color: #2dd4bf;">
+              🌊 Summer Ocean Coastal (Seafoam + Yellow)
+            </button>
           </div>
         </div>
 
