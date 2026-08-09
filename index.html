@@ -170,94 +170,94 @@
         </button>
       </header>
 
-      <!-- Soft Ambient Lighting Field -->
-      <div class="gemini-ambient-glow" style="position: absolute; top: 25%; left: 50%; transform: translate(-50%, -50%); width: 750px; height: 450px; background: radial-gradient(circle at 50% 40%, rgba(6, 182, 212, 0.22) 0%, rgba(56, 189, 248, 0.12) 45%, rgba(6, 9, 17, 0) 80%); pointer-events: none; z-index: 0; filter: blur(50px);"></div>
+      <!-- Soft Warm Sand Ambient Glow -->
+      <div class="gemini-ambient-glow" style="position: absolute; top: 25%; left: 50%; transform: translate(-50%, -50%); width: 750px; height: 450px; background: radial-gradient(circle at 50% 40%, rgba(217, 107, 39, 0.1) 0%, rgba(245, 158, 11, 0.05) 45%, rgba(250, 247, 242, 0) 80%); pointer-events: none; z-index: 0; filter: blur(50px);"></div>
 
       <section id="view-jarvis" class="view-section active" style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; max-width: 880px; margin: 0 auto; width: 100%; height: 100%; max-height: 100vh; position: relative; box-sizing: border-box; overflow: hidden; z-index: 1;">
         
         <!-- Minimal Top Header Bar -->
         <div class="chat-top-header" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 6px 20px; width: 100%; max-width: 820px; margin: 0 auto; box-sizing: border-box; z-index: 10; flex-shrink: 0;">
           <div class="header-left" style="display: flex; align-items: center; gap: 10px;">
-            <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #38bdf8; font-family: 'Outfit', sans-serif;">
-              <span style="width: 8px; height: 8px; border-radius: 50%; background: #38bdf8; box-shadow: 0 0 12px #38bdf8; display: inline-block;"></span>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #d96b27; font-family: 'Outfit', sans-serif;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #d96b27; box-shadow: 0 0 10px rgba(217, 107, 39, 0.5); display: inline-block;"></span>
               <span>Second Brain AI</span>
             </div>
           </div>
           <div class="header-right" style="display: flex; align-items: center; gap: 10px;">
-            <button type="button" class="btn-chat-header-action" onclick="window.createNewChatThread()" title="New Chat" style="display: flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #f1f5f9; border-radius: 12px; padding: 6px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer; backdrop-filter: blur(12px); transition: all 0.2s ease;">
+            <button type="button" class="btn-chat-header-action" onclick="window.createNewChatThread()" title="New Chat" style="display: flex; align-items: center; gap: 6px; background: #ffffff; border: 1px solid #e2d9cd; color: #1e1915; border-radius: 12px; padding: 6px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.04); transition: all 0.2s ease;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               <span>+ New Chat</span>
             </button>
           </div>
         </div>
 
-        <!-- Clean, Elegant Hero View (Claude & Google Glass Aesthetic) -->
+        <!-- Clean, Elegant Hero View (Claude Warm Sand Style) -->
         <div id="chat-hero-view" class="chat-hero-view gemini-hero-center" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px 16px; margin: auto; max-width: 760px; flex: 1; width: 100%; box-sizing: border-box; gap: 20px;">
           
-          <!-- Elegant Minimalist Headline -->
+          <!-- Elegant Minimalist Terracotta Headline -->
           <div style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
-            <h1 class="gemini-hero-title" style="font-size: 36px; font-weight: 800; color: #ffffff !important; margin: 0; font-family: 'Outfit', sans-serif; letter-spacing: -0.4px;">
+            <h1 class="gemini-hero-title" style="font-size: 36px; font-weight: 800; color: #1e1915 !important; margin: 0; font-family: 'Outfit', sans-serif; letter-spacing: -0.4px;">
               What can I help you explore today?
             </h1>
-            <p style="font-size: 14.5px; color: #94a3b8 !important; margin: 0; font-family: 'Inter', sans-serif; font-weight: 500;">
+            <p style="font-size: 14.5px; color: #645a50 !important; margin: 0; font-family: 'Inter', sans-serif; font-weight: 500;">
               Your intelligent collaborator for notes, research, and ideas.
             </p>
           </div>
 
-          <!-- Holographic Floating Orb Centerpiece (Clean & Frameless) -->
-          <div class="hero-centerpiece-container" style="width: 100%; max-width: 640px; height: 120px; margin: 2px 0; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(20px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-            <canvas id="af-hero-neural-canvas" class="af-neural-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.7;"></canvas>
-            <div class="floating-orb-emblem" style="width: 54px; height: 54px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #38bdf8 0%, #0284c7 60%, #0f172a 100%); box-shadow: 0 0 25px rgba(56, 189, 248, 0.6), 0 0 50px rgba(6, 182, 212, 0.3); animation: orbPulse 3s ease-in-out infinite; z-index: 2; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #ffffff; border: 1.5px solid rgba(255,255,255,0.4);">✦</div>
+          <!-- Warm Sand Floating Centerpiece Container -->
+          <div class="hero-centerpiece-container" style="width: 100%; max-width: 640px; height: 110px; margin: 2px 0; border: 1px solid #e7ded2; border-radius: 20px; background: #ffffff; box-shadow: 0 6px 20px rgba(120, 110, 101, 0.06); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+            <canvas id="af-hero-neural-canvas" class="af-neural-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.35;"></canvas>
+            <div class="floating-orb-emblem" style="width: 52px; height: 52px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #f59e0b 0%, #d96b27 70%, #9a3412 100%); box-shadow: 0 0 20px rgba(217, 107, 39, 0.4); animation: orbPulse 3s ease-in-out infinite; z-index: 2; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #ffffff; border: 1.5px solid rgba(255,255,255,0.7);">✦</div>
           </div>
 
-          <!-- Clean Claude-Style Tab Pill Recommendations -->
+          <!-- Clean Claude Warm Sand Suggestion Pills -->
           <div class="hero-suggestion-pills-row" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 640px;">
-            <button class="pill-suggestion-btn" onclick="window.triggerSampleQuery('Summarize my recent research notes')" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 7px 16px; color: #e2e8f0; font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; backdrop-filter: blur(10px);">Summarize Notes</button>
-            <button class="pill-suggestion-btn" onclick="window.triggerSampleQuery('Explain deep learning and neural networks')" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 7px 16px; color: #e2e8f0; font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; backdrop-filter: blur(10px);">Explain Deep Learning</button>
-            <button class="pill-suggestion-btn" onclick="window.triggerSampleQuery('Build a high-throughput Express REST API server')" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 7px 16px; color: #e2e8f0; font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; backdrop-filter: blur(10px);">Write Express Code</button>
-            <button class="pill-suggestion-btn" onclick="window.triggerSampleQuery('Analyze AI market trends in 2026')" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 7px 16px; color: #e2e8f0; font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; backdrop-filter: blur(10px);">Analyze AI Trends</button>
+            <button class="pill-suggestion-btn" onclick="window.triggerSampleQuery('Summarize my recent research notes')" style="background: #ffffff; border: 1px solid #e2d9cd; border-radius: 20px; padding: 7px 16px; color: #4a423a; font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">Summarize Notes</button>
+            <button class="pill-suggestion-btn" onclick="window.triggerSampleQuery('Explain deep learning and neural networks')" style="background: #ffffff; border: 1px solid #e2d9cd; border-radius: 20px; padding: 7px 16px; color: #4a423a; font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">Explain Deep Learning</button>
+            <button class="pill-suggestion-btn" onclick="window.triggerSampleQuery('Build a high-throughput Express REST API server')" style="background: #ffffff; border: 1px solid #e2d9cd; border-radius: 20px; padding: 7px 16px; color: #4a423a; font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">Write Express Code</button>
+            <button class="pill-suggestion-btn" onclick="window.triggerSampleQuery('Analyze AI market trends in 2026')" style="background: #ffffff; border: 1px solid #e2d9cd; border-radius: 20px; padding: 7px 16px; color: #4a423a; font-size: 12.5px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">Analyze AI Trends</button>
           </div>
 
-          <!-- Cohesive Uniform Glass Action Grid (Clean, Easy & Balanced) -->
+          <!-- Cohesive Terracotta Warm Glass Action Grid -->
           <div class="hero-action-grid-2x2" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; max-width: 640px; margin-top: 2px;">
             <!-- Action 1: Voice & Talk -->
-            <div class="action-card-item" onclick="window.toggleVoiceListen()" style="background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 18px; text-align: left; cursor: pointer; transition: all 0.2s ease; backdrop-filter: blur(12px);">
+            <div class="action-card-item" onclick="window.toggleVoiceListen()" style="background: #ffffff; border: 1px solid #e7ded2; border-radius: 16px; padding: 16px 18px; text-align: left; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 16px rgba(120, 110, 101, 0.05);">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <span style="font-size: 22px;">🎙️</span>
-                <span style="font-size: 14px; color: #94a3b8; font-weight: 600;">↗</span>
+                <span style="font-size: 14px; color: #d96b27; font-weight: 600;">↗</span>
               </div>
-              <div style="font-size: 16px; font-weight: 700; color: #f8fafc; font-family: 'Outfit', sans-serif;">Voice &amp; Audio</div>
-              <div style="font-size: 12px; color: #94a3b8; font-weight: 500; margin-top: 2px;">Speak or record audio memos</div>
+              <div style="font-size: 16px; font-weight: 700; color: #1e1915; font-family: 'Outfit', sans-serif;">Voice &amp; Audio</div>
+              <div style="font-size: 12px; color: #645a50; font-weight: 500; margin-top: 2px;">Speak or record audio memos</div>
             </div>
 
             <!-- Action 2: Write & Notes -->
-            <div class="action-card-item" onclick="window.activateView('capture')" style="background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 18px; text-align: left; cursor: pointer; transition: all 0.2s ease; backdrop-filter: blur(12px);">
+            <div class="action-card-item" onclick="window.activateView('capture')" style="background: #ffffff; border: 1px solid #e7ded2; border-radius: 16px; padding: 16px 18px; text-align: left; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 16px rgba(120, 110, 101, 0.05);">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <span style="font-size: 22px;">✍️</span>
-                <span style="font-size: 14px; color: #94a3b8; font-weight: 600;">↗</span>
+                <span style="font-size: 14px; color: #d96b27; font-weight: 600;">↗</span>
               </div>
-              <div style="font-size: 16px; font-weight: 700; color: #f8fafc; font-family: 'Outfit', sans-serif;">Draft &amp; Write</div>
-              <div style="font-size: 12px; color: #94a3b8; font-weight: 500; margin-top: 2px;">Create and structure knowledge</div>
+              <div style="font-size: 16px; font-weight: 700; color: #1e1915; font-family: 'Outfit', sans-serif;">Draft &amp; Write</div>
+              <div style="font-size: 12px; color: #645a50; font-weight: 500; margin-top: 2px;">Create and structure knowledge</div>
             </div>
 
             <!-- Action 3: Deep Research -->
-            <div class="action-card-item" onclick="window.activateView('agents')" style="background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 18px; text-align: left; cursor: pointer; transition: all 0.2s ease; backdrop-filter: blur(12px);">
+            <div class="action-card-item" onclick="window.activateView('agents')" style="background: #ffffff; border: 1px solid #e7ded2; border-radius: 16px; padding: 16px 18px; text-align: left; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 16px rgba(120, 110, 101, 0.05);">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <span style="font-size: 22px;">🔬</span>
-                <span style="font-size: 14px; color: #94a3b8; font-weight: 600;">↗</span>
+                <span style="font-size: 14px; color: #d96b27; font-weight: 600;">↗</span>
               </div>
-              <div style="font-size: 16px; font-weight: 700; color: #f8fafc; font-family: 'Outfit', sans-serif;">Deep Research</div>
-              <div style="font-size: 12px; color: #94a3b8; font-weight: 500; margin-top: 2px;">Multi-agent paper synthesis</div>
+              <div style="font-size: 16px; font-weight: 700; color: #1e1915; font-family: 'Outfit', sans-serif;">Deep Research</div>
+              <div style="font-size: 12px; color: #645a50; font-weight: 500; margin-top: 2px;">Multi-agent paper synthesis</div>
             </div>
 
             <!-- Action 4: Creative Vision -->
-            <div class="action-card-item" onclick="window.triggerSampleQuery('generate an image of clean futuristic AI workspace architecture')" style="background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 16px 18px; text-align: left; cursor: pointer; transition: all 0.2s ease; backdrop-filter: blur(12px);">
+            <div class="action-card-item" onclick="window.triggerSampleQuery('generate an image of clean futuristic AI workspace architecture')" style="background: #ffffff; border: 1px solid #e7ded2; border-radius: 16px; padding: 16px 18px; text-align: left; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 16px rgba(120, 110, 101, 0.05);">
               <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <span style="font-size: 22px;">🎨</span>
-                <span style="font-size: 14px; color: #94a3b8; font-weight: 600;">↗</span>
+                <span style="font-size: 14px; color: #d96b27; font-weight: 600;">↗</span>
               </div>
-              <div style="font-size: 16px; font-weight: 700; color: #f8fafc; font-family: 'Outfit', sans-serif;">Image &amp; Vision</div>
-              <div style="font-size: 12px; color: #94a3b8; font-weight: 500; margin-top: 2px;">Generate visual concepts</div>
+              <div style="font-size: 16px; font-weight: 700; color: #1e1915; font-family: 'Outfit', sans-serif;">Image &amp; Vision</div>
+              <div style="font-size: 12px; color: #645a50; font-weight: 500; margin-top: 2px;">Generate visual concepts</div>
             </div>
           </div>
         </div>
