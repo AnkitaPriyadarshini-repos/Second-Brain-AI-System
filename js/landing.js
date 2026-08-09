@@ -35,7 +35,7 @@ function initParticleCanvas() {
       vx: (Math.random() - 0.5) * 0.3,
       vy: (Math.random() - 0.5) * 0.3,
       radius: Math.random() * 1.5 + 1,
-      color: Math.random() > 0.5 ? 'rgba(245, 158, 11, 0.3)' : 'rgba(56, 189, 248, 0.25)'
+      color: Math.random() > 0.5 ? 'rgba(6, 182, 212, 0.3)' : 'rgba(56, 189, 248, 0.25)'
     });
   }
 
@@ -65,7 +65,7 @@ function initParticleCanvas() {
           ctx.beginPath();
           ctx.moveTo(p.x, p.y);
           ctx.lineTo(p2.x, p2.y);
-          ctx.strokeStyle = `rgba(245, 158, 11, ${0.12 - dist / 900})`;
+          ctx.strokeStyle = `rgba(6, 182, 212, ${0.12 - dist / 900})`;
           ctx.lineWidth = 0.5;
           ctx.stroke();
         }

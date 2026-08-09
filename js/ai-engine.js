@@ -244,10 +244,10 @@ export function HydratedComponent({ data }) {
 
     const markdownOutput = `### 🎨 Juno Imagen 3 Generation\n\n` +
       `Here is the AI generated artwork based on your prompt: **"${cleanSubject}"**\n\n` +
-      `<div class="gemini-generated-image-card" style="margin: 14px 0; background: rgba(0,0,0,0.2); border: 1.5px solid var(--border-color, #fbc02d); border-radius: 16px; padding: 12px; text-align: center;">\n` +
+      `<div class="gemini-generated-image-card" style="margin: 14px 0; background: rgba(0,0,0,0.2); border: 1.5px solid var(--border-color, #00f2fe); border-radius: 16px; padding: 12px; text-align: center;">\n` +
       `  <img src="${imageUrl}" alt="${cleanSubject}" style="width: 100%; max-width: 700px; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);" loading="lazy" onerror="this.onerror=null; this.src='assets/pinterest_color.jpg';">\n` +
       `  <div style="margin-top: 10px; display: flex; gap: 8px; justify-content: center;">\n` +
-      `    <a href="${imageUrl}" target="_blank" download="juno_artwork.jpg" class="chat-action-btn" style="text-decoration: none; padding: 6px 14px; background: #ffd93d; color: #2c1d00; font-weight: 700; border-radius: 10px;">📥 Download Image</a>\n` +
+      `    <a href="${imageUrl}" target="_blank" download="juno_artwork.jpg" class="chat-action-btn" style="text-decoration: none; padding: 6px 14px; background: #00f2fe; color: #2c1d00; font-weight: 700; border-radius: 10px;">📥 Download Image</a>\n` +
       `  </div>\n` +
       `</div>\n\n` +
       `*Generated with Juno AI Imagen 3 Engine.*`;

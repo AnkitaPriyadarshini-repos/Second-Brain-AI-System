@@ -261,10 +261,10 @@
       const weakTopics = Object.keys(allTags).sort((a, b) => allTags[a] - allTags[b]).slice(0, 3);
 
       const reportHtml = `
-        <div class="glass-card" style="margin-top: 14px; padding: 18px; border-left: 4px solid #f59e0b; background: rgba(15, 23, 42, 0.85);">
+        <div class="glass-card" style="margin-top: 14px; padding: 18px; border-left: 4px solid #06b6d4; background: rgba(15, 23, 42, 0.85);">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <strong style="color: #f59e0b; font-size: 15px;">🧠 "Ask My Brain" Knowledge Diagnostic Summary</strong>
-            <span style="font-size: 11px; background: rgba(245, 158, 11, 0.2); color: #f59e0b; padding: 2px 8px; border-radius: 8px; font-weight: 700;">REAL-TIME DIAGNOSTIC</span>
+            <strong style="color: #06b6d4; font-size: 15px;">🧠 "Ask My Brain" Knowledge Diagnostic Summary</strong>
+            <span style="font-size: 11px; background: rgba(6, 182, 212, 0.2); color: #06b6d4; padding: 2px 8px; border-radius: 8px; font-weight: 700;">REAL-TIME DIAGNOSTIC</span>
           </div>
           <p style="font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px;">
             I analyzed your <strong>${totalNotes} grounded knowledge items</strong> across all saved notes, PDFs, web clips, and voice transcripts.
@@ -1112,7 +1112,7 @@
           container.style.display = 'flex';
           let previewContent = '';
           if (activePromptAttachment.isImage) {
-            previewContent = `<img src="${activePromptAttachment.base64}" style="width: 32px; height: 32px; object-fit: cover; border-radius: 6px; border: 1px solid #fbc02d;">`;
+            previewContent = `<img src="${activePromptAttachment.base64}" style="width: 32px; height: 32px; object-fit: cover; border-radius: 6px; border: 1px solid #00f2fe;">`;
           } else {
             previewContent = `<span style="font-size: 18px;">📄</span>`;
           }
@@ -1461,11 +1461,11 @@
           window.adaptiveFusionEngine.startLiveStreamingAnimation(cardId);
         } else {
           thinkingCard.innerHTML = `<div class="chat-header" style="display: flex; align-items: center; gap: 8px; font-weight: 800;">
-            <div class="ai-avatar" style="width: 24px; height: 24px; border-radius: 50%; background: #ffd93d; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #2c1d00;">✨</div>
+            <div class="ai-avatar" style="width: 24px; height: 24px; border-radius: 50%; background: #00f2fe; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #2c1d00;">✨</div>
             <strong style="color: #e65100;">Juno Thinking Process</strong>
           </div>
           <div class="chat-text" style="display: flex; align-items: center; gap: 8px; font-style: italic; color: #8c5a00; font-size: 13.5px; margin-top: 6px;">
-            <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #fbc02d; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
+            <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #00f2fe; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
             <span>Synthesizing response & searching knowledge vault...</span>
           </div>`;
           if (targetContainer) {
@@ -1664,18 +1664,18 @@
       ];
 
       const forecastItemsHTML = days.map(d => `
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 52px; padding: 10px 8px; border-radius: 12px; background: ${d.active ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)'}; border: 1px solid ${d.active ? '#fbc02d' : 'rgba(255, 255, 255, 0.08)'}; flex-shrink: 0; transition: all 0.2s ease;">
-          <span style="font-size: 11px; font-weight: 700; color: ${d.active ? '#ffd93d' : '#a0a5b5'}; margin-bottom: 6px;">${d.day}</span>
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 52px; padding: 10px 8px; border-radius: 12px; background: ${d.active ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)'}; border: 1px solid ${d.active ? '#00f2fe' : 'rgba(255, 255, 255, 0.08)'}; flex-shrink: 0; transition: all 0.2s ease;">
+          <span style="font-size: 11px; font-weight: 700; color: ${d.active ? '#00f2fe' : '#a0a5b5'}; margin-bottom: 6px;">${d.day}</span>
           <span style="font-size: 20px; margin-bottom: 6px;">${d.emoji}</span>
           <span style="font-size: 11px; font-weight: 600; color: #ffffff;">${d.temp}</span>
         </div>
       `).join('');
 
       return `
-        <div class="weather-widget-card" style="background: rgba(30, 32, 38, 0.96); border: 1.5px solid rgba(251, 192, 45, 0.4); border-radius: 20px; padding: 20px 22px; margin: 14px 0 8px 0; box-shadow: 0 8px 24px rgba(0,0,0,0.3); font-family: 'Outfit', sans-serif; color: #ffffff; width: 100%; box-sizing: border-box;">
+        <div class="weather-widget-card" style="background: rgba(30, 32, 38, 0.96); border: 1.5px solid rgba(0, 242, 254, 0.4); border-radius: 20px; padding: 20px 22px; margin: 14px 0 8px 0; box-shadow: 0 8px 24px rgba(0,0,0,0.3); font-family: 'Outfit', sans-serif; color: #ffffff; width: 100%; box-sizing: border-box;">
           <div style="font-size: 13px; color: #a0a5b5; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
             <span>${locationName}</span>
-            <span style="font-size: 10px; text-transform: uppercase; background: rgba(251, 192, 45, 0.2); border: 1px solid #fbc02d; color: #ffd93d; padding: 3px 8px; border-radius: 10px; font-weight: 800;">Live Forecast</span>
+            <span style="font-size: 10px; text-transform: uppercase; background: rgba(0, 242, 254, 0.2); border: 1px solid #00f2fe; color: #00f2fe; padding: 3px 8px; border-radius: 10px; font-weight: 800;">Live Forecast</span>
           </div>
           
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
@@ -1892,7 +1892,7 @@
       const thumbDown = msgCard.querySelector('.thumb-down-btn');
       if (thumbUp) {
         thumbUp.addEventListener('click', () => {
-          thumbUp.style.background = '#ffd93d';
+          thumbUp.style.background = '#00f2fe';
           if (thumbDown) thumbDown.style.background = 'transparent';
           if (typeof showToast === 'function') showToast('👍 Thank you for your feedback!');
         });
@@ -2078,20 +2078,20 @@
       // Drag & Drop handlers
       fileUploadZone.addEventListener('dragover', (e) => {
         e.preventDefault();
-        fileUploadZone.style.borderColor = '#f59e0b';
-        fileUploadZone.style.background = 'rgba(245, 158, 11, 0.12)';
+        fileUploadZone.style.borderColor = '#06b6d4';
+        fileUploadZone.style.background = 'rgba(6, 182, 212, 0.12)';
       });
 
       fileUploadZone.addEventListener('dragleave', (e) => {
         e.preventDefault();
-        fileUploadZone.style.borderColor = 'rgba(245, 158, 11, 0.5)';
-        fileUploadZone.style.background = 'rgba(245, 158, 11, 0.04)';
+        fileUploadZone.style.borderColor = 'rgba(6, 182, 212, 0.5)';
+        fileUploadZone.style.background = 'rgba(6, 182, 212, 0.04)';
       });
 
       fileUploadZone.addEventListener('drop', (e) => {
         e.preventDefault();
-        fileUploadZone.style.borderColor = 'rgba(245, 158, 11, 0.5)';
-        fileUploadZone.style.background = 'rgba(245, 158, 11, 0.04)';
+        fileUploadZone.style.borderColor = 'rgba(6, 182, 212, 0.5)';
+        fileUploadZone.style.background = 'rgba(6, 182, 212, 0.04)';
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
           handleFileIngest(e.dataTransfer.files[0]);
         }
@@ -2757,7 +2757,7 @@
       if (pinnedNotesEl) {
         const pinned = allNotes.filter(n => n.pinned).slice(0, 4);
         pinnedNotesEl.innerHTML = pinned.length ? pinned.map(n => `
-          <div style="padding: 10px 12px; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="window.openNoteDrawerById('${n.id}')">
+          <div style="padding: 10px 12px; background: rgba(6, 182, 212, 0.05); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="window.openNoteDrawerById('${n.id}')">
             <div>
               <div style="font-weight: 600; font-size: 13px; color: var(--text-primary);">📌 ${escapeHTML(n.title)}</div>
               <div style="font-size: 11px; color: var(--text-muted);">${escapeHTML(n.dateStr || '')}</div>
@@ -2961,7 +2961,7 @@
         if (btn) btn.innerHTML = '<span>▶</span> <span>Play Audio Overview</span>';
         if (statusBadge) {
           statusBadge.textContent = '● Paused';
-          statusBadge.style.color = '#f59e0b';
+          statusBadge.style.color = '#06b6d4';
         }
         eqBars.forEach(bar => bar.classList.remove('active'));
         if (podcastTimerInterval) clearInterval(podcastTimerInterval);
@@ -3050,7 +3050,7 @@
         <div class="glass-card" style="padding: 20px; border-radius: 16px; border: 1.5px solid var(--border-color); display: flex; flex-direction: column; justify-content: space-between; gap: 14px;">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span class="status-badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706; font-size: 11px;">${escapeHTML(goal.category)}</span>
+              <span class="status-badge" style="background: rgba(6, 182, 212, 0.15); color: #d97706; font-size: 11px;">${escapeHTML(goal.category)}</span>
               <span style="font-size: 11px; color: var(--text-muted);">Target: ${escapeHTML(goal.targetDate)}</span>
             </div>
             <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">🎯 ${escapeHTML(goal.title)}</h3>
@@ -3062,7 +3062,7 @@
                 <span style="color: var(--accent-amber);">${goal.progress}%</span>
               </div>
               <div style="height: 8px; background: rgba(255, 255, 255, 0.06); border-radius: 4px; overflow: hidden;">
-                <div style="height: 100%; width: ${goal.progress}%; background: linear-gradient(90deg, #f59e0b, #fbbf24); border-radius: 4px; transition: width 0.4s ease;"></div>
+                <div style="height: 100%; width: ${goal.progress}%; background: linear-gradient(90deg, #06b6d4, #22d3ee); border-radius: 4px; transition: width 0.4s ease;"></div>
               </div>
             </div>
 
@@ -3500,8 +3500,8 @@
       });
       if (btnEl) {
         btnEl.classList.add('active');
-        btnEl.style.background = '#fbc02d';
-        btnEl.style.boxShadow = '0 2px 8px rgba(251, 192, 45, 0.4)';
+        btnEl.style.background = '#00f2fe';
+        btnEl.style.boxShadow = '0 2px 8px rgba(0, 242, 254, 0.4)';
       }
       if (typeof showToast === 'function') {
         showToast('🧬 Neural Lab v2.5 Cognitive Reasoning Mode Online.');

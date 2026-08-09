@@ -32,7 +32,7 @@ function Home({ initialHistory, initialMetrics, ssrPerformance }) {
             style: {
               fontSize: '2.2rem',
               fontWeight: 800,
-              background: 'linear-gradient(135deg, #f59e0b, #fbbf24, #10b981)',
+              background: 'linear-gradient(135deg, #06b6d4, #22d3ee, #10b981)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               margin: 0

@@ -20,11 +20,11 @@ class AdaptiveFusionVisualizer {
 
     // Strands definition matching the 5 intelligence forms
     this.strands = [
-      { id: 'research', label: 'RESEARCH', color: '#f59e0b', glow: 'rgba(245, 158, 11, 0.8)', startRatio: { x: 0.1, y: 0.22 }, curveOffset: -40 },
+      { id: 'research', label: 'RESEARCH', color: '#06b6d4', glow: 'rgba(6, 182, 212, 0.8)', startRatio: { x: 0.1, y: 0.22 }, curveOffset: -40 },
       { id: 'analyze', label: 'ANALYZE', color: '#06b6d4', glow: 'rgba(6, 182, 212, 0.8)', startRatio: { x: 0.08, y: 0.42 }, curveOffset: -15 },
       { id: 'challenge', label: 'CHALLENGE', color: '#a855f7', glow: 'rgba(168, 85, 247, 0.8)', startRatio: { x: 0.12, y: 0.82 }, curveOffset: 35 },
       { id: 'audit', label: 'AUDIT', color: '#e2e8f0', glow: 'rgba(226, 232, 240, 0.8)', startRatio: { x: 0.28, y: 0.88 }, curveOffset: 25 },
-      { id: 'fuse', label: 'FUSE', color: '#fbbf24', glow: 'rgba(251, 191, 36, 0.95)', isOutputBeam: true, startRatio: { x: 0.55, y: 0.50 }, endRatio: { x: 0.95, y: 0.50 } }
+      { id: 'fuse', label: 'FUSE', color: '#22d3ee', glow: 'rgba(251, 191, 36, 0.95)', isOutputBeam: true, startRatio: { x: 0.55, y: 0.50 }, endRatio: { x: 0.95, y: 0.50 } }
     ];
 
     this.init();
@@ -70,7 +70,7 @@ class AdaptiveFusionVisualizer {
     for (let i = 0; i < 35; i++) {
       this.particles.push({
         strandId: 'fuse',
-        color: '#fbbf24',
+        color: '#22d3ee',
         progress: Math.random(),
         speed: 0.008 + Math.random() * 0.012,
         size: 2.0 + Math.random() * 3.0,
@@ -179,7 +179,7 @@ class AdaptiveFusionVisualizer {
     ctx.lineTo(beamEnd.x, beamEnd.y);
     ctx.strokeStyle = 'rgba(251, 191, 36, 0.6)';
     ctx.lineWidth = 10;
-    ctx.shadowColor = '#f59e0b';
+    ctx.shadowColor = '#06b6d4';
     ctx.shadowBlur = 25;
     ctx.stroke();
 
@@ -193,7 +193,7 @@ class AdaptiveFusionVisualizer {
 
     // FUSE Label
     ctx.font = '800 10px "Outfit", sans-serif';
-    ctx.fillStyle = '#fbbf24';
+    ctx.fillStyle = '#22d3ee';
     ctx.fillText('FUSE ➔', beamEnd.x - 45, beamEnd.y - 12);
     ctx.restore();
 
@@ -242,7 +242,7 @@ class AdaptiveFusionVisualizer {
     const auraGrad = ctx.createRadialGradient(coreX, coreY, 2, coreX, coreY, pulseRadius * 2.5);
     auraGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
     auraGrad.addColorStop(0.3, 'rgba(251, 191, 36, 0.8)');
-    auraGrad.addColorStop(0.7, 'rgba(245, 158, 11, 0.3)');
+    auraGrad.addColorStop(0.7, 'rgba(6, 182, 212, 0.3)');
     auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
     ctx.beginPath();
@@ -254,7 +254,7 @@ class AdaptiveFusionVisualizer {
     ctx.beginPath();
     ctx.arc(coreX, coreY, pulseRadius, 0, Math.PI * 2);
     ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = '#fbbf24';
+    ctx.shadowColor = '#22d3ee';
     ctx.shadowBlur = 30;
     ctx.fill();
 

@@ -47,7 +47,7 @@ function formatMarkdownText(mdText) {
     const escapedCode = escapeHTML(rawCode);
     const isExecutable = /html|xml|svg|js|javascript|css|jsx|tsx|web/i.test(cleanLang) || rawCode.includes('<html') || rawCode.includes('<div') || rawCode.includes('function');
 
-    const canvasBtn = isExecutable ? `<button class="code-copy-btn canvas-run-btn" onclick="window.runInCanvasFromBlock(this)" style="background: linear-gradient(135deg, #ffd93d, #fbc02d); color: #2c1d00; font-weight: 800; border: none; border-radius: 8px; padding: 3px 8px; margin-right: 6px; cursor: pointer;">🚀 Run in Canvas</button>` : '';
+    const canvasBtn = isExecutable ? `<button class="code-copy-btn canvas-run-btn" onclick="window.runInCanvasFromBlock(this)" style="background: linear-gradient(135deg, #00f2fe, #00f2fe); color: #2c1d00; font-weight: 800; border: none; border-radius: 8px; padding: 3px 8px; margin-right: 6px; cursor: pointer;">🚀 Run in Canvas</button>` : '';
 
     return `<div class="code-block-wrapper">
       <div class="code-block-header">

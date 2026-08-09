@@ -63,7 +63,7 @@
       const clusterCenters = [
         { name: 'AI Systems & Deep Learning', x: width * 0.3, y: height * 0.35, color: '#8b5cf6' },
         { name: 'Voice Memos & Audio', x: width * 0.7, y: height * 0.3, color: '#10b981' },
-        { name: 'Web Research & Clips', x: width * 0.75, y: height * 0.7, color: '#f59e0b' },
+        { name: 'Web Research & Clips', x: width * 0.75, y: height * 0.7, color: '#06b6d4' },
         { name: 'System Architecture', x: width * 0.25, y: height * 0.72, color: '#3b82f6' }
       ];
 
@@ -226,7 +226,7 @@
         if (s && t) {
           ctx.beginPath();
           const isHighlighted = (this.hoveredNode && (this.hoveredNode.id === s.id || this.hoveredNode.id === t.id));
-          ctx.strokeStyle = isHighlighted ? (isLight ? '#d97706' : '#fbbf24') : (isLight ? 'rgba(15, 23, 42, 0.05)' : 'rgba(255, 255, 255, 0.06)');
+          ctx.strokeStyle = isHighlighted ? (isLight ? '#d97706' : '#22d3ee') : (isLight ? 'rgba(15, 23, 42, 0.05)' : 'rgba(255, 255, 255, 0.06)');
           ctx.lineWidth = isHighlighted ? 2.5 : 1;
           ctx.moveTo(s.x, s.y);
           ctx.lineTo(t.x, t.y);
@@ -246,7 +246,7 @@
 
         switch (node.sourceType) {
           case 'voice': ctx.fillStyle = '#10b981'; break;   // Emerald
-          case 'clip': ctx.fillStyle = '#f59e0b'; break;    // Amber
+          case 'clip': ctx.fillStyle = '#06b6d4'; break;    // Amber
           case 'file': ctx.fillStyle = '#ec4899'; break;    // Pink
           case 'bookmark': ctx.fillStyle = '#3b82f6'; break;// Blue
           default: ctx.fillStyle = '#8b5cf6'; break;         // Violet

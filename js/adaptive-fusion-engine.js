@@ -179,7 +179,7 @@ class AdaptiveFusionEngine {
   <details class="af-accordion" open>
     <summary class="af-accordion-summary">
       <span>🌌 Claves Adaptive Fusion — 5 Intelligence Strands Applied</span>
-      <span style="font-size: 11px; background: rgba(245, 158, 11, 0.2); padding: 2px 8px; border-radius: 10px; color: #fbbf24;">Fused 100%</span>
+      <span style="font-size: 11px; background: rgba(6, 182, 212, 0.2); padding: 2px 8px; border-radius: 10px; color: #22d3ee;">Fused 100%</span>
     </summary>
     <div class="af-accordion-content">
       <div style="display: flex; flex-direction: column; gap: 8px;">
@@ -257,7 +257,7 @@ window.openAdaptiveFusionModal = function() {
           </div>
 
           <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-top: 10px;">
-            <button onclick="window.activateAdaptiveFusionModel()" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); border: none; color: #000; font-weight: 800; padding: 10px 20px; border-radius: 12px; cursor: pointer; font-size: 13.5px; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);">
+            <button onclick="window.activateAdaptiveFusionModel()" style="background: linear-gradient(135deg, #06b6d4, #22d3ee); border: none; color: #000; font-weight: 800; padding: 10px 20px; border-radius: 12px; cursor: pointer; font-size: 13.5px; box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);">
               Enable Adaptive Fusion AI Mode
             </button>
           </div>

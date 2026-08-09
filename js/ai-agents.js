@@ -232,7 +232,7 @@
           <div class="agent-output-box glass-card" style="margin-top: 12px; padding: 14px; border-left: 3px solid var(--accent-amber);">
             <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
               <strong style="color: var(--accent-amber);">🔮 Resurfaced Forgotten Note:</strong>
-              <span class="status-badge" style="background: rgba(245, 158, 11, 0.15); color: var(--accent-amber);">${this.escapeHTML(topItem.reason)}</span>
+              <span class="status-badge" style="background: rgba(6, 182, 212, 0.15); color: var(--accent-amber);">${this.escapeHTML(topItem.reason)}</span>
             </div>
             <h4 style="font-size: 14px; margin-bottom: 4px;">${this.escapeHTML(topItem.note.title)}</h4>
             <p style="font-size: 13px; color: var(--text-secondary);">${this.escapeHTML(topItem.note.summary || topItem.note.content.substring(0, 100) + '...')}</p>

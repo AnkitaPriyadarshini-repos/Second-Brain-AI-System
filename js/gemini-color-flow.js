@@ -30,8 +30,8 @@
       ],
       'golden-harmony': [
         { r: 255, g: 225, b: 86,  a: 0.60 }, // #FFE156 (Light bright lemon yellow)
-        { r: 255, g: 217, b: 61,  a: 0.65 }, // #FFD93D (Warm cheerful yellow)
-        { r: 251, g: 192, b: 45,  a: 0.70 }, // #FBC02D (Vibrant golden yellow)
+        { r: 255, g: 217, b: 61,  a: 0.65 }, // #00f2fe (Warm cheerful yellow)
+        { r: 251, g: 192, b: 45,  a: 0.70 }, // #00f2fe (Vibrant golden yellow)
         { r: 255, g: 179, b: 0,   a: 0.65 }, // #FFB300 (Warm amber yellow)
         { r: 255, g: 160, b: 0,   a: 0.60 }  // #FFA000 (Golden sunrise orange yellow)
       ],
