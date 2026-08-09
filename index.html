@@ -178,17 +178,9 @@
         <!-- Top Header Bar (Ultra-Clean & Minimalist Aqua Aesthetic) -->
         <div class="chat-top-header" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 8px 20px; width: 100%; max-width: 850px; margin: 0 auto; box-sizing: border-box; z-index: 10; flex-shrink: 0;">
           <div class="header-left" style="display: flex; align-items: center; gap: 10px;">
-            <div class="gemini-model-selector-pill" style="display: flex; align-items: center; gap: 8px; background: rgba(9, 27, 46, 0.95); border: 1.5px solid rgba(6, 182, 212, 0.5); padding: 6px 14px; border-radius: 20px; cursor: pointer; backdrop-filter: blur(14px); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);">
-              <span class="yellow-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #00f2fe; box-shadow: 0 0 12px #00f2fe;"></span>
-              <select id="model-select-dropdown" class="model-select-dropdown" onchange="window.handleModelChange(this.value)" style="background: transparent; border: none; color: #ecfeff; font-size: 13.5px; font-weight: 700; cursor: pointer; outline: none; font-family: inherit;">
-                <option value="aqua-aesthetic" selected>💧 Second Brain Aqua AI ∨</option>
-                <option value="claves-adaptive-fusion">🧠 Second Brain Hybrid RAG AI ∨</option>
-                <option value="gemini-2.5-flash">✨ Gemini 2.5 Flash ∨</option>
-                <option value="gemini-2.5-pro">🧠 Gemini 2.5 Pro (Deep Thinking) ∨</option>
-                <option value="gemini-2.0-flash">⚡ Gemini 2.0 Flash Thinking ∨</option>
-                <option value="perplexity-cyan">💻 Code Architect &amp; Canvas ∨</option>
-                <option value="web-search-grounding">🔍 Web Search Grounding ∨</option>
-              </select>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #00f2fe; font-family: 'Outfit', sans-serif;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; background: #00f2fe; box-shadow: 0 0 12px #00f2fe; display: inline-block;"></span>
+              <span>Second Brain AI</span>
             </div>
           </div>
           <div class="header-right" style="display: flex; align-items: center; gap: 10px;">
@@ -202,18 +194,9 @@
         <!-- Second Brain AI Spacious Aqua Hero View -->
         <div id="chat-hero-view" class="chat-hero-view gemini-hero-center" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 24px 20px; margin: auto; max-width: 760px; flex: 1; width: 100%; box-sizing: border-box; gap: 16px;">
           
-          <!-- Clean Luminous High-Contrast Headline with Transparent Cute Bee Mascot -->
-          <div style="display: flex; flex-direction: column; gap: 12px; align-items: center; position: relative;">
-            
-            <!-- Cute Floating 3D Bee Mascot Companion -->
-            <div class="cute-bee-mascot-wrapper" onclick="window.triggerBeeGreeting()" title="Click me! Bzzzt 🐝">
-              <img src="assets/cute_bee_mascot.png" alt="Cute Bee Mascot" class="cute-bee-img">
-              <div id="bee-speech-bubble" class="cute-bee-speech-bubble" style="display: none;">
-                Bzzzt! Hi Ankita! I'm your Second Brain Bee helper! 🐝🍯
-              </div>
-            </div>
-
-            <h1 class="gemini-hero-title" style="font-size: 36px; font-weight: 800; color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; text-shadow: 0 2px 22px rgba(56, 189, 248, 0.7), 0 0 45px rgba(0, 242, 254, 0.5); margin: 0; font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;">
+          <!-- Clean Luminous High-Contrast Headline -->
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+            <h1 class="gemini-hero-title" style="font-size: 38px; font-weight: 800; color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; text-shadow: 0 2px 22px rgba(56, 189, 248, 0.7), 0 0 45px rgba(0, 242, 254, 0.5); margin: 0; font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;">
               What's on your mind today, Ankita?
             </h1>
             <p style="font-size: 15px; color: #7dd3fc !important; margin: 0; font-family: 'Inter', sans-serif; font-weight: 600; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);">
