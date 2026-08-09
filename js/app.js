@@ -212,6 +212,30 @@
     window.activateView = activateView;
     window.applyTheme = applyTheme;
 
+    window.triggerBeeGreeting = function() {
+      const bubble = document.getElementById('bee-speech-bubble');
+      if (!bubble) return;
+      
+      const greetings = [
+        "Bzzzt! Hi Ankita! I'm your Second Brain Bee helper! 🐝🍯",
+        "Buzzing with 100+ grounded notes & memories! 🍯✨",
+        "Need a quick study quiz? Click 'Ask My Brain'! 🧠🐝",
+        "Sweet knowledge collected in your Second Brain! 🍯📚"
+      ];
+      
+      const randomMsg = greetings[Math.floor(Math.random() * greetings.length)];
+      bubble.textContent = randomMsg;
+      bubble.style.display = 'block';
+      
+      if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) {
+        SoundEngine.playClick();
+      }
+      
+      setTimeout(() => {
+        if (bubble) bubble.style.display = 'none';
+      }, 4000);
+    };
+
     window.openSourceModal = function(noteId) {
       const modal = document.getElementById('citation-source-modal');
       if (!modal) return;
