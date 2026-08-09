@@ -11,10 +11,14 @@ const { WebSocketServer, WebSocket } = require('ws');
 const NoteControllerClass = require('./controllers/NoteController');
 const ChatControllerClass = require('./controllers/ChatController');
 const GoalControllerClass = require('./controllers/GoalController');
+const AuthControllerClass = require('./controllers/AuthController');
+const AIGatewayControllerClass = require('./controllers/AIGatewayController');
 
 const noteController = new NoteControllerClass();
 const chatController = new ChatControllerClass();
 const goalController = new GoalControllerClass();
+const authController = new AuthControllerClass();
+const aiGatewayController = new AIGatewayControllerClass();
 
 const dev = process.env.NODE_ENV !== 'production';
 const PORT = process.env.PORT || 3000;
@@ -139,6 +143,16 @@ nextApp.prepare().then(() => {
   app.get('/api/goals', (req, res) => goalController.getGoals(req, res));
   app.post('/api/goals', (req, res) => goalController.createGoal(req, res));
   app.post('/api/goals/:id/progress', (req, res) => goalController.updateProgress(req, res));
+
+  // Authentication API Endpoints
+  app.post('/api/auth/register', (req, res) => authController.register(req, res));
+  app.post('/api/auth/login', (req, res) => authController.login(req, res));
+  app.post('/api/auth/otp', (req, res) => authController.sendOTP(req, res));
+  app.get('/api/auth/me', (req, res) => authController.me(req, res));
+  app.post('/api/auth/logout', (req, res) => authController.logout(req, res));
+
+  // Secure AI Gateway Endpoint
+  app.post('/api/ai/gateway', (req, res) => aiGatewayController.handleQuery(req, res));
 
   // Express static middleware for landing.html, index.html, css, js, and static assets
   app.use(express.static(__dirname));

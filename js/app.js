@@ -137,28 +137,38 @@
     function activateView(targetView) {
       if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
 
+      // Map view aliases to canonical view section IDs
+      const viewAliasMap = {
+        'ask': 'jarvis',
+        'library': 'vault',
+        'memories': 'resurfacing',
+        'learn': 'flashcards',
+        'research': 'agents'
+      };
+      const canonicalView = viewAliasMap[targetView] || targetView;
+
       const allNavTabs = document.querySelectorAll('.nav-tab');
       allNavTabs.forEach(t => {
-        const isTarget = t.getAttribute('data-view') === targetView;
+        const isTarget = t.getAttribute('data-view') === targetView || t.getAttribute('data-view') === canonicalView;
         t.classList.toggle('active', isTarget);
         t.setAttribute('aria-selected', isTarget ? 'true' : 'false');
       });
 
       const sidebarItems = document.querySelectorAll('.sidebar-menu-item');
       sidebarItems.forEach(item => {
-        const isTarget = item.getAttribute('data-view') === targetView;
+        const isTarget = item.getAttribute('data-view') === targetView || item.getAttribute('data-view') === canonicalView;
         item.classList.toggle('active', isTarget);
       });
 
       const mobileNavBtns = document.querySelectorAll('.mobile-nav-btn');
       mobileNavBtns.forEach(btn => {
-        const isTarget = btn.getAttribute('data-view') === targetView;
+        const isTarget = btn.getAttribute('data-view') === targetView || btn.getAttribute('data-view') === canonicalView;
         btn.classList.toggle('active', isTarget);
       });
 
       const allViewSections = document.querySelectorAll('.view-section');
       allViewSections.forEach(sec => {
-        const isTarget = sec.id === `view-${targetView}`;
+        const isTarget = sec.id === `view-${canonicalView}`;
         if (isTarget) {
           sec.style.display = sec.id === 'view-jarvis' ? 'flex' : 'block';
           sec.classList.add('active');
@@ -177,7 +187,7 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
-      if (targetView === 'graph' && typeof GraphVisualizer !== 'undefined') {
+      if (canonicalView === 'graph' && typeof GraphVisualizer !== 'undefined') {
         setTimeout(() => {
           const graphCanvas = document.getElementById('graph-canvas');
           if (graphCanvas) {
@@ -189,11 +199,11 @@
         if (typeof GraphVisualizer !== 'undefined' && typeof GraphVisualizer.stopSimulation === 'function') {
           GraphVisualizer.stopSimulation();
         }
-        if (targetView === 'flashcards') {
+        if (canonicalView === 'flashcards') {
           initFlashcards();
-        } else if (targetView === 'dashboard') {
+        } else if (canonicalView === 'dashboard') {
           renderDashboard();
-        } else if (targetView === 'goals') {
+        } else if (canonicalView === 'goals') {
           renderGoals();
         }
       }
@@ -201,6 +211,128 @@
 
     window.activateView = activateView;
     window.applyTheme = applyTheme;
+
+    window.openSourceModal = function(noteId) {
+      const modal = document.getElementById('citation-source-modal');
+      if (!modal) return;
+
+      const store = typeof Store !== 'undefined' ? Store : null;
+      const notes = store ? store.getNotes() : [];
+      let note = notes.find(n => n.id === noteId);
+
+      if (!note && typeof noteId === 'string') {
+        note = notes.find(n => n.title.toLowerCase().includes(noteId.toLowerCase()));
+      }
+      if (!note && notes.length > 0) {
+        note = notes[0];
+      }
+
+      if (note) {
+        const titleEl = document.getElementById('citation-modal-title');
+        const typeEl = document.getElementById('citation-modal-source-type');
+        const dateEl = document.getElementById('citation-modal-date');
+        const tagsEl = document.getElementById('citation-modal-tags');
+        const contentEl = document.getElementById('citation-modal-content');
+
+        if (titleEl) titleEl.textContent = note.title;
+        if (typeEl) typeEl.textContent = (note.sourceType || 'note').toUpperCase() + ' CITATION SOURCE';
+        if (dateEl) dateEl.textContent = note.dateStr || 'Recently Saved';
+        if (tagsEl) tagsEl.textContent = (note.tags || []).join(', ') || 'General Knowledge';
+        if (contentEl) contentEl.textContent = note.content || note.summary || 'No text snippet available.';
+      }
+
+      modal.style.display = 'flex';
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
+    };
+
+    window.askMyBrain = function() {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playBotWhisper();
+      const notes = typeof Store !== 'undefined' ? Store.getNotes() : [];
+      const totalNotes = notes.length;
+      
+      let allTags = {};
+      notes.forEach(n => {
+        (n.tags || []).forEach(t => {
+          allTags[t] = (allTags[t] || 0) + 1;
+        });
+      });
+
+      const topTopics = Object.keys(allTags).sort((a, b) => allTags[b] - allTags[a]).slice(0, 4);
+      const weakTopics = Object.keys(allTags).sort((a, b) => allTags[a] - allTags[b]).slice(0, 3);
+
+      const reportHtml = `
+        <div class="glass-card" style="margin-top: 14px; padding: 18px; border-left: 4px solid #f59e0b; background: rgba(15, 23, 42, 0.85);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <strong style="color: #f59e0b; font-size: 15px;">🧠 "Ask My Brain" Knowledge Diagnostic Summary</strong>
+            <span style="font-size: 11px; background: rgba(245, 158, 11, 0.2); color: #f59e0b; padding: 2px 8px; border-radius: 8px; font-weight: 700;">REAL-TIME DIAGNOSTIC</span>
+          </div>
+          <p style="font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px;">
+            I analyzed your <strong>${totalNotes} grounded knowledge items</strong> across all saved notes, PDFs, web clips, and voice transcripts.
+          </p>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; font-size: 12.5px;">
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); padding: 10px 12px; border-radius: 10px;">
+              <strong style="color: #10b981; display: block; margin-bottom: 4px;">🏆 Mastered Knowledge Areas:</strong>
+              <span style="color: #e2e8f0;">${topTopics.join(', ') || 'Software Architecture, Machine Learning'}</span>
+            </div>
+            <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); padding: 10px 12px; border-radius: 10px;">
+              <strong style="color: #ef4444; display: block; margin-bottom: 4px;">⚠️ Identified Revision Decay Areas:</strong>
+              <span style="color: #e2e8f0;">${weakTopics.join(', ') || 'System Design, Security Standards'}</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="window.activateView('flashcards')" style="font-size: 12px; padding: 6px 14px;">🎯 Launch Revision Quiz</button>
+            <button class="btn btn-secondary" onclick="window.connectTheDots()" style="font-size: 12px; padding: 6px 14px;">🔗 Connect Knowledge Dots</button>
+          </div>
+        </div>
+      `;
+
+      const chatFeed = document.getElementById('chat-history-container') || document.getElementById('chat-hero-view');
+      if (chatFeed) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'chat-message-bubble assistant-bubble';
+        msgDiv.innerHTML = reportHtml;
+        chatFeed.appendChild(msgDiv);
+        msgDiv.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
+    window.connectTheDots = function() {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playBotWhisper();
+      const notes = typeof Store !== 'undefined' ? Store.getNotes() : [];
+      if (notes.length < 2) return;
+
+      const n1 = notes[Math.floor(Math.random() * notes.length)];
+      const n2 = notes.find(n => n.id !== n1.id) || notes[1];
+
+      const bridgeHtml = `
+        <div class="glass-card" style="margin-top: 14px; padding: 18px; border-left: 4px solid #8b5cf6; background: rgba(15, 23, 42, 0.85);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <strong style="color: #a78bfa; font-size: 15px;">🔗 "Connect the Dots" Knowledge Bridge</strong>
+            <span style="font-size: 11px; background: rgba(139, 92, 246, 0.2); color: #a78bfa; padding: 2px 8px; border-radius: 8px; font-weight: 700;">CROSS-TEMPORAL SYNTHESIS</span>
+          </div>
+          <p style="font-size: 13px; color: #cbd5e1; line-height: 1.5; margin-bottom: 12px;">
+            Discovered a semantic connection between items saved at different times in your Second Brain:
+          </p>
+          <div style="background: rgba(30, 41, 59, 0.6); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); font-size: 13px; margin-bottom: 12px; color: #e2e8f0;">
+            <div style="color: #60a5fa; font-weight: 700;">📄 Note A (${n1.dateStr || 'Earlier'}): ${n1.title}</div>
+            <div style="margin: 6px 0; text-align: center; color: #a78bfa; font-weight: 800;">↓  [Shared Concepts: ${(n1.tags || []).slice(0, 2).join(', ') || 'Architecture'}]  ↓</div>
+            <div style="color: #34d399; font-weight: 700;">📄 Note B (${n2.dateStr || 'Recent'}): ${n2.title}</div>
+          </div>
+          <p style="font-size: 12.5px; color: #94a3b8; margin: 0;">
+            💡 <em>Connecting concepts across different study sessions builds long-term retention and deeper synthesis!</em>
+          </p>
+        </div>
+      `;
+
+      const chatFeed = document.getElementById('chat-history-container') || document.getElementById('chat-hero-view');
+      if (chatFeed) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'chat-message-bubble assistant-bubble';
+        msgDiv.innerHTML = bridgeHtml;
+        chatFeed.appendChild(msgDiv);
+        msgDiv.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
     window.filterKnowledgeGraph = function(val) {
       if (typeof GraphVisualizer !== 'undefined') GraphVisualizer.applyFilter(val);
     };

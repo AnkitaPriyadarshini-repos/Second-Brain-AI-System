@@ -12,11 +12,12 @@
     "start": "node server.js",
     "dev": "node server.js",
     "serve": "npx serve .",
-    "test": "node test/run_tests.js && node test/run_websocket_ssr_tests.js && node test/run_dip_repository_tests.js && node test/run_layered_architecture_tests.js",
+    "test": "node test/run_tests.js && node test/run_websocket_ssr_tests.js && node test/run_dip_repository_tests.js && node test/run_layered_architecture_tests.js && node test/run_production_blueprint_tests.js",
     "test:unit": "node test/run_tests.js",
     "test:realtime": "node test/run_websocket_ssr_tests.js",
     "test:dip": "node test/run_dip_repository_tests.js",
-    "test:layered": "node test/run_layered_architecture_tests.js"
+    "test:layered": "node test/run_layered_architecture_tests.js",
+    "test:blueprint": "node test/run_production_blueprint_tests.js"
   },
   "dependencies": {
     "express": "^4.19.2",
