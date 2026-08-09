@@ -1,15 +1,21 @@
 /**
  * Second Brain AI System — Secure AI Gateway Service (Production Architecture)
  * Handles model routing, dynamic context relevance scoring, genuine Gemini/OpenAI API integration,
- * calibrated confidence metrics, and rate limiting.
+ * PromptSecurityAgent injection filtering, VerificationAgent evidence validation, and rate limiting.
  */
 
 const https = require('https');
+const PromptSecurityAgent = require('../agents/PromptSecurityAgent');
+const VerificationAgent = require('../agents/VerificationAgent');
+const BM25Engine = require('../js/bm25-engine');
 
 class AIGatewayService {
   constructor() {
     this.requestCounts = new Map();
     this.RATE_LIMIT_MAX = 60; // 60 requests per minute per IP/User
+    this.securityAgent = new PromptSecurityAgent();
+    this.verificationAgent = new VerificationAgent();
+    this.bm25Engine = new BM25Engine();
   }
 
   checkRateLimit(identifier) {
@@ -27,9 +33,6 @@ class AIGatewayService {
     return true;
   }
 
-  /**
-   * Calculates real semantic relevance score (0.0 to 1.0) between query prompt and document snippet.
-   */
   calculateContextRelevance(prompt, snippet) {
     if (!prompt || !snippet) return 0;
     const promptTerms = new Set(prompt.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(t => t.length > 2));
@@ -45,19 +48,16 @@ class AIGatewayService {
     return Math.min(1.0, (matchCount / promptTerms.size) * 1.5);
   }
 
-  /**
-   * Performs real Gemini API completion over HTTPS REST endpoint.
-   */
   async invokeGeminiAPI({ prompt, contextSnippets, model, apiKey }) {
     const geminiKey = apiKey || process.env.GEMINI_API_KEY;
     if (!geminiKey) return null;
 
-    const selectedModel = model.includes('gemini') ? model : 'gemini-1.5-flash';
+    const selectedModel = model && model.includes('gemini') ? model : 'gemini-1.5-flash';
     const endpointUrl = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${geminiKey}`;
 
     const systemInstruction = "You are Second Brain AI, a precise, personal knowledge assistant. Ground your answer strictly in the provided context notes when available, citing sources accurately.";
     
-    let fullPrompt = cleanPrompt;
+    let fullPrompt = prompt;
     if (contextSnippets && contextSnippets.length > 0) {
       fullPrompt = `[Context Notes]:\n${contextSnippets.join('\n\n')}\n\n[User Query]: ${prompt}`;
     }
@@ -112,9 +112,23 @@ class AIGatewayService {
       return { error: 'Prompt string is required.' };
     }
 
-    const cleanPrompt = prompt.trim();
+    // Step 1: PromptSecurityAgent Inspection
+    const secResult = this.securityAgent.inspectPrompt(prompt);
+    if (!secResult.isSafe) {
+      return {
+        error: secResult.reason,
+        securityViolation: true
+      };
+    }
 
-    // 1. Context Match & Citation Extraction with relevance scoring
+    const cleanPrompt = secResult.sanitizedPrompt;
+
+    // Step 2: BM25 Keyword Search & Context Match
+    let bm25Ranked = [];
+    if (contextNotes.length > 0) {
+      bm25Ranked = this.bm25Engine.search(cleanPrompt, contextNotes);
+    }
+
     const citations = [];
     const contextSnippets = [];
     let totalRelevanceScore = 0;
@@ -127,7 +141,7 @@ class AIGatewayService {
         totalRelevanceScore += relScore;
 
         citations.push({
-          id: `src_${idx + 1}`,
+          id: note.id || `src_${idx + 1}`,
           title,
           sourceType: note.sourceType || 'note',
           snippet,
@@ -137,38 +151,19 @@ class AIGatewayService {
       }
     });
 
-    // 2. Calibrated Confidence & Grounding Verification
-    const hasContext = contextNotes.length > 0;
-    const avgRelevance = hasContext ? totalRelevanceScore / contextNotes.length : 0;
-    
-    let confidenceLevel = 'LOW';
-    let confidenceScore = 0.50;
+    // Step 3: VerificationAgent Evidence Check
+    const verification = this.verificationAgent.verifyEvidence(cleanPrompt, contextNotes);
 
-    if (hasContext) {
-      if (avgRelevance > 0.4 || citations.length >= 2) {
-        confidenceLevel = 'HIGH';
-        confidenceScore = Math.min(0.98, parseFloat((0.85 + avgRelevance * 0.15).toFixed(2)));
-      } else {
-        confidenceLevel = 'MEDIUM';
-        confidenceScore = Math.min(0.85, parseFloat((0.70 + avgRelevance * 0.15).toFixed(2)));
-      }
-    } else {
-      confidenceLevel = 'GENERAL';
-      confidenceScore = 0.75;
-    }
-
-    const claimsChecked = citations.length;
-    const groundedClaims = citations.filter(c => c.relevanceScore > 0.1).length;
-    const hallucinationCheckStatus = hasContext
-      ? `${groundedClaims} of ${claimsChecked} citations strongly grounded in prompt context`
-      : 'Un-grounded general query (No vault documents referenced)';
-
-    // 3. Response Generation (Grounded synthesis)
+    // Step 4: Grounded Response Synthesis
     let synthesizedAnswer = '';
 
-    if (hasContext) {
-      synthesizedAnswer = `Based on your private knowledge vault (${citations.length} sources matched):\n\nKey finding: ${cleanPrompt} connects directly with your saved research in ${citations[0].title}.\n\nCitations:\n` +
-        citations.map(c => `• [${c.title}]: "${c.snippet.substring(0, 100)}..."`).join('\n');
+    if (contextNotes.length > 0) {
+      if (!verification.hasSufficientEvidence) {
+        synthesizedAnswer = `⚠️ **Insufficient local evidence found in vault.**\n\nYour query "${cleanPrompt}" could not be matched with high confidence against any saved notes or documents in your private knowledge vault. To prevent hallucinations, please add relevant notes or documents to your vault before querying this topic.`;
+      } else {
+        synthesizedAnswer = `Based on your private knowledge vault (${citations.length} sources matched):\n\nKey finding: ${cleanPrompt} connects directly with your saved research in ${citations[0].title}.\n\nCitations:\n` +
+          citations.map(c => `• [${c.title}]: "${c.snippet.substring(0, 100)}..."`).join('\n');
+      }
     } else {
       synthesizedAnswer = `Synthesized response for query: "${cleanPrompt}". You can save new notes or upload PDFs to ground future queries with personal citations.`;
     }
@@ -179,12 +174,13 @@ class AIGatewayService {
       answer: synthesizedAnswer,
       citations,
       verification: {
-        isGrounded: hasContext,
-        confidenceLevel,
-        confidenceScore,
-        groundedClaimsCount: groundedClaims,
-        totalClaimsCount: claimsChecked,
-        hallucinationCheck: hallucinationCheckStatus
+        isGrounded: verification.isGrounded,
+        hasSufficientEvidence: verification.hasSufficientEvidence,
+        confidenceLevel: verification.confidenceLevel,
+        confidenceScore: verification.confidenceScore,
+        groundedClaimsCount: verification.verifiedSourcesCount || 0,
+        totalClaimsCount: citations.length,
+        hallucinationCheck: verification.verdict
       },
       timestamp: new Date().toISOString()
     };

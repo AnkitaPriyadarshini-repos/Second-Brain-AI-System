@@ -69,6 +69,13 @@ class DatabaseService {
     return Object.values(this.data.users).find(u => u.id === id) || null;
   }
 
+  deleteUser(email) {
+    if (email && this.data.users[email.toLowerCase()]) {
+      delete this.data.users[email.toLowerCase()];
+      this.saveSync();
+    }
+  }
+
   saveUser(userObj) {
     if (!userObj || !userObj.email) return null;
     const email = userObj.email.toLowerCase();

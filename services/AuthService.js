@@ -73,6 +73,12 @@ class AuthService {
     }
   }
 
+  deleteUser(email) {
+    if (email) {
+      this.db.deleteUser(email);
+    }
+  }
+
   register({ email, password, name }) {
     if (!email || !email.includes('@')) {
       return { error: 'Valid email address is required.' };

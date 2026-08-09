@@ -8,7 +8,7 @@
     <img src="https://img.shields.io/badge/GitHub-Repository-10b981?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Repo">
   </a>
   <a href="test/run_tests.js">
-    <img src="https://img.shields.io/badge/Tests-45%2F45%20Passed%20(100%25)-00f2fe?style=for-the-badge" alt="Tests Passed">
+    <img src="https://img.shields.io/badge/Tests-46%2F46%20Passed%20(100%25)-00f2fe?style=for-the-badge" alt="Tests Passed">
   </a>
   <a href="manifest.json">
     <img src="https://img.shields.io/badge/PWA-Installable%20Offline-38bdf8?style=for-the-badge" alt="PWA Installable">
@@ -28,23 +28,25 @@
   <a href="#-hybrid-rag-retrieval-pipeline"><strong>⚡ Hybrid RAG Engine</strong></a> •
   <a href="#-rag-quality-evaluation-benchmark"><strong>🧪 Evaluation Benchmark</strong></a> •
   <a href="#-architecture--software-design"><strong>🏛️ Architecture</strong></a> •
-  <a href="#-automated-test-suite-4545"><strong>🧪 Test Suite (45/45)</strong></a>
+  <a href="#-automated-test-suite-4646"><strong>🧪 Test Suite (46/46)</strong></a>
 </p>
 
 ---
 
 ## ⚡ Hybrid RAG Retrieval Pipeline
 
-Second Brain AI executes a multi-stage hybrid retrieval architecture combining **BM25 keyword search**, **TF-IDF sparse vector similarity**, and **temporal recency scoring** to guarantee high precision and zero hallucinations:
+Second Brain AI executes a multi-stage hybrid retrieval architecture combining **BM25 keyword search** (`BM25Engine`), **TF-IDF sparse vector similarity**, and **temporal recency scoring**:
 
 ```text
 User Query
+    ↓
+Prompt Security Agent (PromptSecurityAgent - Injection & Override Filter)
     ↓
 Query Rewriter & Entity Parser (NLP Engine)
     ↓
  ┌───────────────────────────┐
  │                           │
-Sparse TF-IDF Vector      BM25 Keyword Search
+Sparse TF-IDF Vector      BM25 Keyword Search (BM25Engine)
  │                           │
  └─────────────┬─────────────┘
                ↓
@@ -52,11 +54,9 @@ Sparse TF-IDF Vector      BM25 Keyword Search
                ↓
     Context Selection & Chunk Deduplication
                ↓
-    Prompt Security Filter (PromptSecurityAgent)
+    Secure Provider Gateway (AIGatewayService & Gemini API)
                ↓
-    Secure Provider Gateway (AIGatewayService)
-               ↓
-    Verification Agent (Factual Grounding Check)
+    Verification Agent (VerificationAgent - Evidence Guardrail Check)
                ↓
     Grounded Response + Clickable Source Citations
 ```
@@ -65,40 +65,41 @@ Sparse TF-IDF Vector      BM25 Keyword Search
 
 ## 🧪 RAG Quality Evaluation Benchmark
 
-Second Brain AI was evaluated against an internal **500-Query Grounded Evaluation Benchmark** designed to test retrieval precision, citation accuracy, and response latency:
+Second Brain AI is evaluated against an automated **Grounded Evaluation Benchmark** designed to test retrieval precision, citation accuracy, and response latency:
 
-| Metric Category | Evaluation Dimension | Benchmark Benchmark Result |
+| Metric Category | Evaluation Dimension | Benchmark Result |
 | :--- | :--- | :--- |
 | **Retrieval Accuracy** | Recall@5 | **96.4%** |
 | **Retrieval Accuracy** | Recall@10 | **99.1%** |
 | **Rank Precision** | Mean Reciprocal Rank (MRR) | **0.942** |
 | **Rank Precision** | Normalized Discounted Cumulative Gain (NDCG) | **0.958** |
 | **Answer Quality** | Factual Citation Correctness | **98.6%** |
-| **Answer Quality** | Hallucination Rate | **0.4%** |
+| **Answer Quality** | Grounded Citation Verification | **Calibrated High/Med/Low** |
 | **Performance** | P50 Retrieval Latency | **14 ms** |
 | **Performance** | P95 Retrieval Latency | **48 ms** |
 
-> **Key Architectural Guarantee**: *If retrieved local documents do not contain sufficient evidence to answer a query, the VerificationAgent forces the system to state "Insufficient local evidence found" rather than hallucinating fake details.*
+> **Key Architectural Guarantee**: *If retrieved local documents do not contain sufficient evidence to answer a query, the `VerificationAgent` forces the system to state "Insufficient local evidence found" rather than hallucinating unsupported claims.*
 
 ---
 
 ## 🏛️ Architecture & Production Software Design
 
-The codebase strictly enforces production-grade enterprise software principles:
+The codebase enforces layered domain architecture principles:
 
-### 1. **Layered Domain Architecture**
+### 1. **Multi-Agent Fleet & Security**
+- **`PromptSecurityAgent`** (`agents/PromptSecurityAgent.js`): Inspects incoming prompts for injection attacks, system override attempts, and malicious code.
+- **`VerificationAgent`** (`agents/VerificationAgent.js`): Asserts evidence sufficiency and enforces factual grounding guardrails.
+- **`BM25Engine`** (`js/bm25-engine.js`): Implements Okapi BM25 probabilistic keyword ranking.
+- **`DatabaseService`** (`services/DatabaseService.js`): Provides durable persistent storage for user profiles, sessions, notes, goals, and chat streams.
+
+### 2. **Layered Domain Architecture**
 - **Controllers Layer** (`NoteController`, `ChatController`, `GoalController`, `AuthController`, `AIGatewayController`, `ShareController`): Enforces HTTP DTO schemas, input sanitization, and request boundaries.
-- **Services Layer** (`NoteService`, `ChatService`, `GoalService`, `AuthService`, `AIGatewayService`, `ShareService`): Implements core domain logic, rate limiting, and hybrid vector RAG retrieval.
-- **Repositories Layer** (`INoteRepository`, `IChatThreadRepository`): Abstracts persistence contracts using the **Dependency Inversion Principle (DIP)**.
-
-### 2. **Dependency Inversion Principle (DIP) & Storage Adapters**
-- `InMemoryNoteRepositoryAdapter` (Fast execution harness)
-- `LocalStorageNoteRepositoryAdapter` (IndexedDB / LocalStorage persistence)
-- `DatabaseMigrationManager` (Transactional schema migration `v1` ➔ `v2` ➔ `v3`)
+- **Services Layer** (`NoteService`, `ChatService`, `GoalService`, `AuthService`, `AIGatewayService`, `ShareService`, `DatabaseService`): Implements core domain logic, HMAC JWT authentication, rate limiting, and hybrid vector RAG retrieval.
+- **Repositories Layer** (`INoteRepository`, `IChatThreadRepository`, `IMessageRepository`): Abstracts persistence contracts using the **Dependency Inversion Principle (DIP)**.
 
 ---
 
-## 🧪 Automated Test Suite (45 / 45 Passed Cleanly)
+## 🧪 Automated Test Suite (46 / 46 Passed Cleanly)
 
 Execute the full automated test suite containing 5 specialized test harnesses:
 
@@ -128,7 +129,7 @@ Suite 11: AI Engine & Multi-Turn Chat Threads (3/3 Passed)
 ====================================================
 Suite A: Next.js SSR Performance & Hydration (2/2 Passed)
 Suite B: Real-Time WebSockets Sub-300ms Assertion (3/3 Passed)
-   -> Benchmark: Avg Latency = 5ms | Max Latency = 45ms
+   -> Benchmark: Avg Latency = 6ms | Max Latency = 54ms
 
 ====================================================
 🏗️ DEPENDENCY INVERSION & DB MIGRATION TEST SUITE
@@ -136,7 +137,7 @@ Suite B: Real-Time WebSockets Sub-300ms Assertion (3/3 Passed)
 Suite A: Abstract Interface Contracts DIP (1/1 Passed)
 Suite B: Dependency Injection Container Swapping (2/2 Passed)
 Suite C: Database Migration Manager Speed Benchmark (2/2 Passed)
-   -> Benchmark: 120 Notes transformed in 0.14ms
+   -> Benchmark: 120 Notes transformed in 0.26ms
 
 ====================================================
 🏛️ LAYERED ARCHITECTURE & COMPONENT TEST SUITE
@@ -150,8 +151,9 @@ Suite B: Reusable Component-Based Frontend Library (2/2 Passed)
 Suite 1: Authentication & User Session Management (3/3 Passed)
 Suite 2: Secure AI Gateway & Rate Limiting (2/2 Passed)
 Suite 3: Hybrid RAG Engine & Citations (1/1 Passed)
+Suite 4: Database Persistence & Storage Service (1/1 Passed)
 
-SUMMARY: 45 / 45 TESTS PASSED CLEANLY (100% Pass Rate).
+SUMMARY: 46 / 46 TESTS PASSED CLEANLY (100% Pass Rate).
 ```
 
 ---
