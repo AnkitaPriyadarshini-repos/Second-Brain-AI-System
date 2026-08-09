@@ -13,12 +13,14 @@ const ChatControllerClass = require('./controllers/ChatController');
 const GoalControllerClass = require('./controllers/GoalController');
 const AuthControllerClass = require('./controllers/AuthController');
 const AIGatewayControllerClass = require('./controllers/AIGatewayController');
+const ShareControllerClass = require('./controllers/ShareController');
 
 const noteController = new NoteControllerClass();
 const chatController = new ChatControllerClass();
 const goalController = new GoalControllerClass();
 const authController = new AuthControllerClass();
 const aiGatewayController = new AIGatewayControllerClass();
+const shareController = new ShareControllerClass();
 
 const dev = process.env.NODE_ENV !== 'production';
 const PORT = process.env.PORT || 3000;
@@ -153,6 +155,10 @@ nextApp.prepare().then(() => {
 
   // Secure AI Gateway Endpoint
   app.post('/api/ai/gateway', (req, res) => aiGatewayController.handleQuery(req, res));
+
+  // Share System API Endpoints
+  app.post('/api/share', (req, res) => shareController.createShareLink(req, res));
+  app.get('/api/share/:id', (req, res) => shareController.getShareLink(req, res));
 
   // Express static middleware for landing.html, index.html, css, js, and static assets
   app.use(express.static(__dirname));

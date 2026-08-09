@@ -38,7 +38,15 @@
         role: 'Entity Relationship & Cluster Discrepancy Mapper',
         status: 'online',
         lastExecuted: 'Ready',
-        description: 'Auto-discovers hidden bi-directional connections between notes using NLP entity extraction.'
+        description: 'Synthesizes graph connections and maps semantic relationships between cross-category entities.'
+      },
+      security: {
+        id: 'security',
+        name: '🛡️ Prompt Security Agent',
+        role: 'Prompt Injection & Untrusted File Ingest Filter',
+        status: 'online',
+        lastExecuted: 'Active',
+        description: 'Scans ingested PDFs, notes, and web text for malicious prompt injection instructions before passing context to LLMs.'
       },
       resurfacing: {
         id: 'resurfacing',

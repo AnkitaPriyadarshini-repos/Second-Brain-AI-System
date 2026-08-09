@@ -236,6 +236,41 @@
       }, 4000);
     };
 
+    window.nextObStep = function(stepNum) {
+      for (let i = 1; i <= 3; i++) {
+        const panel = document.getElementById(`ob-step-${i}`);
+        const dot = document.getElementById(`ob-step-dot-${i}`);
+        if (panel) panel.style.display = (i === stepNum) ? 'block' : 'none';
+        if (dot) {
+          if (i === stepNum) {
+            dot.style.width = '28px';
+            dot.style.background = '#00f2fe';
+          } else {
+            dot.style.width = '10px';
+            dot.style.background = 'rgba(255, 255, 255, 0.2)';
+          }
+        }
+      }
+    };
+
+    window.setObGoal = function(goalName) {
+      if (typeof window.showToast === 'function') {
+        window.showToast(`Selected goal: ${goalName}`);
+      }
+      window.nextObStep(2);
+    };
+
+    window.completeOnboarding = function() {
+      const modal = document.getElementById('onboarding-modal');
+      if (modal) modal.style.display = 'none';
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('sb_onboarding_completed', 'true');
+      }
+      if (typeof window.showToast === 'function') {
+        window.showToast('🚀 Welcome to Second Brain AI!');
+      }
+    };
+
     window.openSourceModal = function(noteId) {
       const modal = document.getElementById('citation-source-modal');
       if (!modal) return;
