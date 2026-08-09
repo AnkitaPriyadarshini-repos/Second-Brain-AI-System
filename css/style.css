@@ -208,30 +208,40 @@ a, a:hover, a:visited, a:focus, a:active,
 
 body,
 .app-main-canvas {
-  background: #060911 !important;
-  color: #ecfeff !important;
+  background: #090d16 !important;
+  color: #f8fafc !important;
 }
 
 .gemini-ambient-glow {
-  background: radial-gradient(ellipse at 35% 30%, rgba(255, 75, 0, 0.48) 0%, rgba(6, 182, 212, 0.35) 45%, rgba(139, 92, 246, 0.15) 70%, rgba(6, 9, 17, 0) 90%) !important;
+  background: radial-gradient(ellipse at 50% 30%, rgba(56, 189, 248, 0.15) 0%, rgba(6, 182, 212, 0.08) 50%, rgba(9, 13, 22, 0) 85%) !important;
 }
 
 .action-card-item {
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
+  background: rgba(30, 41, 59, 0.45) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease !important;
 }
 
 .action-card-item:hover {
-  transform: translateY(-4px) scale(1.015) !important;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 25px rgba(255, 255, 255, 0.15) !important;
-  border-color: rgba(255, 255, 255, 0.6) !important;
+  transform: translateY(-3px) !important;
+  background: rgba(30, 41, 59, 0.7) !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.2) !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+}
+
+.pill-suggestion-btn {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #cbd5e1 !important;
+  transition: all 0.2s ease !important;
 }
 
 .pill-suggestion-btn:hover {
-  background: rgba(255, 255, 255, 0.18) !important;
-  border-color: #00f2fe !important;
-  color: #ffffff !important;
+  background: rgba(56, 189, 248, 0.12) !important;
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  color: #38bdf8 !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 0 16px rgba(0, 242, 254, 0.4) !important;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.25) !important;
 }
 
 .app-sidebar,
