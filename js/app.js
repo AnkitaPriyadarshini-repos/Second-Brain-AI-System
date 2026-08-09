@@ -917,9 +917,9 @@
     });
 
     function applyTheme(themeName) {
-      if (!themeName) themeName = 'golden-harmony';
-      if (themeName === 'royal-gold' || themeName === 'sunflower-yellow' || themeName === 'emerald-luxe' || themeName === 'sapphire-platinum' || themeName === 'atlassian-azure') {
-        themeName = 'golden-harmony';
+      if (!themeName) themeName = 'aqua-aesthetic';
+      if (themeName === 'royal-gold' || themeName === 'sunflower-yellow' || themeName === 'emerald-luxe' || themeName === 'sapphire-platinum' || themeName === 'atlassian-azure' || themeName === 'golden-harmony' || themeName === 'claves-adaptive-fusion') {
+        themeName = 'aqua-aesthetic';
       }
       const root = document.documentElement || document.body || (typeof document !== 'undefined' ? document.querySelector('html') : null);
       if (root && typeof root.setAttribute === 'function') {

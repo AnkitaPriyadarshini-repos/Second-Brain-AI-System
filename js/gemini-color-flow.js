@@ -10,7 +10,7 @@
     canvas: null,
     ctx: null,
     animId: null,
-    theme: 'sunflower-sunrise', // 'sunflower-sunrise' | 'gemini-glow' | 'gold-glassmorphism' | 'emerald-luxe' | 'sapphire-platinum' | 'gemini-dark' | 'obsidian'
+    theme: 'aqua-aesthetic', // 'aqua-aesthetic' | 'summer-ocean' | 'golden-harmony'
     speedPreset: 'swift',  // 'gentle' | 'swift' | 'hyper'
     speedMultiplier: 1.2,
     currentState: 'idle',  // 'idle' | 'listening' | 'thinking' | 'responding'
@@ -19,8 +19,15 @@
 
     nodes: [],
 
-    // Color palettes for different themes tailored for Juno AI Yellow Moon & Premium Aesthetics
+    // Color palettes for different themes tailored for Second Brain Aqua Aesthetic
     palettes: {
+      'aqua-aesthetic': [
+        { r: 6,   g: 182, b: 212, a: 0.85 }, // #06B6D4 Electric Aqua Cyan
+        { r: 0,   g: 242, b: 254, a: 0.90 }, // #00F2FE Neon Cyan
+        { r: 34,  g: 211, b: 238, a: 0.80 }, // #22D3EE Turquoise Aqua
+        { r: 56,  g: 189, b: 248, a: 0.75 }, // #38BDF8 Sky Cyan
+        { r: 236, g: 254, b: 255, a: 0.95 }  // #ECFEFF Ice Aqua Platinum
+      ],
       'golden-harmony': [
         { r: 255, g: 225, b: 86,  a: 0.60 }, // #FFE156 (Light bright lemon yellow)
         { r: 255, g: 217, b: 61,  a: 0.65 }, // #FFD93D (Warm cheerful yellow)
