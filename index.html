@@ -161,8 +161,8 @@
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
         <div class="mobile-header-brand" style="font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 17px; color: #f8fafc; display: flex; align-items: center; gap: 6px;">
-          <span>Claves AI</span>
-          <span style="font-size: 14px;">🌌</span>
+          <span>Second Brain AI</span>
+          <span style="font-size: 14px;">🧠</span>
         </div>
         <button type="button" class="mobile-header-btn" onclick="window.createNewChatThread()" title="New Session" aria-label="New Session" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); border: none; color: #000; border-radius: 14px; cursor: pointer; padding: 5px 12px; display: flex; align-items: center; gap: 4px; font-weight: 800; font-size: 12px; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -181,11 +181,11 @@
             <div class="gemini-model-selector-pill" style="display: flex; align-items: center; gap: 8px; background: rgba(15, 23, 42, 0.95); border: 1.5px solid rgba(245, 158, 11, 0.4); padding: 6px 14px; border-radius: 20px; cursor: pointer; backdrop-filter: blur(14px); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);">
               <span class="yellow-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 10px #f59e0b;"></span>
               <select id="model-select-dropdown" class="model-select-dropdown" onchange="window.handleModelChange(this.value)" style="background: transparent; border: none; color: #f8fafc; font-size: 13.5px; font-weight: 700; cursor: pointer; outline: none; font-family: inherit;">
-                <option value="claves-adaptive-fusion" selected>🌌 Claves Adaptive Fusion AI ∨</option>
-                <option value="gemini-2.5-flash">✨ Juno 2.5 Flash ∨</option>
-                <option value="gemini-2.5-pro">🧠 Juno 2.5 Pro (Deep Thinking) ∨</option>
-                <option value="gemini-2.0-flash">⚡ Juno 2.0 Flash Thinking ∨</option>
-                <option value="perplexity-cyan">💻 Code Architect & Canvas ∨</option>
+                <option value="claves-adaptive-fusion" selected>🧠 Second Brain Hybrid RAG AI ∨</option>
+                <option value="gemini-2.5-flash">✨ Gemini 2.5 Flash ∨</option>
+                <option value="gemini-2.5-pro">🧠 Gemini 2.5 Pro (Deep Thinking) ∨</option>
+                <option value="gemini-2.0-flash">⚡ Gemini 2.0 Flash Thinking ∨</option>
+                <option value="perplexity-cyan">💻 Code Architect &amp; Canvas ∨</option>
                 <option value="web-search-grounding">🔍 Web Search Grounding ∨</option>
                 <option value="golden-harmony">🧠 Grounded Vault RAG ∨</option>
               </select>
@@ -208,14 +208,14 @@
               What's on your mind today, Ankita?
             </h1>
             <p style="font-size: 14px; color: #94a3b8; margin: 0; font-family: 'Inter', sans-serif; font-weight: 500;">
-              Claves Adaptive Fusion AI • Multi-Perspective Intelligence
+              Second Brain AI • Personal Knowledge &amp; Grounded RAG
             </p>
           </div>
 
           <!-- Proportional Neural Canvas Visualizer -->
           <div class="af-canvas-wrapper" style="width: 100%; max-width: 680px; height: 145px; margin: 4px 0; border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 16px; box-shadow: 0 12px 36px rgba(0,0,0,0.7), 0 0 25px rgba(245, 158, 11, 0.15);">
             <canvas id="af-hero-neural-canvas" class="af-neural-canvas"></canvas>
-            <div class="af-canvas-overlay-text">Claves Live Neural Core</div>
+            <div class="af-canvas-overlay-text">Second Brain Neural Core</div>
           </div>
 
           <!-- 4 Clean, Spacious One-Click Prompt Cards -->
@@ -939,7 +939,7 @@
         <span style="font-size: 24px;">🗝️</span>
         <div>
           <h2 style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin: 0;">AI Model &amp; API Key Configuration</h2>
-          <p style="font-size: 12px; color: var(--text-secondary); margin: 2px 0 0 0;">Connect your cloud model provider for worldwide unlimited generation, or use Juno On-Device RAG.</p>
+          <p style="font-size: 12px; color: var(--text-secondary); margin: 2px 0 0 0;">Connect your cloud model provider for worldwide unlimited generation, or use Second Brain Local RAG.</p>
         </div>
       </div>
 
@@ -959,7 +959,7 @@
         <div>
           <label style="font-weight: 700; font-size: 13px; color: var(--text-primary); display: block; margin-bottom: 6px;">Default AI Provider</label>
           <select id="modal-preferred-provider" class="select-field" style="width: 100%; padding: 8px 12px; font-size: 13px;">
-            <option value="local">🔒 Juno On-Device RAG Synthesizer (Default / Privacy First)</option>
+            <option value="local">🔒 Second Brain Local RAG Synthesizer (Default / Privacy First)</option>
             <option value="gemini">✨ Google Gemini Cloud API</option>
             <option value="openai">⚡ OpenAI Cloud API</option>
           </select>
@@ -1183,7 +1183,7 @@
   <div id="user-onboarding-modal" class="modal-backdrop" aria-label="Welcome User Login Modal">
     <div class="spec-modal-card glass-card" style="max-width: 480px; text-align: center; border: 1.5px solid var(--accent-amber); box-shadow: 0 25px 70px rgba(0, 0, 0, 0.45); padding: 32px 28px; border-radius: 20px; background: rgba(30, 31, 36, 0.95); backdrop-filter: blur(20px);">
       <div style="font-size: 48px; margin-bottom: 12px; filter: drop-shadow(0 4px 12px rgba(245, 176, 65, 0.4));">🧠✨</div>
-      <h2 style="font-size: 24px; font-weight: 800; color: var(--accent-amber); margin-bottom: 8px; font-family: var(--font-primary);">Welcome to Juno AI</h2>
+      <h2 style="font-size: 24px; font-weight: 800; color: var(--accent-amber); margin-bottom: 8px; font-family: var(--font-primary);">Welcome to Second Brain AI</h2>
       <p id="onboarding-modal-subtitle" style="color: var(--text-secondary); font-size: 13.5px; line-height: 1.6; margin-bottom: 22px;">
         Please enter your details to verify your Email ID &amp; unlock your personalized session.
       </p>
@@ -1244,7 +1244,7 @@
       <div class="pwa-popup-badge">
         <span class="pwa-icon">📲</span>
         <div>
-          <div class="pwa-popup-title">Install Juno AI App</div>
+          <div class="pwa-popup-title">Install Second Brain AI App</div>
           <div class="pwa-popup-sub">Fast on-device access &amp; instant local RAG</div>
         </div>
       </div>
@@ -1259,9 +1259,9 @@
   <div id="pwa-guide-modal" class="modal-backdrop" style="display: none; z-index: 9999999; align-items: center; justify-content: center;">
     <div class="glass-card modal-content" style="max-width: 420px; width: 92%; padding: 24px; text-align: center; border: 2px solid #FBC02D; margin: auto;">
       <div style="font-size: 38px; margin-bottom: 8px;">📲</div>
-      <h2 style="font-size: 20px; font-weight: 800; color: #2C1D00; margin-bottom: 8px;">Install Juno AI App</h2>
+      <h2 style="font-size: 20px; font-weight: 800; color: #2C1D00; margin-bottom: 8px;">Install Second Brain AI App</h2>
       <p style="font-size: 13px; color: #5D4037; line-height: 1.5; margin-bottom: 20px;">
-        Add Juno AI to your mobile Home Screen or Desktop for instant full-screen access, air-gapped performance, and offline support.
+        Add Second Brain AI to your mobile Home Screen or Desktop for instant full-screen access, local-first performance, and offline support.
       </p>
 
       <div style="background: rgba(255, 248, 225, 0.9); border: 1.5px solid #FFE156; border-radius: 14px; padding: 14px; text-align: left; margin-bottom: 20px; font-size: 13px; color: #2C1D00;">
@@ -1269,7 +1269,7 @@
         <ol style="margin: 0; padding-left: 18px; line-height: 1.6;">
           <li>Tap your browser's <b>Menu (⋮)</b> or <b>Share (⎋)</b> icon.</li>
           <li>Select <b>"Add to Home Screen"</b> or <b>"Install App"</b>.</li>
-          <li>Launch Juno AI anytime right from your home screen!</li>
+          <li>Launch Second Brain AI anytime right from your home screen!</li>
         </ol>
       </div>
 
@@ -1283,7 +1283,7 @@
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="font-size: 20px;">🚀</span>
           <div>
-            <h3 style="font-size: 15px; font-weight: 800; margin: 0; line-height: 1.2;">Juno Canvas Live Preview</h3>
+            <h3 style="font-size: 15px; font-weight: 800; margin: 0; line-height: 1.2;">Second Brain Canvas Live Preview</h3>
             <span style="font-size: 11px; opacity: 0.85; font-weight: 600;">Interactive Sandboxed Web Execution</span>
           </div>
         </div>
@@ -1302,12 +1302,12 @@
       <button type="button" onclick="window.dismissPWAInstallModal()" style="position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.06); border: none; font-size: 18px; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; color: #6d4c41; display: flex; align-items: center; justify-content: center;">✕</button>
 
       <div style="width: 72px; height: 72px; margin: 0 auto 16px auto; border-radius: 20px; background: linear-gradient(135deg, #ffd93d, #ffb300); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(251, 192, 45, 0.4); border: 2px solid #ffffff;">
-        <img src="assets/nexus_yellow_bot.png" alt="Juno AI Icon" style="width: 52px; height: 52px; object-fit: contain;">
+        <img src="assets/nexus_yellow_bot.png" alt="Second Brain AI Icon" style="width: 52px; height: 52px; object-fit: contain;">
       </div>
 
-      <h2 style="font-size: 22px; font-weight: 800; color: #2c1d00; margin: 0 0 8px 0; letter-spacing: -0.3px;">Install Juno AI App</h2>
+      <h2 style="font-size: 22px; font-weight: 800; color: #2c1d00; margin: 0 0 8px 0; letter-spacing: -0.3px;">Install Second Brain AI App</h2>
       <p style="font-size: 14px; color: #6d4c41; margin: 0 0 20px 0; line-height: 1.5; font-weight: 500;">
-        Install Juno AI on your home screen for instant zero-friction access, offline RAG search, and native mobile performance.
+        Install Second Brain AI on your home screen for instant zero-friction access, offline RAG search, and native mobile performance.
       </p>
 
       <div id="pwa-ios-instructions" style="display: none; background: rgba(251, 192, 45, 0.15); border: 1.5px solid #fbc02d; border-radius: 16px; padding: 12px 14px; font-size: 13px; color: #2c1d00; font-weight: 600; margin-bottom: 18px; text-align: left; line-height: 1.4;">
