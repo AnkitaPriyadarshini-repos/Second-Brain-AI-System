@@ -172,6 +172,41 @@ runTest('BM25Engine should rank documents by keyword relevance', () => {
   assert.strictEqual(ranked[0].doc.title, 'Raft Consensus Protocol');
 });
 
+// Suite 6: Orchestrator, Context Planner & Postgres SQL Schema
+console.log('\nSuite 6: Orchestrator, Context Planner & Postgres SQL Schema');
+const OrchestratorService = require('../services/OrchestratorService');
+const ContextPlannerService = require('../services/ContextPlannerService');
+const PostgresStoreService = require('../services/PostgresStoreService');
+
+runTest('OrchestratorService should classify user intent and select modular tools', () => {
+  const orchestrator = new OrchestratorService();
+  const res = orchestrator.classifyIntent('search my vault for deep learning notes');
+  assert.strictEqual(res.primaryIntent, 'vault_grounded_search');
+  assert.ok(res.selectedTools.includes('search_vault'));
+
+  const codeRes = orchestrator.classifyIntent('audit security of python script');
+  assert.strictEqual(codeRes.primaryIntent, 'code_execution_analysis');
+  assert.ok(codeRes.selectedTools.includes('execute_code'));
+});
+
+runTest('ContextPlannerService should resolve multi-turn references and build token-budgeted window', () => {
+  const planner = new ContextPlannerService(2048);
+  const history = [{ query: 'Tell me about Raft consensus protocol', answer: 'Raft manages leader election...' }];
+  const resolved = planner.resolveReferences('summarize it further', history);
+  assert.ok(resolved.includes('Context reference: "Tell me about Raft consensus protocol"'));
+
+  const windowData = planner.buildContextWindow({ prompt: resolved, history, contextNotes: [] });
+  assert.ok(windowData.estimatedTokens > 0);
+});
+
+runTest('PostgresStoreService should generate production-grade SQL DDL schema for enterprise scale', () => {
+  const pg = new PostgresStoreService();
+  const ddl = pg.getSchemaDDL();
+  assert.ok(ddl.includes('CREATE TABLE IF NOT EXISTS users'));
+  assert.ok(ddl.includes('CREATE TABLE IF NOT EXISTS notes'));
+  assert.ok(ddl.includes('CREATE TABLE IF NOT EXISTS chat_messages'));
+});
+
 // Summary
 console.log('\n====================================================');
 console.log(`SUMMARY: ${passCount} / ${passCount + failCount} TESTS PASSED CLEANLY.`);

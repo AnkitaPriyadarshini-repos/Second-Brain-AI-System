@@ -8,7 +8,7 @@
     <img src="https://img.shields.io/badge/GitHub-Repository-10b981?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Repo">
   </a>
   <a href="test/run_tests.js">
-    <img src="https://img.shields.io/badge/Tests-46%2F46%20Passed%20(100%25)-00f2fe?style=for-the-badge" alt="Tests Passed">
+    <img src="https://img.shields.io/badge/Tests-52%2F52%20Passed%20(100%25)-00f2fe?style=for-the-badge" alt="Tests Passed">
   </a>
   <a href="manifest.json">
     <img src="https://img.shields.io/badge/PWA-Installable%20Offline-38bdf8?style=for-the-badge" alt="PWA Installable">
@@ -28,21 +28,23 @@
   <a href="#-hybrid-rag-retrieval-pipeline"><strong>⚡ Hybrid RAG Engine</strong></a> •
   <a href="#-rag-quality-evaluation-benchmark"><strong>🧪 Evaluation Benchmark</strong></a> •
   <a href="#-architecture--software-design"><strong>🏛️ Architecture</strong></a> •
-  <a href="#-automated-test-suite-4646"><strong>🧪 Test Suite (46/46)</strong></a>
+  <a href="#-automated-test-suite-5252"><strong>🧪 Test Suite (52/52)</strong></a>
 </p>
 
 ---
 
 ## ⚡ Hybrid RAG Retrieval Pipeline
 
-Second Brain AI executes a multi-stage hybrid retrieval architecture combining **BM25 keyword search** (`BM25Engine`), **TF-IDF sparse vector similarity**, and **temporal recency scoring**:
+Second Brain AI executes a multi-stage hybrid retrieval architecture combining **BM25 keyword search** (`BM25Engine`), **TF-IDF sparse vector similarity**, **Intent Classification Orchestration** (`OrchestratorService`), and **Multi-Turn Context Planning** (`ContextPlannerService`):
 
 ```text
 User Query
     ↓
 Prompt Security Agent (PromptSecurityAgent - Injection & Override Filter)
     ↓
-Query Rewriter & Entity Parser (NLP Engine)
+Intent Classification & Tool Orchestrator (OrchestratorService)
+    ↓
+Multi-Turn History Reference Resolver & Token Planner (ContextPlannerService)
     ↓
  ┌───────────────────────────┐
  │                           │
@@ -86,7 +88,10 @@ Second Brain AI is evaluated against an automated **Grounded Evaluation Benchmar
 
 The codebase enforces layered domain architecture principles:
 
-### 1. **Multi-Agent Fleet & Security**
+### 1. **Multi-Agent Fleet, Orchestrator & Security**
+- **`OrchestratorService`** (`services/OrchestratorService.js`): Classifies prompt intent and selects modular tools (`search_vault`, `create_note`, `update_goal`, `execute_code`, `web_lookup`).
+- **`ContextPlannerService`** (`services/ContextPlannerService.js`): Resolves pronouns and references across multi-turn chat turns and builds token-budgeted prompt windows.
+- **`PostgresStoreService`** (`services/PostgresStoreService.js`): Provides production-grade SQL DDL schema and relational database operations for scaling to millions of users.
 - **`PromptSecurityAgent`** (`agents/PromptSecurityAgent.js`): Inspects incoming prompts for injection attacks, system override attempts, and malicious code.
 - **`VerificationAgent`** (`agents/VerificationAgent.js`): Asserts evidence sufficiency and enforces factual grounding guardrails.
 - **`BM25Engine`** (`js/bm25-engine.js`): Implements Okapi BM25 probabilistic keyword ranking.
@@ -94,14 +99,14 @@ The codebase enforces layered domain architecture principles:
 
 ### 2. **Layered Domain Architecture**
 - **Controllers Layer** (`NoteController`, `ChatController`, `GoalController`, `AuthController`, `AIGatewayController`, `ShareController`): Enforces HTTP DTO schemas, input sanitization, and request boundaries.
-- **Services Layer** (`NoteService`, `ChatService`, `GoalService`, `AuthService`, `AIGatewayService`, `ShareService`, `DatabaseService`): Implements core domain logic, HMAC JWT authentication, rate limiting, and hybrid vector RAG retrieval.
+- **Services Layer** (`NoteService`, `ChatService`, `GoalService`, `AuthService`, `AIGatewayService`, `ShareService`, `DatabaseService`, `OrchestratorService`, `ContextPlannerService`, `PostgresStoreService`): Implements core domain logic, HMAC JWT authentication, rate limiting, intent orchestration, and hybrid vector RAG retrieval.
 - **Repositories Layer** (`INoteRepository`, `IChatThreadRepository`, `IMessageRepository`): Abstracts persistence contracts using the **Dependency Inversion Principle (DIP)**.
 
 ---
 
-## 🧪 Automated Test Suite (46 / 46 Passed Cleanly)
+## 🧪 Automated Test Suite (52 / 52 Passed Cleanly)
 
-Execute the full automated test suite containing 5 specialized test harnesses:
+Execute the full automated test suite containing 6 specialized test harnesses:
 
 ```bash
 npm test
@@ -112,38 +117,22 @@ npm test
 ====================================================
 🧠 SECOND BRAIN AI SYSTEM — AUTOMATED SUITE
 ====================================================
-Suite 1: Data Store & 100 Notes Pre-Seeding (2/2 Passed)
-Suite 2: NLP Engine & Entity Extraction (2/2 Passed)
-Suite 3: Grounded RAG Engine Vault Search (3/3 Passed)
-Suite 4: Proactive Resurfacing Digest (1/1 Passed)
-Suite 5: Store CRUD & Multi-Surface Ingest (2/2 Passed)
-Suite 6: Audio Presets Module (1/1 Passed)
-Suite 7: Gemini Dynamic Color Flow Engine (2/2 Passed)
-Suite 8: Nexus AI Fairy Bot Engine (3/3 Passed)
-Suite 9: Developer Telemetry & Human Engineering HUD (2/2 Passed)
-Suite 10: Goal & Milestone Management Engine (3/3 Passed)
-Suite 11: AI Engine & Multi-Turn Chat Threads (3/3 Passed)
+SUMMARY: 24 / 24 TESTS PASSED CLEANLY.
 
 ====================================================
 ⚡ REAL-TIME WEBSOCKET & NEXT.JS SSR TEST SUITE
 ====================================================
-Suite A: Next.js SSR Performance & Hydration (2/2 Passed)
-Suite B: Real-Time WebSockets Sub-300ms Assertion (3/3 Passed)
-   -> Benchmark: Avg Latency = 6ms | Max Latency = 54ms
+SUMMARY: 5 / 5 TESTS PASSED CLEANLY.
 
 ====================================================
 🏗️ DEPENDENCY INVERSION & DB MIGRATION TEST SUITE
 ====================================================
-Suite A: Abstract Interface Contracts DIP (1/1 Passed)
-Suite B: Dependency Injection Container Swapping (2/2 Passed)
-Suite C: Database Migration Manager Speed Benchmark (2/2 Passed)
-   -> Benchmark: 120 Notes transformed in 0.26ms
+SUMMARY: 5 / 5 TESTS PASSED CLEANLY.
 
 ====================================================
 🏛️ LAYERED ARCHITECTURE & COMPONENT TEST SUITE
 ====================================================
-Suite A: Layered Backend Architecture (3/3 Passed)
-Suite B: Reusable Component-Based Frontend Library (2/2 Passed)
+SUMMARY: 5 / 5 TESTS PASSED CLEANLY.
 
 ====================================================
 🛡️ SECOND BRAIN AI — PRODUCTION BLUEPRINT TEST SUITE
@@ -152,8 +141,11 @@ Suite 1: Authentication & User Session Management (3/3 Passed)
 Suite 2: Secure AI Gateway & Rate Limiting (2/2 Passed)
 Suite 3: Hybrid RAG Engine & Citations (1/1 Passed)
 Suite 4: Database Persistence & Storage Service (1/1 Passed)
+Suite 5: Multi-Agent Fleet & Security Verification (3/3 Passed)
+Suite 6: Orchestrator, Context Planner & Postgres SQL Schema (3/3 Passed)
 
-SUMMARY: 46 / 46 TESTS PASSED CLEANLY (100% Pass Rate).
+SUMMARY: 13 / 13 TESTS PASSED CLEANLY (100% Pass Rate).
+TOTAL: 52 / 52 TESTS PASSED CLEANLY.
 ```
 
 ---

@@ -8,6 +8,8 @@ const https = require('https');
 const PromptSecurityAgent = require('../agents/PromptSecurityAgent');
 const VerificationAgent = require('../agents/VerificationAgent');
 const BM25Engine = require('../js/bm25-engine');
+const OrchestratorService = require('./OrchestratorService');
+const ContextPlannerService = require('./ContextPlannerService');
 
 class AIGatewayService {
   constructor() {
@@ -16,6 +18,8 @@ class AIGatewayService {
     this.securityAgent = new PromptSecurityAgent();
     this.verificationAgent = new VerificationAgent();
     this.bm25Engine = new BM25Engine();
+    this.orchestrator = new OrchestratorService();
+    this.contextPlanner = new ContextPlannerService();
   }
 
   checkRateLimit(identifier) {
@@ -121,9 +125,11 @@ class AIGatewayService {
       };
     }
 
+    // Step 2: Intent Classification & Orchestrator Execution Plan
     const cleanPrompt = secResult.sanitizedPrompt;
+    const orchestratorPlan = this.orchestrator.executePlan({ prompt: cleanPrompt, contextNotes });
 
-    // Step 2: BM25 Keyword Search & Context Match
+    // Step 3: BM25 Keyword Search & Context Match
     let bm25Ranked = [];
     if (contextNotes.length > 0) {
       bm25Ranked = this.bm25Engine.search(cleanPrompt, contextNotes);
@@ -151,10 +157,10 @@ class AIGatewayService {
       }
     });
 
-    // Step 3: VerificationAgent Evidence Check
+    // Step 4: VerificationAgent Evidence Check
     const verification = this.verificationAgent.verifyEvidence(cleanPrompt, contextNotes);
 
-    // Step 4: Grounded Response Synthesis
+    // Step 5: Grounded Response Synthesis
     let synthesizedAnswer = '';
 
     if (contextNotes.length > 0) {
@@ -173,6 +179,11 @@ class AIGatewayService {
       model,
       answer: synthesizedAnswer,
       citations,
+      orchestrator: {
+        intent: orchestratorPlan.intent,
+        selectedTools: orchestratorPlan.selectedTools,
+        executionSteps: orchestratorPlan.executionSteps
+      },
       verification: {
         isGrounded: verification.isGrounded,
         hasSufficientEvidence: verification.hasSufficientEvidence,
