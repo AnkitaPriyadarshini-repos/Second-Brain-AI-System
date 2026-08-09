@@ -93,6 +93,43 @@ a, a:hover, a:visited, a:focus, a:active,
   --shadow-glow: 0 0 35px rgba(245, 158, 11, 0.4);
 }
 
+/* Summer Ocean Coastal Aesthetic Theme (Seafoam Green + Buttery Yellow + Soft Ivory + Deep Coastal Slate) */
+[data-theme="summer-ocean"] {
+  --bg-dark: #08121c;
+  --bg-card: rgba(14, 28, 44, 0.92);
+  --bg-card-hover: rgba(22, 42, 64, 0.95);
+  --bg-card-active: rgba(30, 58, 88, 0.95);
+  --border-color: rgba(45, 212, 191, 0.35);
+  --border-highlight: #2dd4bf;
+  --border-accent: #facc15;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --accent-primary: #2dd4bf;
+  --accent-primary-hover: #14b8a6;
+  --accent-primary-light: rgba(45, 212, 191, 0.25);
+  --accent-indigo: #38bdf8;
+  --accent-violet: #818cf8;
+  --accent-emerald: #2dd4bf;
+  --accent-amber: #facc15;
+  --accent-cyan: #2dd4bf;
+  --shadow-card: 0 10px 40px -5px rgba(0, 0, 0, 0.8);
+  --shadow-glow: 0 0 35px rgba(45, 212, 191, 0.4);
+}
+
+[data-theme="summer-ocean"] .gemini-ambient-glow {
+  background: radial-gradient(circle, rgba(45, 212, 191, 0.32) 0%, rgba(250, 204, 21, 0.22) 35%, rgba(56, 189, 248, 0.15) 65%, rgba(8, 18, 28, 0) 85%) !important;
+}
+
+[data-theme="summer-ocean"] .yellow-dot {
+  background: #2dd4bf !important;
+  box-shadow: 0 0 10px #2dd4bf !important;
+}
+
+[data-theme="summer-ocean"] .gemini-model-selector-pill {
+  border-color: rgba(45, 212, 191, 0.5) !important;
+}
+
 [data-theme="second-brain-dark"],
 [data-theme="gemini-dark"],
 :root {
