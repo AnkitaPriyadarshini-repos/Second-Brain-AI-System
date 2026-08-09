@@ -1,6 +1,7 @@
 /**
  * Second Brain AI System — Chat Domain Service (Layered Architecture)
- * Handles message stream processing, ACK validation, and real-time latency calculation.
+ * Handles message stream processing, ACK validation, real-time latency calculation,
+ * and AI assistant completion.
  */
 
 (function (global) {
@@ -12,11 +13,14 @@
     }
 
     get repository() {
-      return this.container.resolve('MessageRepository');
+      return this.container ? this.container.resolve('MessageRepository') : null;
     }
 
     getChannelHistory(room = 'general') {
-      return this.repository.getHistory(room);
+      if (this.repository && typeof this.repository.getHistory === 'function') {
+        return this.repository.getHistory(room);
+      }
+      return [];
     }
 
     processIncomingMessage(messageDto) {
@@ -40,7 +44,9 @@
         isUnder300ms: deliveryLatencyMs < 300
       };
 
-      this.repository.saveMessage(processedMessage);
+      if (this.repository && typeof this.repository.saveMessage === 'function') {
+        this.repository.saveMessage(processedMessage);
+      }
 
       return {
         message: processedMessage,
@@ -61,9 +67,9 @@
       
       let answerText = '';
       let thinkingSteps = [
-        `Received incoming prompt stream for "${text.substring(0, 30)}..."`,
-        `Synthesized RAG memory vault vectors & system execution constraints`,
-        `Formatted output using Gemini 2.5 Flash deliberative model`
+        `Received user query: "${text.substring(0, 40)}..."`,
+        `Analyzing knowledge vault citations and intent classification`,
+        `Executing Gemini ${selectedModel} completion engine`
       ];
 
       if (AIEngineClass) {
@@ -78,7 +84,7 @@
       }
 
       if (!answerText) {
-        answerText = `Hello! 👋 I have received your message: **"${text}"**.\n\nYour Gemini Second Brain AI system is active and ready to assist you with deep deliberate reasoning, code analysis, and knowledge synthesis.`;
+        answerText = `Hello! 👋 I have received your query: **"${text}"**.\n\nYour Gemini Second Brain AI system is active and ready to assist you with deep deliberate reasoning, code analysis, and knowledge synthesis.`;
       }
 
       const aiMsg = {
@@ -90,16 +96,22 @@
         room: room,
         timestamp: Date.now(),
         serverTimestamp: Date.now(),
-        deliveryLatencyMs: 12,
+        deliveryLatencyMs: 15,
         isUnder300ms: true
       };
 
-      this.repository.saveMessage(aiMsg);
+      if (this.repository && typeof this.repository.saveMessage === 'function') {
+        this.repository.saveMessage(aiMsg);
+      }
+
       return aiMsg;
     }
 
     clearChannelHistory(room = 'general') {
-      return this.repository.clearHistory(room);
+      if (this.repository && typeof this.repository.clearHistory === 'function') {
+        return this.repository.clearHistory(room);
+      }
+      return true;
     }
   }
 

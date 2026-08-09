@@ -28,6 +28,8 @@ docs/optimization_*
 
 .vercel
 .next/
+# Data storage runtime files
+data/*.json
 
 # Binary & Document Exclusions
 *.pdf

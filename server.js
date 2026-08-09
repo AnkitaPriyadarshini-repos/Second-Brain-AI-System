@@ -95,9 +95,12 @@ nextApp.prepare().then(() => {
             ...result.ack
           }));
 
-          // 2. Broadcast user message to all connected clients in room
+          const targetRoom = result.message.room || 'general';
+
+          // 2. Broadcast user message to connected clients in the SAME room
           wss.clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
+            const clientUser = activeUsers.get(client);
+            if (client.readyState === WebSocket.OPEN && (!clientUser || clientUser.room === targetRoom)) {
               client.send(JSON.stringify({
                 type: 'NEW_MESSAGE',
                 message: result.message
@@ -105,12 +108,13 @@ nextApp.prepare().then(() => {
             }
           });
 
-          // 3. Generate and broadcast AI Assistant response
+          // 3. Generate and broadcast AI Assistant response to the same room
           setTimeout(() => {
             const aiMsg = chatController.generateAIResponse(result.message);
             if (aiMsg) {
               wss.clients.forEach((client) => {
-                if (client.readyState === WebSocket.OPEN) {
+                const clientUser = activeUsers.get(client);
+                if (client.readyState === WebSocket.OPEN && (!clientUser || clientUser.room === targetRoom)) {
                   client.send(JSON.stringify({
                     type: 'NEW_MESSAGE',
                     message: aiMsg

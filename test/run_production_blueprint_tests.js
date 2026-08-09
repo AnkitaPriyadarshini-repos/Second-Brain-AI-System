@@ -110,6 +110,27 @@ runTest('RAGEngine should execute query and return grounded answer with citation
   assert.strictEqual(result.citations[0].title, 'Deep Learning & Neural Networks');
 });
 
+// Suite 4: Database Persistence & Storage Service
+console.log('\nSuite 4: Database Persistence & Storage Service');
+const DatabaseService = require('../services/DatabaseService');
+
+runTest('DatabaseService should persist and retrieve chat history across operations', () => {
+  const db = new DatabaseService();
+  const testMsg = {
+    id: 'msg-test-100',
+    sender: 'Test Researcher',
+    text: 'Persistence verification query',
+    room: 'test-room',
+    timestamp: Date.now()
+  };
+
+  db.saveChatMessage(testMsg);
+  const history = db.getChatHistory('test-room');
+  assert.ok(history.length >= 1);
+  assert.strictEqual(history[history.length - 1].id, 'msg-test-100');
+  db.clearChatHistory('test-room');
+});
+
 // Summary
 console.log('\n====================================================');
 console.log(`SUMMARY: ${passCount} / ${passCount + failCount} TESTS PASSED CLEANLY.`);

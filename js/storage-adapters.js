@@ -283,7 +283,7 @@
   }
 
   /**
-   * In-Memory Repository Adapter for Messages
+   * In-Memory / Persistent Repository Adapter for Messages
    */
   class InMemoryMessageRepository extends IMessageRepository {
     constructor() {
@@ -292,12 +292,27 @@
     }
 
     getHistory(room = 'general') {
+      if (typeof require !== 'undefined') {
+        try {
+          const db = require('../services/DatabaseService').dbInstance;
+          if (db) {
+            const dbHistory = db.getChatHistory(room);
+            if (dbHistory && dbHistory.length > 0) return dbHistory;
+          }
+        } catch (e) {}
+      }
       return this.messagesMap.get(room) || [];
     }
 
     saveMessage(message) {
       const room = message.room || 'general';
-      const history = this.getHistory(room);
+      if (typeof require !== 'undefined') {
+        try {
+          const db = require('../services/DatabaseService').dbInstance;
+          if (db) db.saveChatMessage(message);
+        } catch (e) {}
+      }
+      const history = this.messagesMap.get(room) || [];
       history.push(message);
       if (history.length > 200) history.shift();
       this.messagesMap.set(room, history);
@@ -305,6 +320,12 @@
     }
 
     clearHistory(room = 'general') {
+      if (typeof require !== 'undefined') {
+        try {
+          const db = require('../services/DatabaseService').dbInstance;
+          if (db) db.clearChatHistory(room);
+        } catch (e) {}
+      }
       this.messagesMap.set(room, []);
     }
   }
