@@ -1,137 +1,207 @@
-/**
- * Second Brain AI System — PWA Installer Engine
- * Manages Service Worker registration, mobile installation popup modals, and native PWA prompt execution.
- */
+// ============================================
+// Juno AI — Progressive Web App (PWA) Engine
+// Handles Service Worker registration, deferred installation prompts,
+// standalone app detection, and graceful device installation support.
+// ============================================
 
 (function () {
-  let deferredPrompt = null;
-  const STORAGE_KEY_DISMISSED = 'juno_pwa_install_dismissed_time';
+  'use strict';
 
-  // 1. Register Service Worker for Offline PWA Support
+  let deferredInstallPrompt = null;
+  let isStandalone = false;
+
+  // 1. Standalone Display Mode Detection
+  function checkStandaloneMode() {
+    return (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true ||
+      document.referrer.includes('android-app://')
+    );
+  }
+
+  isStandalone = checkStandaloneMode();
+
+  // 2. Service Worker Registration
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
+      navigator.serviceWorker
+        .register('./sw.js')
         .then((reg) => {
-          console.log('[PWA Engine] Service Worker registered successfully:', reg.scope);
+          console.log('✅ ServiceWorker registered successfully with scope:', reg.scope);
+          
+          // Check for service worker updates
+          reg.addEventListener('updatefound', () => {
+            const installingWorker = reg.installing;
+            if (installingWorker) {
+              installingWorker.addEventListener('statechange', () => {
+                if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('⚡ New Juno AI Service Worker update available.');
+                }
+              });
+            }
+          });
         })
         .catch((err) => {
-          console.warn('[PWA Engine] Service Worker registration failed:', err);
+          console.warn('⚠️ ServiceWorker registration failed:', err);
         });
     });
   }
 
-  // 2. Detect iOS Device
-  function isIOS() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  }
-
-  // 3. Detect Standalone PWA Mode
-  function isStandalone() {
-    return (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone === true);
-  }
-
-  // 4. Intercept beforeinstallprompt
+  // 3. BeforeInstallPrompt Event Capture
   window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent immediate automated browser mini-infobar prompt
     e.preventDefault();
-    deferredPrompt = e;
-    console.log('[PWA Engine] beforeinstallprompt event captured');
+    deferredInstallPrompt = e;
+    console.log('📱 Captured PWA beforeinstallprompt event.');
 
-    // Auto launch popup modal if not recently dismissed
-    checkAndShowPWAInstallModal();
+    // Reveal in-app install pill/button if hidden
+    const pwaBtn = document.getElementById('pwa-install-nav-btn');
+    if (pwaBtn) {
+      pwaBtn.style.display = 'flex';
+    }
   });
 
-  // 5. Check if Modal Should Auto Launch
-  function checkAndShowPWAInstallModal() {
-    if (isStandalone()) return; // Already installed as PWA
+  // 4. App Installed Event Listener
+  window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
+    isStandalone = true;
+    localStorage.setItem('juno_pwa_installed', 'true');
+    console.log('🎉 Juno AI successfully installed as a Progressive Web App!');
 
-    const lastDismissed = localStorage.getItem(STORAGE_KEY_DISMISSED);
-    const now = Date.now();
+    if (typeof window.showToast === 'function') {
+      window.showToast('🎉 Juno AI installed successfully! Launch it from your home screen.');
+    }
 
-    // If dismissed less than 24 hours ago, skip auto popup
-    if (lastDismissed && (now - parseInt(lastDismissed, 10) < 24 * 60 * 60 * 1000)) {
+    const modal = document.getElementById('pwa-install-modal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  });
+
+  // 5. Global Trigger Function for PWA Installation Flow
+  window.triggerPWAInstall = function () {
+    if (isStandalone) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('📱 You are using the installed Juno AI standalone app! ✓');
+      }
       return;
     }
 
-    // Delay modal launch slightly for smoother UI load
-    setTimeout(() => {
-      showPWAInstallModal();
-    }, 1500);
-  }
-
-  // 6. Show PWA Install Modal
-  function showPWAInstallModal() {
-    const modal = document.getElementById('pwa-install-modal');
-    if (!modal) return;
-
-    const iosBox = document.getElementById('pwa-ios-instructions');
-    const installBtn = document.getElementById('pwa-modal-install-btn');
-
-    if (isIOS()) {
-      if (iosBox) iosBox.style.display = 'block';
-      if (installBtn) {
-        installBtn.innerHTML = `<span style="font-size: 18px;">📲</span> <span>How to Install on iPhone</span>`;
-      }
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      deferredInstallPrompt.userChoice
+        .then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the PWA install prompt');
+            if (typeof window.showToast === 'function') {
+              window.showToast('📥 Installing Juno AI on your home screen...');
+            }
+          } else {
+            console.log('User dismissed the PWA install prompt');
+          }
+          deferredInstallPrompt = null;
+        })
+        .catch((err) => {
+          console.warn('Error during PWA installation prompt:', err);
+        });
     } else {
-      if (iosBox) iosBox.style.display = 'none';
+      // Fallback: Gracefully display step-by-step instructions for manual installation
+      window.openPWAInstallInstructionsModal();
     }
+  };
+
+  window.installPWA = window.triggerPWAInstall;
+
+  // 6. Graceful Installation Instructions Modal
+  window.openPWAInstallInstructionsModal = function () {
+    let modal = document.getElementById('pwa-install-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'pwa-install-modal';
+      modal.className = 'pwa-install-modal-backdrop';
+      document.body.appendChild(modal);
+    }
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isAndroid = /Android/.test(navigator.userAgent);
+
+    let instructionHTML = '';
+    if (isIOS) {
+      instructionHTML = `
+        <div class="pwa-step-item">
+          <span class="step-num">1</span>
+          <span>Tap the <strong>Share button</strong> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> at the bottom of Safari.</span>
+        </div>
+        <div class="pwa-step-item">
+          <span class="step-num">2</span>
+          <span>Scroll down and select <strong>"Add to Home Screen"</strong> <span class="plus-box">＋</span>.</span>
+        </div>
+        <div class="pwa-step-item">
+          <span class="step-num">3</span>
+          <span>Tap <strong>Add</strong> in the top right corner to launch Juno AI as a native app!</span>
+        </div>
+      `;
+    } else if (isAndroid) {
+      instructionHTML = `
+        <div class="pwa-step-item">
+          <span class="step-num">1</span>
+          <span>Tap the <strong>browser menu button (⋮)</strong> in Chrome.</span>
+        </div>
+        <div class="pwa-step-item">
+          <span class="step-num">2</span>
+          <span>Select <strong>"Add to Home screen"</strong> or <strong>"Install app"</strong>.</span>
+        </div>
+        <div class="pwa-step-item">
+          <span class="step-num">3</span>
+          <span>Confirm installation to run Juno AI independently from Chrome!</span>
+        </div>
+      `;
+    } else {
+      instructionHTML = `
+        <div class="pwa-step-item">
+          <span class="step-num">1</span>
+          <span>Look for the <strong>Install icon (⊕)</strong> in your browser address bar (Chrome/Edge).</span>
+        </div>
+        <div class="pwa-step-item">
+          <span class="step-num">2</span>
+          <span>Click <strong>"Install"</strong> to add Juno AI as a standalone desktop application.</span>
+        </div>
+      `;
+    }
+
+    modal.innerHTML = `
+      <div class="pwa-install-dialog glass-panel">
+        <div class="pwa-dialog-header">
+          <div class="pwa-dialog-title">
+            <span class="pwa-app-icon">🚀</span>
+            <div>
+              <h3>Install Juno AI App</h3>
+              <p>Run full-screen with offline support & sub-50ms speed</p>
+            </div>
+          </div>
+          <button class="pwa-close-btn" onclick="document.getElementById('pwa-install-modal').style.display='none'">✕</button>
+        </div>
+
+        <div class="pwa-dialog-body">
+          ${instructionHTML}
+        </div>
+
+        <div class="pwa-dialog-footer">
+          <button class="btn-pwa-close" onclick="document.getElementById('pwa-install-modal').style.display='none'">Got it</button>
+        </div>
+      </div>
+    `;
 
     modal.style.display = 'flex';
-  }
-
-  // 7. Global Trigger for PWA Installation (Button click handler)
-  window.triggerPWAInstall = function () {
-    if (isIOS()) {
-      const iosBox = document.getElementById('pwa-ios-instructions');
-      if (iosBox) {
-        iosBox.style.display = 'block';
-        iosBox.scrollIntoView({ behavior: 'smooth' });
-      }
-      if (typeof showToast === 'function') {
-        showToast('📱 Safari: Tap Share -> Add to Home Screen to install!');
-      }
-      return;
-    }
-
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('[PWA Engine] User accepted the PWA installation');
-          window.dismissPWAInstallModal();
-          if (typeof showToast === 'function') {
-            showToast('🎉 Juno AI installed to Home Screen successfully!');
-          }
-        } else {
-          console.log('[PWA Engine] User dismissed the PWA installation');
-        }
-        deferredPrompt = null;
-      });
-    } else {
-      showPWAInstallModal();
-    }
   };
 
-  // 8. Dismiss Modal
-  window.dismissPWAInstallModal = function () {
-    const modal = document.getElementById('pwa-install-modal');
-    if (modal) modal.style.display = 'none';
-    localStorage.setItem(STORAGE_KEY_DISMISSED, Date.now().toString());
+  // Export functions to window
+  window.checkPWAStatus = function () {
+    return {
+      isStandalone: isStandalone,
+      canInstall: !!deferredInstallPrompt,
+      serviceWorkerActive: 'serviceWorker' in navigator && !!navigator.serviceWorker.controller
+    };
   };
-
-  // 9. Listen for successful PWA installation
-  window.addEventListener('appinstalled', () => {
-    console.log('[PWA Engine] Juno AI App was installed');
-    window.dismissPWAInstallModal();
-    if (typeof showToast === 'function') {
-      showToast('🎉 Juno AI app installed! Access anytime from your home screen.');
-    }
-  });
-
-  // Auto-check on page load for iOS or browsers that don't emit beforeinstallprompt
-  window.addEventListener('DOMContentLoaded', () => {
-    if (isIOS() && !isStandalone()) {
-      checkAndShowPWAInstallModal();
-    }
-  });
 
 })();
