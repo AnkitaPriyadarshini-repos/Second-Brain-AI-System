@@ -6,18 +6,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --bg-dark: #0b0f17;
-  --bg-card: rgba(18, 24, 38, 0.75);
-  --bg-card-hover: rgba(28, 36, 54, 0.85);
-  --border-color: rgba(245, 158, 11, 0.22);
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --accent-amber: #f59e0b;
-  --accent-gold: #fbbf24;
-  --accent-blue: #38bdf8;
-  --accent-emerald: #10b981;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --bg-dark: #fef08a;
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --bg-card-hover: #fef9c3;
+  --border-color: rgba(202, 138, 4, 0.35);
+  --border-subtle: rgba(202, 138, 4, 0.2);
+  --accent-amber: #ca8a04;
+  --accent-gold: #eab308;
+  --accent-blue: #ca8a04;
+  --accent-emerald: #15803d;
+  --text-primary: #1c1900;
+  --text-secondary: #451a03;
+  --text-muted: #78350f;
   --font-main: 'Outfit', 'Inter', -apple-system, sans-serif;
   --font-code: 'Fira Code', monospace;
   --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);

@@ -10,7 +10,7 @@
     canvas: null,
     ctx: null,
     animId: null,
-    theme: 'aqua-aesthetic', // 'aqua-aesthetic' | 'summer-ocean' | 'golden-harmony'
+    theme: 'golden-harmony', // 'aqua-aesthetic' | 'summer-ocean' | 'golden-harmony'
     speedPreset: 'swift',  // 'gentle' | 'swift' | 'hyper'
     speedMultiplier: 1.2,
     currentState: 'idle',  // 'idle' | 'listening' | 'thinking' | 'responding'

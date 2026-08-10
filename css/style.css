@@ -15,298 +15,522 @@
 [data-theme="emerald-luxe"],
 [data-theme="sapphire-platinum"],
 [data-theme="platinum-gold"],
-[data-theme="gemini-light"] {
-  /* Aqua Color Aesthetic — Flagship Deep Ocean System */
-  --bg-dark: #040d1a;
-  --bg-card: rgba(9, 27, 46, 0.92);
-  --bg-card-hover: rgba(15, 41, 68, 0.95);
-  --bg-card-active: rgba(22, 58, 94, 0.95);
-  --border-color: rgba(6, 182, 212, 0.4);
-  --border-highlight: #00f2fe;
-  --border-accent: #22d3ee;
+[data-theme="gemini-light"],
+[data-theme="second-brain-dark"],
+[data-theme="gemini-dark"] {
+  /* Radiant Yellow ChatGPT Design Tokens — Yellow replacing Black */
+  --bg-dark: #fef08a;
+  --bg-dark-gradient: linear-gradient(135deg, #fef9c3 0%, #fef08a 50%, #fde047 100%);
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --bg-card-hover: #fef9c3;
+  --bg-card-active: #fef08a;
+  --border-color: rgba(202, 138, 4, 0.35);
+  --border-highlight: #ca8a04;
+  --border-accent: #eab308;
 
-  /* Ice Aqua & Crisp Platinum Typography */
-  --text-primary: #ecfeff;
-  --text-secondary: #cffafe;
-  --text-muted: #67e8f9;
+  --text-primary: #1c1900;
+  --text-secondary: #451a03;
+  --text-muted: #78350f;
 
-  /* Aqua Cyan & Electric Turquoise Accents */
-  --accent-primary: #06b6d4;
-  --accent-primary-hover: #0891b2;
-  --accent-primary-light: rgba(6, 182, 212, 0.25);
+  --accent-primary: #ca8a04;
+  --accent-primary-hover: #a16207;
+  --accent-primary-light: rgba(234, 179, 8, 0.25);
   
-  --accent-indigo: #38bdf8;
-  --accent-violet: #818cf8;
-  --accent-emerald: #22d3ee;
-  --accent-amber: #00f2fe;
-  --accent-pink: #ec4899;
-  --accent-blue: #38bdf8;
-  --accent-cyan: #00f2fe;
+  --accent-indigo: #d97706;
+  --accent-violet: #b45309;
+  --accent-emerald: #15803d;
+  --accent-amber: #eab308;
+  --accent-pink: #d97706;
+  --accent-blue: #ca8a04;
+  --accent-cyan: #eab308;
 
-  /* Typography Stack */
   --font-main: "Outfit", "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
   --font-code: "Fira Code", "SF Mono", monospace;
   
-  /* Radii */
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-full: 9999px;
   
-  /* Shadows & Transitions */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-  --shadow-card: 0 10px 40px -5px rgba(0, 0, 0, 0.85);
-  --shadow-glow: 0 0 35px rgba(6, 182, 212, 0.45);
+  --shadow-sm: 0 1px 2px 0 rgba(161, 98, 7, 0.15);
+  --shadow-card: 0 10px 40px -5px rgba(202, 138, 4, 0.25);
+  --shadow-glow: 0 0 35px rgba(234, 179, 8, 0.45);
   --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-a, a:hover, a:visited, a:focus, a:active,
-.sidebar-brand, .sidebar-brand:hover, .sidebar-brand:focus, .sidebar-brand span {
-  text-decoration: none !important;
-  border-bottom: none !important;
-  box-shadow: none !important;
-  outline: none !important;
-}
-
-/* ==========================================
-   FLAGSHIP AI PLATFORM THEMES (Golden Harmony Yellow Theme Default)
-   ========================================== */
-
-[data-theme="gemini-glow"],
-[data-theme="claude-obsidian"],
-[data-theme="chatgpt-emerald"],
-[data-theme="perplexity-cyan"],
-[data-theme="grey-titanium"],
-[data-theme="emerald-luxe"],
-[data-theme="sapphire-platinum"],
-[data-theme="platinum-gold"],
-[data-theme="gemini-light"] {
-  --bg-dark: #07090e;
-  --bg-card: rgba(15, 23, 42, 0.92);
-  --bg-card-hover: rgba(30, 41, 59, 0.95);
-  --bg-card-active: rgba(51, 65, 85, 0.95);
-  --border-color: rgba(6, 182, 212, 0.35);
-  --border-highlight: #06b6d4;
-  --border-accent: #a855f7;
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --accent-primary: #06b6d4;
-  --accent-primary-hover: #0891b2;
-  --accent-primary-light: rgba(6, 182, 212, 0.25);
-  --accent-indigo: #8b5cf6;
-  --accent-violet: #a855f7;
-  --accent-emerald: #10b981;
-  --accent-amber: #06b6d4;
-  --accent-cyan: #06b6d4;
-  --shadow-card: 0 10px 40px -5px rgba(0, 0, 0, 0.8);
-  --shadow-glow: 0 0 35px rgba(6, 182, 212, 0.4);
-}
-
-/* Summer Ocean Coastal Aesthetic Theme (Seafoam Green + Buttery Yellow + Soft Ivory + Deep Coastal Slate) */
-[data-theme="summer-ocean"] {
-  --bg-dark: #08121c;
-  --bg-card: rgba(14, 28, 44, 0.92);
-  --bg-card-hover: rgba(22, 42, 64, 0.95);
-  --bg-card-active: rgba(30, 58, 88, 0.95);
-  --border-color: rgba(45, 212, 191, 0.35);
-  --border-highlight: #2dd4bf;
-  --border-accent: #facc15;
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --accent-primary: #2dd4bf;
-  --accent-primary-hover: #14b8a6;
-  --accent-primary-light: rgba(45, 212, 191, 0.25);
-  --accent-indigo: #38bdf8;
-  --accent-violet: #818cf8;
-  --accent-emerald: #2dd4bf;
-  --accent-amber: #facc15;
-  --accent-cyan: #2dd4bf;
-  --shadow-card: 0 10px 40px -5px rgba(0, 0, 0, 0.8);
-  --shadow-glow: 0 0 35px rgba(45, 212, 191, 0.4);
-}
-
-[data-theme="summer-ocean"] .gemini-ambient-glow {
-  background: radial-gradient(circle, rgba(45, 212, 191, 0.32) 0%, rgba(250, 204, 21, 0.22) 35%, rgba(56, 189, 248, 0.15) 65%, rgba(8, 18, 28, 0) 85%) !important;
-}
-
-[data-theme="summer-ocean"] .yellow-dot {
-  background: #2dd4bf !important;
-  box-shadow: 0 0 10px #2dd4bf !important;
-}
-
-[data-theme="summer-ocean"] .gemini-model-selector-pill {
-  border-color: rgba(45, 212, 191, 0.5) !important;
-}
-
-/* Aqua Aesthetic Theme (Electric Aqua Cyan + Deep Ocean Navy + Crisp Ice Aqua) */
-[data-theme="aqua-aesthetic"],
-[data-theme="aqua-cyan"] {
-  --bg-dark: #040d1a;
-  --bg-card: rgba(9, 27, 46, 0.92);
-  --bg-card-hover: rgba(15, 41, 68, 0.95);
-  --bg-card-active: rgba(22, 58, 94, 0.95);
-  --border-color: rgba(6, 182, 212, 0.4);
-  --border-highlight: #00f2fe;
-  --border-accent: #22d3ee;
-  --text-primary: #ecfeff;
-  --text-secondary: #cffafe;
-  --text-muted: #67e8f9;
-  --accent-primary: #06b6d4;
-  --accent-primary-hover: #0891b2;
-  --accent-primary-light: rgba(6, 182, 212, 0.25);
-  --accent-indigo: #38bdf8;
-  --accent-violet: #818cf8;
-  --accent-emerald: #22d3ee;
-  --accent-amber: #38bdf8;
-  --accent-cyan: #00f2fe;
-  --shadow-card: 0 10px 40px -5px rgba(0, 0, 0, 0.85);
-  --shadow-glow: 0 0 35px rgba(6, 182, 212, 0.45);
-}
-
-[data-theme="aqua-aesthetic"] .gemini-ambient-glow,
-[data-theme="aqua-cyan"] .gemini-ambient-glow {
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.38) 0%, rgba(34, 211, 238, 0.25) 35%, rgba(56, 189, 248, 0.18) 65%, rgba(4, 13, 26, 0) 85%) !important;
-}
-
-[data-theme="aqua-aesthetic"] .yellow-dot,
-[data-theme="aqua-cyan"] .yellow-dot {
-  background: #00f2fe !important;
-  box-shadow: 0 0 12px #00f2fe !important;
-}
-
-[data-theme="aqua-aesthetic"] .gemini-model-selector-pill,
-[data-theme="aqua-cyan"] .gemini-model-selector-pill {
-  border-color: rgba(6, 182, 212, 0.6) !important;
-}
-
-[data-theme="second-brain-dark"],
-[data-theme="gemini-dark"],
-:root {
-  --bg-dark: #0b0f19;
-  --bg-card: #1e293b;
-  --bg-card-hover: #334155;
-  --bg-card-active: #475569;
-  --border-color: rgba(255, 255, 255, 0.12);
-  --border-highlight: #06b6d4;
-  --border-accent: #8b5cf6;
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --accent-primary: #06b6d4;
-  --accent-primary-hover: #0891b2;
-  --accent-primary-light: rgba(6, 182, 212, 0.2);
-  --accent-indigo: #6366f1;
-  --accent-violet: #8b5cf6;
-  --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-cyan: #38bdf8;
-  --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 25px rgba(56, 189, 248, 0.15);
-}
-
 /* ==========================================================================
-   UNIFIED LUMINOUS GOLD & OBSIDIAN SPACE DARK THEME
-   Fully Harmonized Golden Yellow Frame & Crisp High-Contrast Typography
+   CHATGPT RADIANT YELLOW THEME SYSTEM
+   Identical to ChatGPT Layout with Warm Yellow Background Replacing Black
    ========================================================================== */
+
+:root,
+[data-theme="golden-harmony"],
+[data-theme="chatgpt-yellow"],
+[data-theme="sunflower-sunrise"],
+[data-theme="aqua-aesthetic"] {
+  --bg-dark: #fef08a;
+  --bg-dark-gradient: linear-gradient(135deg, #fef9c3 0%, #fef08a 50%, #fde047 100%);
+  --bg-card: rgba(255, 255, 255, 0.95);
+  --bg-card-hover: #fef9c3;
+  --bg-card-active: #fef08a;
+  --border-color: rgba(202, 138, 4, 0.35);
+  --border-highlight: #ca8a04;
+  --border-accent: #eab308;
+
+  --text-primary: #1c1900;
+  --text-secondary: #451a03;
+  --text-muted: #78350f;
+
+  --accent-primary: #ca8a04;
+  --accent-primary-hover: #a16207;
+  --accent-primary-light: rgba(234, 179, 8, 0.25);
+  --accent-amber: #eab308;
+
+  --shadow-sm: 0 1px 3px rgba(161, 98, 7, 0.15);
+  --shadow-card: 0 10px 30px -5px rgba(202, 138, 4, 0.25);
+  --shadow-glow: 0 0 35px rgba(234, 179, 8, 0.4);
+}
 
 body,
 .app-main-canvas {
-  background: #090d16 !important;
-  color: #f8fafc !important;
+  background: var(--bg-dark-gradient) !important;
+  color: var(--text-primary) !important;
   font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
-  letter-spacing: -0.01em;
 }
 
-.gemini-ambient-glow {
-  background: radial-gradient(ellipse at 50% 25%, rgba(251, 191, 36, 0.22) 0%, rgba(245, 158, 11, 0.12) 45%, rgba(9, 13, 22, 0) 80%) !important;
-}
-
-.action-card-item {
-  background: rgba(15, 23, 42, 0.55) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 16px !important;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease !important;
-}
-
-.action-card-item:hover {
-  transform: translateY(-3px) !important;
-  background: rgba(30, 41, 59, 0.75) !important;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 0 22px rgba(251, 191, 36, 0.2) !important;
-  border-color: rgba(251, 191, 36, 0.45) !important;
-}
-
-.pill-suggestion-btn {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border: 1px solid rgba(255, 255, 255, 0.09) !important;
-  color: #cbd5e1 !important;
-  border-radius: 20px !important;
-  transition: all 0.2s ease !important;
-}
-
-.pill-suggestion-btn:hover {
-  background: rgba(251, 191, 36, 0.14) !important;
-  border-color: rgba(251, 191, 36, 0.45) !important;
-  color: #fbbf24 !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 0 14px rgba(251, 191, 36, 0.25) !important;
-}
-
+/* Sidebar ChatGPT Layout & Yellow Styling */
 .app-sidebar,
 .gemini-sidebar {
-  background: #080c14 !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: #fde047 !important;
+  border-right: 1px solid rgba(202, 138, 4, 0.3) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  padding: 12px 10px !important;
+  width: 260px !important;
+}
+
+.sidebar-brand-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 4px 6px 12px 6px !important;
+}
+
+.brand-title {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+}
+
+.brand-name {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #1c1900 !important;
+}
+
+.sidebar-top-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+}
+
+.sidebar-top-icon-btn,
+.sidebar-collapse-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #78350f !important;
+  cursor: pointer !important;
+  padding: 6px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background 0.2s ease !important;
+}
+
+.sidebar-top-icon-btn:hover,
+.sidebar-collapse-btn:hover {
+  background: rgba(202, 138, 4, 0.18) !important;
+  color: #1c1900 !important;
+}
+
+.sidebar-new-chat-btn {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 10px 14px !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+  border: 1px solid rgba(202, 138, 4, 0.3) !important;
+  color: #1c1900 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  margin-bottom: 12px !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 8px rgba(202, 138, 4, 0.12) !important;
+}
+
+.sidebar-new-chat-btn:hover {
+  background: #ffffff !important;
+  border-color: #ca8a04 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(202, 138, 4, 0.25) !important;
+}
+
+.gemini-nav-menu {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
 }
 
 .sidebar-menu-item {
-  color: #94a3b8 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 9px 12px !important;
+  border-radius: 10px !important;
+  color: #451a03 !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  font-size: 13.5px !important;
   font-weight: 500 !important;
+  transition: background 0.15s ease !important;
+  text-decoration: none !important;
 }
 
 .sidebar-menu-item:hover {
-  background: rgba(255, 255, 255, 0.05) !important;
-  color: #f8fafc !important;
+  background: rgba(254, 240, 138, 0.7) !important;
+  color: #1c1900 !important;
 }
 
 .sidebar-menu-item.active {
-  background: rgba(251, 191, 36, 0.14) !important;
-  border: 1px solid rgba(251, 191, 36, 0.4) !important;
-  color: #fbbf24 !important;
-  box-shadow: 0 0 16px rgba(251, 191, 36, 0.25) !important;
+  background: #fef08a !important;
+  color: #1c1900 !important;
+  font-weight: 700 !important;
+  border: 1px solid #ca8a04 !important;
 }
 
-.brand-name,
-#user-display-name {
-  color: #f8fafc !important;
+.sidebar-chat-history {
+  margin-top: 14px !important;
+  flex: 1 !important;
+  overflow-y: auto !important;
 }
 
-.gemini-hero-title,
-h1.gemini-hero-title {
+.history-section-label {
+  font-size: 12px !important;
+  color: #78350f !important;
+  font-weight: 700 !important;
+  margin-bottom: 6px !important;
+  padding-left: 10px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.sidebar-thread-item {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 8px 10px !important;
+  border-radius: 8px !important;
+  margin-bottom: 2px !important;
+  cursor: pointer !important;
+  background: transparent !important;
+  color: #451a03 !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  transition: background 0.2s ease !important;
+}
+
+.sidebar-thread-item:hover {
+  background: rgba(254, 240, 138, 0.8) !important;
+  color: #1c1900 !important;
+}
+
+.sidebar-thread-item.active {
+  background: #fef08a !important;
+  color: #1c1900 !important;
+  font-weight: 700 !important;
+}
+
+.sidebar-footer {
+  padding: 12px 6px 4px 6px !important;
+  border-top: 1px solid rgba(202, 138, 4, 0.25) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.user-profile-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  cursor: pointer !important;
+}
+
+.user-avatar-circle {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: #ca8a04 !important;
   color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-  background: none !important;
-  -webkit-background-clip: unset !important;
-  text-shadow: 0 2px 20px rgba(251, 191, 36, 0.35), 0 0 40px rgba(245, 158, 11, 0.2) !important;
-  filter: none !important;
   font-weight: 800 !important;
+  font-size: 13px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
-.chat-textarea {
-  color: #f8fafc !important;
+.user-info-stack {
+  display: flex !important;
+  flex-direction: column !important;
 }
 
-.gemini-floating-pill {
-  background: rgba(15, 23, 42, 0.85) !important;
-  border: 1.5px solid rgba(251, 191, 36, 0.35) !important;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 22px rgba(251, 191, 36, 0.15) !important;
-  backdrop-filter: blur(20px) !important;
+#user-display-name {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: #1c1900 !important;
+  line-height: 1.2 !important;
 }
 
-.gemini-floating-pill:focus-within {
-  border-color: #fbbf24 !important;
-  background: rgba(15, 23, 42, 0.95) !important;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7), 0 0 28px rgba(251, 191, 36, 0.25) !important;
+.user-tier {
+  font-size: 11px !important;
+  color: #78350f !important;
+  font-weight: 600 !important;
+}
+
+.sidebar-settings-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #78350f !important;
+  cursor: pointer !important;
+  padding: 6px !important;
+  border-radius: 50% !important;
+}
+
+/* ChatGPT Main Canvas Header & Hero View */
+.chat-top-header {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 14px 24px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.chatgpt-model-dropdown {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  color: #1c1900 !important;
+  cursor: pointer !important;
+  padding: 4px 8px !important;
+  border-radius: 10px !important;
+  transition: background 0.2s ease !important;
+}
+
+.chatgpt-model-dropdown:hover {
+  background: rgba(202, 138, 4, 0.15) !important;
+}
+
+.btn-chat-header-icon {
+  background: transparent !important;
+  border: none !important;
+  color: #78350f !important;
+  cursor: pointer !important;
+  padding: 8px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.btn-chat-header-icon:hover {
+  background: rgba(202, 138, 4, 0.15) !important;
+  color: #1c1900 !important;
+}
+
+/* ChatGPT Hero View Center */
+.chatgpt-hero-center {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  padding: 40px 20px 20px 20px !important;
+  margin: auto !important;
+  max-width: 780px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  gap: 28px !important;
+}
+
+.chatgpt-hero-title {
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  color: #1c1900 !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  letter-spacing: -0.5px !important;
+  margin: 0 !important;
+  text-shadow: none !important;
+}
+
+/* ChatGPT Iconic Prompt Input Capsule Container */
+.chatgpt-prompt-capsule-wrapper {
+  width: 100% !important;
+  max-width: 720px !important;
+}
+
+.chatgpt-prompt-capsule {
+  background: #ffffff !important;
+  border: 1.5px solid #ca8a04 !important;
+  border-radius: 28px !important;
+  padding: 10px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  box-shadow: 0 10px 30px rgba(202, 138, 4, 0.25), 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.chatgpt-prompt-capsule:focus-within {
+  border-color: #a16207 !important;
+  box-shadow: 0 12px 35px rgba(202, 138, 4, 0.35), 0 0 0 3px rgba(234, 179, 8, 0.3) !important;
+}
+
+.chatgpt-input-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+.chatgpt-input-plus-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #78350f !important;
+  cursor: pointer !important;
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background 0.2s ease !important;
+}
+
+.chatgpt-input-plus-btn:hover {
+  background: rgba(254, 240, 138, 0.8) !important;
+  color: #1c1900 !important;
+}
+
+.chatgpt-textarea {
+  flex: 1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  color: #1c1900 !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  outline: none !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  padding: 6px 0 !important;
+  resize: none !important;
+  max-height: 200px !important;
+  line-height: 1.5 !important;
+}
+
+.chatgpt-textarea::placeholder {
+  color: #854d0e !important;
+  opacity: 0.8 !important;
+}
+
+.chatgpt-input-tools-right {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.chatgpt-tool-btn {
+  background: transparent !important;
+  border: none !important;
+  color: #78350f !important;
+  cursor: pointer !important;
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: background 0.2s ease !important;
+}
+
+.chatgpt-tool-btn:hover {
+  background: rgba(254, 240, 138, 0.8) !important;
+  color: #1c1900 !important;
+}
+
+.chatgpt-send-btn {
+  background: #ca8a04 !important;
+  border: none !important;
+  color: #ffffff !important;
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: transform 0.15s ease, background 0.2s ease !important;
+  box-shadow: 0 2px 8px rgba(202, 138, 4, 0.4) !important;
+}
+
+.chatgpt-send-btn:hover {
+  background: #a16207 !important;
+  transform: scale(1.05) !important;
+}
+
+/* ChatGPT Quick Action Chips Under Input Capsule */
+.chatgpt-action-chips-list {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+  max-width: 720px !important;
+}
+
+.chatgpt-action-chip {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 18px !important;
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1.5px solid rgba(202, 138, 4, 0.35) !important;
+  color: #1c1900 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  font-family: 'Inter', system-ui, sans-serif !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 8px rgba(202, 138, 4, 0.1) !important;
+}
+
+.chatgpt-action-chip:hover {
+  background: #ffffff !important;
+  border-color: #ca8a04 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(202, 138, 4, 0.25) !important;
 }
 
 /* Gemini Thinking Process Accordion Component */
@@ -6663,6 +6887,382 @@ body[data-theme="gemini-dark"] .chat-action-btn {
 .chat-textarea::-webkit-scrollbar-thumb {
   background: #00f2fe;
   border-radius: 4px;
+}
+
+/* ==========================================================================
+   JUNO AI GOLDEN STUDIO & REASONING HUB DESIGN SYSTEM (Screenshot 3 Matching)
+   ========================================================================== */
+
+/* Dark Background Canvas for Main Layout */
+.app-layout-wrapper.gemini-layout,
+.app-main-canvas.juno-main-canvas,
+.juno-hero-section {
+  background-color: #0b0e17 !important;
+  color: #f8fafc !important;
+}
+
+/* Sidebar Styles matching Screenshot 3 */
+.app-sidebar.juno-sidebar {
+  background-color: #080a10 !important;
+  border-right: 1px solid rgba(251, 191, 36, 0.15) !important;
+  padding: 16px 14px;
+}
+
+.juno-sparkle-star {
+  color: #fbbf24;
+  font-size: 18px;
+  margin-right: 6px;
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
+}
+
+.juno-brand-name {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: #fbbf24 !important;
+  letter-spacing: -0.3px;
+}
+
+/* Tab Switcher: Studio | Neural Lab v2.5 */
+.juno-tab-switcher {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 16px 0 12px 0;
+  background: rgba(15, 23, 42, 0.6);
+  padding: 4px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.juno-tab-btn {
+  flex: 1;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.juno-tab-btn.active {
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid #fbbf24;
+  color: #fbbf24;
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.25);
+}
+
+.juno-tab-btn .version-badge {
+  font-size: 9.5px;
+  font-weight: 800;
+  background: #fbbf24;
+  color: #0b0e17;
+  padding: 1px 5px;
+  border-radius: 10px;
+}
+
+/* Primary + New Session Button */
+.juno-new-session-btn {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 22px;
+  background: #ffffff;
+  color: #d97706;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 13.5px;
+  font-weight: 800;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  margin: 12px 0 16px 0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease;
+}
+
+.juno-new-session-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(251, 191, 36, 0.35);
+  background: #fffbeb;
+}
+
+.juno-new-session-btn .plus-icon {
+  font-size: 16px;
+  font-weight: 900;
+}
+
+/* Navigation Links */
+.juno-nav-menu .sidebar-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: #e2e8f0;
+  font-size: 13.5px;
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.juno-nav-menu .sidebar-menu-item:hover,
+.juno-nav-menu .sidebar-menu-item.active {
+  background: rgba(251, 191, 36, 0.12);
+  color: #fbbf24;
+}
+
+/* Smart Notebooks Section */
+.juno-notebooks-section {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.section-sublabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  padding-left: 8px;
+}
+
+.juno-avatar {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+}
+
+.juno-user-role {
+  color: #fbbf24 !important;
+  font-weight: 700 !important;
+  font-size: 11px !important;
+}
+
+/* Centered Hero View */
+.juno-hero-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 75vh;
+  padding: 2rem 1rem;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* Glowing Yellow Title Headline */
+.juno-hero-headline {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #fbbf24 !important;
+  text-shadow: 0 0 35px rgba(251, 191, 36, 0.5), 0 0 70px rgba(245, 158, 11, 0.25);
+  margin-bottom: 32px;
+  letter-spacing: -0.5px;
+  max-width: 850px;
+}
+
+/* Input Capsule Container */
+.juno-prompt-capsule-wrapper {
+  width: 100%;
+  max-width: 720px;
+}
+
+.juno-prompt-capsule {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1.5px solid #ca8a04;
+  border-radius: 28px;
+  padding: 8px 16px;
+  box-shadow: 0 0 30px rgba(234, 179, 8, 0.3), inset 0 0 15px rgba(251, 191, 36, 0.08);
+  backdrop-filter: blur(16px);
+  transition: all 0.25s ease;
+}
+
+.juno-prompt-capsule:focus-within {
+  border-color: #fbbf24;
+  box-shadow: 0 0 40px rgba(251, 191, 36, 0.5), inset 0 0 20px rgba(251, 191, 36, 0.12);
+}
+
+.juno-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.juno-input-plus-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  transition: color 0.2s ease;
+}
+
+.juno-input-plus-btn:hover {
+  color: #fbbf24;
+}
+
+.juno-textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #f8fafc;
+  font-family: 'Inter', sans-serif;
+  font-size: 14.5px;
+  font-weight: 500;
+  resize: none;
+  padding: 6px 0;
+}
+
+.juno-textarea::placeholder {
+  color: #94a3b8;
+}
+
+.juno-input-tools-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Model Dropdown Pill */
+.juno-model-picker-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid #ca8a04;
+  border-radius: 18px;
+  padding: 4px 10px;
+}
+
+.juno-live-gold-dot {
+  color: #fbbf24;
+  font-size: 9px;
+  filter: drop-shadow(0 0 6px #fbbf24);
+}
+
+.juno-model-dropdown {
+  background: transparent;
+  border: none;
+  color: #fbbf24;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  outline: none;
+  cursor: pointer;
+}
+
+.juno-model-dropdown option {
+  background: #0f172a;
+  color: #fbbf24;
+}
+
+.juno-tool-btn {
+  background: transparent;
+  border: none;
+  color: #fbbf24;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  transition: transform 0.2s ease;
+}
+
+.juno-tool-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Yellow Robot Helper Card (Bottom-Right Widget) */
+.yellow-robot-helper-card {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(251, 191, 36, 0.35);
+  z-index: 100;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.yellow-robot-helper-card:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.6), 0 0 30px rgba(251, 191, 36, 0.5);
+}
+
+.yellow-robot-helper-card .mascot-avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #fff9c4;
+  border: 1.5px solid #fbbf24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.yellow-robot-helper-card .mascot-avatar-circle img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.yellow-robot-helper-card .mascot-info-stack {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.yellow-robot-helper-card .mascot-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.yellow-robot-helper-card .mascot-status {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ca8a04;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.yellow-robot-helper-card .status-green-dot {
+  color: #22c55e;
+  font-size: 10px;
 }
 
 

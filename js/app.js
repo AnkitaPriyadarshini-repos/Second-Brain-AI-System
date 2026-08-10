@@ -976,9 +976,9 @@
     });
 
     function applyTheme(themeName) {
-      if (!themeName) themeName = 'aqua-aesthetic';
-      if (themeName === 'royal-gold' || themeName === 'sunflower-yellow' || themeName === 'emerald-luxe' || themeName === 'sapphire-platinum' || themeName === 'atlassian-azure' || themeName === 'golden-harmony' || themeName === 'claves-adaptive-fusion') {
-        themeName = 'aqua-aesthetic';
+      if (!themeName) themeName = 'golden-harmony';
+      if (themeName === 'chatgpt-yellow' || themeName === 'royal-gold' || themeName === 'sunflower-yellow' || themeName === 'golden-harmony') {
+        // Active Yellow ChatGPT Theme
       }
       const root = document.documentElement || document.body || (typeof document !== 'undefined' ? document.querySelector('html') : null);
       if (root && typeof root.setAttribute === 'function') {
