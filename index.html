@@ -1,4 +1,4 @@
-<html lang="en" data-theme="golden-harmony">
+<html lang="en" data-theme="claude-obsidian">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,173 +14,172 @@
   <meta http-equiv="Expires" content="0">
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 
-  <!-- Google Fonts -->
+  <!-- Google Fonts: Playfair Display Serif + Outfit + Inter + Fira Code -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
 
   <!-- Stylesheets & App Manifest -->
-  <link rel="stylesheet" href="css/style.css?v=56.0">
-  <link rel="stylesheet" href="css/responsive.css?v=56.0">
-  <link rel="stylesheet" href="css/websocket-chat.css?v=56.0">
+  <link rel="stylesheet" href="css/style.css?v=57.0">
+  <link rel="stylesheet" href="css/responsive.css?v=57.0">
+  <link rel="stylesheet" href="css/websocket-chat.css?v=57.0">
   <link rel="stylesheet" href="css/adaptive-fusion.css?v=1.0">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0b0e17">
+  <meta name="theme-color" content="#181715">
 </head>
 <body>
 
   <!-- Dynamic Background Canvas -->
-  <canvas id="gemini-flow-canvas" class="gemini-flow-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none; opacity: 0.4;"></canvas>
+  <canvas id="gemini-flow-canvas" class="gemini-flow-canvas" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; pointer-events: none; opacity: 0.25;"></canvas>
 
-  <!-- Soft Ambient Lighting Field (Radiant Golden Glow) -->
-  <div class="juno-ambient-gold-glow" style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); width: 750px; height: 450px; background: radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.32) 0%, rgba(245, 158, 11, 0.15) 45%, rgba(9, 13, 22, 0) 80%); pointer-events: none; z-index: 0; filter: blur(55px);"></div>
-
-  <!-- App Layout Wrapper -->
-  <div class="app-layout-wrapper gemini-layout">
-    <!-- Left Vertical Navigation Sidebar (Juno AI Golden Theme) -->
-    <aside id="app-sidebar" class="app-sidebar juno-sidebar">
+  <!-- App Layout Wrapper (Claude Dark Canvas Style) -->
+  <div class="app-layout-wrapper claude-layout">
+    
+    <!-- Left Vertical Narrow Icon Sidebar (Claude Style) -->
+    <aside id="app-sidebar" class="app-sidebar claude-sidebar">
       <div class="sidebar-top">
-        <!-- Brand Header: Juno AI + Collapse Toggle -->
-        <div class="sidebar-brand-header">
-          <div class="brand-left">
-            <div class="brand-title" onclick="window.activateView('jarvis')">
-              <span class="juno-sparkle-star">✦</span>
-              <span class="brand-name juno-brand-name">Juno AI</span>
-            </div>
-          </div>
-          <button class="sidebar-collapse-btn" onclick="window.toggleSidebar()" title="Collapse Sidebar">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-          </button>
-        </div>
-
-        <!-- Mode Switcher Tabs: Studio | Neural Lab v2.5 -->
-        <div class="juno-tab-switcher">
-          <button class="juno-tab-btn active" onclick="window.activateView('jarvis')">Studio</button>
-          <button class="juno-tab-btn" onclick="window.openAdaptiveFusionModal()">
-            <span>Neural Lab</span>
-            <span class="version-badge">v2.5</span>
-          </button>
-        </div>
-
-        <!-- Juno AI Action Button: + New Session -->
-        <button class="juno-new-session-btn" onclick="window.createNewChatThread()" title="New Session">
-          <span class="plus-icon">+</span>
-          <span>New Session</span>
+        <!-- Top Collapse Button -->
+        <button class="claude-sidebar-btn" onclick="window.toggleSidebar()" title="Sidebar Menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
         </button>
 
-        <!-- Primary Navigation Menu Links -->
-        <div class="gemini-nav-menu juno-nav-menu">
-          <button class="sidebar-menu-item active" data-view="jarvis" onclick="window.activateView('jarvis')">
-            <span class="menu-icon">🧠</span>
-            <span>Neural Memory</span>
-          </button>
-          <button class="sidebar-menu-item" data-view="vault" onclick="window.activateView('vault')">
-            <span class="menu-icon">📄</span>
-            <span>Research Synthesis</span>
-          </button>
-          <button class="sidebar-menu-item" data-view="resurfacing" onclick="window.activateView('resurfacing')">
-            <span class="menu-icon">💻</span>
-            <span>Repo Architect</span>
-          </button>
-          <button class="sidebar-menu-item" data-view="graph" onclick="window.activateView('graph')">
-            <span class="menu-icon">🎙️</span>
-            <span>Voice Studio</span>
-          </button>
-        </div>
-
-        <!-- Smart Notebooks Section -->
-        <div class="juno-notebooks-section">
-          <div class="section-sublabel">Smart Notebooks</div>
-          <button class="sidebar-menu-item" onclick="window.activateView('capture')">
-            <span class="menu-icon" style="color: #fbbf24; font-weight: 800;">+</span>
-            <span>New notebook</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Recent Sessions List -->
-      <div class="sidebar-chat-history">
-        <div class="history-section-label">RECENT SESSIONS</div>
-        <div id="sidebar-chat-threads-container" class="sidebar-threads-list">
-          <!-- Rendered dynamically -->
-        </div>
-      </div>
-
-      <!-- Bottom Profile Footer -->
-      <div class="sidebar-footer gemini-footer juno-footer">
-        <div class="user-profile-row" onclick="window.openUserOnboardingModal()">
-          <div class="user-avatar-circle juno-avatar">A</div>
-          <div class="user-info-stack">
-            <span id="user-display-name">Ankita Priyadarshini Pallai</span>
-            <span class="user-tier juno-user-role">Juno Pro Architect</span>
-          </div>
-        </div>
-        <button class="sidebar-settings-btn" onclick="window.activateView('settings')" title="Settings">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <!-- New Chat Icon Button (+) -->
+        <button class="claude-sidebar-btn add-btn" onclick="window.createNewChatThread()" title="New Chat">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </button>
+
+        <!-- Navigation Icons -->
+        <button class="claude-sidebar-btn active" data-view="jarvis" onclick="window.activateView('jarvis')" title="Chats & Synthesis">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </button>
+
+        <button class="claude-sidebar-btn" data-view="vault" onclick="window.activateView('vault')" title="Projects & Library">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        </button>
+
+        <button class="claude-sidebar-btn" data-view="resurfacing" onclick="window.activateView('resurfacing')" title="Artifacts & Knowledge">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </button>
+
+        <button class="claude-sidebar-btn" data-view="graph" onclick="window.activateView('graph')" title="Repo Architect & Code">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </button>
+
+        <button class="claude-sidebar-btn" data-view="capture" onclick="window.activateView('capture')" title="Files & Notebooks">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </button>
+
+        <button class="claude-sidebar-btn" onclick="window.openAdaptiveFusionModal()" title="Studio Themes & Style">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.92 0 1.67-.75 1.67-1.67 0-.42-.16-.8-.44-1.1-.26-.29-.41-.67-.41-1.09 0-.92.75-1.67 1.67-1.67H16c3.31 0 6-2.69 6-6 0-4.96-4.49-9-10-9z"/></svg>
+        </button>
+      </div>
+
+      <!-- Bottom Profile & Download Section -->
+      <div class="sidebar-bottom">
+        <button class="claude-sidebar-btn" onclick="window.installPWA && window.installPWA()" title="Download desktop app">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+        
+        <div class="claude-profile-avatar" onclick="window.openUserOnboardingModal()" title="Ankita Priyadarshini Pallai">
+          <span>AP</span>
+        </div>
       </div>
     </aside>
 
-    <!-- Main Canvas Area (Juno AI Golden Synth Studio) -->
-    <div class="app-main-canvas gemini-main-canvas juno-main-canvas">
+    <!-- Main Canvas Area (Claude Dark Studio Canvas) -->
+    <div class="app-main-canvas claude-main-canvas">
       
-      <!-- Mobile Top Navigation Bar -->
-      <header class="mobile-top-bar">
-        <button type="button" class="mobile-header-btn" onclick="window.toggleSidebar()" title="Open Navigation Menu" aria-label="Open Navigation Menu">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-        </button>
-        <div class="mobile-header-brand">
-          <span style="color: #fbbf24;">✦ Juno AI</span>
+      <!-- Top Navigation Bar -->
+      <header class="claude-top-navbar">
+        <div class="top-nav-left"></div>
+        <div class="top-nav-center">
+          <button class="claude-plan-pill" onclick="window.openUserOnboardingModal()">
+            <span>Free plan</span>
+            <span class="dot-separator">•</span>
+            <span class="upgrade-text">Upgrade</span>
+          </button>
         </div>
-        <button type="button" class="mobile-header-btn" onclick="window.createNewChatThread()" title="New Session" aria-label="New Session">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        </button>
+        <div class="top-nav-right">
+          <button class="claude-incognito-btn" title="Incognito Mode" onclick="window.toggleIncognitoMode && window.toggleIncognitoMode()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
       </header>
 
-      <section id="view-jarvis" class="view-section active juno-hero-section">
+      <section id="view-jarvis" class="view-section active claude-hero-section">
         
-        <!-- Juno AI Centered Studio View -->
-        <div id="chat-hero-view" class="chat-hero-view juno-hero-center">
+        <!-- Main Central View -->
+        <div id="chat-hero-view" class="chat-hero-view claude-hero-center">
           
-          <!-- Iconic Glowing Golden Title Headline -->
-          <h1 class="juno-hero-headline">What will we synthesize today, Ankita?</h1>
+          <!-- Terracotta Gold Logo Icon & Serif Headline -->
+          <div class="claude-brand-headline-wrapper">
+            <span class="claude-terracotta-icon">💥</span>
+            <h1 class="claude-serif-headline">Back at it, Ankita Priyadarshini Pallai</h1>
+          </div>
 
-          <!-- Glowing Gold Prompt Input Pill Box -->
-          <div class="juno-prompt-capsule-wrapper">
-            <form id="rag-query-form" class="juno-prompt-capsule" autocomplete="off" onsubmit="window.submitRAGQuery(event); return false;">
+          <!-- Rounded Floating Input Card Container -->
+          <div class="claude-prompt-card-wrapper">
+            <form id="rag-query-form" class="claude-prompt-card" autocomplete="off" onsubmit="window.submitRAGQuery(event); return false;">
               <!-- Attachment Preview Container -->
               <div id="prompt-attachment-preview-container" class="prompt-attachment-preview" style="display: none;"></div>
 
-              <div class="juno-input-row">
-                <!-- Left Action: Plus Attachment Button -->
+              <div class="claude-textarea-row">
+                <textarea id="rag-query-input" class="claude-textarea" placeholder="How can I help you today?" aria-label="How can I help you today?" rows="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+              </div>
+
+              <div class="claude-card-bottom-row">
+                <!-- Left Attachment Button (+) -->
                 <input type="file" id="prompt-file-attach-input" accept="image/*,.pdf,.txt,.js,.json" style="display: none;" onchange="window.handlePromptFileSelected(this.files)">
-                <button type="button" class="juno-input-plus-btn" title="Add file or document" onclick="document.getElementById('prompt-file-attach-input').click()">
+                <button type="button" class="claude-plus-btn" title="Add content" onclick="document.getElementById('prompt-file-attach-input').click()">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 </button>
 
-                <!-- Center Text Area -->
-                <textarea id="rag-query-input" class="juno-textarea" placeholder="Ask Juno anything, search documents, or generate code." aria-label="Ask Juno anything" rows="1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
-
-                <!-- Right Tool Dropdown & Mic -->
-                <div class="juno-input-tools-right">
-                  <!-- Integrated Model Selector Dropdown Pill -->
-                  <div class="juno-model-picker-pill">
-                    <span class="juno-live-gold-dot">●</span>
-                    <select id="model-select-dropdown" class="juno-model-dropdown" onchange="window.handleModelChange(this.value)">
-                      <option value="golden-harmony" selected>✨ Juno Ultra 1.5 v</option>
-                      <option value="gemini-2.5-pro">🧠 Juno Deep Think 2.5</option>
-                      <option value="gemini-2.0-flash">⚡ Fast Code Synthesizer</option>
+                <!-- Right Action Tools: Model Picker, Mic & Waveform -->
+                <div class="claude-card-tools-right">
+                  <div class="claude-model-selector-pill">
+                    <select id="model-select-dropdown" class="claude-model-dropdown" onchange="window.handleModelChange(this.value)">
+                      <option value="sonnet-5" selected>Sonnet 5 Medium ⌄</option>
+                      <option value="opus-3.5">Opus 3.5 Extended ⌄</option>
+                      <option value="haiku-3">Haiku 3 Fast ⌄</option>
                     </select>
                   </div>
 
-                  <!-- Voice Mic Trigger Button -->
-                  <button type="button" id="voice-trigger-btn" class="juno-tool-btn" title="Voice Input" onclick="window.toggleVoiceListen()">
+                  <button type="button" id="voice-trigger-btn" class="claude-tool-icon-btn" title="Voice Input" onclick="window.toggleVoiceListen()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
                   </button>
+
+                  <button type="button" class="claude-tool-icon-btn" title="Voice Waveform" onclick="window.toggleVoiceListen()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="10" width="3" height="4" rx="1"/><rect x="7" y="6" width="3" height="12" rx="1"/><rect x="12" y="3" width="3" height="18" rx="1"/><rect x="17" y="8" width="3" height="8" rx="1"/></svg>
+                  </button>
+
                   <button type="submit" id="rag-submit-btn" style="display: none;"></button>
                 </div>
               </div>
             </form>
+          </div>
+
+          <!-- Action Chips directly underneath Input Card -->
+          <div class="claude-action-chips">
+            <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Write clean modular code for frontend UI component')">
+              <span class="chip-symbol">&lt;/&gt;</span>
+              <span>Code</span>
+            </button>
+            <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Give me ideas for daily routine and life productivity')">
+              <span class="chip-icon">☕</span>
+              <span>Life stuff</span>
+            </button>
+            <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Explain deep learning attention mechanisms with examples')">
+              <span class="chip-icon">🎓</span>
+              <span>Learn</span>
+            </button>
+            <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Draft a high quality research synthesis summary')">
+              <span class="chip-icon">✏️</span>
+              <span>Write</span>
+            </button>
+            <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Surprise me with Juno AI intelligent recommendations')">
+              <span class="chip-icon">💡</span>
+              <span>Juno's choice</span>
+            </button>
           </div>
         </div>
 
@@ -191,20 +190,6 @@
         <button id="scroll-to-bottom-btn" onclick="window.scrollToChatBottom()" title="Scroll to bottom">
           ↓
         </button>
-
-        <!-- Floating Yellow Robot Helper Widget (Bottom Right) -->
-        <div id="yellow-robot-helper-widget" class="yellow-robot-helper-card" onclick="window.toggleVoiceListen()">
-          <div class="mascot-avatar-circle">
-            <img src="assets/nexus_yellow_bot.png" alt="Yellow Robot Mascot" onerror="this.src='assets/astronaut.png'">
-          </div>
-          <div class="mascot-info-stack">
-            <div class="mascot-title">Yellow Robot Helper</div>
-            <div class="mascot-status">
-              <span class="status-green-dot">●</span>
-              <span>Ready to help</span>
-            </div>
-          </div>
-        </div>
       </section>
 
 
