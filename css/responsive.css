@@ -944,99 +944,186 @@ body[data-theme="gemini-dark"] .pwa-install-card p {
 }
 
 /* ==================================================== */
-/* CLAUDE AI MOBILE RESPONSIVE & PWA INSTALLABLE ENGINE */
+/* CLAUDE AI MOBILE WEB INTERFACE (EXACT MATCH SCREENSHOT 2) */
 /* ==================================================== */
 
 @media (max-width: 768px) {
-  /* Prevent iOS auto-zoom on form controls */
-  input, textarea, select {
-    font-size: 16px !important;
+  /* 1. Canvas & Backgrounds: Pure Dark Charcoal (#1b1917), No Outer Yellow Frames */
+  body, html, .app-layout-wrapper, .app-main-canvas, .view-section {
+    background: #1b1917 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
   }
 
-  /* Main Canvas full width with safe area inset */
-  .app-main-canvas.claude-main-canvas {
-    margin-left: 0 !important;
-    width: 100% !important;
-    max-width: 100vw !important;
-    padding: 8px 12px calc(24px + env(safe-area-inset-bottom, 0px)) 12px !important;
+  /* Hide old bottom navigation bar & yellow overlays */
+  .bottom-mobile-nav {
+    display: none !important;
+  }
+
+  /* Hide heavy feature cards on mobile for ultra-clean Screenshot 2 layout */
+  .px-feature-cards-grid,
+  .px-notice-banner,
+  .cookie-consent-modal {
+    display: none !important;
+  }
+
+  /* 2. Top Header Bar (Matching Screenshot 2) */
+  .claude-top-navbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 12px 16px !important;
+    background: #1b1917 !important;
+    border-bottom: none !important;
+    height: 52px !important;
     box-sizing: border-box !important;
   }
 
-  /* Responsive Headline */
-  .claude-serif-headline {
-    font-size: clamp(22px, 6vw, 32px) !important;
+  .claude-top-navbar .top-nav-left {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .claude-top-navbar .mobile-menu-toggle-btn {
+    display: flex !important;
+    background: transparent !important;
+    border: none !important;
+    color: #d6d3d1 !important;
+    font-size: 22px !important;
+    cursor: pointer !important;
+    padding: 4px !important;
+  }
+
+  .claude-plan-pill {
+    display: none !important; /* Screenshot 2 hides top upgrade pill in header on mobile */
+  }
+
+  /* 3. Hero Center View (Matching Screenshot 2) */
+  .claude-hero-center {
+    min-height: calc(100vh - 210px) !important;
+    padding: 40px 20px 180px 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
     text-align: center !important;
   }
 
   .claude-brand-headline-wrapper {
-    gap: 8px !important;
+    flex-direction: column !important;
+    gap: 16px !important;
     margin-bottom: 20px !important;
   }
 
   .claude-terracotta-icon {
-    font-size: 26px !important;
+    font-size: 38px !important;
   }
 
-  /* Mobile Floating Prompt Card */
+  .claude-serif-headline {
+    font-family: 'Playfair Display', Georgia, serif !important;
+    font-size: 26px !important;
+    font-weight: 500 !important;
+    color: #f3f0e8 !important;
+    line-height: 1.35 !important;
+    max-width: 280px !important;
+    margin: 0 auto !important;
+  }
+
+  /* 4. Bottom Fixed Input Deck (Matching Screenshot 2) */
   .claude-prompt-card-wrapper {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     width: 100% !important;
+    padding: 10px 14px calc(14px + env(safe-area-inset-bottom, 0px)) 14px !important;
+    background: #1b1917 !important;
+    z-index: 999999 !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
     max-width: 100% !important;
   }
 
   .claude-prompt-card {
-    padding: 14px 16px !important;
-    border-radius: 16px !important;
+    background: #262421 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 20px !important;
+    padding: 12px 14px !important;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .claude-pro-top-bar {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 8px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+    font-size: 12px !important;
+  }
+
+  .claude-pro-top-bar .pro-text {
+    color: #a8a29e !important;
+  }
+
+  .claude-pro-top-bar .upgrade-link {
+    color: #fbbf24 !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
   }
 
   .claude-textarea {
-    font-size: 16px !important; /* Touch viewport fix */
-    min-height: 52px !important;
+    font-size: 16px !important; /* iOS zoom fix */
+    min-height: 44px !important;
+    color: #f3f0e8 !important;
   }
 
   .claude-card-bottom-row {
-    flex-wrap: nowrap !important;
-    gap: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-top: 8px !important;
+  }
+
+  .claude-plus-btn {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    background: #33302b !important;
+    color: #d6d3d1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: none !important;
   }
 
   .claude-model-selector-pill {
-    padding: 2px 8px !important;
-    max-width: 140px !important;
+    background: #33302b !important;
+    border-radius: 16px !important;
+    padding: 4px 10px !important;
+    border: none !important;
   }
 
   .claude-model-dropdown {
-    font-size: 11.5px !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-  }
-
-  /* Action Chips Stack Responsively */
-  .claude-action-chips {
-    gap: 6px !important;
-    margin-top: 14px !important;
-  }
-
-  .claude-chip {
-    padding: 6px 12px !important;
     font-size: 12px !important;
-    min-height: 40px !important;
-    touch-action: manipulation !important;
+    color: #d6d3d1 !important;
+    background: transparent !important;
   }
 
-  /* Slide-Out Drawer Navigation on Mobile */
-  .app-sidebar.claude-sidebar {
-    display: none !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    bottom: 0 !important;
-    width: 64px !important;
-    z-index: 1000000 !important;
-    box-shadow: 6px 0 24px rgba(0, 0, 0, 0.6) !important;
+  /* Action Chips below Hero */
+  .claude-action-chips {
+    display: none !important; /* Clean hero canvas matching Screenshot 2 */
   }
 
-  .app-sidebar.claude-sidebar.mobile-open {
-    display: flex !important;
+  /* Active Chat Feed Padding for Bottom Input Deck */
+  .chat-stream {
+    padding-bottom: 180px !important;
   }
 }
 
