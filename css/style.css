@@ -7353,7 +7353,7 @@ body[data-theme="gemini-dark"] .chat-action-btn {
 }
 
 .claude-profile-avatar:hover {
-  border-color: #ca785c;
+  border-color: #f59e0b;
   color: #ffffff;
 }
 
@@ -7599,10 +7599,10 @@ body[data-theme="gemini-dark"] .chat-action-btn {
   color: #a8a29e;
 }
 
-/* Terracotta Send Button (Matching Screenshot 2) */
+/* Astronaut Golden Yellow Send Button */
 .claude-send-btn {
-  background: #cc785c !important;
-  color: #ffffff !important;
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%) !important;
+  color: #0f172a !important;
   border: none !important;
   border-radius: 8px !important;
   width: 32px !important;
@@ -7611,13 +7611,14 @@ body[data-theme="gemini-dark"] .chat-action-btn {
   align-items: center !important;
   justify-content: center !important;
   cursor: pointer !important;
-  transition: background 0.2s ease, transform 0.2s ease !important;
-  box-shadow: 0 2px 8px rgba(204, 120, 92, 0.3) !important;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.45) !important;
 }
 
 .claude-send-btn:hover {
-  background: #da866a !important;
-  transform: scale(1.05) !important;
+  background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%) !important;
+  transform: scale(1.08) translateY(-1px) !important;
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.7) !important;
 }
 
 /* Disclaimer text under Input Box */
