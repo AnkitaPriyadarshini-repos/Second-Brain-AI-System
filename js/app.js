@@ -1781,11 +1781,12 @@
 
       const msgCard = document.createElement('div');
       if (sender === 'user') {
-        msgCard.className = `chat-bubble user-bubble`;
+        msgCard.className = `chat-bubble user-bubble claude-user-bubble`;
         msgCard.innerHTML = `
-          <div class="chat-text" style="font-size: 14.5px; line-height: 1.5; font-weight: 500; word-break: break-word;">${escapeHTML(text)}</div>
+          <div class="chat-text" style="font-size: 15px; line-height: 1.5; font-weight: 400; word-break: break-word; color: #f3f0e8;">${escapeHTML(text)}</div>
         `;
       } else {
+        msgCard.className = `chat-bubble ai-bubble claude-ai-bubble`;
         let citationsHTML = '';
         if (citations && citations.length > 0) {
           citationsHTML = `<div class="citations-container">
@@ -1800,33 +1801,16 @@
           </div>`;
         }
 
-        const actionsHTML = `<div class="chat-actions-bar">
+        const actionsHTML = `<div class="chat-actions-bar claude-actions-bar">
           <button class="chat-action-btn copy-btn" title="Copy answer text">📋 Copy</button>
-          <button class="chat-action-btn regen-btn" title="Regenerate AI response">🔄 Regenerate</button>
-          <button class="chat-action-btn speak-btn" title="Listen to AI answer">🔊 Read Aloud</button>
+          <button class="chat-action-btn regen-btn" title="Regenerate response">🔄 Retry</button>
+          <button class="chat-action-btn speak-btn" title="Listen to answer">🔊 Read</button>
           <button class="chat-action-btn thumb-up-btn" title="Good response">👍</button>
           <button class="chat-action-btn thumb-down-btn" title="Bad response">👎</button>
-          <button class="chat-action-btn save-answer-btn" title="Save answer to Second Brain Vault">💾 Save to Vault</button>
         </div>`;
 
         msgCard.innerHTML = `
-          <div class="chat-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-            <div class="ai-avatar" style="width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M12 0C12 6.627 6.627 12 0 12C6.627 12 12 17.373 12 24C12 17.373 17.373 12 24 12C17.373 12 12 6.627 12 0Z" fill="url(#gemini-msg-gradient)"/>
-                <defs>
-                  <linearGradient id="gemini-msg-gradient" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stop-color="#4285F4"/>
-                    <stop offset="35%" stop-color="#9B72CB"/>
-                    <stop offset="70%" stop-color="#D96570"/>
-                    <stop offset="100%" stop-color="#F4B400"/>
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-            <strong style="color: #a8c7fa; font-weight: 600; font-size: 13.5px;">${escapeHTML(customProvider || 'Gemini 2.5 Flash')}</strong>
-          </div>
-          <div class="chat-text" style="color: #e3e3e3; font-size: 14.5px; line-height: 1.6;"></div>
+          <div class="chat-text" style="color: #f3f0e8; font-size: 15.5px; line-height: 1.65; font-family: 'Inter', sans-serif;"></div>
           ${citationsHTML}
           ${actionsHTML}
         `;
