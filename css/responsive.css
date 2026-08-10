@@ -309,6 +309,15 @@ html, body {
   overflow-x: hidden !important;
   max-width: 100vw !important;
   -webkit-tap-highlight-color: transparent;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 @media (max-width: 768px) {
@@ -1042,7 +1051,7 @@ body[data-theme="gemini-dark"] .pwa-install-card p {
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
-    padding: 10px 14px calc(14px + env(safe-area-inset-bottom, 0px)) 14px !important;
+    padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px)) 12px !important;
     background: #1b1917 !important;
     z-index: 999999 !important;
     box-sizing: border-box !important;
@@ -1054,18 +1063,20 @@ body[data-theme="gemini-dark"] .pwa-install-card p {
     background: #262421 !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     border-radius: 20px !important;
-    padding: 12px 14px !important;
+    padding: 10px 12px !important;
     box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.6) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .claude-pro-top-bar {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    padding-bottom: 8px !important;
-    margin-bottom: 8px !important;
+    padding-bottom: 6px !important;
+    margin-bottom: 6px !important;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-    font-size: 12px !important;
+    font-size: 11.5px !important;
   }
 
   .claude-pro-top-bar .pro-text {
@@ -1080,40 +1091,70 @@ body[data-theme="gemini-dark"] .pwa-install-card p {
 
   .claude-textarea {
     font-size: 16px !important; /* iOS zoom fix */
-    min-height: 44px !important;
+    min-height: 42px !important;
     color: #f3f0e8 !important;
+    padding: 4px 0 !important;
   }
 
+  /* Responsive Tools Row with Touch Scroll (No Overflow Cutoff) */
   .claude-card-bottom-row {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    margin-top: 8px !important;
+    gap: 6px !important;
+    margin-top: 6px !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
-  .claude-plus-btn {
-    width: 32px !important;
-    height: 32px !important;
-    border-radius: 50% !important;
-    background: #33302b !important;
-    color: #d6d3d1 !important;
+  .claude-card-bottom-row::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .claude-card-tools-left, .claude-card-tools-right {
     display: flex !important;
     align-items: center !important;
-    justify-content: center !important;
-    border: none !important;
+    gap: 5px !important;
+    flex-shrink: 0 !important;
   }
 
-  .claude-model-selector-pill {
-    background: #33302b !important;
-    border-radius: 16px !important;
-    padding: 4px 10px !important;
-    border: none !important;
+  .px-search-mode-dropdown, .px-computer-pill, .claude-model-selector-pill {
+    padding: 3px 8px !important;
+    font-size: 11px !important;
+    flex-shrink: 0 !important;
+    height: 28px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .px-search-mode-dropdown {
+    max-width: 95px !important;
+    text-overflow: ellipsis !important;
   }
 
   .claude-model-dropdown {
-    font-size: 12px !important;
-    color: #d6d3d1 !important;
-    background: transparent !important;
+    max-width: 85px !important;
+    font-size: 11px !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .claude-plus-btn, .claude-tool-icon-btn, .claude-send-btn {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    padding: 0 !important;
+    flex-shrink: 0 !important;
+    border-radius: 8px !important;
+  }
+
+  .claude-plus-btn {
+    border-radius: 50% !important;
   }
 
   /* Action Chips below Hero */
