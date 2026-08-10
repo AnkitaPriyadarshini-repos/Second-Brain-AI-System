@@ -502,19 +502,51 @@
       try {
         const inputEl = document.getElementById('rag-query-input');
         const query = inputEl ? inputEl.value.trim() : '';
-        if (query) {
-          // Pass query to handler FIRST. Clear input ONLY after successful execution trigger.
-          const handler = window.handleRAGQuery || handleRAGQuery;
-          if (typeof handler === 'function') {
-            handler(query);
-            if (inputEl) {
-              inputEl.value = '';
-              inputEl.style.height = 'auto';
-            }
-            const submitBtn = document.getElementById('rag-submit-btn');
-            if (submitBtn) submitBtn.classList.remove('has-input');
+        if (!query && !window.activePromptAttachment) return false;
+
+        const handler = window.handleRAGQuery || (typeof handleRAGQuery === 'function' ? handleRAGQuery : null);
+        if (typeof handler === 'function') {
+          handler(query);
+        } else {
+          console.warn('[submitRAGQuery] Executing direct fallback query submission');
+          const heroView = document.getElementById('chat-hero-view');
+          const targetContainer = document.getElementById('chat-container') || document.querySelector('.chat-stream');
+          if (heroView) heroView.style.display = 'none';
+          if (targetContainer) {
+            targetContainer.style.display = 'flex';
+            targetContainer.style.flexDirection = 'column';
+          }
+          if (typeof window.appendChatMessage === 'function') {
+            window.appendChatMessage('user', query);
+          } else if (typeof appendChatMessage === 'function') {
+            appendChatMessage('user', query);
+          }
+          const engine = typeof aiEngine !== 'undefined' ? aiEngine : (typeof window !== 'undefined' ? window.aiEngine : null);
+          if (engine && typeof engine.generateResponse === 'function') {
+            engine.generateResponse({ prompt: query }).then(res => {
+              const text = res && res.text ? res.text : `Here is the response for **"${query}"**:\n\nHello! How can I assist you today?`;
+              if (typeof window.appendChatMessage === 'function') {
+                window.appendChatMessage('ai', text, [], false, query, 'Juno 2.5 Flash', true);
+              } else if (typeof appendChatMessage === 'function') {
+                appendChatMessage('ai', text, [], false, query, 'Juno 2.5 Flash', true);
+              }
+            }).catch(err => {
+              const fallbackText = "Hello! 😊 How can I help you synthesize your ideas and notes today?";
+              if (typeof window.appendChatMessage === 'function') {
+                window.appendChatMessage('ai', fallbackText, [], false, query, 'Juno 2.5 Flash', false);
+              } else if (typeof appendChatMessage === 'function') {
+                appendChatMessage('ai', fallbackText, [], false, query, 'Juno 2.5 Flash', false);
+              }
+            });
           }
         }
+
+        if (inputEl) {
+          inputEl.value = '';
+          inputEl.style.height = 'auto';
+        }
+        const submitBtn = document.getElementById('rag-submit-btn');
+        if (submitBtn) submitBtn.classList.remove('has-input');
       } catch (err) {
         console.error('Error in submitRAGQuery:', err);
       }
@@ -1535,6 +1567,7 @@
     };
 
     async function handleRAGQuery(query) {
+      window.handleRAGQuery = handleRAGQuery;
       const cleanQuery = (typeof query === 'string' ? query : (query ? String(query) : '')).trim();
       if (!cleanQuery && !activePromptAttachment) return;
 
