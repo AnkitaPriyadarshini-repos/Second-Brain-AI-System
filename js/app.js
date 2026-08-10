@@ -1493,22 +1493,29 @@
     window.shareCurrentThread = function() {
       const activeId = (typeof Store !== 'undefined' && Store.getActiveThreadId) ? Store.getActiveThreadId() : null;
       const threads = (typeof Store !== 'undefined' && Store.getChatThreads) ? Store.getChatThreads() : [];
-      const currentThread = threads.find(t => t.id === activeId);
+      const currentThread = threads.find(t => t && t.id === activeId);
 
-      if (!currentThread || !currentThread.messages || currentThread.messages.length === 0) {
-        if (typeof showToast === 'function') showToast('⚠️ No messages in current session to share.');
-        return;
-      }
+      const modal = document.getElementById('share-chat-modal');
+      const input = document.getElementById('share-url-input');
 
-      let markdown = `# Chat Transcript — ${currentThread.title || 'Juno AI Session'}\n\n`;
-      currentThread.messages.forEach(m => {
-        const sender = m.role === 'assistant' ? '🤖 Juno AI' : '👤 You';
-        markdown += `### ${sender}\n${m.content}\n\n---\n\n`;
-      });
+      const baseUrl = window.location.origin + window.location.pathname;
+      const shareUrl = `${baseUrl}?share=${encodeURIComponent(activeId || 'session-demo')}`;
 
-      navigator.clipboard.writeText(markdown);
+      if (input) input.value = shareUrl;
+      if (modal) modal.style.display = 'flex';
+
       if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) SoundEngine.playClick();
-      if (typeof showToast === 'function') showToast('📋 Full chat session transcript copied to clipboard as Markdown!');
+    };
+
+    window.copyShareLinkInput = function() {
+      const input = document.getElementById('share-url-input');
+      if (input) {
+        navigator.clipboard.writeText(input.value);
+        if (typeof showToast === 'function') showToast('🔗 Shareable chat link copied to clipboard!');
+        if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) SoundEngine.playClick();
+        const modal = document.getElementById('share-chat-modal');
+        if (modal) modal.style.display = 'none';
+      }
     };
 
     window.regenerateLastResponse = function() {

@@ -244,6 +244,28 @@
         </form>
       </div>
 
+      <!-- Share Chat Link Modal (Screenshot 3) -->
+      <div id="share-chat-modal" class="share-chat-modal" style="display: none;" onclick="if(event.target === this) this.style.display='none';">
+        <div class="share-dialog-card glass-card">
+          <div class="share-dialog-header">
+            <div class="share-title-group">
+              <h3>Share a link to chat?</h3>
+              <p>This creates a copy that others can chat with</p>
+            </div>
+            <button type="button" class="share-close-btn" onclick="document.getElementById('share-chat-modal').style.display='none';">✕</button>
+          </div>
+          <div class="share-dialog-body">
+            <div class="share-input-box">
+              <input type="text" id="share-url-input" readonly value="https://second-brain-ai-system.vercel.app/">
+              <button type="button" class="btn-copy-share-url" onclick="window.copyShareLinkInput()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                <span>Copy Link</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Feature Showcase Cards (Perplexity Style) -->
       <div class="px-feature-cards-grid">
         <div class="px-feature-card golden-card" onclick="window.triggerSampleQuery('Search grounded knowledge vault & web for deep synthesis')">
