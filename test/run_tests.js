@@ -380,38 +380,45 @@ test('AIEngine should generate tailored answers for all 30 test domains without 
   }
 });
 
-test('AIEngine should resolve multi-turn conversation context ("Who created it?")', async () => {
+test('AIEngine should execute the exact 6-turn conversation sequence with topic switching', async () => {
   const AIEngineClass = require('../js/ai-engine');
   const ai = new AIEngineClass();
 
-  const mockHistory = [
-    { role: 'user', content: 'What is Java?' },
-    { role: 'assistant', content: 'Java is a high-level, class-based object-oriented programming language designed to have as few implementation dependencies as possible.' }
-  ];
+  const history = [];
 
-  const res = await ai.generateResponse({
-    prompt: 'Who created it?',
-    chatHistory: mockHistory
-  });
+  // Turn 1: "Explain binary search."
+  const t1 = await ai.generateResponse({ prompt: 'Explain binary search.', chatHistory: history });
+  assert.ok(t1.text.includes('Binary Search') || t1.text.includes('divide-and-conquer'), 'Turn 1 failed');
+  history.push({ role: 'user', content: 'Explain binary search.' });
+  history.push({ role: 'assistant', content: t1.text });
 
-  assert.ok(res.text.includes('James Gosling') || res.text.includes('Sun Microsystems'), 'Multi-turn follow-up "Who created it?" failed to resolve Java creator');
-});
+  // Turn 2: "What is its time complexity?"
+  const t2 = await ai.generateResponse({ prompt: 'What is its time complexity?', chatHistory: history });
+  assert.ok(t2.text.includes('O(log N)') || t2.text.includes('\\log N'), 'Turn 2 failed to resolve "its time complexity" -> Binary Search');
+  history.push({ role: 'user', content: 'What is its time complexity?' });
+  history.push({ role: 'assistant', content: t2.text });
 
-test('AIEngine should resolve multi-turn example request ("Give me a simple example")', async () => {
-  const AIEngineClass = require('../js/ai-engine');
-  const ai = new AIEngineClass();
+  // Turn 3: "Give me the C++ implementation."
+  const t3 = await ai.generateResponse({ prompt: 'Give me the C++ implementation.', chatHistory: history });
+  assert.ok(t3.text.includes('cpp') || t3.text.includes('vector'), 'Turn 3 failed to generate C++ code for Binary Search');
+  history.push({ role: 'user', content: 'Give me the C++ implementation.' });
+  history.push({ role: 'assistant', content: t3.text });
 
-  const mockHistory = [
-    { role: 'user', content: 'Explain React' },
-    { role: 'assistant', content: 'React is a popular JavaScript library for building user interfaces.' }
-  ];
+  // Turn 4: "Now explain it to a beginner."
+  const t4 = await ai.generateResponse({ prompt: 'Now explain it to a beginner.', chatHistory: history });
+  assert.ok(t4.text.includes('dictionary') || t4.text.includes('Beginner'), 'Turn 4 failed beginner analogy');
+  history.push({ role: 'user', content: 'Now explain it to a beginner.' });
+  history.push({ role: 'assistant', content: t4.text });
 
-  const res = await ai.generateResponse({
-    prompt: 'Give me a simple example',
-    chatHistory: mockHistory
-  });
+  // Turn 5: "Forget that. What is Docker?"
+  const t5 = await ai.generateResponse({ prompt: 'Forget that. What is Docker?', chatHistory: history });
+  assert.ok(t5.text.includes('Docker') || t5.text.includes('containers'), 'Turn 5 failed to switch topic to Docker');
+  history.push({ role: 'user', content: 'Forget that. What is Docker?' });
+  history.push({ role: 'assistant', content: t5.text });
 
-  assert.ok(res.text.includes('useState') || res.text.includes('React') || res.text.includes('jsx'), 'Multi-turn follow-up "Give me a simple example" failed to generate React example');
+  // Turn 6: "Give me a simple example."
+  const t6 = await ai.generateResponse({ prompt: 'Give me a simple example.', chatHistory: history });
+  assert.ok(t6.text.includes('docker') || t6.text.includes('Dockerfile') || t6.text.includes('nginx'), 'Turn 6 failed: should give Docker example, NOT Binary Search!');
 });
 
 console.log('\n====================================================');

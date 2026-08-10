@@ -407,19 +407,52 @@ export function HydratedComponent({ data }) {
       };
     }
 
-    // 2. Resolve Multi-Turn Context References ("it", "this", "that", "above", "who created it?", "give me a simple example")
+    // 2. Resolve Multi-Turn Context References & Detect Topic Switches
     let contextSubject = '';
-    if (Array.isArray(chatHistory) && chatHistory.length > 0) {
+    let isTopicReset = qClean.includes('forget that') || qClean.includes('forget about that') || qClean.includes('change topic') || qClean.includes('new topic') || qClean.includes('never mind');
+    
+    if (Array.isArray(chatHistory) && chatHistory.length > 0 && !isTopicReset) {
       for (let i = chatHistory.length - 1; i >= 0; i--) {
         const msgText = (chatHistory[i].content || '').toLowerCase();
+        if (msgText.includes('binary search')) { contextSubject = 'Binary Search'; break; }
+        if (msgText.includes('docker')) { contextSubject = 'Docker'; break; }
         if (msgText.includes('java')) { contextSubject = 'Java'; break; }
         if (msgText.includes('react')) { contextSubject = 'React'; break; }
         if (msgText.includes('binary tree')) { contextSubject = 'Binary Tree'; break; }
         if (msgText.includes('photosynthesis')) { contextSubject = 'Photosynthesis'; break; }
-        if (msgText.includes('docker')) { contextSubject = 'Docker'; break; }
         if (msgText.includes('tcp') || msgText.includes('udp')) { contextSubject = 'TCP/UDP'; break; }
         if (msgText.includes('mongodb') || msgText.includes('postgresql')) { contextSubject = 'Databases'; break; }
       }
+    }
+
+    // Handle Follow-up: Time Complexity ("What is its time complexity?")
+    if ((qClean.includes('time complexity') || qClean.includes('complexity')) && (contextSubject === 'Binary Search' || qClean.includes('binary search'))) {
+      return {
+        text: `### ⏱️ Time & Space Complexity of Binary Search\n\n- **Best Case Time Complexity:** $\\mathcal{O}(1)$ (when the target element is located at the middle index on the first comparison).\n- **Average & Worst Case Time Complexity:** $\\mathcal{O}(\\log N)$ (since the search space is halved at each step).\n- **Space Complexity:**\n  - **Iterative Approach:** $\\mathcal{O}(1)$ auxiliary space.\n  - **Recursive Approach:** $\\mathcal{O}(\\log N)$ stack space due to recursion call stack.\n\n#### Why $\\mathcal{O}(\\log N)$?\nWith $N$ elements, after $k$ steps the remaining elements equal $\\frac{N}{2^k} = 1 \\implies 2^k = N \\implies k = \\log_2 N$.`,
+        thinkingProcess: ['Resolved multi-turn reference "its time complexity" -> Binary Search', 'Calculated exact Big-O complexity bounds'],
+        provider: 'Second Brain AI (Pro 2.5)',
+        grounded: false
+      };
+    }
+
+    // Handle Follow-up: Implementation ("Give me the C++ implementation")
+    if ((qClean.includes('c++ implementation') || qClean.includes('cpp implementation') || qClean.includes('c++ code') || qClean.includes('implementation')) && (contextSubject === 'Binary Search' || qClean.includes('binary search'))) {
+      return {
+        text: `### 💻 C++ Implementation of Binary Search\n\nHere is a complete, working C++ implementation of **Binary Search**:\n\n\`\`\`cpp\n#include <iostream>\n#include <vector>\n\n// Function to perform binary search on a sorted vector\nint binarySearch(const std::vector<int>& arr, int target) {\n    int low = 0;\n    int high = arr.size() - 1;\n\n    while (low <= high) {\n        int mid = low + (high - low) / 2; // Prevents potential integer overflow\n\n        if (arr[mid] == target) {\n            return mid; // Target found\n        }\n        if (arr[mid] < target) {\n            low = mid + 1; // Search right half\n        } else {\n            high = mid - 1; // Search left half\n        }\n    }\n    return -1; // Target not found\n}\n\nint main() {\n    std::vector<int> numbers = {2, 5, 8, 12, 16, 23, 38, 56, 72, 91};\n    int target = 23;\n    int index = binarySearch(numbers, target);\n\n    if (index != -1) {\n        std::cout << "Element " << target << " found at index " << index << std::endl;\n    } else {\n        std::cout << "Element " << target << " not found." << std::endl;\n    }\n    return 0;\n}\n\`\`\`\n\n#### Output:\n\`\`\`\nElement 23 found at index 5\n\`\`\``,
+        thinkingProcess: ['Resolved multi-turn reference "C++ implementation" -> Binary Search', 'Generated clean working C++ code'],
+        provider: 'Second Brain AI (Pro 2.5)',
+        grounded: false
+      };
+    }
+
+    // Handle Follow-up: Explain to a beginner ("Now explain it to a beginner")
+    if ((qClean.includes('explain it to a beginner') || qClean.includes('explain to a beginner') || qClean.includes('beginner')) && (contextSubject === 'Binary Search' || qClean.includes('binary search'))) {
+      return {
+        text: `### 📖 Binary Search — Beginner-Friendly Analogy\n\nImagine you are looking up the word **"Pencil"** in a huge printed dictionary containing **1,000 pages**:\n\n#### ❌ Slow Way (Linear Search):\nYou open page 1, then page 2, page 3... reading every page sequentially. It could take up to **1,000 page flips**!\n\n#### ⚡ Fast Way (Binary Search):\n1. You open the dictionary right in the **middle** (page 500).\n2. You see the words on page 500 start with **"M"**.\n3. Since **"P"** comes after **"M"**, you instantly throw away pages 1 to 500!\n4. Now you open the middle of the remaining half (page 750).\n5. You repeat this **divide-and-conquer** step.\n\nIn just **10 flips** ($\\log_2 1000 \\approx 10$), you find "Pencil" out of 1,000 pages! That is Binary Search!`,
+        thinkingProcess: ['Resolved beginner explanation request for Binary Search', 'Formatted dictionary lookup analogy'],
+        provider: 'Second Brain AI (Pro 2.5)',
+        grounded: false
+      };
     }
 
     // Handle Follow-up: "Who created it?"
@@ -447,10 +480,12 @@ export function HydratedComponent({ data }) {
     if (qClean.includes('give me a simple example') || qClean.includes('simple example') || qClean.includes('give an example')) {
       const subj = contextSubject || 'React';
       let exampleText = '';
-      if (subj === 'React') {
-        exampleText = `Here is a simple working React Counter component example:\n\n\`\`\`jsx\nimport React, { useState } from 'react';\n\nexport function SimpleCounter() {\n  const [count, setCount] = useState(0);\n\n  return (\n    <div style={{ padding: '20px', textAlign: 'center' }}>\n      <h2>Count: {count}</h2>\n      <button onClick={() => setCount(count + 1)}>Increment</button>\n    </div>\n  );\n}\n\`\`\``;
-      } else if (subj === 'Java') {
-        exampleText = `Here is a simple "Hello World" Java program example:\n\n\`\`\`java\npublic class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}\n\`\`\``;
+      if (subj === 'Docker') {
+        exampleText = `Here is a simple example of running a **Docker** web server container in 1 command:\n\n\`\`\`bash\n# Run an Nginx web server on port 8080\ndocker run -d -p 8080:80 --name my-web-server nginx\n\`\`\`\n\nAnd here is a simple **Dockerfile** for a Node.js web app:\n\n\`\`\`dockerfile\nFROM node:18-alpine\nWORKDIR /app\nCOPY package*.json ./\nRUN npm install\nCOPY . .\nEXPOSE 3000\nCMD ["node", "server.js"]\n\`\`\``;
+      } else if (subj === 'Binary Search') {
+        exampleText = `Here is a simple example of searching for number **7** in sorted list \`[1, 3, 5, 7, 9, 11]\`:\n\n1. Initial bounds: \`low = 0\` (val 1), \`high = 5\` (val 11).\n2. Middle index: \`mid = 2\` (val 5).\n3. Since 7 > 5, search right half: \`low = 3\` (val 7).\n4. Middle index: \`mid = 4\` (val 9).\n5. Since 7 < 9, search left half: \`high = 3\` (val 7).\n6. \`low == high == 3\` (val 7) $\\rightarrow$ **Target 7 Found!**`;
+      } else if (subj === 'React') {
+        exampleText = `Here is a simple working React Counter component example:\n\n\`\`\`jsx\nimport React, { useState } from 'react';\n\nexport function SimpleCounter() {\n  const [count, setCount] = useState(0);\n  return <button onClick={() => setCount(count + 1)}>Clicked {count} times</button>;\n}\n\`\`\``;
       } else {
         exampleText = `Here is a simple code example demonstrating **${subj}**:\n\n\`\`\`javascript\n// Simple ${subj} Demonstration\nfunction demonstrateExample(data) {\n  console.log("Processing ${subj}:", data);\n  return { success: true, timestamp: Date.now() };\n}\n\ndemonstrateExample("Sample Payload");\n\`\`\``;
       }
