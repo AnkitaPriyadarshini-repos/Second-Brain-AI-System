@@ -108,84 +108,174 @@
 
       <section id="view-jarvis" class="view-section active claude-hero-section">
         
-        <!-- Main Central View -->
-        <div id="chat-hero-view" class="chat-hero-view claude-hero-center">
-          
-          <!-- Rocket Logo Icon & Serif Headline -->
-          <div class="claude-brand-headline-wrapper">
-            <span class="claude-terracotta-icon">🚀</span>
-            <h1 class="claude-serif-headline">Back at it, Ankita Priyadarshini Pallai</h1>
-          </div>
+    <!-- Top Notice Banner -->
+    <div id="px-notice-banner" class="px-notice-banner">
+      <span>System Notice: Juno 2.5 Flash & Computer Mode Online</span>
+      <a class="notice-link" href="#" onclick="window.openUserOnboardingModal(); return false;">Explore Features →</a>
+      <button class="notice-close-btn" onclick="document.getElementById('px-notice-banner').style.display='none'">✕</button>
+    </div>
 
-          <!-- Rounded Floating Input Card Container -->
-          <div class="claude-prompt-card-wrapper">
-            <form id="rag-query-form" class="claude-prompt-card" autocomplete="off" onsubmit="window.submitRAGQuery(event); return false;">
-              <!-- Attachment Preview Container -->
-              <div id="prompt-attachment-preview-container" class="prompt-attachment-preview" style="display: none;"></div>
-
-              <div class="claude-textarea-row">
-                <textarea id="rag-query-input" class="claude-textarea" placeholder="How can I help you today?" aria-label="How can I help you today?" rows="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
-              </div>
-
-              <div class="claude-card-bottom-row">
-                <!-- Left Attachment Button (+) -->
-                <input type="file" id="prompt-file-attach-input" accept="image/*,.pdf,.txt,.js,.json" style="display: none;" onchange="window.handlePromptFileSelected(this.files)">
-                <button type="button" class="claude-plus-btn" title="Add content" onclick="document.getElementById('prompt-file-attach-input').click()">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                </button>
-
-                <!-- Right Action Tools: Model Picker, Mic & Waveform -->
-                <div class="claude-card-tools-right">
-                  <div class="claude-model-selector-pill">
-                    <select id="model-select-dropdown" class="claude-model-dropdown" onchange="window.handleModelChange(this.value)">
-                      <option value="sonnet-5" selected>Sonnet 5 Medium ⌄</option>
-                      <option value="opus-3.5">Opus 3.5 Extended ⌄</option>
-                      <option value="haiku-3">Haiku 3 Fast ⌄</option>
-                    </select>
-                  </div>
-
-                  <button type="button" id="voice-trigger-btn" class="claude-tool-icon-btn" title="Voice Input" onclick="window.toggleVoiceListen()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-                  </button>
-
-                  <button type="button" class="claude-tool-icon-btn" title="Voice Waveform" onclick="window.toggleVoiceListen()">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="10" width="3" height="4" rx="1"/><rect x="7" y="6" width="3" height="12" rx="1"/><rect x="12" y="3" width="3" height="18" rx="1"/><rect x="17" y="8" width="3" height="8" rx="1"/></svg>
-                  </button>
-
-                  <!-- Terracotta Orange Send Button -->
-                  <button type="submit" id="rag-submit-btn" class="claude-send-btn" title="Send message">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
-                  </button>
-                </div>
-              </div>
-            </form>
-            <div class="claude-disclaimer-text">Juno is AI and can make mistakes. Please double-check responses.</div>
-          </div>
-
-          <!-- Action Chips directly underneath Input Card -->
-          <div class="claude-action-chips">
-            <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Write clean modular code for frontend UI component')">
-              <span class="chip-symbol">&lt;/&gt;</span>
-              <span>Code</span>
-            </button>
-            <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Give me ideas for daily routine and life productivity')">
-              <span class="chip-icon">☕</span>
-              <span>Life stuff</span>
-            </button>
-            <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Explain deep learning attention mechanisms with examples')">
-              <span class="chip-icon">🎓</span>
-              <span>Learn</span>
-            </button>
-            <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Draft a high quality research synthesis summary')">
-              <span class="chip-icon">✏️</span>
-              <span>Write</span>
-            </button>
-            <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Surprise me with Juno AI intelligent recommendations')">
-              <span class="chip-icon">💡</span>
-              <span>Juno's choice</span>
-            </button>
+    <!-- Google One-Tap Sign In Modal -->
+    <div id="google-onetap-modal" class="google-onetap-modal">
+      <div class="onetap-header">
+        <div class="onetap-title-row">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.15C3.26 21.3 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.39l3.99-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.61l3.99 3.15c.95-2.85 3.6-4.96 6.72-4.96z"/></svg>
+          <span>Sign in to juno.ai with google.com</span>
+        </div>
+        <button class="onetap-close-btn" onclick="document.getElementById('google-onetap-modal').style.display='none'">✕</button>
+      </div>
+      <div class="onetap-account-list">
+        <div class="onetap-account-item" onclick="window.selectGoogleAccount('Ankita Priyadarshini Pallai', 'ankitapriyadarshini8600@gmail.com')">
+          <div class="account-avatar orange-avatar">A</div>
+          <div class="account-info">
+            <div class="account-name">Ankita Priyadarshini Pallai</div>
+            <div class="account-email">ankitapriyadarshini8600@gmail.com</div>
           </div>
         </div>
+        <div class="onetap-account-item" onclick="window.selectGoogleAccount('Ankita Priyadarshini', 'lotonnatha@gmail.com')">
+          <div class="account-avatar purple-avatar">A</div>
+          <div class="account-info">
+            <div class="account-name">Ankita Priyadarshini</div>
+            <div class="account-email">lotonnatha@gmail.com</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cookie Policy Consent Modal -->
+    <div id="cookie-consent-modal" class="cookie-consent-modal">
+      <div class="cookie-header">
+        <span class="cookie-icon">🍪</span>
+        <strong>Cookie Policy</strong>
+      </div>
+      <p class="cookie-text">
+        We use cookies and APIs to measure performance and improve your AI knowledge synthesis experience.
+      </p>
+      <div class="cookie-actions">
+        <button class="btn-cookie-decline" onclick="document.getElementById('cookie-consent-modal').style.display='none'">Decline optional</button>
+        <button class="btn-cookie-accept" onclick="window.acceptCookieConsent()">Got it</button>
+      </div>
+    </div>
+
+    <!-- Central Hero View -->
+    <div id="chat-hero-view" class="chat-hero-view claude-hero-center">
+      
+      <!-- Rocket Logo Icon & Serif Headline -->
+      <div class="claude-brand-headline-wrapper">
+        <span class="claude-terracotta-icon">🚀</span>
+        <h1 class="claude-serif-headline">What do you want to know?</h1>
+      </div>
+
+      <!-- Rounded Floating Input Card Container -->
+      <div class="claude-prompt-card-wrapper">
+        <form id="rag-query-form" class="claude-prompt-card" autocomplete="off" onsubmit="window.submitRAGQuery(event); return false;">
+          <!-- Attachment Preview Container -->
+          <div id="prompt-attachment-preview-container" class="prompt-attachment-preview" style="display: none;"></div>
+
+          <div class="claude-textarea-row" style="position: relative;">
+            <textarea id="rag-query-input" class="claude-textarea" placeholder="Type / for search modes" aria-label="Type / for search modes" rows="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="window.handleSlashCommandsInput(event)"></textarea>
+            
+            <!-- Slash Commands Menu Popup -->
+            <div id="slash-commands-menu" class="slash-commands-menu" style="display: none;">
+              <div class="slash-item" onclick="window.selectSlashCommand('/search')"><span class="slash-icon">🔍</span> <strong>/search</strong> — Deep Web & Knowledge Vault Search</div>
+              <div class="slash-item" onclick="window.selectSlashCommand('/code')"><span class="slash-icon">💻</span> <strong>/code</strong> — Modular Code Synthesis & Inspector</div>
+              <div class="slash-item" onclick="window.selectSlashCommand('/learn')"><span class="slash-icon">🎓</span> <strong>/learn</strong> — Deep Learning Tutorial & Concept Guide</div>
+              <div class="slash-item" onclick="window.selectSlashCommand('/write')"><span class="slash-icon">✏️</span> <strong>/write</strong> — Research Article & Synthesis Draft</div>
+              <div class="slash-item" onclick="window.selectSlashCommand('/computer')"><span class="slash-icon">⚡</span> <strong>/computer</strong> — Compute & Project Deliverables Mode</div>
+            </div>
+          </div>
+
+          <div class="claude-card-bottom-row">
+            <!-- Left Attachment Button (+) & Perplexity Mode Selectors -->
+            <div class="claude-card-tools-left" style="display: flex; align-items: center; gap: 8px;">
+              <input type="file" id="prompt-file-attach-input" accept="image/*,.pdf,.txt,.js,.json" style="display: none;" onchange="window.handlePromptFileSelected(this.files)">
+              <button type="button" class="claude-plus-btn" title="Add content" onclick="document.getElementById('prompt-file-attach-input').click()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
+
+              <select id="px-search-mode-select" class="px-search-mode-dropdown" onchange="window.handleSearchModeChange(this.value)">
+                <option value="search" selected>🔍 Search ⌄</option>
+                <option value="academic">🎓 Academic ⌄</option>
+                <option value="code">💻 Code ⌄</option>
+                <option value="vault">📚 Vault ⌄</option>
+              </select>
+
+              <button type="button" id="px-computer-mode-btn" class="px-computer-pill" onclick="window.toggleComputerMode()" title="Toggle Computer Mode">
+                <span class="pill-icon">💻</span>
+                <span>Computer</span>
+              </button>
+            </div>
+
+            <!-- Right Action Tools: Model Picker, Mic & Waveform -->
+            <div class="claude-card-tools-right">
+              <div class="claude-model-selector-pill">
+                <select id="model-select-dropdown" class="claude-model-dropdown" onchange="window.handleModelChange(this.value)">
+                  <option value="sonnet-5" selected>Model ⌄</option>
+                  <option value="opus-3.5">Juno Ultra 1.5 ⌄</option>
+                  <option value="haiku-3">Juno Fast ⌄</option>
+                </select>
+              </div>
+
+              <button type="button" id="voice-trigger-btn" class="claude-tool-icon-btn" title="Voice Input" onclick="window.toggleVoiceListen()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+              </button>
+
+              <button type="button" class="claude-tool-icon-btn" title="Voice Waveform" onclick="window.toggleVoiceListen()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="10" width="3" height="4" rx="1"/><rect x="7" y="6" width="3" height="12" rx="1"/><rect x="12" y="3" width="3" height="18" rx="1"/><rect x="17" y="8" width="3" height="8" rx="1"/></svg>
+              </button>
+
+              <!-- Astronaut Golden Yellow Send Button -->
+              <button type="submit" id="rag-submit-btn" class="claude-send-btn" title="Send message">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+              </button>
+            </div>
+          </div>
+        </form>
+        <div class="claude-disclaimer-text">Juno is AI and can make mistakes. Please double-check responses.</div>
+      </div>
+
+      <!-- Feature Showcase Cards (Perplexity Style) -->
+      <div class="px-feature-cards-grid">
+        <div class="px-feature-card golden-card" onclick="window.triggerSampleQuery('Search grounded knowledge vault & web for deep synthesis')">
+          <div class="px-card-header">
+            <span class="px-card-icon">🔍</span>
+            <strong>Search anything</strong>
+          </div>
+          <p class="px-card-desc">Get fast and accurate answers from your notes, web & trusted knowledge base.</p>
+        </div>
+        <div class="px-feature-card dark-card" onclick="window.triggerSampleQuery('Hand off project deliverables and modular code synthesis to Juno Computer')">
+          <div class="px-card-header">
+            <span class="px-card-icon">💻</span>
+            <strong>Get work done with Computer</strong>
+          </div>
+          <p class="px-card-desc">Hand off complex coding, research & data analysis deliverables around the clock.</p>
+        </div>
+      </div>
+
+      <!-- Action Chips directly underneath Input Card -->
+      <div class="claude-action-chips">
+        <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Write clean modular code for frontend UI component')">
+          <span class="chip-symbol">&lt;/&gt;</span>
+          <span>Code</span>
+        </button>
+        <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Give me ideas for daily routine and life productivity')">
+          <span class="chip-icon">☕</span>
+          <span>Life stuff</span>
+        </button>
+        <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Explain deep learning attention mechanisms with examples')">
+          <span class="chip-icon">🎓</span>
+          <span>Learn</span>
+        </button>
+        <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Draft a high quality research synthesis summary')">
+          <span class="chip-icon">✏️</span>
+          <span>Write</span>
+        </button>
+        <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Surprise me with Juno AI intelligent recommendations')">
+          <span class="chip-icon">💡</span>
+          <span>Juno's choice</span>
+        </button>
+      </div>
+    </div>
 
         <!-- Chat Stream Messages Container -->
         <div id="chat-container" class="chat-stream"></div>

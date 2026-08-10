@@ -3623,6 +3623,64 @@
       handleRAGQuery(cleanQuery);
     };
 
+    // Slash Commands Auto-complete Handler
+    window.handleSlashCommandsInput = function(e) {
+      const val = e.target.value;
+      const menu = document.getElementById('slash-commands-menu');
+      if (!menu) return;
+
+      if (val.startsWith('/')) {
+        menu.style.display = 'block';
+      } else {
+        menu.style.display = 'none';
+      }
+    };
+
+    window.selectSlashCommand = function(cmd) {
+      const input = document.getElementById('rag-query-input');
+      const menu = document.getElementById('slash-commands-menu');
+      if (input) {
+        input.value = cmd + ' ';
+        input.focus();
+      }
+      if (menu) menu.style.display = 'none';
+    };
+
+    // Computer Mode Toggle Handler
+    let isComputerModeActive = false;
+    window.toggleComputerMode = function() {
+      isComputerModeActive = !isComputerModeActive;
+      const btn = document.getElementById('px-computer-mode-btn');
+      if (btn) {
+        if (isComputerModeActive) {
+          btn.classList.add('active');
+          if (typeof showToast === 'function') showToast('💻 Computer Mode Enabled: Automated deliverables & synthesis active');
+        } else {
+          btn.classList.remove('active');
+          if (typeof showToast === 'function') showToast('⚡ Standard Chat Mode Active');
+        }
+      }
+    };
+
+    window.handleSearchModeChange = function(mode) {
+      if (typeof showToast === 'function') showToast(`🔍 Search Mode set to: ${mode.toUpperCase()}`);
+    };
+
+    // Google One-Tap Sign In
+    window.selectGoogleAccount = function(name, email) {
+      const modal = document.getElementById('google-onetap-modal');
+      if (modal) modal.style.display = 'none';
+      if (typeof showToast === 'function') showToast(`✅ Signed in as ${name} (${email})`);
+    };
+
+    // Cookie Consent Handler
+    window.acceptCookieConsent = function() {
+      const modal = document.getElementById('cookie-consent-modal');
+      if (modal) modal.style.display = 'none';
+      localStorage.setItem('juno_cookie_consent_accepted', 'true');
+      if (typeof showToast === 'function') showToast('🍪 Cookie preferences saved!');
+    };
+
   }
 
   if (document.readyState === 'loading') {

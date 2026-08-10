@@ -7691,4 +7691,320 @@ body[data-theme="gemini-dark"] .chat-action-btn {
   color: #f3f0e8;
 }
 
+/* ==================================================== */
+/* PERPLEXITY PROFESSIONAL FEATURES DESIGN ENGINE       */
+/* ==================================================== */
+
+/* Top Notice Banner */
+.px-notice-banner {
+  background: #153e3f;
+  color: #5eead4;
+  padding: 8px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(94, 234, 212, 0.2);
+  position: relative;
+  z-index: 100000;
+}
+
+.px-notice-banner .notice-link {
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.px-notice-banner .notice-close-btn {
+  background: transparent;
+  border: none;
+  color: #5eead4;
+  cursor: pointer;
+  position: absolute;
+  right: 14px;
+  font-size: 14px;
+}
+
+/* Google One-Tap Sign In Box (Top Right) */
+.google-onetap-modal {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 330px;
+  background: #202124;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  z-index: 1000000;
+  padding: 14px;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+  animation: slideDownIn 0.3s ease;
+}
+
+@keyframes slideDownIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.onetap-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.onetap-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #e8eaed;
+}
+
+.onetap-close-btn {
+  background: transparent;
+  border: none;
+  color: #9aa0a6;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.onetap-account-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.onetap-account-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.onetap-account-item:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.account-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.account-avatar.orange-avatar { background: #e65100; }
+.account-avatar.purple-avatar { background: #8e24aa; }
+
+.account-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.account-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.account-email {
+  font-size: 11px;
+  color: #9aa0a6;
+}
+
+/* Cookie Policy Modal (Bottom Right) */
+.cookie-consent-modal {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 320px;
+  background: #1c1b18;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  z-index: 1000000;
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
+}
+
+.cookie-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: #f3f0e8;
+  margin-bottom: 8px;
+}
+
+.cookie-text {
+  font-size: 11.5px;
+  color: #a8a29e;
+  line-height: 1.45;
+  margin: 0 0 12px 0;
+}
+
+.cookie-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-cookie-decline {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #d6d3d1;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-cookie-accept {
+  background: #f5f5f4;
+  border: none;
+  color: #1c1917;
+  border-radius: 8px;
+  padding: 5px 14px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Slash Commands Menu Popup */
+.slash-commands-menu {
+  position: absolute;
+  top: -190px;
+  left: 0;
+  right: 0;
+  background: #23201c;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  z-index: 999999;
+}
+
+.slash-item {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #e7e5e4;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.15s ease;
+}
+
+.slash-item:hover {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+}
+
+/* Perplexity Search Mode Selectors */
+.px-search-mode-dropdown {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 4px 10px;
+  color: #d6d3d1;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+
+.px-computer-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 4px 12px;
+  color: #d6d3d1;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.px-computer-pill.active,
+.px-computer-pill:hover {
+  background: rgba(251, 191, 36, 0.18);
+  border-color: #fbbf24;
+  color: #fbbf24;
+}
+
+/* Perplexity Feature Showcase Cards */
+.px-feature-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  width: 100%;
+  max-width: 720px;
+  margin: 20px auto 16px auto;
+}
+
+.px-feature-card {
+  border-radius: 16px;
+  padding: 16px 18px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.px-feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.px-feature-card.golden-card {
+  background: #153d3e;
+  border: 1px solid #2dd4bf;
+  color: #f0fdfa;
+}
+
+.px-feature-card.dark-card {
+  background: #23201c;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f3f0e8;
+}
+
+.px-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14.5px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.px-card-desc {
+  font-size: 12px;
+  line-height: 1.45;
+  opacity: 0.85;
+  margin: 0;
+}
+
 
