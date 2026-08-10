@@ -1,12 +1,14 @@
 {
-  "name": "Second Brain AI System",
-  "short_name": "SecondBrain",
-  "description": "Zero-Friction Capture & Conversational RAG Retrieval Platform",
-  "start_url": "./index.html",
+  "name": "Juno AI — Personal Knowledge & Intelligence System",
+  "short_name": "Juno AI",
+  "description": "High-performance AI assistant for notes, research, code synthesis, and grounded knowledge retrieval.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#07090e",
-  "theme_color": "#07090e",
-  "orientation": "any",
+  "background_color": "#181715",
+  "theme_color": "#181715",
+  "orientation": "portrait-primary",
+  "categories": ["productivity", "utilities", "education"],
   "icons": [
     {
       "src": "assets/nexus_yellow_bot.png",
@@ -19,6 +21,15 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Chat",
+      "short_name": "New Chat",
+      "description": "Start a new Juno AI conversation",
+      "url": "/?action=new",
+      "icons": [{ "src": "assets/nexus_yellow_bot.png", "sizes": "192x192" }]
     }
   ]
 }
