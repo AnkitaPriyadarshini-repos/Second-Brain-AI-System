@@ -430,6 +430,67 @@
         handleRAGQuery(cleanQuery);
       }
     };
+
+    // 1. Hamburger Mobile Navigation Drawer Toggle Handler
+    let isMobileDrawerOpen = false;
+    window.toggleMobileDrawer = function(forceState) {
+      const drawer = document.getElementById('mobile-drawer-panel');
+      const backdrop = document.getElementById('mobile-drawer-backdrop');
+      const sidebar = document.querySelector('.claude-sidebar');
+
+      isMobileDrawerOpen = (typeof forceState === 'boolean') ? forceState : !isMobileDrawerOpen;
+
+      if (drawer) {
+        if (isMobileDrawerOpen) {
+          drawer.classList.add('active');
+          drawer.setAttribute('aria-hidden', 'false');
+        } else {
+          drawer.classList.remove('active');
+          drawer.setAttribute('aria-hidden', 'true');
+        }
+      }
+
+      if (backdrop) {
+        backdrop.style.display = isMobileDrawerOpen ? 'block' : 'none';
+      }
+
+      if (sidebar) {
+        if (isMobileDrawerOpen) {
+          sidebar.classList.add('mobile-open');
+        } else {
+          sidebar.classList.remove('mobile-open');
+        }
+      }
+    };
+
+    // Close mobile drawer on Escape key press
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isMobileDrawerOpen) {
+        window.toggleMobileDrawer(false);
+      }
+    });
+
+    // 2. Eye Icon Focus & Fullscreen View Mode Handler
+    let isFocusViewActive = false;
+    window.toggleFocusViewMode = function() {
+      isFocusViewActive = !isFocusViewActive;
+      const btn = document.getElementById('focus-view-toggle-btn');
+      const body = document.body;
+
+      if (body) {
+        if (isFocusViewActive) {
+          body.classList.add('focus-preview-mode');
+          if (btn) btn.classList.add('active');
+          if (typeof showToast === 'function') showToast('👁️ Focus View Mode Enabled (Distractions Hidden)');
+        } else {
+          body.classList.remove('focus-preview-mode');
+          if (btn) btn.classList.remove('active');
+          if (typeof showToast === 'function') showToast('👁️ Standard Studio View Mode');
+        }
+      }
+    };
+
+    // 3. Robust Chat Composer Submit Architecture
     window.submitRAGQuery = function(e) {
       try {
         if (e) {
@@ -442,14 +503,16 @@
         const inputEl = document.getElementById('rag-query-input');
         const query = inputEl ? inputEl.value.trim() : '';
         if (query) {
-          if (inputEl) {
-            inputEl.value = '';
-            inputEl.style.height = 'auto';
-          }
-          if (typeof window.handleRAGQuery === 'function') {
-            window.handleRAGQuery(query);
-          } else if (typeof handleRAGQuery === 'function') {
-            handleRAGQuery(query);
+          // Pass query to handler FIRST. Clear input ONLY after successful execution trigger.
+          const handler = window.handleRAGQuery || handleRAGQuery;
+          if (typeof handler === 'function') {
+            handler(query);
+            if (inputEl) {
+              inputEl.value = '';
+              inputEl.style.height = 'auto';
+            }
+            const submitBtn = document.getElementById('rag-submit-btn');
+            if (submitBtn) submitBtn.classList.remove('has-input');
           }
         }
       } catch (err) {
@@ -3680,6 +3743,31 @@
       localStorage.setItem('juno_cookie_consent_accepted', 'true');
       if (typeof showToast === 'function') showToast('🍪 Cookie preferences saved!');
     };
+
+    // PWA Install Event Listener & In-App Prompt Handler
+    let deferredPWAInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPWAInstallPrompt = e;
+      console.log('📱 Juno AI PWA install prompt captured!');
+    });
+
+    window.triggerPWAInstall = function() {
+      if (deferredPWAInstallPrompt) {
+        deferredPWAInstallPrompt.prompt();
+        deferredPWAInstallPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            if (typeof showToast === 'function') showToast('📱 Installing Juno AI on home screen...');
+          }
+          deferredPWAInstallPrompt = null;
+        });
+      } else {
+        if (typeof showToast === 'function') {
+          showToast('📱 To install Juno AI: tap your browser menu (⋮ or Share) and select "Add to Home Screen"');
+        }
+      }
+    };
+    window.installPWA = window.triggerPWAInstall;
 
   }
 
