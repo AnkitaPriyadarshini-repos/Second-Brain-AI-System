@@ -7427,8 +7427,14 @@ body[data-theme="gemini-dark"] .chat-action-btn {
 }
 
 .claude-terracotta-icon {
-  font-size: 28px;
-  filter: drop-shadow(0 0 10px rgba(217, 119, 6, 0.4));
+  font-size: 30px;
+  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.6));
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.claude-terracotta-icon:hover {
+  transform: translateY(-3px) scale(1.15) rotate(-10deg);
 }
 
 .claude-serif-headline {
