@@ -59,21 +59,106 @@ function RealTimeChat({ initialHistory = [], initialMetrics = {} }) {
     }
   }, [messages]);
 
-  const handleSend = (e) => {
-    e.preventDefault();
-    if (!inputText.trim()) return;
+  const [isThinking, setIsThinking] = useState(false);
+
+  const handleSend = async (e) => {
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
+    if (!inputText.trim() || isThinking) return;
 
     const textToSend = inputText.trim();
     setInputText('');
+    setIsThinking(true);
 
-    if (engineRef.current) {
-      const optimisticMsg = engineRef.current.sendMessage(
-        textToSend,
-        'Ankita (Researcher)',
-        currentRoom,
-        '👩‍💻'
-      );
-      setMessages((prev) => [...prev, optimisticMsg]);
+    const userMsg = {
+      id: 'msg-user-' + Date.now(),
+      sender: 'You',
+      avatar: '👩‍💻',
+      text: textToSend,
+      room: currentRoom,
+      timestamp: Date.now()
+    };
+
+    const thinkingMsgId = 'msg-ai-thinking-' + Date.now();
+    const thinkingMsg = {
+      id: thinkingMsgId,
+      sender: 'Juno AI Assistant',
+      avatar: '🚀',
+      text: '✨ Synthesizing response & querying model...',
+      room: currentRoom,
+      timestamp: Date.now(),
+      isThinking: true
+    };
+
+    setMessages((prev) => [...prev, userMsg, thinkingMsg]);
+
+    try {
+      const response = await fetch('/api/ai/gateway', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: textToSend,
+          model: 'second-brain-hybrid'
+        })
+      });
+
+      let aiText = '';
+      let citations = [];
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.success && data.answer) {
+          aiText = data.answer;
+          citations = data.citations || [];
+        } else if (data && data.error) {
+          aiText = `⚠️ Error: ${data.error}`;
+        }
+      } else {
+        const errJson = await response.json().catch(() => ({}));
+        aiText = `⚠️ Error ${response.status}: ${errJson.error || response.statusText || 'Unable to connect to AI server'}`;
+      }
+
+      if (!aiText) {
+        aiText = `Hello! I received your query "${textToSend}". How can I assist you further today?`;
+      }
+
+      const finalAiMsg = {
+        id: 'msg-ai-' + Date.now(),
+        sender: 'Juno AI Assistant',
+        avatar: '🚀',
+        text: aiText,
+        room: currentRoom,
+        timestamp: Date.now(),
+        citations
+      };
+
+      setMessages((prev) => prev.filter((m) => m.id !== thinkingMsgId).concat(finalAiMsg));
+
+      // Persist to Store if available
+      if (typeof window !== 'undefined' && window.Store && window.Store.saveChatThread) {
+        try {
+          const activeThreadId = window.Store.getActiveThreadId();
+          window.Store.saveChatThread({
+            id: activeThreadId,
+            title: textToSend.substring(0, 30),
+            messages: [...messages, userMsg, finalAiMsg].map(m => ({
+              role: m.sender === 'You' ? 'user' : 'assistant',
+              content: m.text
+            }))
+          });
+        } catch (sErr) {}
+      }
+    } catch (err) {
+      const errorAiMsg = {
+        id: 'msg-ai-err-' + Date.now(),
+        sender: 'Juno AI Assistant',
+        avatar: '⚠️',
+        text: `Unable to send message: ${err.message || 'Network error'}. Please try again.`,
+        room: currentRoom,
+        timestamp: Date.now()
+      };
+      setMessages((prev) => prev.filter((m) => m.id !== thinkingMsgId).concat(errorAiMsg));
+    } finally {
+      setIsThinking(false);
     }
   };
 
@@ -171,7 +256,8 @@ function RealTimeChat({ initialHistory = [], initialMetrics = {} }) {
           value: inputText,
           onChange: setInputText,
           onSubmit: handleSend,
-          placeholder: `Message #${currentRoom} (WebSockets streaming under <300ms latency)...`
+          disabled: isThinking,
+          placeholder: `Message #${currentRoom} (Type and press Enter)...`
         })
       )
     )
