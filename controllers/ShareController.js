@@ -39,4 +39,4 @@ class ShareController {
   }
 }
 
-module.exports = new ShareController();
+module.exports = ShareController;

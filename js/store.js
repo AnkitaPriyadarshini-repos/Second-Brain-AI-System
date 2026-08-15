@@ -328,10 +328,14 @@
      * Safely sets item in localStorage or polyfill
      */
     _setItem: function (key, value) {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.setItem(key, value);
-      } else if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(key, value);
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem(key, value);
+        } else if (typeof localStorage !== 'undefined') {
+          localStorage.setItem(key, value);
+        }
+      } catch (err) {
+        console.warn(`[Store] Could not write to storage key "${key}":`, err);
       }
     },
 
@@ -726,7 +730,7 @@
         }
       ];
       this._setItem('second_brain_chat_threads_v2', JSON.stringify(defaultThreads));
-      this._setItem('second_brain_active_thread_id', 'thread-default');
+      this._setItem('second_brain_active_thread_v2', 'thread-default');
       return defaultThreads;
     },
 

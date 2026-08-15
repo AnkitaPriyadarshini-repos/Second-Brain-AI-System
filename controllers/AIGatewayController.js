@@ -10,23 +10,38 @@ class AIGatewayController {
     this.aiGatewayService = new AIGatewayService();
   }
 
-  handleQuery(req, res) {
+  async handleQuery(req, res) {
+    const requestId = 'req_' + Math.random().toString(36).substring(2, 10);
+    const startTime = Date.now();
     const { prompt, contextNotes, model } = req.body || {};
     const userId = req.headers['x-user-id'] || req.ip || 'client';
 
-    const result = this.aiGatewayService.processGatewayRequest({
-      prompt,
-      contextNotes,
-      model,
-      userId
-    });
+    console.log(`[${requestId}] AI Query start - user:${userId} model:${model || 'default'}`);
 
-    if (result.error) {
-      const statusCode = result.error.includes('Rate limit') ? 429 : 400;
-      return res.status(statusCode).json({ success: false, error: result.error });
+    try {
+      const result = await this.aiGatewayService.processGatewayRequest({
+        prompt,
+        contextNotes,
+        model,
+        userId,
+        requestId
+      });
+
+      const duration = Date.now() - startTime;
+
+      if (result.error) {
+        const statusCode = result.error.includes('Rate limit') ? 429 : 400;
+        console.warn(`[${requestId}] AI Query rejected (${statusCode}) - duration:${duration}ms error:${result.error}`);
+        return res.status(statusCode).json({ success: false, requestId, error: result.error });
+      }
+
+      console.log(`[${requestId}] AI Query success - duration:${duration}ms citations:${(result.citations || []).length}`);
+      return res.status(200).json({ ...result, requestId, durationMs: duration });
+    } catch (err) {
+      const duration = Date.now() - startTime;
+      console.error(`[${requestId}] AI Query exception - duration:${duration}ms error:`, err);
+      return res.status(500).json({ success: false, requestId, error: err.message || 'Internal Server Error' });
     }
-
-    return res.status(200).json(result);
   }
 }
 

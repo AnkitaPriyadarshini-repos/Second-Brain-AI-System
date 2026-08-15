@@ -221,7 +221,7 @@ export function HydratedComponent({ data }) {
       try {
         return await this.callGeminiAPI(prompt, keys.geminiKey, model, systemPrompt, ragContext, imageAttachment, chatHistory);
       } catch (err) {
-        console.warn('Gemini API call failed, falling back to Local RAG Synthesizer:', err);
+        console.warn('Gemini API call failed, attempting Gateway or fallback:', err);
       }
     }
 
@@ -229,8 +229,32 @@ export function HydratedComponent({ data }) {
       try {
         return await this.callOpenAIAPI(prompt, keys.openaiKey, model, systemPrompt, ragContext, chatHistory);
       } catch (err) {
-        console.warn('OpenAI API call failed, falling back to Local RAG Synthesizer:', err);
+        console.warn('OpenAI API call failed, attempting Gateway or fallback:', err);
       }
+    }
+
+    // Try server AI Gateway if available
+    try {
+      if (typeof fetch !== 'undefined') {
+        const gatewayRes = await fetch('/api/ai/gateway', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt, model, apiKey: keys.geminiKey })
+        });
+        if (gatewayRes.ok) {
+          const gData = await gatewayRes.json();
+          if (gData && gData.success && gData.answer) {
+            return {
+              text: gData.answer,
+              provider: 'Second Brain AI Gateway',
+              grounded: (gData.citations && gData.citations.length > 0),
+              citations: gData.citations || []
+            };
+          }
+        }
+      }
+    } catch (gwErr) {
+      console.warn('AI Gateway endpoint unavailable, using local synthesis:', gwErr);
     }
 
     // Default: Built-in Intelligent ChatGPT Brain & NLP Synthesizer (Zero-config)
@@ -259,15 +283,13 @@ export function HydratedComponent({ data }) {
     };
   }
 
-  async callGeminiAPI(prompt, apiKey, modelName = 'gemini-2.5-flash', systemPrompt = '', ragContext = '', imageAttachment = null, chatHistory = []) {
-    let endpointModel = 'gemini-2.5-flash';
-    if (modelName.includes('2.5-pro') || modelName.includes('pro')) {
-      endpointModel = 'gemini-2.5-pro';
-    } else if (modelName.includes('2.0-flash') || modelName.includes('thinking')) {
+  async callGeminiAPI(prompt, apiKey, modelName = 'gemini-1.5-flash', systemPrompt = '', ragContext = '', imageAttachment = null, chatHistory = []) {
+    let endpointModel = 'gemini-1.5-flash';
+    if (modelName.includes('2.0') || modelName.includes('thinking')) {
       endpointModel = 'gemini-2.0-flash';
-    } else if (modelName.includes('1.5-pro')) {
+    } else if (modelName.includes('pro') || modelName.includes('1.5-pro')) {
       endpointModel = 'gemini-1.5-pro';
-    } else if (modelName.includes('1.5-flash')) {
+    } else {
       endpointModel = 'gemini-1.5-flash';
     }
 
@@ -315,16 +337,23 @@ export function HydratedComponent({ data }) {
     });
 
     if (!res.ok) {
-      throw new Error(`Juno API HTTP Error ${res.status}: ${res.statusText}`);
+      let errDetail = res.statusText;
+      try {
+        const errJson = await res.json();
+        if (errJson && errJson.error && errJson.error.message) {
+          errDetail = errJson.error.message;
+        }
+      } catch (e) {}
+      throw new Error(`Gemini API Error ${res.status}: ${errDetail}`);
     }
 
     const data = await res.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error('Invalid or empty response structure from Juno API');
+    if (!text) throw new Error('Invalid or empty response structure from Gemini API');
 
     return {
       text: text,
-      provider: 'Juno Ultra (' + endpointModel + ')',
+      provider: 'Gemini (' + endpointModel + ')',
       grounded: !!ragContext
     };
   }

@@ -56,7 +56,15 @@ class AIGatewayService {
     const geminiKey = apiKey || process.env.GEMINI_API_KEY;
     if (!geminiKey) return null;
 
-    const selectedModel = model && model.includes('gemini') ? model : 'gemini-1.5-flash';
+    let selectedModel = 'gemini-1.5-flash';
+    if (model) {
+      if (model.includes('2.0') || model.includes('thinking')) {
+        selectedModel = 'gemini-2.0-flash';
+      } else if (model.includes('pro') || model.includes('1.5-pro')) {
+        selectedModel = 'gemini-1.5-pro';
+      }
+    }
+
     const endpointUrl = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${geminiKey}`;
 
     const systemInstruction = "You are Second Brain AI, a precise, personal knowledge assistant. Ground your answer strictly in the provided context notes when available, citing sources accurately.";
@@ -107,7 +115,7 @@ class AIGatewayService {
     });
   }
 
-  processGatewayRequest({ prompt, contextNotes = [], model = 'second-brain-hybrid', userId = 'anonymous', apiKey = null }) {
+  async processGatewayRequest({ prompt, contextNotes = [], model = 'second-brain-hybrid', userId = 'anonymous', apiKey = null }) {
     if (!this.checkRateLimit(userId)) {
       return { error: 'Rate limit exceeded. Maximum 60 requests per minute.' };
     }
@@ -160,18 +168,20 @@ class AIGatewayService {
     // Step 4: VerificationAgent Evidence Check
     const verification = this.verificationAgent.verifyEvidence(cleanPrompt, contextNotes);
 
-    // Step 5: Grounded Response Synthesis
-    let synthesizedAnswer = '';
+    // Step 5: Grounded Response Synthesis via Gemini API or Vault Grounding
+    let synthesizedAnswer = await this.invokeGeminiAPI({ prompt: cleanPrompt, contextSnippets, model, apiKey });
 
-    if (contextNotes.length > 0) {
-      if (!verification.hasSufficientEvidence) {
-        synthesizedAnswer = `⚠️ **Insufficient local evidence found in vault.**\n\nYour query "${cleanPrompt}" could not be matched with high confidence against any saved notes or documents in your private knowledge vault. To prevent hallucinations, please add relevant notes or documents to your vault before querying this topic.`;
+    if (!synthesizedAnswer) {
+      if (contextNotes.length > 0) {
+        if (!verification.hasSufficientEvidence) {
+          synthesizedAnswer = `⚠️ **Insufficient local evidence found in vault.**\n\nYour query "${cleanPrompt}" could not be matched with high confidence against any saved notes or documents in your private knowledge vault. To prevent hallucinations, please add relevant notes or documents to your vault before querying this topic.`;
+        } else {
+          synthesizedAnswer = `Based on your private knowledge vault (${citations.length} sources matched):\n\nKey finding: ${cleanPrompt} connects directly with your saved research in ${citations[0].title}.\n\nCitations:\n` +
+            citations.map(c => `• [${c.title}]: "${c.snippet.substring(0, 100)}..."`).join('\n');
+        }
       } else {
-        synthesizedAnswer = `Based on your private knowledge vault (${citations.length} sources matched):\n\nKey finding: ${cleanPrompt} connects directly with your saved research in ${citations[0].title}.\n\nCitations:\n` +
-          citations.map(c => `• [${c.title}]: "${c.snippet.substring(0, 100)}..."`).join('\n');
+        synthesizedAnswer = `Synthesized response for query: "${cleanPrompt}". You can save new notes or upload PDFs to ground future queries with personal citations.`;
       }
-    } else {
-      synthesizedAnswer = `Synthesized response for query: "${cleanPrompt}". You can save new notes or upload PDFs to ground future queries with personal citations.`;
     }
 
     return {

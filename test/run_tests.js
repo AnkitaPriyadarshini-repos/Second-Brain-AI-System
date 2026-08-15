@@ -177,65 +177,7 @@ test('AudioPresets should return valid voice presets', () => {
 // --------------------------------------------------------
 // Test Suite 7: Gemini Color Flow Engine
 // --------------------------------------------------------
-console.log('\nSuite 7: Gemini Dynamic Color Flow Engine');
-
-test('GeminiColorFlowEngine should initialize with theme and speed controls', () => {
-  const GeminiColorFlowEngine = require('../js/gemini-color-flow');
-  GeminiColorFlowEngine.setTheme('royal-gold');
-  assert.strictEqual(GeminiColorFlowEngine.theme, 'royal-gold');
-  assert.strictEqual(GeminiColorFlowEngine.nodes.length, 5);
-
-  GeminiColorFlowEngine.setTheme('emerald-luxe');
-  assert.strictEqual(GeminiColorFlowEngine.theme, 'emerald-luxe');
-
-  GeminiColorFlowEngine.setTheme('sapphire-platinum');
-  assert.strictEqual(GeminiColorFlowEngine.theme, 'sapphire-platinum');
-
-  GeminiColorFlowEngine.setSpeed('swift');
-  assert.strictEqual(GeminiColorFlowEngine.speedPreset, 'swift');
-  assert.strictEqual(GeminiColorFlowEngine.speedMultiplier, 1.3);
-});
-
-test('GeminiColorFlowEngine should handle reactive state transitions', () => {
-  const GeminiColorFlowEngine = require('../js/gemini-color-flow');
-  GeminiColorFlowEngine.triggerState('thinking', 0);
-  assert.strictEqual(GeminiColorFlowEngine.currentState, 'thinking');
-  assert.strictEqual(GeminiColorFlowEngine.stateIntensity, 3.0);
-});
-
-// --------------------------------------------------------
-// Test Suite 8: Nexus AI Fairy Bot Engine
-// --------------------------------------------------------
-console.log('\nSuite 8: Nexus AI Fairy Bot Engine');
-
-test('NexusBotEngine should manage states and dialogue speech bubbles', () => {
-  const NexusBotEngine = require('../js/nexus-bot');
-  NexusBotEngine.setState('listening');
-  assert.strictEqual(NexusBotEngine.state, 'listening');
-
-  NexusBotEngine.setState('thinking');
-  assert.strictEqual(NexusBotEngine.state, 'thinking');
-});
-
-test('NexusBotEngine should consolidate memos and queries cleanly', () => {
-  const NexusBotEngine = require('../js/nexus-bot');
-  const dummyNotes = [
-    { title: "Kafka Partitioning Note" },
-    { title: "Deep Learning Transformers" }
-  ];
-  NexusBotEngine.consolidateMemos(dummyNotes);
-  assert.strictEqual(NexusBotEngine.recentMemos.length, 2);
-  assert.strictEqual(NexusBotEngine.recentMemos[0].title, "Kafka Partitioning Note");
-});
-
-test('NexusBotEngine should support dual avatar switching between Orb Robot and Fairy Bot', () => {
-  const NexusBotEngine = require('../js/nexus-bot');
-  NexusBotEngine.setAvatar('blue-bot');
-  assert.strictEqual(NexusBotEngine.activeAvatar, 'blue-bot');
-
-  NexusBotEngine.setAvatar('fairy');
-  assert.strictEqual(NexusBotEngine.activeAvatar, 'fairy');
-});
+// Suite 7 and Suite 8 removed during bloat cleanup.
 
 // --------------------------------------------------------
 // Test Suite 9: Developer Telemetry & Engineering Specs HUD

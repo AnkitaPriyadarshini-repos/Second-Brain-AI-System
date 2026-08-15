@@ -30,7 +30,9 @@
         maxLatency: 45
       };
 
-      this.pingInterval = null;
+      this.reconnectCount = 0;
+      this.maxReconnects = 3;
+      this.fallbackMode = false;
     }
 
     init(wsUrl) {
@@ -46,7 +48,7 @@
     }
 
     connect() {
-      if (!this.wsUrl) return;
+      if (!this.wsUrl || this.fallbackMode) return;
 
       try {
         const WSClass = (typeof window !== 'undefined' && window.WebSocket)
@@ -59,6 +61,7 @@
 
         this.socket.onopen = () => {
           this.connected = true;
+          this.reconnectCount = 0;
           this.emit('connection', { status: 'CONNECTED', url: this.wsUrl });
           this.startHeartbeat();
         };
@@ -71,15 +74,24 @@
           this.connected = false;
           this.stopHeartbeat();
           this.emit('connection', { status: 'DISCONNECTED' });
-          // Auto reconnect after 2 seconds
-          setTimeout(() => this.connect(), 2000);
+          
+          if (this.reconnectCount < this.maxReconnects) {
+            this.reconnectCount++;
+            setTimeout(() => this.connect(), 3000);
+          } else {
+            this.fallbackMode = true;
+            console.info('[WebSocket Engine] Operating in HTTP REST serverless mode.');
+          }
         };
 
         this.socket.onerror = (err) => {
-          console.warn('[WebSocket Engine] Socket error:', err);
+          if (!this.fallbackMode) {
+            console.warn('[WebSocket Engine] WebSocket connection unavailable.');
+          }
         };
       } catch (e) {
-        console.error('[WebSocket Engine] Connection initialization failed:', e);
+        this.fallbackMode = true;
+        console.info('[WebSocket Engine] Falling back to HTTP REST mode.');
       }
     }
 

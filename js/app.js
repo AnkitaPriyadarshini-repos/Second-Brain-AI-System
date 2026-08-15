@@ -101,37 +101,34 @@
     updateHeaderStats();
 
     // Initialize Subsystem Engines
-    if (typeof GeminiColorFlowEngine !== 'undefined' && GeminiColorFlowEngine.init) {
-      GeminiColorFlowEngine.init('#gemini-flow-canvas');
-    }
-    if (typeof NexusBotEngine !== 'undefined' && NexusBotEngine.init) {
-      NexusBotEngine.init();
-    }
-    if (typeof DeveloperHUDEngine !== 'undefined' && DeveloperHUDEngine.init) {
-      DeveloperHUDEngine.init();
-    }
-    if (typeof AIAgentFleetEngine !== 'undefined' && AIAgentFleetEngine.init) {
-      AIAgentFleetEngine.init();
-    }
-    if (typeof VoiceEngine !== 'undefined' && VoiceEngine.init) {
-      VoiceEngine.init({
-        onTranscript: (text, isFinal) => {
-          if (ragQueryInput) ragQueryInput.value = text;
-          if (isFinal && text) {
-            handleRAGQuery(text);
+    try {
+      if (typeof DeveloperHUDEngine !== 'undefined' && DeveloperHUDEngine.init) {
+        DeveloperHUDEngine.init();
+      }
+    } catch (e) { console.warn('DeveloperHUDEngine init warning:', e); }
+
+    try {
+      if (typeof VoiceEngine !== 'undefined' && VoiceEngine.init) {
+        VoiceEngine.init({
+          onTranscript: (text, isFinal) => {
+            if (ragQueryInput) ragQueryInput.value = text;
+            if (isFinal && text) {
+              const handler = window.handleRAGQuery || (typeof handleRAGQuery === 'function' ? handleRAGQuery : null);
+              if (handler) handler(text);
+            }
+          },
+          onStateChange: (state) => {
+            if (voiceTriggerBtn) {
+              voiceTriggerBtn.style.color = state === 'listening' ? '#10b981' : '#e65100';
+            }
+            if (typeof SoundEngine !== 'undefined' && state === 'listening') {
+              SoundEngine.playClick();
+            }
           }
-        },
-        onStateChange: (state) => {
-          if (voiceTriggerBtn) {
-            voiceTriggerBtn.style.color = state === 'listening' ? '#10b981' : '#e65100';
-          }
-          if (typeof SoundEngine !== 'undefined' && state === 'listening') {
-            SoundEngine.playClick();
-          }
-        }
-      });
-      if (waveCanvas) VoiceEngine.startWaveformAnimation(waveCanvas);
-    }
+        });
+        if (waveCanvas) VoiceEngine.startWaveformAnimation(waveCanvas);
+      }
+    } catch (e) { console.warn('VoiceEngine init warning:', e); }
 
     // Navigation View Activation Helper
     function activateView(targetView) {
@@ -499,10 +496,27 @@
         }
       } catch (err) {}
 
+      const now = Date.now();
+      if (window.isAIProcessing && (now - (window.aiProcessingStartTime || 0) < 12000)) {
+        return false;
+      }
+      window.isAIProcessing = true;
+      window.aiProcessingStartTime = now;
+
       try {
         const inputEl = document.getElementById('rag-query-input');
         const query = inputEl ? inputEl.value.trim() : '';
-        if (!query && !window.activePromptAttachment) return false;
+        if (!query && !window.activePromptAttachment) {
+          window.isAIProcessing = false;
+          return false;
+        }
+
+        if (inputEl) {
+          inputEl.value = '';
+          inputEl.style.height = 'auto';
+        }
+        const submitBtn = document.getElementById('rag-submit-btn');
+        if (submitBtn) submitBtn.classList.remove('has-input');
 
         const handler = window.handleRAGQuery || (typeof handleRAGQuery === 'function' ? handleRAGQuery : null);
         if (typeof handler === 'function') {
@@ -537,21 +551,20 @@
               } else if (typeof appendChatMessage === 'function') {
                 appendChatMessage('ai', fallbackText, [], false, query, 'Juno 2.5 Flash', false);
               }
+            }).finally(() => {
+              window.isAIProcessing = false;
             });
+          } else {
+            window.isAIProcessing = false;
           }
         }
-
-        if (inputEl) {
-          inputEl.value = '';
-          inputEl.style.height = 'auto';
-        }
-        const submitBtn = document.getElementById('rag-submit-btn');
-        if (submitBtn) submitBtn.classList.remove('has-input');
       } catch (err) {
         console.error('Error in submitRAGQuery:', err);
+        window.isAIProcessing = false;
       }
       return false;
     };
+    window.sendMessage = window.submitRAGQuery;
 
     let currentSessionOTP = '582914';
     let pendingUserDetails = { firstName: '', lastName: '', email: '' };
@@ -1568,8 +1581,18 @@
 
     async function handleRAGQuery(query) {
       window.handleRAGQuery = handleRAGQuery;
+      const now = Date.now();
+      if (window.isAIProcessing && (now - (window.aiProcessingStartTime || 0) < 12000)) return;
+
       const cleanQuery = (typeof query === 'string' ? query : (query ? String(query) : '')).trim();
-      if (!cleanQuery && !activePromptAttachment) return;
+      if (!cleanQuery && !activePromptAttachment) {
+        window.isAIProcessing = false;
+        return;
+      }
+
+      window.isAIProcessing = true;
+      window.aiProcessingStartTime = now;
+      window.isAIAborted = false;
 
       let thinkingCard = null;
       let submitBtn = document.getElementById('rag-submit-btn');
@@ -1637,12 +1660,17 @@
         }
 
         // Toggle submit button into Stop Generation button
+        window.stopAIStreaming = function() {
+          window.isAIAborted = true;
+          window.isAIProcessing = false;
+        };
+
         if (submitBtn) {
           submitBtn.innerHTML = `<span style="font-size: 14px; color: #2c1d00; font-weight: 900;">⏹️</span>`;
           submitBtn.title = "Stop Generating";
           submitBtn.onclick = function(e) {
             if (e) e.preventDefault();
-            if (typeof window.stopAIStreaming === 'function') window.stopAIStreaming();
+            window.stopAIStreaming();
           };
         }
 
@@ -1704,8 +1732,12 @@
           console.warn("AI Engine synthesis error:", err);
         }
 
+        if (window.isAIAborted) {
+          answerText = "⏹️ *Generation stopped by user.*";
+        }
+
         // Delay slightly for Adaptive Fusion visual stream completion
-        if (isAdaptiveFusion) {
+        if (isAdaptiveFusion && !window.isAIAborted) {
           await new Promise(resolve => setTimeout(resolve, 800));
         }
 
@@ -1725,22 +1757,15 @@
         }
 
         // Format fused answer if Adaptive Fusion is active
-        if (isAdaptiveFusion && window.adaptiveFusionEngine) {
+        if (isAdaptiveFusion && window.adaptiveFusionEngine && !window.isAIAborted) {
           answerText = window.adaptiveFusionEngine.formatFusedMessageOutput(cleanQuery, answerText);
-        }
-
-        // Restore submit button icon
-        if (submitBtn) {
-          submitBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
-          submitBtn.title = "Send Message";
-          submitBtn.onclick = null;
         }
 
         // Render final AI message card with typewriter streaming
         appendChatMessage('ai', answerText, citations, false, cleanQuery, providerName, true);
 
         // Save into current Chat Thread
-        if (typeof Store !== 'undefined' && Store.saveChatThread) {
+        if (typeof Store !== 'undefined' && Store.saveChatThread && !window.isAIAborted) {
           try {
             const activeId = Store.getActiveThreadId();
             const threads = Store.getChatThreads() || [];
@@ -1775,13 +1800,16 @@
         if (thinkingCard && thinkingCard.parentNode) {
           thinkingCard.parentNode.removeChild(thinkingCard);
         }
+        const fallbackAnswer = `⚠️ **Query Synthesis Diagnostics**:\n\n${mainErr.message || 'An unexpected error occurred while generating a response.'}\n\nPlease verify your network connection or API settings and try again.`;
+        appendChatMessage('ai', fallbackAnswer, [], false, cleanQuery, 'Juno System', false);
+      } finally {
+        window.isAIProcessing = false;
+        window.isAIAborted = false;
         if (submitBtn) {
-          submitBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`;
-          submitBtn.title = "Send Message";
+          submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`;
+          submitBtn.title = "Send message";
           submitBtn.onclick = null;
         }
-        const fallbackAnswer = "Hi! 😊 How can I help you synthesize your ideas and notes today?";
-        appendChatMessage('ai', fallbackAnswer, [], false, cleanQuery, 'Juno 2.5 Flash', false);
       }
     }
     window.handleRAGQuery = handleRAGQuery;

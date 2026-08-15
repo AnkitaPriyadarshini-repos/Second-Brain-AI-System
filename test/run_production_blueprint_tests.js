@@ -11,9 +11,9 @@ const RAGEngine = require('../js/rag-engine');
 let passCount = 0;
 let failCount = 0;
 
-function runTest(description, testFn) {
+async function runTest(description, testFn) {
   try {
-    testFn();
+    await testFn();
     console.log(`  ✅ [PASS] ${description}`);
     passCount++;
   } catch (err) {
@@ -64,13 +64,13 @@ runTest('AuthService verifySession should return user profile for active token',
 console.log('\nSuite 2: Secure AI Gateway & Rate Limiting');
 const aiGatewayService = new AIGatewayService();
 
-runTest('AIGatewayService should process query with grounded citations and verification check', () => {
+runTest('AIGatewayService should process query with grounded citations and verification check', async () => {
   const mockNotes = [
     { title: 'Distributed Systems & CAP Theorem', content: 'In a network partition, a distributed system must choose between Availability and Consistency.', sourceType: 'note' },
     { title: 'Raft Consensus Algorithm', content: 'Raft manages replicated logs through leader election, log replication, and safety guarantees.', sourceType: 'note' }
   ];
 
-  const response = aiGatewayService.processGatewayRequest({
+  const response = await aiGatewayService.processGatewayRequest({
     prompt: 'What is CAP theorem?',
     contextNotes: mockNotes,
     model: 'second-brain-hybrid',
@@ -83,11 +83,11 @@ runTest('AIGatewayService should process query with grounded citations and verif
   assert.ok(response.verification.confidenceScore >= 0.9);
 });
 
-runTest('AIGatewayService rate limiter should restrict rapid abusive queries', () => {
+runTest('AIGatewayService rate limiter should restrict rapid abusive queries', async () => {
   const userId = 'abusive_user_99';
   let rateLimited = false;
   for (let i = 0; i < 65; i++) {
-    const res = aiGatewayService.processGatewayRequest({ prompt: 'test query', userId });
+    const res = await aiGatewayService.processGatewayRequest({ prompt: 'test query', userId });
     if (res.error && res.error.includes('Rate limit')) {
       rateLimited = true;
       break;

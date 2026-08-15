@@ -171,6 +171,24 @@
         <h1 class="claude-serif-headline">Back at it, Ankita Priyadarshini Pallai</h1>
       </div>
 
+      <!-- Floating Desktop App Install Banner Pop-up (Codex / ChatGPT Style) -->
+      <div id="pwa-desktop-banner" class="pwa-desktop-banner">
+        <div class="pwa-banner-text-group">
+          <h4 class="pwa-banner-title">Meet Juno AI in the desktop app</h4>
+          <p class="pwa-banner-subtitle">A coding agent that helps you build and ship with AI, included for free in your Juno plan.</p>
+        </div>
+        <div class="pwa-banner-actions">
+          <button type="button" class="pwa-banner-btn-primary" onclick="window.triggerPWAInstall()">Download the app</button>
+          <button type="button" class="pwa-banner-btn-secondary" onclick="window.openPWAInstallInstructionsModal()">Learn more</button>
+          <button type="button" class="pwa-banner-close-btn" onclick="window.dismissPWABanner()" title="Close banner" aria-label="Close banner">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
       <!-- Rounded Floating Input Card Container -->
       <div class="claude-prompt-card-wrapper">
         <form id="rag-query-form" class="claude-prompt-card" autocomplete="off" onsubmit="window.submitRAGQuery(event); return false;">
@@ -184,7 +202,7 @@
           <div id="prompt-attachment-preview-container" class="prompt-attachment-preview" style="display: none;"></div>
 
           <div class="claude-textarea-row" style="position: relative;">
-            <textarea id="rag-query-input" class="claude-textarea" placeholder="Type / for search modes" aria-label="Type / for search modes" rows="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="window.handleSlashCommandsInput(event)"></textarea>
+            <textarea id="rag-query-input" class="claude-textarea" placeholder="Type / for search modes" aria-label="Type / for search modes" rows="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="window.handleSlashCommandsInput(event)" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); window.submitRAGQuery(event); }"></textarea>
             
             <!-- Slash Commands Menu Popup -->
             <div id="slash-commands-menu" class="slash-commands-menu" style="display: none;">
@@ -1528,12 +1546,7 @@
   <script src="js/resurfacing-engine.js?v=58.0"></script>
   <script src="js/graph-visualizer.js?v=58.0"></script>
   <script src="js/ai-engine.js?v=58.0"></script>
-  <script src="js/gemini-color-flow.js?v=58.0"></script>
-  <script src="js/nexus-bot.js?v=58.0"></script>
   <script src="js/developer-hud.js?v=58.0"></script>
-  <script src="js/ai-agents.js?v=58.0"></script>
-  <script src="js/telemetry-mesh.js?v=58.0"></script>
-  <script src="js/particles-engine.js?v=58.0"></script>
   <script src="js/code-inspector.js?v=58.0"></script>
   <script src="js/adaptive-fusion-visualizer.js?v=1.0"></script>
   <script src="js/adaptive-fusion-engine.js?v=1.0"></script>

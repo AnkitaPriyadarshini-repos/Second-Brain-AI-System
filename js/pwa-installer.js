@@ -196,6 +196,25 @@
   };
 
   // Export functions to window
+  window.dismissPWABanner = function () {
+    const banner = document.getElementById('pwa-desktop-banner');
+    if (banner) {
+      banner.classList.add('hiding');
+      setTimeout(() => {
+        banner.style.display = 'none';
+      }, 300);
+    }
+    sessionStorage.setItem('juno_pwa_banner_dismissed', 'true');
+  };
+
+  window.showPWABanner = function () {
+    const banner = document.getElementById('pwa-desktop-banner');
+    if (banner && !isStandalone) {
+      banner.style.display = 'flex';
+      banner.classList.remove('hiding');
+    }
+  };
+
   window.checkPWAStatus = function () {
     return {
       isStandalone: isStandalone,
@@ -204,4 +223,18 @@
     };
   };
 
+  // Auto-init banner check on load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!isStandalone && sessionStorage.getItem('juno_pwa_banner_dismissed') !== 'true') {
+        window.showPWABanner();
+      }
+    });
+  } else {
+    if (!isStandalone && sessionStorage.getItem('juno_pwa_banner_dismissed') !== 'true') {
+      window.showPWABanner();
+    }
+  }
+
 })();
+

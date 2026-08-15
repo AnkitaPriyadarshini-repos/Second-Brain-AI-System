@@ -17,7 +17,8 @@
     "test:realtime": "node test/run_websocket_ssr_tests.js",
     "test:dip": "node test/run_dip_repository_tests.js",
     "test:layered": "node test/run_layered_architecture_tests.js",
-    "test:blueprint": "node test/run_production_blueprint_tests.js"
+    "test:blueprint": "node test/run_production_blueprint_tests.js",
+    "test:load": "node test/load_test_100_users.js"
   },
   "dependencies": {
     "express": "^4.19.2",

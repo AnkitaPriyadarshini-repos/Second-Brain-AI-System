@@ -14,12 +14,15 @@
     synth: typeof window !== 'undefined' ? window.speechSynthesis : null,
     canvasAnimId: null,
 
+    state: 'IDLE',
+
     /**
      * Initializes speech recognition and synthesis
      * @param {Object} callbacks {onTranscript, onError, onStateChange}
      */
     init: function (callbacks = {}) {
       this.callbacks = callbacks;
+      this.setState('IDLE');
 
       if (typeof window !== 'undefined') {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -31,10 +34,11 @@
 
           this.recognition.onstart = () => {
             this.isListening = true;
-            if (this.callbacks.onStateChange) this.callbacks.onStateChange('listening');
+            this.setState('LISTENING');
           };
 
           this.recognition.onresult = (event) => {
+            this.setState('PROCESSING');
             let interimTranscript = '';
             let finalTranscript = '';
 
@@ -46,22 +50,47 @@
               }
             }
 
+            const currentTranscript = finalTranscript || interimTranscript;
+            if (finalTranscript) {
+              this.setState('READY_TO_SEND');
+            } else {
+              this.setState('TRANSCRIBING');
+            }
+
             if (this.callbacks.onTranscript) {
-              this.callbacks.onTranscript(finalTranscript || interimTranscript, !!finalTranscript);
+              this.callbacks.onTranscript(currentTranscript, !!finalTranscript);
             }
           };
 
           this.recognition.onerror = (err) => {
             this.isListening = false;
-            if (this.callbacks.onStateChange) this.callbacks.onStateChange('idle');
+            this.setState('ERROR');
+            let errMsg = 'Voice recognition error occurred.';
+            if (err && err.error === 'not-allowed') {
+              errMsg = 'Microphone access is blocked. Please allow microphone permission in your browser settings and try again.';
+            } else if (err && err.error === 'no-speech') {
+              errMsg = 'No speech was detected. Please try speaking again.';
+            }
+            if (typeof window.showToast === 'function') {
+              window.showToast(`🎙️ ${errMsg}`);
+            }
             if (this.callbacks.onError) this.callbacks.onError(err);
           };
 
           this.recognition.onend = () => {
             this.isListening = false;
-            if (this.callbacks.onStateChange) this.callbacks.onStateChange('idle');
+            if (this.state !== 'READY_TO_SEND' && this.state !== 'ERROR') {
+              this.setState('IDLE');
+            }
           };
         }
+      }
+    },
+
+    setState: function (newState) {
+      this.state = newState;
+      if (this.callbacks && typeof this.callbacks.onStateChange === 'function') {
+        this.callbacks.onStateChange(newState);
       }
     },
 
@@ -69,7 +98,7 @@
      * Toggle listening state
      */
     toggleListen: function () {
-      if (this.isListening) {
+      if (this.isListening || this.state === 'LISTENING') {
         this.stopListen();
       } else {
         this.startListen();
@@ -82,21 +111,17 @@
     startListen: function () {
       if (this.recognition) {
         try {
+          this.setState('REQUESTING_PERMISSION');
           this.recognition.start();
         } catch (e) {
           console.warn('Speech recognition already started or failed:', e);
+          this.stopListen();
         }
       } else {
-        // Fallback simulation for unsupported browsers/environments
-        this.isListening = true;
-        if (this.callbacks.onStateChange) this.callbacks.onStateChange('listening');
-        setTimeout(() => {
-          if (this.callbacks.onTranscript) {
-            this.callbacks.onTranscript("What did I save about deep learning last month?", true);
-          }
-          this.isListening = false;
-          if (this.callbacks.onStateChange) this.callbacks.onStateChange('idle');
-        }, 3000);
+        this.setState('ERROR');
+        if (typeof window.showToast === 'function') {
+          window.showToast("🎙️ Voice input isn't supported by this browser. You can still type your message.");
+        }
       }
     },
 
@@ -105,10 +130,12 @@
      */
     stopListen: function () {
       if (this.recognition && this.isListening) {
-        this.recognition.stop();
+        try {
+          this.recognition.stop();
+        } catch (e) {}
       }
       this.isListening = false;
-      if (this.callbacks.onStateChange) this.callbacks.onStateChange('idle');
+      this.setState('IDLE');
     },
 
     /**
