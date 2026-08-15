@@ -32,7 +32,7 @@ function escapeHTML(str) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+    .replace(/\"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
 
@@ -118,3 +118,132 @@ window.formatMarkdownText = formatMarkdownText;
 window.copyCodeFromBlock = copyCodeFromBlock;
 window.runInCanvasFromBlock = runInCanvasFromBlock;
 
+// ------------------------------------------------------------
+// Production chat bridge
+// The static Juno homepage is loaded before the Next/Express demo
+// chat components. This bridge is the canonical text-chat path for
+// the deployed site: composer -> Vercel function -> Gemini -> UI.
+// ------------------------------------------------------------
+(function installProductionChatBridge() {
+  function ensureChatContainer() {
+    const container = document.getElementById('chat-container');
+    if (!container) throw new Error('Chat container is missing from the page.');
+    return container;
+  }
+
+  function scrollChat(container) {
+    try {
+      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+    } catch (_) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }
+
+  function appendMessage(role, text, options = {}) {
+    const container = ensureChatContainer();
+    const wrapper = document.createElement('div');
+    wrapper.className = `chat-message-bubble ${role === 'user' ? 'user-bubble' : 'assistant-bubble'}`;
+    if (options.id) wrapper.id = options.id;
+
+    const content = document.createElement('div');
+    content.className = 'chat-message-content';
+    if (options.html) {
+      content.innerHTML = options.html;
+    } else if (role === 'assistant' && typeof window.formatMarkdownText === 'function') {
+      content.innerHTML = window.formatMarkdownText(text);
+    } else {
+      content.textContent = text;
+    }
+
+    wrapper.appendChild(content);
+    container.appendChild(wrapper);
+    scrollChat(container);
+    return wrapper;
+  }
+
+  function replaceMessage(wrapper, role, text) {
+    if (!wrapper) return;
+    wrapper.className = `chat-message-bubble ${role === 'user' ? 'user-bubble' : 'assistant-bubble'}`;
+    const content = wrapper.querySelector('.chat-message-content') || wrapper;
+    if (role === 'assistant' && typeof window.formatMarkdownText === 'function') {
+      content.innerHTML = window.formatMarkdownText(text);
+    } else {
+      content.textContent = text;
+    }
+  }
+
+  function setChatView() {
+    const hero = document.getElementById('chat-hero-view');
+    const stream = document.getElementById('chat-container');
+    if (hero) hero.style.display = 'none';
+    if (stream) {
+      stream.style.display = 'flex';
+      stream.style.flexDirection = 'column';
+    }
+  }
+
+  async function handleRAGQuery(query) {
+    const prompt = String(query || '').trim();
+    if (!prompt) return;
+
+    setChatView();
+    const userMessage = appendMessage('user', prompt);
+    const thinkingMessage = appendMessage('assistant', 'Thinking…', {
+      id: `juno-thinking-${Date.now()}`
+    });
+    const startedAt = Date.now();
+
+    try {
+      const history = [];
+      const response = await fetch('/api/ai/gateway', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt,
+          model: 'gemini-2.5-flash',
+          history
+        })
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.success || !data.answer) {
+        throw new Error(data.error || `AI request failed (HTTP ${response.status}).`);
+      }
+
+      replaceMessage(thinkingMessage, 'assistant', data.answer);
+
+      // Keep a lightweight local conversation copy for refresh/reuse.
+      try {
+        const saved = JSON.parse(localStorage.getItem('juno_chat_history') || '[]');
+        saved.push(
+          { role: 'user', content: prompt, timestamp: Date.now() },
+          { role: 'model', content: data.answer, timestamp: Date.now() }
+        );
+        localStorage.setItem('juno_chat_history', JSON.stringify(saved.slice(-40)));
+      } catch (_) {}
+
+      if (typeof window.showToast === 'function' && Date.now() - startedAt > 15000) {
+        window.showToast('Juno AI responded successfully.', 'success');
+      }
+    } catch (error) {
+      replaceMessage(
+        thinkingMessage,
+        'assistant',
+        `I couldn't complete that request. ${error.message || 'Please try again.'}`
+      );
+      if (typeof window.showToast === 'function') {
+        window.showToast('AI request failed. Please try again.', 'error');
+      }
+      console.error('[Juno chat]', error);
+    } finally {
+      window.isAIProcessing = false;
+      window.aiProcessingStartTime = 0;
+    }
+  }
+
+  window.handleRAGQuery = handleRAGQuery;
+  window.appendChatMessage = function(role, text) {
+    setChatView();
+    return appendMessage(role === 'ai' ? 'assistant' : role, text);
+  };
+})();
