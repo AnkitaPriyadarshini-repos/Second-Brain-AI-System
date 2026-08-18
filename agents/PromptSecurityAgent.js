@@ -44,6 +44,18 @@ class PromptSecurityAgent {
       sanitizedPrompt: clean
     };
   }
+
+  /**
+   * Sanitizes untrusted note content to prevent embedded prompt injection attacks
+   */
+  sanitizeContextSnippet(text) {
+    if (!text || typeof text !== 'string') return '';
+    let sanitized = text;
+    for (const pattern of this.injectionPatterns) {
+      sanitized = sanitized.replace(pattern, '[REDACTED_SECURITY_PATTERN]');
+    }
+    return sanitized.replace(/<[^>]*>/g, '').trim();
+  }
 }
 
 if (typeof module !== 'undefined' && module.exports) {

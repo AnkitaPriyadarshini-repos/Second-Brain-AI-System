@@ -50,7 +50,7 @@
 
       // Check multi-turn follow-up
       let effectiveQuery = queryText;
-      const isFollowUp = /(this topic|that|what else|more about|tell me more|on this)/i.test(queryText);
+      const isFollowUp = /(this topic|that|what else|more about|tell me more|on this|explain further)/i.test(queryText);
       if (isFollowUp && this.sessionHistory.length > 0) {
         const lastQuery = this.sessionHistory[this.sessionHistory.length - 1].query;
         effectiveQuery = `${lastQuery} ${queryText}`;
@@ -59,7 +59,8 @@
       let nlp = typeof NLPEngine !== 'undefined' ? NLPEngine : null;
       if (!nlp && typeof global !== 'undefined' && global.NLPEngine) nlp = global.NLPEngine;
 
-      const qTokens = effectiveQuery.toLowerCase().split(/\W+/).filter(t => t.length > 1);
+      const stopWords = new Set(['what', 'is', 'the', 'of', 'in', 'and', 'to', 'a', 'an', 'for', 'on', 'with', 'as', 'at', 'by', 'from', 'or', 'it', 'this', 'that', 'you', 'me', 'my', 'how', 'do', 'can', 'are']);
+      const qTokens = effectiveQuery.toLowerCase().split(/\W+/).filter(t => t.length > 2 && !stopWords.has(t));
       const queryVector = nlp ? nlp.createTFVector(effectiveQuery) : null;
 
       // Calculate semantic similarity scores & keyword matches for all notes
@@ -70,23 +71,24 @@
         
         const fullTextLower = fullText.toLowerCase();
         let keywordMatches = 0;
-        qTokens.forEach(token => {
-          // Use exact word boundaries so 'hi' doesn't match 'machine', 'this', 'architecture', 'history'
-          const regex = new RegExp('\\b' + token + '\\b', 'i');
-          if (regex.test(fullTextLower)) keywordMatches++;
-        });
+        if (qTokens.length > 0) {
+          qTokens.forEach(token => {
+            const regex = new RegExp('\\b' + token + '\\b', 'i');
+            if (regex.test(fullTextLower)) keywordMatches++;
+          });
+        }
 
-        const combinedScore = simScore + (keywordMatches * 0.1);
+        const combinedScore = simScore + (keywordMatches * 0.15);
         return { note, score: combinedScore, keywordMatches };
       });
 
-      // Filter and sort matching notes
+      // Filter and sort matching notes (require score >= 0.15 and at least 1 non-stopword match)
       let matches = scoredNotes
-        .filter(item => item.score > 0.01 || item.keywordMatches > 0)
+        .filter(item => item.score >= 0.15 && item.keywordMatches > 0)
         .sort((a, b) => b.score - a.score);
 
       let response;
-      if (matches.length > 0 && matches[0].score > 0.05) {
+      if (matches.length > 0) {
         const retrievedNotes = matches.slice(0, 4).map(m => m.note);
         const synthesizedAnswer = this.synthesizeDynamicAnswer(effectiveQuery, retrievedNotes);
 
@@ -98,7 +100,7 @@
           modelUsed: this.activeModel
         };
       } else {
-        // Fallback: Dynamic AI Model Knowledge Generation
+        // Fallback: Dynamic AI Model Knowledge Generation (General Knowledge)
         response = {
           answer: this.generateFallbackAISynthesis(effectiveQuery),
           citations: [],
@@ -113,14 +115,23 @@
     },
 
     /**
-     * Synthesizes a structured answer from retrieved notes dynamically
+     * Synthesizes a structured answer from retrieved notes dynamically across multi-note context
      */
     synthesizeDynamicAnswer: function (query, retrievedNotes) {
-      if (retrievedNotes.length === 0) return '';
+      if (!retrievedNotes || retrievedNotes.length === 0) return '';
 
-      const topNote = retrievedNotes[0];
-      const rawContent = topNote.summary || topNote.content || '';
-      return rawContent.replace(/\(Ref item \d+: [^)]+\)/gi, '').replace(/\.\s*\./g, '.').trim();
+      if (retrievedNotes.length === 1) {
+        const rawContent = retrievedNotes[0].summary || retrievedNotes[0].content || '';
+        return rawContent.replace(/\(Ref item \d+: [^)]+\)/gi, '').replace(/\.\s*\./g, '.').trim();
+      }
+
+      let multiAnswer = `Based on your saved vault research (${retrievedNotes.length} matching sources):\n\n`;
+      retrievedNotes.forEach((note, idx) => {
+        const text = note.summary || (note.content || '').substring(0, 220) + '...';
+        const cleanText = text.replace(/\(Ref item \d+: [^)]+\)/gi, '').replace(/\.\s*\./g, '.').trim();
+        multiAnswer += `#### ${idx + 1}. [${note.title}]\n${cleanText}\n\n`;
+      });
+      return multiAnswer.trim();
     },
 
     /**

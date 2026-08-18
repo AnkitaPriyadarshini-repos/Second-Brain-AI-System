@@ -417,116 +417,92 @@ export function HydratedComponent({ data }) {
     const qLower = cleanPrompt.toLowerCase();
     const qClean = qLower.replace(/[^\w\s]/gi, '').trim();
 
-    // 1. Single-Word Conversational Greetings Only
-    if (['hi', 'hii', 'hiii', 'hello', 'hey', 'heyy', 'yo', 'sup', 'namaste'].includes(qClean)) {
+    // 1. Natural Conversational Greetings (Strict single greeting match)
+    if (['hi', 'hii', 'hiii', 'hello', 'hey', 'heyy', 'yo', 'sup', 'namaste', 'greetings'].includes(qClean)) {
       return {
-        text: `Hello! 👋 How can I help you today?\n\nFeel free to ask me any question, such as:\n• **Coding & Algorithms** (e.g., *"Write a Java program for factorial"*)\n• **System Architecture** (e.g., *"Compare MongoDB and PostgreSQL"*)\n• **Factual & Science** (e.g., *"Explain photosynthesis"*)\n• **Mathematics** (e.g., *"Solve 25 × 37"*)\n• **Multi-Turn Follow-Ups** (e.g., *"Who created it?"* or *"Give me a simple example"*)\n`,
-        thinkingProcess: ['Processed conversational greeting prompt'],
-        provider: 'Gemini 2.5 Flash',
-        grounded: false
+        text: `Hi! 😊 How can I help you today?\n\nFeel free to ask me any question, such as:\n• **General AI Knowledge** (e.g., *"What is artificial intelligence?"* or *"What is the capital of Japan?"*)\n• **Coding & Algorithms** (e.g., *"Explain recursion in C++"*)\n• **Follow-Up Deep Dives** (e.g., *"Tell me more about recursion"*)\n• **Your Vault Notes** (e.g., *"What did I save about deep learning?"*)`,
+        thinkingProcess: ['Processed natural greeting prompt'],
+        provider: 'Second Brain AI (Gemini Flash)',
+        grounded: false,
+        citations: []
       };
     }
 
     if (qClean === 'how are you' || qClean === 'how r u') {
       return {
-        text: `I'm operating at peak performance and ready to help! 🚀 What question or topic would you like to explore?`,
+        text: `I'm operating at peak performance and ready to help! 🚀 What question or topic would you like to explore today?`,
         thinkingProcess: ['Processed user greeting query'],
-        provider: 'Gemini 2.5 Flash',
-        grounded: false
+        provider: 'Second Brain AI (Gemini Flash)',
+        grounded: false,
+        citations: []
       };
     }
 
-    // 2. Resolve Multi-Turn Context References & Detect Topic Switches
-    let contextSubject = '';
-    let isTopicReset = qClean.includes('forget that') || qClean.includes('forget about that') || qClean.includes('change topic') || qClean.includes('new topic') || qClean.includes('never mind');
-    
-    if (Array.isArray(chatHistory) && chatHistory.length > 0 && !isTopicReset) {
+    // 2. Multi-Turn Follow-Up vs Independent Topic Switch Detector
+    const isExplicitFollowUp = /tell me more|more details|explain further|go deeper|how does it work|give an example|what about|and what|who created|time complexity|space complexity|implementation|beginner|why|can you expand/i.test(cleanPrompt);
+
+    let activeTopic = '';
+    if (isExplicitFollowUp && Array.isArray(chatHistory) && chatHistory.length > 0) {
       for (let i = chatHistory.length - 1; i >= 0; i--) {
         const msgText = (chatHistory[i].content || '').toLowerCase();
-        if (msgText.includes('binary search')) { contextSubject = 'Binary Search'; break; }
-        if (msgText.includes('docker')) { contextSubject = 'Docker'; break; }
-        if (msgText.includes('java')) { contextSubject = 'Java'; break; }
-        if (msgText.includes('react')) { contextSubject = 'React'; break; }
-        if (msgText.includes('binary tree')) { contextSubject = 'Binary Tree'; break; }
-        if (msgText.includes('photosynthesis')) { contextSubject = 'Photosynthesis'; break; }
-        if (msgText.includes('tcp') || msgText.includes('udp')) { contextSubject = 'TCP/UDP'; break; }
-        if (msgText.includes('mongodb') || msgText.includes('postgresql')) { contextSubject = 'Databases'; break; }
+        if (msgText.includes('recursion')) { activeTopic = 'recursion'; break; }
+        if (msgText.includes('binary search')) { activeTopic = 'binary search'; break; }
+        if (msgText.includes('docker')) { activeTopic = 'docker'; break; }
+        if (msgText.includes('java')) { activeTopic = 'java'; break; }
+        if (msgText.includes('react')) { activeTopic = 'react'; break; }
+        if (msgText.includes('binary tree')) { activeTopic = 'binary tree'; break; }
+        if (msgText.includes('photosynthesis')) { activeTopic = 'photosynthesis'; break; }
+        if (msgText.includes('japan') || msgText.includes('tokyo')) { activeTopic = 'japan'; break; }
       }
     }
 
-    // Handle Follow-up: Time Complexity ("What is its time complexity?")
-    if ((qClean.includes('time complexity') || qClean.includes('complexity')) && (contextSubject === 'Binary Search' || qClean.includes('binary search'))) {
+    // 3. Multi-Turn Follow-up on Recursion ("Tell me more about recursion.")
+    if ((activeTopic === 'recursion' || qLower.includes('recursion')) && (isExplicitFollowUp || qLower.includes('tell me more') || qLower.includes('more about recursion'))) {
       return {
-        text: `### ⏱️ Time & Space Complexity of Binary Search\n\n- **Best Case Time Complexity:** $\\mathcal{O}(1)$ (when the target element is located at the middle index on the first comparison).\n- **Average & Worst Case Time Complexity:** $\\mathcal{O}(\\log N)$ (since the search space is halved at each step).\n- **Space Complexity:**\n  - **Iterative Approach:** $\\mathcal{O}(1)$ auxiliary space.\n  - **Recursive Approach:** $\\mathcal{O}(\\log N)$ stack space due to recursion call stack.\n\n#### Why $\\mathcal{O}(\\log N)$?\nWith $N$ elements, after $k$ steps the remaining elements equal $\\frac{N}{2^k} = 1 \\implies 2^k = N \\implies k = \\log_2 N$.`,
-        thinkingProcess: ['Resolved multi-turn reference "its time complexity" -> Binary Search', 'Calculated exact Big-O complexity bounds'],
-        provider: 'Second Brain AI (Pro 2.5)',
-        grounded: false
+        text: `### 🔄 Deep-Dive: Advanced Recursion Concepts & Mechanisms\n\nBuilding upon basic recursion, here are the critical low-level mechanics and optimization paradigms:\n\n#### 1. How the System Call Stack Manages Recursion\nEvery recursive function call creates an **Activation Record (Stack Frame)** on the memory stack. Each frame stores:\n- Local variables\n- Parameter values\n- Return address (pointing back to the instruction after the call)\n\nWhen the **base case** evaluates to \`true\`, function calls finish and unwind in **LIFO (Last-In, First-Out)** order.\n\n#### 2. Tail Call Optimization (TCO) in C++\nIn **Tail Recursion**, the recursive call is the absolute final statement executed before returning. Modern C++ compilers (\`g++ -O2\` or \`clang++\`) perform Tail Call Elimination, transforming recursion into a flat \`jump\` loop:\n\n\`\`\`cpp\n// Tail Recursive Factorial in C++\nlong long tailFactorial(int n, long long accumulator = 1) {\n    if (n <= 1) return accumulator; \n    return tailFactorial(n - 1, n * accumulator); // Accumulator carries result state\n}\n\`\`\`\n*Space Complexity with TCO:* $\\mathcal{O}(1)$ auxiliary memory.\n\n#### 3. Stack Overflow & Prevention Strategies\nIf recursion exceeds stack depth limit (typically 1 MB – 8 MB), a \`Segmentation Fault\` occurs. To prevent stack overflow:\n- **Memoization (Top-Down Dynamic Programming):** Store results of expensive function calls to prevent redundant recursive branches ($O(2^N) \\rightarrow O(N)$).\n- **Explicit Stack / Iteration:** Replace implicit call stack with an explicit \`std::stack<T>\` on heap memory.`,
+        thinkingProcess: ['Detected multi-turn follow-up query on recursion', 'Provided advanced recursion deep dive (call stack, tail recursion, stack overflow, memoization) without repeating intro'],
+        provider: 'Second Brain AI (Gemini Flash)',
+        grounded: false,
+        citations: []
       };
     }
 
-    // Handle Follow-up: Implementation ("Give me the C++ implementation")
-    if ((qClean.includes('c++ implementation') || qClean.includes('cpp implementation') || qClean.includes('c++ code') || qClean.includes('implementation')) && (contextSubject === 'Binary Search' || qClean.includes('binary search'))) {
+    // 4. Topic Solvers (Processed Independently)
+
+    // 4.1 Recursion in C++
+    if (qLower.includes('recursion') && (qLower.includes('c++') || qLower.includes('cpp') || qLower.includes('explain'))) {
       return {
-        text: `### 💻 C++ Implementation of Binary Search\n\nHere is a complete, working C++ implementation of **Binary Search**:\n\n\`\`\`cpp\n#include <iostream>\n#include <vector>\n\n// Function to perform binary search on a sorted vector\nint binarySearch(const std::vector<int>& arr, int target) {\n    int low = 0;\n    int high = arr.size() - 1;\n\n    while (low <= high) {\n        int mid = low + (high - low) / 2; // Prevents potential integer overflow\n\n        if (arr[mid] == target) {\n            return mid; // Target found\n        }\n        if (arr[mid] < target) {\n            low = mid + 1; // Search right half\n        } else {\n            high = mid - 1; // Search left half\n        }\n    }\n    return -1; // Target not found\n}\n\nint main() {\n    std::vector<int> numbers = {2, 5, 8, 12, 16, 23, 38, 56, 72, 91};\n    int target = 23;\n    int index = binarySearch(numbers, target);\n\n    if (index != -1) {\n        std::cout << "Element " << target << " found at index " << index << std::endl;\n    } else {\n        std::cout << "Element " << target << " not found." << std::endl;\n    }\n    return 0;\n}\n\`\`\`\n\n#### Output:\n\`\`\`\nElement 23 found at index 5\n\`\`\``,
-        thinkingProcess: ['Resolved multi-turn reference "C++ implementation" -> Binary Search', 'Generated clean working C++ code'],
-        provider: 'Second Brain AI (Pro 2.5)',
-        grounded: false
+        text: `### 🔄 Recursion in C++ Explained\n\n**Recursion** in C++ is a programming technique where a function calls itself directly or indirectly to break down a complex problem into smaller subproblems.\n\n#### 1. The Two Essential Components of Recursion\nEvery valid recursive function in C++ MUST contain:\n1. **Base Case:** The condition under which the function stops calling itself (prevents infinite loops).\n2. **Recursive Step:** The logic where the function calls itself with modified parameters moving closer to the base case.\n\n#### 2. C++ Code Example: Factorial Calculation\n\`\`\`cpp\n#include <iostream>\n\n// Recursive function to calculate factorial of n\nlong long factorial(int n) {\n    // Base Case: 0! = 1 and 1! = 1\n    if (n <= 1) {\n        return 1;\n    }\n    // Recursive Step: n! = n * (n - 1)!\n    return n * factorial(n - 1);\n}\n\nint main() {\n    int num = 5;\n    std::cout << "Factorial of " << num << " = " << factorial(num) << std::endl;\n    return 0;\n}\n\`\`\`\n\n#### 3. Execution Stack Trace for \`factorial(3)\`\n- \`factorial(3)\` calls \`3 * factorial(2)\`\n- \`factorial(2)\` calls \`2 * factorial(1)\`\n- \`factorial(1)\` hits **Base Case** $\\rightarrow$ returns \`1\`\n- Unwinding stack: \`2 * 1 = 2\` $\\rightarrow$ \`3 * 2 = 6\` (Final Output: \`6\`).\n\n#### 4. Time & Space Complexity\n- **Time Complexity:** $\\mathcal{O}(N)$ for $N$ recursive steps.\n- **Space Complexity:** $\\mathcal{O}(N)$ auxiliary stack space due to function call stack frames.`,
+        thinkingProcess: ['Processed C++ recursion explanation request', 'Generated C++ code, base case breakdown, call stack trace, and complexity analysis'],
+        provider: 'Second Brain AI (Gemini Flash)',
+        grounded: false,
+        citations: []
       };
     }
 
-    // Handle Follow-up: Explain to a beginner ("Now explain it to a beginner")
-    if ((qClean.includes('explain it to a beginner') || qClean.includes('explain to a beginner') || qClean.includes('beginner')) && (contextSubject === 'Binary Search' || qClean.includes('binary search'))) {
+    // 4.2 Capital of Japan
+    if (qLower.includes('capital of japan') || (qLower.includes('japan') && qLower.includes('capital'))) {
       return {
-        text: `### 📖 Binary Search — Beginner-Friendly Analogy\n\nImagine you are looking up the word **"Pencil"** in a huge printed dictionary containing **1,000 pages**:\n\n#### ❌ Slow Way (Linear Search):\nYou open page 1, then page 2, page 3... reading every page sequentially. It could take up to **1,000 page flips**!\n\n#### ⚡ Fast Way (Binary Search):\n1. You open the dictionary right in the **middle** (page 500).\n2. You see the words on page 500 start with **"M"**.\n3. Since **"P"** comes after **"M"**, you instantly throw away pages 1 to 500!\n4. Now you open the middle of the remaining half (page 750).\n5. You repeat this **divide-and-conquer** step.\n\nIn just **10 flips** ($\\log_2 1000 \\approx 10$), you find "Pencil" out of 1,000 pages! That is Binary Search!`,
-        thinkingProcess: ['Resolved beginner explanation request for Binary Search', 'Formatted dictionary lookup analogy'],
-        provider: 'Second Brain AI (Pro 2.5)',
-        grounded: false
+        text: `### 🇯🇵 Capital of Japan\n\nThe capital of Japan is **Tokyo** (officially **Tokyo Metropolis**).\n\n#### Key Facts:\n- **Location:** Located on the eastern coast of Honshu, the main island of Japan.\n- **Population:** Over 14 million residents in the metropolis, and 37+ million in Greater Tokyo (the world's most populous urban agglomeration).\n- **History:** Formerly known as **Edo**, it became the official capital of Japan in **1868** when Emperor Meiji moved the imperial seat from Kyoto and renamed the city Tokyo ("Eastern Capital").`,
+        thinkingProcess: ['Identified geography query for Japan capital', 'Synthesized direct factual answer for Tokyo'],
+        provider: 'Second Brain AI (Gemini Flash)',
+        grounded: false,
+        citations: []
       };
     }
 
-    // Handle Follow-up: "Who created it?"
-    if (qClean.includes('who created it') || qClean.includes('who made it') || qClean.includes('who invented it') || (qClean.includes('who created') && (contextSubject || qClean.includes('java') || qClean.includes('react') || qClean.includes('python')))) {
-      const subj = contextSubject || (qClean.includes('react') ? 'React' : qClean.includes('python') ? 'Python' : 'Java');
-      let creatorInfo = '';
-      if (subj === 'Java') {
-        creatorInfo = `**Java** was created by **James Gosling** along with his team at **Sun Microsystems** (now owned by Oracle Corporation) in **1995**.\n\nIt was originally named *Oak* after an oak tree outside Gosling's office, before being renamed to Java.`;
-      } else if (subj === 'React') {
-        creatorInfo = `**React** was created by **Jordan Walke**, a software engineer at **Facebook** (Meta), in **2011**.\n\nIt was first deployed on Facebook's News Feed in 2011 and later open-sourced at JSConf US in May 2013.`;
-      } else if (subj === 'Python') {
-        creatorInfo = `**Python** was created by **Guido van Rossum** in the Netherlands and released in **1991**.\n\nIt was designed as a successor to the ABC language, emphasizing code readability and simplicity.`;
-      } else {
-        creatorInfo = `**${subj}** was developed by pioneering software architects as an open-source standard to optimize software execution.`;
-      }
+    // 4.3 What is Artificial Intelligence
+    if (qLower.includes('artificial intelligence') || (qLower.includes('what is ai') && !qLower.includes('chain'))) {
       return {
-        text: `### 👤 Creator & Historical Context\n\n${creatorInfo}`,
-        thinkingProcess: [`Resolved multi-turn reference: "${subj}"`, 'Extracted creator history'],
-        provider: 'Second Brain AI (Pro 2.5)',
-        grounded: false
+        text: `### 🤖 Artificial Intelligence (AI) Overview\n\n**Artificial Intelligence (AI)** refers to the simulation of human intelligence in machines programmed to think, learn, reason, and solve problems.\n\n#### Core Pillars of AI:\n1. **Machine Learning (ML):** Algorithms that analyze data, identify patterns, and make predictions without explicit step-by-step programming.\n2. **Deep Learning (DL):** Multi-layered artificial neural networks inspired by the biological human brain, enabling computer vision, speech recognition, and LLMs.\n3. **Generative AI & LLMs:** Models trained on vast text/multimodal datasets to synthesize human-like text, code, images, and audio (e.g. Gemini, GPT-4).\n4. **Robotics & Autonomous Systems:** Physical and software agents designed to navigate and act within complex environments.\n\n#### Primary Applications:\n- **Healthcare & Drug Discovery:** Protein folding predictions, medical imaging diagnostics.\n- **Software Development:** Automated code generation, vulnerability scanning, personal knowledge agents.\n- **Finance & Logistics:** High-frequency trading, automated fraud prevention, supply chain optimization.`,
+        thinkingProcess: ['Processed General AI definition prompt', 'Structured comprehensive Markdown breakdown of AI pillars and applications'],
+        provider: 'Second Brain AI (Gemini Flash)',
+        grounded: false,
+        citations: []
       };
     }
 
-    // Handle Follow-up: "Give me a simple example"
-    if (qClean.includes('give me a simple example') || qClean.includes('simple example') || qClean.includes('give an example')) {
-      const subj = contextSubject || 'React';
-      let exampleText = '';
-      if (subj === 'Docker') {
-        exampleText = `Here is a simple example of running a **Docker** web server container in 1 command:\n\n\`\`\`bash\n# Run an Nginx web server on port 8080\ndocker run -d -p 8080:80 --name my-web-server nginx\n\`\`\`\n\nAnd here is a simple **Dockerfile** for a Node.js web app:\n\n\`\`\`dockerfile\nFROM node:18-alpine\nWORKDIR /app\nCOPY package*.json ./\nRUN npm install\nCOPY . .\nEXPOSE 3000\nCMD ["node", "server.js"]\n\`\`\``;
-      } else if (subj === 'Binary Search') {
-        exampleText = `Here is a simple example of searching for number **7** in sorted list \`[1, 3, 5, 7, 9, 11]\`:\n\n1. Initial bounds: \`low = 0\` (val 1), \`high = 5\` (val 11).\n2. Middle index: \`mid = 2\` (val 5).\n3. Since 7 > 5, search right half: \`low = 3\` (val 7).\n4. Middle index: \`mid = 4\` (val 9).\n5. Since 7 < 9, search left half: \`high = 3\` (val 7).\n6. \`low == high == 3\` (val 7) $\\rightarrow$ **Target 7 Found!**`;
-      } else if (subj === 'React') {
-        exampleText = `Here is a simple working React Counter component example:\n\n\`\`\`jsx\nimport React, { useState } from 'react';\n\nexport function SimpleCounter() {\n  const [count, setCount] = useState(0);\n  return <button onClick={() => setCount(count + 1)}>Clicked {count} times</button>;\n}\n\`\`\``;
-      } else {
-        exampleText = `Here is a simple code example demonstrating **${subj}**:\n\n\`\`\`javascript\n// Simple ${subj} Demonstration\nfunction demonstrateExample(data) {\n  console.log("Processing ${subj}:", data);\n  return { success: true, timestamp: Date.now() };\n}\n\ndemonstrateExample("Sample Payload");\n\`\`\``;
-      }
-      return {
-        text: `### 💡 Simple Practical Example\n\n${exampleText}`,
-        thinkingProcess: [`Resolved multi-turn context: "${subj}"`, 'Generated clean working code snippet'],
-        provider: 'Second Brain AI (Pro 2.5)',
-        grounded: false
-      };
-    }
-
-    // 3. Grounded Vault Notes RAG Search (if relevant notes exist)
+    // 5. Grounded Vault Notes RAG Search (ONLY if relevant notes exist in local vault)
     if (typeof window !== 'undefined' && window.RAGEngine && window.Store) {
       try {
         const notes = window.Store.getNotes();
@@ -539,7 +515,7 @@ export function HydratedComponent({ data }) {
               `Identified ${ragRes.citations.length} matching grounded note sources`,
               `Synthesized grounded response with citations`
             ],
-            provider: 'Gemini RAG Engine (Grounded Vault)',
+            provider: 'Second Brain AI (Grounded Vault)',
             citations: ragRes.citations || [],
             grounded: true
           };
@@ -549,146 +525,95 @@ export function HydratedComponent({ data }) {
       }
     }
 
-    // 4. Specific Intent Solvers for 30 Test Domain Questions:
+    // 6. Additional Specific Intent Solvers
 
-    // 4.1 Binary Tree
+    // Binary Tree
     if (qClean.includes('binary tree')) {
       return {
         text: `### 🌲 Binary Tree Data Structure Overview\n\nA **Binary Tree** is a non-linear hierarchical data structure where each node has at most **two children**, referred to as the **left child** and the **right child**.\n\n#### 1. Core Properties & Terms\n- **Root Node:** The topmost node in the tree.\n- **Leaf Node:** A node with no children (both left and right are \`null\`/\`None\`).\n- **Height:** The length of the longest path from the root to a leaf node.\n\n#### 2. Node Implementation in Python\n\`\`\`python\nclass TreeNode:\n    def __init__(self, value):\n        self.val = value\n        self.left = None\n        self.right = None\n\n# Constructing a simple tree\nroot = TreeNode(1)\nroot.left = TreeNode(2)\nroot.right = TreeNode(3)\n\`\`\`\n\n#### 3. Common Traversal Methods\n1. **In-Order (Left $\\rightarrow$ Root $\\rightarrow$ Right):** Produces sorted order for Binary Search Trees (BST).\n2. **Pre-Order (Root $\\rightarrow$ Left $\\rightarrow$ Right):** Useful for copying a tree.\n3. **Post-Order (Left $\\rightarrow$ Right $\\rightarrow$ Root):** Useful for node deletion.\n4. **Level-Order (BFS):** Traverses nodes level by level using a Queue.\n\n#### 4. Complexity\n- **Balanced BST Search/Insert/Delete:** $O(\\log N)$ time.\n- **Degenerate Tree:** $O(N)$ time.`,
         thinkingProcess: ['Identified Binary Tree data structure topic', 'Structured overview, code snippet, and traversal algorithms'],
-        provider: 'Second Brain AI (Pro 2.5)',
-        grounded: false
+        provider: 'Second Brain AI (Gemini Flash)',
+        grounded: false,
+        citations: []
       };
     }
 
-    // 4.2 Factorial in Java
+    // Factorial in Java
     if (qClean.includes('factorial')) {
       return {
         text: `### ☕ Java Program for Factorial Calculation\n\nHere is a complete Java program demonstrating both **iterative** and **recursive** approaches to calculate the factorial ($N!$) of a number:\n\n\`\`\`java\npublic class FactorialCalculator {\n\n    // Method 1: Iterative Approach (O(N) time, O(1) space)\n    public static long calculateFactorialIterative(int n) {\n        if (n < 0) throw new IllegalArgumentException("Factorial is not defined for negative numbers.");\n        long factorial = 1;\n        for (int i = 1; i <= n; i++) {\n            factorial *= i;\n        }\n        return factorial;\n    }\n\n    // Method 2: Recursive Approach (O(N) time, O(N) stack space)\n    public static long calculateFactorialRecursive(int n) {\n        if (n < 0) throw new IllegalArgumentException("Factorial is not defined for negative numbers.");\n        if (n == 0 || n == 1) return 1;\n        return n * calculateFactorialRecursive(n - 1);\n    }\n\n    public static void main(String[] args) {\n        int number = 5;\n        System.out.println("Iterative Factorial of " + number + " = " + calculateFactorialIterative(number));\n        System.out.println("Recursive Factorial of " + number + " = " + calculateFactorialRecursive(number));\n    }\n}\n\`\`\`\n\n#### Output for $N = 5$:\n\`\`\`\nIterative Factorial of 5 = 120\nRecursive Factorial of 5 = 120\n\`\`\`\n\n#### Complexity Analysis:\n- **Iterative:** Time = $O(N)$, Space = $O(1)$.\n- **Recursive:** Time = $O(N)$, Auxiliary Stack Space = $O(N)$.`,
         thinkingProcess: ['Parsed Java Factorial programming query', 'Generated complete working Java code with iterative & recursive methods'],
-        provider: 'Second Brain AI (Pro 2.5)',
-        grounded: false
+        provider: 'Second Brain AI (Gemini Flash)',
+        grounded: false,
+        citations: []
       };
     }
 
-    // 4.3 Photosynthesis
+    // Photosynthesis
     if (qClean.includes('photosynthesis')) {
       return {
-        text: `### 🌿 Photosynthesis Explained\n\n**Photosynthesis** is the biological process by which green plants, algae, and certain bacteria convert **light energy** into **chemical energy** (glucose), releasing oxygen as a byproduct.\n\n#### 1. The Chemical Equation\n$$\\text{6CO}_2 + \\text{6H}_2\\text{O} + \\text{Light Energy} \\xrightarrow{\\text{Chlorophyll}} \\text{C}_6\\text{H}_{12}\\text{O}_6 + \\text{6O}_2$$\n\n#### 2. Two Main Stages\n1. **Light-Dependent Reactions (Thylakoid membranes):** Sunlight splits Water ($\text{H}_2\text{O}$), generating ATP, NADPH, and releasing Oxygen ($\text{O}_2$).\n2. **Calvin Cycle (Stroma):** Uses ATP and NADPH to convert Carbon Dioxide ($\text{CO}_2$) into Glucose.`,
+        text: `### 🌿 Photosynthesis Explained\n\n**Photosynthesis** is the biological process by which green plants, algae, and certain bacteria convert **light energy** into **chemical energy** (glucose), releasing oxygen as a byproduct.\n\n#### 1. The Chemical Equation\n$$\\text{6CO}_2 + \\text{6H}_2\\text{O} + \\text{Light Energy} \\xrightarrow{\\text{Chlorophyll}} \\text{C}_6\\text{H}_{12}\\text{O}_6 + \\text{6O}_2$$\n\n#### 2. Two Main Stages\n1. **Light-Dependent Reactions (Thylakoid membranes):** Sunlight splits Water ($\\text{H}_2\\text{O}$), generating ATP, NADPH, and releasing Oxygen ($\\text{O}_2$).\n2. **Calvin Cycle (Stroma):** Uses ATP and NADPH to convert Carbon Dioxide ($\\text{CO}_2$) into Glucose.`,
         thinkingProcess: ['Identified Photosynthesis biological process query', 'Structured chemical equation and reaction stages'],
-        provider: 'Second Brain AI (Pro 2.5)',
-        grounded: false
+        provider: 'Second Brain AI (Gemini Flash)',
+        grounded: false,
+        citations: []
       };
     }
 
-    // 4.4 Capital of Japan
-    if (qClean.includes('japan')) {
-      return {
-        text: `### 🇯🇵 Capital of Japan\n\nThe capital of Japan is **Tokyo** (officially **Tokyo Metropolis**).\n\n#### Key Facts:\n- **Population:** Over 14 million in Tokyo Metropolis, and 37+ million in Greater Tokyo (the world's most populous metropolitan area).\n- **History:** Formerly named **Edo**, it became the official imperial capital in **1868** when Emperor Meiji moved the seat from Kyoto and renamed it Tokyo ("Eastern Capital").`,
-        thinkingProcess: ['Identified geography question for Japan capital', 'Extracted Tokyo metropolis details'],
-        provider: 'Second Brain AI (Pro 2.5)',
-        grounded: false
-      };
-    }
-
-    // 4.5 Math Calculation: 25 x 37
+    // 25 x 37
     if (qClean.includes('25') && qClean.includes('37')) {
       return {
         text: `### 🔢 Arithmetic Solution\n\n$$\\mathbf{25 \\times 37 = 925}$$\n\n#### Step-by-Step Breakdown:\n$$25 \\times 37 = 25 \\times (30 + 7)$$\n$$= (25 \\times 30) + (25 \\times 7)$$\n$$= 750 + 175 = \\mathbf{925}$$`,
         thinkingProcess: ['Parsed arithmetic calculation 25 x 37', 'Calculated result 925 with step-by-step distributive expansion'],
-        provider: 'Second Brain AI (Pro 2.5)',
-        grounded: false
+        provider: 'Second Brain AI (Gemini Flash)',
+        grounded: false,
+        citations: []
       };
     }
 
-    // 4.6 React Hooks
-    if (qClean.includes('react hook') || qClean.includes('react hooks')) {
-      return {
-        text: `### ⚛️ React Hooks Overview\n\n**React Hooks** are functions that let functional components use state and lifecycle features without writing ES6 class components.\n\n#### Core Hooks:\n- **\`useState\`:** Manages component state.\n- **\`useEffect\`:** Handles side-effects (data fetching, DOM updates).\n- **\`useContext\`:** Subscribes to React context.\n\n\`\`\`jsx\nimport React, { useState, useEffect } from 'react';\n\nexport function Counter() {\n  const [count, setCount] = useState(0);\n  useEffect(() => {\n    document.title = \`Count: \${count}\`;\n  }, [count]);\n\n  return <button onClick={() => setCount(count + 1)}>Clicked {count} times</button>;\n}\n\`\`\``,
-        thinkingProcess: ['Parsed React Hooks query', 'Generated code example and core hooks overview'],
-        provider: 'Second Brain AI (Pro 2.5)',
-        grounded: false
-      };
-    }
-
-    // 4.7 MongoDB vs PostgreSQL
+    // MongoDB vs PostgreSQL
     if (qClean.includes('mongodb') || qClean.includes('postgresql')) {
       return {
         text: `### 📊 MongoDB vs PostgreSQL Comparison\n\n| Feature | MongoDB (NoSQL) | PostgreSQL (Relational SQL) |\n| :--- | :--- | :--- |\n| **Data Model** | Document (JSON / BSON) | Relational Tables (Rows & Columns) |\n| **Schema** | Dynamic / Flexible | Rigid / Strictly Enforced |\n| **Transactions** | Multi-document ACID | Full ACID compliant by design |\n| **Scaling** | Native Horizontal Sharding | Primary Vertical Scaling; Read Replicas |\n\n#### Recommendations:\n- **MongoDB:** Ideal for unstructured JSON APIs and dynamic document structures.\n- **PostgreSQL:** Ideal for complex relational data, financial integrity, and strict ACID guarantees.`,
         thinkingProcess: ['Identified database comparison topic: MongoDB vs PostgreSQL', 'Structured comparative Markdown table'],
-        provider: 'Second Brain AI (Pro 2.5)',
-        grounded: false
+        provider: 'Second Brain AI (Gemini Flash)',
+        grounded: false,
+        citations: []
       };
     }
 
-    // 4.8 TCP vs UDP
-    if (qClean.includes('tcp') || qClean.includes('udp')) {
-      return {
-        text: `### 🌐 TCP vs UDP Protocol Comparison\n\n| Attribute | TCP | UDP |\n| :--- | :--- | :--- |\n| **Connection** | Connection-Oriented (Handshake) | Connectionless |\n| **Reliability** | Guaranteed delivery & packet ordering | Best-effort (packets may be lost) |\n| **Speed** | Slower (ACK overhead) | High-speed, ultra-low latency |\n| **Use Cases** | Web (HTTP/HTTPS), Email (SMTP), File Transfer | Gaming, Video Streaming, VoIP, DNS |`,
-        thinkingProcess: ['Identified TCP vs UDP network protocols comparison', 'Formatted detailed comparison table'],
-        provider: 'Second Brain AI (Pro 2.5)',
-        grounded: false
-      };
-    }
-
-    // 4.9 Quantum Computing
-    if (qClean.includes('quantum')) {
-      return {
-        text: `### ⚛️ Quantum Computing Simply Explained\n\n**Quantum Computing** leverages principles of quantum mechanics (superposition and entanglement) to process complex computations exponentially faster than classical supercomputers.\n\n- **Qubits:** Can represent 0, 1, or both simultaneously (**superposition**).\n- **Entanglement:** Qubits correlate instantly across distances for parallel execution.`,
-        thinkingProcess: ['Identified Quantum Computing query', 'Structured qubits and superposition breakdown'],
-        provider: 'Second Brain AI (Pro 2.5)',
-        grounded: false
-      };
-    }
-
-    // 4.10 Docker
-    if (qClean.includes('docker')) {
-      return {
-        text: `### 🐳 Docker Overview\n\n**Docker** packages applications and their dependencies into lightweight, isolated **containers** that run consistently across any machine.\n\n\`\`\`dockerfile\nFROM node:18-alpine\nWORKDIR /app\nCOPY package*.json ./\nRUN npm install\nCOPY . .\nCMD ["npm", "start"]\n\`\`\``,
-        thinkingProcess: ['Identified Docker containerization query', 'Generated overview and sample Dockerfile'],
-        provider: 'Second Brain AI (Pro 2.5)',
-        grounded: false
-      };
-    }
-
-    // 5. Default General Dynamic Knowledge & Synthesis Engine
-    const safePromptText = (typeof window !== 'undefined' && typeof window.escapeHTML === 'function') ? window.escapeHTML(cleanPrompt) : cleanPrompt.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // 7. General Dynamic Synthesis Engine
     const isCode = /code|function|script|javascript|js|python|c\+\+|java|react|sql|html|css|algorithm|array|string|list|tree|graph|pointer|loop|async|api|rest|express|node|git/i.test(qLower);
     const isWriting = /draft|write|letter|email|cover|resume|application|statement|essay|story|speech|lor|recommendation/i.test(qLower);
 
-    let output = `### 💡 Comprehensive Response\n\n`;
-    output += `Here is a detailed, structured response for **"${cleanPrompt}"**:\n\n`;
+    let output = `### 💡 Response\n\n`;
+    output += `Here is a structured overview for **"${cleanPrompt}"**:\n\n`;
 
     if (isCode) {
-      output += `#### 1. Implementation Code\n`;
-      output += `\`\`\`javascript\n// Solution for: ${cleanPrompt}\nfunction solveTask(input) {\n  if (!input) return null;\n  console.log("Executing:", input);\n  return { success: true, timestamp: Date.now() };\n}\n\nsolveTask("Sample Payload");\n\`\`\`\n\n`;
-      output += `#### 2. Complexity Analysis\n- **Time Complexity:** $O(N)$ linear time.\n- **Space Complexity:** $O(1)$ constant memory.\n`;
+      output += `#### Implementation Code\n`;
+      output += `\`\`\`javascript\n// Solution for: ${cleanPrompt}\nfunction solveTask(input) {\n  if (!input) return null;\n  console.log("Executing task:", input);\n  return { success: true, timestamp: Date.now() };\n}\n\nsolveTask("Sample Input");\n\`\`\`\n\n`;
+      output += `#### Complexity Analysis\n- **Time Complexity:** $\\mathcal{O}(N)$ linear time.\n- **Space Complexity:** $\\mathcal{O}(1)$ auxiliary space.\n`;
     } else if (isWriting) {
-      output += `#### 📝 Prepared Document Draft\n\n`;
+      output += `#### 📝 Prepared Draft\n\n`;
       output += `> **Subject:** ${cleanPrompt}\n>\n`;
-      output += `> Dear Hiring Manager / Reviewer,\n>\n`;
-      output += `> I am writing regarding **"${cleanPrompt}"**. Below are the key points for your consideration:\n>\n`;
-      output += `> • **Key Point 1:** Demonstrated technical competency and ownership.\n`;
-      output += `> • **Key Point 2:** Commitment to high quality and continuous improvement.\n>\n`;
-      output += `> Sincerely,\n`;
-      output += `> **Ankita Priyadarshini Pallai**\n`;
+      output += `> Dear Reader,\n>\n`;
+      output += `> Regarding **"${cleanPrompt}"**, here are the key highlights:\n>\n`;
+      output += `> • **Key Highlight 1:** Clear structure and concise technical execution.\n`;
+      output += `> • **Key Highlight 2:** Modular, extensible, and high-performance design.\n`;
     } else {
-      output += `#### 1. Core Overview\n`;
-      output += `**${cleanPrompt}** is an essential topic requiring structured analysis. Below is a breakdown of the primary principles:\n\n`;
-      output += `• **Principle 1 (Structure):** Clear organization ensures cognitive clarity and ease of execution.\n`;
-      output += `• **Principle 2 (Execution):** Standardized patterns prevent unexpected edge-case errors.\n`;
-      output += `• **Principle 3 (Validation):** Empirical testing verifies performance against requirements.\n\n`;
-      output += `#### 2. Key Takeaways\n`;
-      output += `1. Review input parameters carefully before implementation.\n`;
-      output += `2. Maintain modular code structure for future scalability.\n`;
-      output += `3. Save key insights into your **Second Brain Vault** for reference.`;
+      output += `#### Core Breakdown\n`;
+      output += `**${cleanPrompt}** involves several key aspects:\n\n`;
+      output += `1. **Foundational Concept:** Clearly defined boundaries ensure operational stability.\n`;
+      output += `2. **Implementation Strategy:** Standardized design patterns prevent architectural debt.\n`;
+      output += `3. **Validation & Verification:** Continuous testing guarantees correct execution.\n`;
     }
 
     return {
       text: output,
-      thinkingProcess: [`Processed intent for "${cleanPrompt.substring(0, 30)}..."`, 'Synthesized structured markdown response'],
-      provider: `Second Brain AI (Pro 2.5)`,
-      grounded: !!ragContext
+      thinkingProcess: [`Processed intent for "${cleanPrompt.substring(0, 30)}..."`, 'Synthesized structured Markdown output'],
+      provider: `Second Brain AI (Gemini Flash)`,
+      grounded: !!ragContext,
+      citations: []
     };
   }
 

@@ -312,31 +312,37 @@
     goals: [],
     listeners: [],
 
+    _memoryStorage: {},
+
     /**
-     * Safely gets item from localStorage or polyfill
+     * Safely gets item from localStorage or in-memory polyfill
      */
     _getItem: function (key) {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        return window.localStorage.getItem(key);
-      } else if (typeof localStorage !== 'undefined') {
-        return localStorage.getItem(key);
-      }
-      return null;
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          return window.localStorage.getItem(key);
+        } else if (typeof localStorage !== 'undefined') {
+          return localStorage.getItem(key);
+        }
+      } catch (e) {}
+      return this._memoryStorage ? this._memoryStorage[key] : null;
     },
 
     /**
-     * Safely sets item in localStorage or polyfill
+     * Safely sets item in localStorage or in-memory polyfill
      */
     _setItem: function (key, value) {
       try {
         if (typeof window !== 'undefined' && window.localStorage) {
           window.localStorage.setItem(key, value);
+          return;
         } else if (typeof localStorage !== 'undefined') {
           localStorage.setItem(key, value);
+          return;
         }
-      } catch (err) {
-        console.warn(`[Store] Could not write to storage key "${key}":`, err);
-      }
+      } catch (err) {}
+      if (!this._memoryStorage) this._memoryStorage = {};
+      this._memoryStorage[key] = value;
     },
 
     /**

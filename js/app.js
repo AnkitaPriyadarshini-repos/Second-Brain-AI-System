@@ -496,71 +496,17 @@
         }
       } catch (err) {}
 
-      const now = Date.now();
-      if (window.isAIProcessing && (now - (window.aiProcessingStartTime || 0) < 12000)) {
+      if (window.isAIProcessing) return false;
+
+      const inputEl = document.getElementById('rag-query-input');
+      const query = inputEl ? inputEl.value.trim() : '';
+      if (!query && !window.activePromptAttachment) {
         return false;
       }
-      window.isAIProcessing = true;
-      window.aiProcessingStartTime = now;
 
-      try {
-        const inputEl = document.getElementById('rag-query-input');
-        const query = inputEl ? inputEl.value.trim() : '';
-        if (!query && !window.activePromptAttachment) {
-          window.isAIProcessing = false;
-          return false;
-        }
-
-        if (inputEl) {
-          inputEl.value = '';
-          inputEl.style.height = 'auto';
-        }
-        const submitBtn = document.getElementById('rag-submit-btn');
-        if (submitBtn) submitBtn.classList.remove('has-input');
-
-        const handler = window.handleRAGQuery || (typeof handleRAGQuery === 'function' ? handleRAGQuery : null);
-        if (typeof handler === 'function') {
-          handler(query);
-        } else {
-          console.warn('[submitRAGQuery] Executing direct fallback query submission');
-          const heroView = document.getElementById('chat-hero-view');
-          const targetContainer = document.getElementById('chat-container') || document.querySelector('.chat-stream');
-          if (heroView) heroView.style.display = 'none';
-          if (targetContainer) {
-            targetContainer.style.display = 'flex';
-            targetContainer.style.flexDirection = 'column';
-          }
-          if (typeof window.appendChatMessage === 'function') {
-            window.appendChatMessage('user', query);
-          } else if (typeof appendChatMessage === 'function') {
-            appendChatMessage('user', query);
-          }
-          const engine = typeof aiEngine !== 'undefined' ? aiEngine : (typeof window !== 'undefined' ? window.aiEngine : null);
-          if (engine && typeof engine.generateResponse === 'function') {
-            engine.generateResponse({ prompt: query }).then(res => {
-              const text = res && res.text ? res.text : `Here is the response for **"${query}"**:\n\nHello! How can I assist you today?`;
-              if (typeof window.appendChatMessage === 'function') {
-                window.appendChatMessage('ai', text, [], false, query, 'Juno 2.5 Flash', true);
-              } else if (typeof appendChatMessage === 'function') {
-                appendChatMessage('ai', text, [], false, query, 'Juno 2.5 Flash', true);
-              }
-            }).catch(err => {
-              const fallbackText = "Hello! 😊 How can I help you synthesize your ideas and notes today?";
-              if (typeof window.appendChatMessage === 'function') {
-                window.appendChatMessage('ai', fallbackText, [], false, query, 'Juno 2.5 Flash', false);
-              } else if (typeof appendChatMessage === 'function') {
-                appendChatMessage('ai', fallbackText, [], false, query, 'Juno 2.5 Flash', false);
-              }
-            }).finally(() => {
-              window.isAIProcessing = false;
-            });
-          } else {
-            window.isAIProcessing = false;
-          }
-        }
-      } catch (err) {
-        console.error('Error in submitRAGQuery:', err);
-        window.isAIProcessing = false;
+      const handler = window.handleRAGQuery || (typeof handleRAGQuery === 'function' ? handleRAGQuery : null);
+      if (typeof handler === 'function') {
+        handler(query);
       }
       return false;
     };
@@ -1581,21 +1527,30 @@
 
     async function handleRAGQuery(query) {
       window.handleRAGQuery = handleRAGQuery;
-      const now = Date.now();
-      if (window.isAIProcessing && (now - (window.aiProcessingStartTime || 0) < 12000)) return;
-
       const cleanQuery = (typeof query === 'string' ? query : (query ? String(query) : '')).trim();
       if (!cleanQuery && !activePromptAttachment) {
-        window.isAIProcessing = false;
         return;
       }
 
+      if (window.isAIProcessing) return;
+
+      const now = Date.now();
       window.isAIProcessing = true;
       window.aiProcessingStartTime = now;
       window.isAIAborted = false;
 
       let thinkingCard = null;
       let submitBtn = document.getElementById('rag-submit-btn');
+      let inputEl = document.getElementById('rag-query-input');
+
+      if (inputEl) {
+        inputEl.disabled = true;
+        inputEl.setAttribute('aria-disabled', 'true');
+      }
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.setAttribute('aria-busy', 'true');
+      }
 
       try {
         if (typeof window.activateView === 'function') {
@@ -1619,7 +1574,6 @@
         }
         appendChatMessage('user', userDisplayQuery);
 
-        const inputEl = document.getElementById('rag-query-input');
         if (inputEl) {
           inputEl.value = '';
           inputEl.style.height = 'auto';
@@ -1666,6 +1620,7 @@
         };
 
         if (submitBtn) {
+          submitBtn.disabled = false;
           submitBtn.innerHTML = `<span style="font-size: 14px; color: #2c1d00; font-weight: 900;">⏹️</span>`;
           submitBtn.title = "Stop Generating";
           submitBtn.onclick = function(e) {
@@ -1805,7 +1760,16 @@
       } finally {
         window.isAIProcessing = false;
         window.isAIAborted = false;
+        const inputEl = document.getElementById('rag-query-input');
+        const submitBtn = document.getElementById('rag-submit-btn');
+        if (inputEl) {
+          inputEl.disabled = false;
+          inputEl.removeAttribute('aria-disabled');
+          inputEl.focus();
+        }
         if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.removeAttribute('aria-busy');
           submitBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`;
           submitBtn.title = "Send message";
           submitBtn.onclick = null;

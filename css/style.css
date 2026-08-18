@@ -8579,5 +8579,62 @@ body.focus-preview-mode .claude-main-canvas {
   }
 }
 
+/* ==========================================================================
+   JUNO AI INTERFACE POLISH: DISABLED STATES & FLOATING SCROLL BUTTON
+   ========================================================================== */
+
+.claude-textarea:disabled,
+#rag-query-input:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  background: rgba(15, 23, 42, 0.4) !important;
+}
+
+.claude-send-btn:disabled,
+#rag-submit-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  filter: grayscale(0.6);
+}
+
+#scroll-to-bottom-btn {
+  position: fixed;
+  bottom: 110px;
+  right: 28px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.92);
+  color: #00f2fe;
+  border: 1.5px solid rgba(0, 242, 254, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  z-index: 999;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#scroll-to-bottom-btn:hover {
+  transform: translateY(-2px) scale(1.05);
+  background: #00f2fe;
+  color: #040d1a;
+  box-shadow: 0 8px 25px rgba(0, 242, 254, 0.5);
+}
+
+.thinking-placeholder {
+  animation: pulseGlow 1.8s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+  0% { opacity: 0.85; }
+  50% { opacity: 1.0; }
+  100% { opacity: 0.85; }
+}
+
 
 

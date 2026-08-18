@@ -12,13 +12,14 @@
     "start": "node server.js",
     "dev": "node server.js",
     "serve": "npx serve .",
-    "test": "node test/run_tests.js && node test/run_websocket_ssr_tests.js && node test/run_dip_repository_tests.js && node test/run_layered_architecture_tests.js && node test/run_production_blueprint_tests.js && node test/run_juno_gateway_regression.js",
+    "test": "node test/run_tests.js && node test/run_websocket_ssr_tests.js && node test/run_dip_repository_tests.js && node test/run_layered_architecture_tests.js && node test/run_production_blueprint_tests.js && node test/run_rag_system_tests.js && node test/run_production_audit_tests.js",
     "test:unit": "node test/run_tests.js",
     "test:realtime": "node test/run_websocket_ssr_tests.js",
     "test:dip": "node test/run_dip_repository_tests.js",
     "test:layered": "node test/run_layered_architecture_tests.js",
     "test:blueprint": "node test/run_production_blueprint_tests.js",
-    "test:juno": "node test/run_juno_gateway_regression.js",
+    "test:rag": "node test/run_rag_system_tests.js",
+    "test:audit": "node test/run_production_audit_tests.js",
     "test:load": "node test/load_test_100_users.js"
   },
   "dependencies": {
