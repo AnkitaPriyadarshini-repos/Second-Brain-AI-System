@@ -4,18 +4,18 @@
 
 /* Adaptive Fusion Theme & Container Variables */
 :root {
-  --af-gold: #ca8a04;
-  --af-gold-glow: rgba(202, 138, 4, 0.4);
-  --af-cyan: #eab308;
-  --af-cyan-glow: rgba(234, 179, 8, 0.4);
-  --af-purple: #d97706;
-  --af-purple-glow: rgba(217, 119, 6, 0.4);
-  --af-silver: #ca8a04;
-  --af-silver-glow: rgba(202, 138, 4, 0.4);
-  --af-fuse-beam: #ca8a04;
-  --af-bg-dark: #fef08a;
-  --af-card-bg: rgba(255, 255, 255, 0.95);
-  --af-card-border: rgba(202, 138, 4, 0.35);
+  --af-gold: #153A50;
+  --af-gold-glow: rgba(21, 58, 80, 0.15);
+  --af-cyan: #5B8094;
+  --af-cyan-glow: rgba(91, 128, 148, 0.15);
+  --af-purple: #7198AF;
+  --af-purple-glow: rgba(113, 152, 175, 0.15);
+  --af-silver: #87B1C8;
+  --af-silver-glow: rgba(135, 177, 200, 0.15);
+  --af-fuse-beam: #153A50;
+  --af-bg-dark: #F5F9FC;
+  --af-card-bg: #FFFFFF;
+  --af-card-border: #D8E6EE;
 }
 
 /* Adaptive Fusion Model Selector Highlight */

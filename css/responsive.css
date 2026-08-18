@@ -61,37 +61,18 @@
     backdrop-filter: blur(12px) !important;
   }
 
-  [data-theme="sunflower-yellow"] .bottom-mobile-nav,
-  [data-theme="gemini-light"] .bottom-mobile-nav {
-    background: rgba(254, 252, 232, 0.94) !important;
-    border-color: #fde047 !important;
-  }
-
-  .mobile-nav-btn {
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 3px !important;
-    background: transparent !important;
-    border: none !important;
-    color: var(--text-secondary) !important;
-    font-size: 11px !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
-    padding: 6px 0 !important;
-    min-height: 44px !important; /* Touch target accessibility */
-    touch-action: manipulation !important;
+  .bottom-mobile-nav {
+    background: #FFFFFF !important;
+    border-top: 1px solid #D8E6EE !important;
   }
 
   .mobile-nav-btn.active {
-    color: #d97706 !important;
-    font-weight: 800 !important;
+    color: #153A50 !important;
+    font-weight: 700 !important;
   }
 
   .mobile-nav-btn.active svg {
-    stroke: #f59e0b !important;
+    stroke: #153A50 !important;
   }
 
   /* Hero Banner Mobile Adjustments */

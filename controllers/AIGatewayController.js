@@ -16,7 +16,9 @@ class AIGatewayController {
     const { prompt, contextNotes, model } = req.body || {};
     const userId = req.headers['x-user-id'] || req.ip || 'client';
 
-    console.log(`[${requestId}] AI Query start - user:${userId} model:${model || 'default'}`);
+    if (process.env.NODE_ENV !== 'test') {
+      console.log(`[${requestId}] AI Query start - user:${userId} model:${model || 'default'}`);
+    }
 
     try {
       const result = await this.aiGatewayService.processGatewayRequest({
@@ -31,11 +33,15 @@ class AIGatewayController {
 
       if (result.error) {
         const statusCode = result.error.includes('Rate limit') ? 429 : 400;
-        console.warn(`[${requestId}] AI Query rejected (${statusCode}) - duration:${duration}ms error:${result.error}`);
+        if (process.env.NODE_ENV !== 'test') {
+          console.warn(`[${requestId}] AI Query rejected (${statusCode}) - duration:${duration}ms error:${result.error}`);
+        }
         return res.status(statusCode).json({ success: false, requestId, error: result.error });
       }
 
-      console.log(`[${requestId}] AI Query success - duration:${duration}ms citations:${(result.citations || []).length}`);
+      if (process.env.NODE_ENV !== 'test') {
+        console.log(`[${requestId}] AI Query success - duration:${duration}ms citations:${(result.citations || []).length}`);
+      }
       return res.status(200).json({ ...result, requestId, durationMs: duration });
     } catch (err) {
       const duration = Date.now() - startTime;

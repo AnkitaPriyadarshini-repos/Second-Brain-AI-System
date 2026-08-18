@@ -114,12 +114,12 @@ class AdaptiveFusionVisualizer {
     const coreX = w * this.coreXRatio;
     const coreY = h * this.coreYRatio;
 
-    // 1. Dark Background Fill with Gradient Depth
+    // 1. Light Ambient Background Fill
     ctx.clearRect(0, 0, w, h);
     const bgGrad = ctx.createRadialGradient(coreX, coreY, 10, coreX, coreY, Math.max(w, h));
-    bgGrad.addColorStop(0, '#0c111e');
-    bgGrad.addColorStop(0.5, '#07090e');
-    bgGrad.addColorStop(1, '#030407');
+    bgGrad.addColorStop(0, 'rgba(245, 249, 252, 0.9)');
+    bgGrad.addColorStop(0.5, 'rgba(245, 249, 252, 0.95)');
+    bgGrad.addColorStop(1, '#F5F9FC');
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, w, h);
 

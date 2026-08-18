@@ -136,11 +136,17 @@
 
       // Map view aliases to canonical view section IDs
       const viewAliasMap = {
+        'chat': 'jarvis',
         'ask': 'jarvis',
+        'search': 'vault',
+        'notes': 'capture',
         'library': 'vault',
         'memories': 'resurfacing',
         'learn': 'flashcards',
-        'research': 'agents'
+        'agents': 'agents',
+        'research': 'agents',
+        'tasks': 'goals',
+        'settings': 'settings'
       };
       const canonicalView = viewAliasMap[targetView] || targetView;
 
@@ -826,15 +832,7 @@
 
       window.handleModelChange = function(modelVal) {
         if (!modelVal) return;
-        // Map model value directly to theme
-        let targetTheme = 'golden-harmony';
-        if (modelVal === 'aqua-aesthetic' || modelVal === 'aqua-cyan') targetTheme = 'aqua-aesthetic';
-        else if (modelVal === 'summer-ocean') targetTheme = 'summer-ocean';
-        else if (modelVal === 'claude-obsidian') targetTheme = 'claude-obsidian';
-        else if (modelVal === 'chatgpt-emerald') targetTheme = 'chatgpt-emerald';
-        else if (modelVal === 'perplexity-cyan') targetTheme = 'perplexity-cyan';
-        else if (modelVal === 'gemini-glow') targetTheme = 'gemini-glow';
-        
+        const targetTheme = 'second-brain-navy';
         window.applyTheme(targetTheme);
       
       if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) {
@@ -1010,9 +1008,9 @@
 
     // Theme Switcher Initialization
     const themeCardOpts = document.querySelectorAll('.theme-card-option');
-    let savedTheme = Store.settings ? Store.settings.theme : 'golden-harmony';
-    if (!savedTheme || savedTheme === 'royal-gold' || savedTheme === 'sunflower-yellow' || savedTheme === 'emerald-luxe') {
-      savedTheme = 'golden-harmony';
+    let savedTheme = Store.settings ? Store.settings.theme : 'second-brain-navy';
+    if (!savedTheme || savedTheme === 'royal-gold' || savedTheme === 'sunflower-yellow' || savedTheme === 'golden-harmony') {
+      savedTheme = 'second-brain-navy';
     }
     applyTheme(savedTheme);
 
@@ -1030,10 +1028,7 @@
     });
 
     function applyTheme(themeName) {
-      if (!themeName) themeName = 'golden-harmony';
-      if (themeName === 'chatgpt-yellow' || themeName === 'royal-gold' || themeName === 'sunflower-yellow' || themeName === 'golden-harmony') {
-        // Active Yellow ChatGPT Theme
-      }
+      if (!themeName) themeName = 'second-brain-navy';
       const root = document.documentElement || document.body || (typeof document !== 'undefined' ? document.querySelector('html') : null);
       if (root && typeof root.setAttribute === 'function') {
         root.setAttribute('data-theme', themeName);

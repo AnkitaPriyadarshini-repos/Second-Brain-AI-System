@@ -1,16 +1,16 @@
 /* 🌙 Juno AI — WebSocket Real-Time Chat & Next.js SSR Design System */
 
 :root {
-  --ws-bg-dark: #fef08a;
-  --ws-card-bg: rgba(255, 255, 255, 0.95);
-  --ws-border: rgba(202, 138, 4, 0.35);
-  --ws-gold-primary: #ca8a04;
-  --ws-gold-hover: #a16207;
-  --ws-emerald-accent: #15803d;
-  --ws-cyan-accent: #eab308;
-  --ws-text-bright: #1c1900;
-  --ws-text-muted: #78350f;
-  --ws-shadow-glow: 0 8px 32px 0 rgba(234, 179, 8, 0.25);
+  --ws-bg-dark: #F5F9FC;
+  --ws-card-bg: #FFFFFF;
+  --ws-border: #D8E6EE;
+  --ws-gold-primary: #153A50;
+  --ws-gold-hover: #0E2738;
+  --ws-emerald-accent: #10B981;
+  --ws-cyan-accent: #5B8094;
+  --ws-text-bright: #153A50;
+  --ws-text-muted: #7198AF;
+  --ws-shadow-glow: 0 4px 16px rgba(21, 58, 80, 0.06);
 }
 
 .ws-chat-wrapper {

@@ -22,7 +22,7 @@ function Home({ initialHistory, initialMetrics, ssrPerformance }) {
     ),
     React.createElement(
       'main',
-      { style: { minHeight: '100vh', background: '#090d14', paddingTop: '2rem' } },
+      { style: { minHeight: '100vh', background: '#F5F9FC', paddingTop: '2rem' } },
       React.createElement(
         'header',
         { style: { textAlign: 'center', marginBottom: '1.5rem' } },
@@ -32,17 +32,15 @@ function Home({ initialHistory, initialMetrics, ssrPerformance }) {
             style: {
               fontSize: '2.2rem',
               fontWeight: 800,
-              background: 'linear-gradient(135deg, #06b6d4, #22d3ee, #10b981)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              color: '#153A50',
               margin: 0
             }
           },
-          '🌙 Juno AI — Real-Time Stream Hub'
+          '🧠 Second Brain AI — Real-Time Stream Hub'
         ),
         React.createElement(
           'p',
-          { style: { color: '#9ca3af', marginTop: '0.4rem', fontSize: '1rem' } },
+          { style: { color: '#5B8094', marginTop: '0.4rem', fontSize: '1rem' } },
           'Next.js Server-Side Rendering (2x Faster Initial Page Load) • WebSockets (< 300ms Message Delivery)'
         )
       ),
@@ -73,8 +71,8 @@ async function getServerSideProps(context) {
     },
     {
       id: 'msg-ssr-2',
-      sender: 'Juno AI System',
-      avatar: '🌼',
+      sender: 'Second Brain AI System',
+      avatar: '🧠',
       text: 'Real-Time WebSocket channel connected. Bi-directional stream latency guaranteed under 300ms.',
       room: 'general',
       timestamp: Date.now() - 60000,

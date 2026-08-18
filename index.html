@@ -1,11 +1,11 @@
-<html lang="en" data-theme="claude-obsidian">
+<html lang="en" data-theme="second-brain-navy">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Juno AI 🧠 — Personal Knowledge & Intelligence System</title>
-  <meta name="description" content="Juno AI personal cognitive assistant featuring grounded document retrieval and intelligence synthesis.">
+  <title>Second Brain AI 🧠 — Personal Knowledge & Intelligence System</title>
+  <meta name="description" content="Second Brain AI personal cognitive assistant featuring grounded document retrieval and intelligence synthesis.">
   <link rel="canonical" href="https://second-brain-ai-system.vercel.app/">
-  <meta property="og:title" content="Juno AI 🧠 — Knowledge Partner">
+  <meta property="og:title" content="Second Brain AI 🧠 — Knowledge Partner">
   <meta property="og:description" content="Private Second Brain & Research Assistant.">
   <meta property="og:url" content="https://second-brain-ai-system.vercel.app/">
   <meta property="og:type" content="website">
@@ -14,18 +14,18 @@
   <meta http-equiv="Expires" content="0">
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 
-  <!-- Google Fonts: Playfair Display Serif + Outfit + Inter + Fira Code -->
+  <!-- Google Fonts: Inter + Fira Code -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheets & App Manifest -->
-  <link rel="stylesheet" href="css/style.css?v=57.0">
-  <link rel="stylesheet" href="css/responsive.css?v=57.0">
-  <link rel="stylesheet" href="css/websocket-chat.css?v=57.0">
+  <link rel="stylesheet" href="css/style.css?v=58.0">
+  <link rel="stylesheet" href="css/responsive.css?v=58.0">
+  <link rel="stylesheet" href="css/websocket-chat.css?v=58.0">
   <link rel="stylesheet" href="css/adaptive-fusion.css?v=1.0">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#181715">
+  <meta name="theme-color" content="#153A50">
 </head>
 <body>
 
@@ -35,53 +35,78 @@
   <!-- App Layout Wrapper (Claude Dark Canvas Style) -->
   <div class="app-layout-wrapper claude-layout">
     
-    <!-- Left Vertical Narrow Icon Sidebar (Claude Style) -->
+    <!-- Left Vertical Compact Navy Sidebar (#153A50) -->
     <aside id="app-sidebar" class="app-sidebar claude-sidebar">
       <div class="sidebar-top">
-        <!-- Top Collapse Button -->
-        <button class="claude-sidebar-btn" onclick="window.toggleSidebar()" title="Sidebar Menu">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+        <!-- Sidebar Brand Header -->
+        <div class="sidebar-brand-header">
+          <div class="brand-title" onclick="window.activateView('jarvis')">
+            <span class="brand-icon" style="font-size: 20px;">🧠</span>
+            <span class="brand-name">Second Brain AI</span>
+          </div>
+          <button class="claude-sidebar-btn" onclick="window.toggleSidebar()" title="Toggle Sidebar" style="width: auto; padding: 4px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+          </button>
+        </div>
+
+        <!-- New Chat Button -->
+        <button class="sidebar-new-chat-btn" onclick="window.createNewChatThread()" title="Start New Chat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>New Chat</span>
         </button>
 
-        <!-- New Chat Icon Button (+) -->
-        <button class="claude-sidebar-btn add-btn" onclick="window.createNewChatThread()" title="New Chat">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        </button>
+        <!-- 8 Compact Navy Navigation Items -->
+        <div class="sidebar-menu-list">
+          <button class="sidebar-menu-item active" data-view="jarvis" onclick="window.activateView('jarvis')" title="Chat Workspace">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>Chat</span>
+          </button>
 
-        <!-- Navigation Icons -->
-        <button class="claude-sidebar-btn active" data-view="jarvis" onclick="window.activateView('jarvis')" title="Chats & Synthesis">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        </button>
+          <button class="sidebar-menu-item" data-view="search" onclick="window.openSearchChatsModal()" title="Search Conversations & RAG">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Search</span>
+          </button>
 
-        <button class="claude-sidebar-btn" data-view="vault" onclick="window.activateView('vault')" title="Projects & Library">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        </button>
+          <button class="sidebar-menu-item" data-view="capture" onclick="window.activateView('capture')" title="Notes & Ingest">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <span>Notes</span>
+          </button>
 
-        <button class="claude-sidebar-btn" data-view="resurfacing" onclick="window.activateView('resurfacing')" title="Artifacts & Knowledge">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </button>
+          <button class="sidebar-menu-item" data-view="graph" onclick="window.activateView('graph')" title="Knowledge Graph Network">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            <span>Knowledge Graph</span>
+          </button>
 
-        <button class="claude-sidebar-btn" data-view="graph" onclick="window.activateView('graph')" title="Repo Architect & Code">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-        </button>
+          <button class="sidebar-menu-item" data-view="agents" onclick="window.activateView('agents')" title="Specialized AI Working Agents">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/></svg>
+            <span>Agents</span>
+          </button>
 
-        <button class="claude-sidebar-btn" data-view="capture" onclick="window.activateView('capture')" title="Files & Notebooks">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        </button>
+          <button class="sidebar-menu-item" data-view="vault" onclick="window.activateView('vault')" title="Knowledge Vault Explorer">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span>Vault</span>
+          </button>
 
-        <button class="claude-sidebar-btn" onclick="window.openAdaptiveFusionModal()" title="Studio Themes & Style">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.92 0 1.67-.75 1.67-1.67 0-.42-.16-.8-.44-1.1-.26-.29-.41-.67-.41-1.09 0-.92.75-1.67 1.67-1.67H16c3.31 0 6-2.69 6-6 0-4.96-4.49-9-10-9z"/></svg>
-        </button>
+          <button class="sidebar-menu-item" data-view="goals" onclick="window.activateView('goals')" title="Tasks & Learning Goals">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+            <span>Tasks</span>
+          </button>
+
+          <button class="sidebar-menu-item" data-view="settings" onclick="window.activateView('settings')" title="System Settings & Privacy">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Settings</span>
+          </button>
+        </div>
       </div>
 
       <!-- Bottom Profile & Download Section -->
       <div class="sidebar-bottom">
-        <button class="claude-sidebar-btn" onclick="window.installPWA && window.installPWA()" title="Download desktop app">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        </button>
-        
-        <div class="claude-profile-avatar" onclick="window.openUserOnboardingModal()" title="Ankita Priyadarshini Pallai">
-          <span>AP</span>
+        <div class="user-profile-row" onclick="window.openUserOnboardingModal()" title="Profile & Account Settings">
+          <div class="user-avatar-circle">AP</div>
+          <div class="user-info-stack">
+            <div id="user-display-name">Ankita Priyadarshini</div>
+            <div class="user-tier">Second Brain Pro</div>
+          </div>
         </div>
       </div>
     </aside>
@@ -91,8 +116,8 @@
     <div id="mobile-drawer-panel" class="mobile-drawer-panel" aria-hidden="true" role="dialog" aria-label="Navigation Menu">
       <div class="drawer-header">
         <div class="drawer-brand">
-          <span class="brand-icon">🚀</span>
-          <strong>Juno AI Studio</strong>
+          <span class="brand-icon">🧠</span>
+          <strong>Second Brain AI</strong>
         </div>
         <button class="drawer-close-btn" onclick="window.toggleMobileDrawer(false)" aria-label="Close menu">✕</button>
       </div>
@@ -103,27 +128,35 @@
         </button>
         <button class="drawer-nav-item" onclick="window.activateView('jarvis'); window.toggleMobileDrawer(false);">
           <span class="nav-icon">💬</span>
-          <span>Chats & Synthesis</span>
+          <span>Chat</span>
         </button>
         <button class="drawer-nav-item" onclick="window.openSearchChatsModal(); window.toggleMobileDrawer(false);">
           <span class="nav-icon">🔍</span>
-          <span>Search Conversations</span>
+          <span>Search</span>
+        </button>
+        <button class="drawer-nav-item" onclick="window.activateView('capture'); window.toggleMobileDrawer(false);">
+          <span class="nav-icon">✏️</span>
+          <span>Notes</span>
+        </button>
+        <button class="drawer-nav-item" onclick="window.activateView('graph'); window.toggleMobileDrawer(false);">
+          <span class="nav-icon">🕸️</span>
+          <span>Knowledge Graph</span>
+        </button>
+        <button class="drawer-nav-item" onclick="window.activateView('agents'); window.toggleMobileDrawer(false);">
+          <span class="nav-icon">🤖</span>
+          <span>Agents</span>
         </button>
         <button class="drawer-nav-item" onclick="window.activateView('vault'); window.toggleMobileDrawer(false);">
           <span class="nav-icon">📚</span>
-          <span>Projects & Vault</span>
+          <span>Vault</span>
         </button>
-        <button class="drawer-nav-item" onclick="window.activateView('graph'); window.toggleMobileDrawer(false);">
-          <span class="nav-icon">💻</span>
-          <span>Repo Architect & Code</span>
+        <button class="drawer-nav-item" onclick="window.activateView('goals'); window.toggleMobileDrawer(false);">
+          <span class="nav-icon">🎯</span>
+          <span>Tasks</span>
         </button>
-        <button class="drawer-nav-item" onclick="window.openUserOnboardingModal(); window.toggleMobileDrawer(false);">
+        <button class="drawer-nav-item" onclick="window.activateView('settings'); window.toggleMobileDrawer(false);">
           <span class="nav-icon">⚙️</span>
-          <span>Settings & Account</span>
-        </button>
-        <button class="drawer-nav-item" onclick="window.triggerPWAInstall && window.triggerPWAInstall(); window.toggleMobileDrawer(false);">
-          <span class="nav-icon">📱</span>
-          <span>Install Mobile App</span>
+          <span>Settings</span>
         </button>
       </div>
       <div class="drawer-footer">
@@ -131,95 +164,74 @@
           <div class="user-avatar-circle">AP</div>
           <div class="user-info">
             <div class="user-name">Ankita Priyadarshini</div>
-            <div class="user-role">Juno Pro Architect</div>
+            <div class="user-role">Second Brain Pro</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Main Canvas Area (Claude Dark Studio Canvas) -->
+    <!-- Main Canvas Area -->
     <div class="app-main-canvas claude-main-canvas">
       <!-- Top Navigation Bar -->
       <header class="claude-top-navbar">
-        <div class="top-nav-left">
+        <div class="top-nav-left" style="display: flex; align-items: center; gap: 12px;">
           <button type="button" class="mobile-menu-toggle-btn" aria-label="Open Navigation Menu" onclick="window.toggleMobileDrawer && window.toggleMobileDrawer(true)" title="Open Navigation Menu">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
+          <div class="status-pill-badge">
+            <span class="status-dot-active"></span>
+            <span>Local RAG Active</span>
+          </div>
         </div>
         <div class="top-nav-center">
-          <button class="claude-plan-pill" onclick="window.openUserOnboardingModal()">
-            <span>Free plan</span>
-            <span class="dot-separator">•</span>
-            <span class="upgrade-text">Upgrade</span>
-          </button>
+          <span style="font-size: 14px; font-weight: 600; color: var(--navy-primary);">Second Brain Workspace</span>
         </div>
-        <div class="top-nav-right">
-          <button class="claude-incognito-btn" id="focus-view-toggle-btn" title="Toggle Focus Mode (Hide Distractions)" aria-label="Toggle Focus Mode" onclick="window.toggleFocusViewMode && window.toggleFocusViewMode()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <div class="top-nav-right" style="display: flex; align-items: center; gap: 10px;">
+          <button type="button" class="claude-plan-pill" onclick="window.activateView('settings')">
+            <span>Theme: Classic Navy</span>
           </button>
+          <div class="user-avatar-circle" style="cursor: pointer;" onclick="window.openUserOnboardingModal()" title="Ankita Priyadarshini">AP</div>
         </div>
       </header>
 
       <section id="view-jarvis" class="view-section active claude-hero-section">
         
-    <!-- Central Hero View -->
+    <!-- Central Hero Workspace View -->
     <div id="chat-hero-view" class="chat-hero-view claude-hero-center">
       
-      <!-- Rocket Logo Icon & Serif Headline -->
+      <!-- Welcome Headline Section -->
       <div class="claude-brand-headline-wrapper">
-        <span class="claude-terracotta-icon">🚀</span>
-        <h1 class="claude-serif-headline">Back at it, Ankita Priyadarshini Pallai</h1>
+        <span style="font-size: 28px;">🧠</span>
+        <h1 class="claude-serif-headline">Welcome back, Ankita</h1>
+        <p class="hero-subtitle-text">Ask anything across your personal knowledge base, notes, and research.</p>
       </div>
 
-      <!-- Floating Desktop App Install Banner Pop-up (Codex / ChatGPT Style) -->
-      <div id="pwa-desktop-banner" class="pwa-desktop-banner">
-        <div class="pwa-banner-text-group">
-          <h4 class="pwa-banner-title">Meet Juno AI in the desktop app</h4>
-          <p class="pwa-banner-subtitle">A coding agent that helps you build and ship with AI, included for free in your Juno plan.</p>
-        </div>
-        <div class="pwa-banner-actions">
-          <button type="button" class="pwa-banner-btn-primary" onclick="window.triggerPWAInstall()">Download the app</button>
-          <button type="button" class="pwa-banner-btn-secondary" onclick="window.openPWAInstallInstructionsModal()">Learn more</button>
-          <button type="button" class="pwa-banner-close-btn" onclick="window.dismissPWABanner()" title="Close banner" aria-label="Close banner">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Rounded Floating Input Card Container -->
+      <!-- Composer Card Container -->
       <div class="claude-prompt-card-wrapper">
         <form id="rag-query-form" class="claude-prompt-card" autocomplete="off" onsubmit="window.submitRAGQuery(event); return false;">
-          <!-- Top Mini Pro Banner inside Card (Screenshot 2) -->
-          <div class="claude-pro-top-bar">
-            <span class="pro-text">Get more with Juno Pro</span>
-            <a href="#" class="upgrade-link" onclick="window.openUserOnboardingModal(); return false;">Upgrade to Pro</a>
-          </div>
-
+          
           <!-- Attachment Preview Container -->
           <div id="prompt-attachment-preview-container" class="prompt-attachment-preview" style="display: none;"></div>
 
           <div class="claude-textarea-row" style="position: relative;">
-            <textarea id="rag-query-input" class="claude-textarea" placeholder="Type / for search modes" aria-label="Type / for search modes" rows="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="window.handleSlashCommandsInput(event)" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); window.submitRAGQuery(event); }"></textarea>
+            <textarea id="rag-query-input" class="claude-textarea" placeholder="Ask anything..." aria-label="Ask anything..." rows="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="window.handleSlashCommandsInput(event)" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); window.submitRAGQuery(event); }"></textarea>
             
             <!-- Slash Commands Menu Popup -->
             <div id="slash-commands-menu" class="slash-commands-menu" style="display: none;">
-              <div class="slash-item" onclick="window.selectSlashCommand('/search')"><span class="slash-icon">🔍</span> <strong>/search</strong> — Deep Web & Knowledge Vault Search</div>
-              <div class="slash-item" onclick="window.selectSlashCommand('/code')"><span class="slash-icon">💻</span> <strong>/code</strong> — Modular Code Synthesis & Inspector</div>
-              <div class="slash-item" onclick="window.selectSlashCommand('/learn')"><span class="slash-icon">🎓</span> <strong>/learn</strong> — Deep Learning Tutorial & Concept Guide</div>
-              <div class="slash-item" onclick="window.selectSlashCommand('/write')"><span class="slash-icon">✏️</span> <strong>/write</strong> — Research Article & Synthesis Draft</div>
-              <div class="slash-item" onclick="window.selectSlashCommand('/computer')"><span class="slash-icon">⚡</span> <strong>/computer</strong> — Compute & Project Deliverables Mode</div>
+              <div class="slash-item" onclick="window.selectSlashCommand('/search')"><span class="slash-icon">🔍</span> <strong>/search</strong> — Knowledge Vault & Deep Search</div>
+              <div class="slash-item" onclick="window.selectSlashCommand('/code')"><span class="slash-icon">💻</span> <strong>/code</strong> — Modular Code Synthesis</div>
+              <div class="slash-item" onclick="window.selectSlashCommand('/learn')"><span class="slash-icon">🎓</span> <strong>/learn</strong> — Concept Guides & Tutorials</div>
+              <div class="slash-item" onclick="window.selectSlashCommand('/write')"><span class="slash-icon">✏️</span> <strong>/write</strong> — Research Summary & Drafts</div>
+              <div class="slash-item" onclick="window.selectSlashCommand('/computer')"><span class="slash-icon">⚡</span> <strong>/computer</strong> — Computer Mode Deliverables</div>
             </div>
           </div>
 
           <div class="claude-card-bottom-row">
-            <!-- Left Attachment Button (+) & Perplexity Mode Selectors -->
+            <!-- Left Tools: File Attachment & Search Mode / Computer -->
             <div class="claude-card-tools-left" style="display: flex; align-items: center; gap: 8px;">
               <input type="file" id="prompt-file-attach-input" accept="image/*,.pdf,.txt,.js,.json" style="display: none;" onchange="window.handlePromptFileSelected(this.files)">
-              <button type="button" class="claude-plus-btn" title="Add content" onclick="document.getElementById('prompt-file-attach-input').click()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <button type="button" class="claude-plus-btn" title="Add file attachment" onclick="document.getElementById('prompt-file-attach-input').click()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               </button>
 
               <select id="px-search-mode-select" class="px-search-mode-dropdown" onchange="window.handleSearchModeChange(this.value)">
@@ -235,74 +247,60 @@
               </button>
             </div>
 
-            <!-- Right Action Tools: Model Picker, Mic & Waveform -->
+            <!-- Right Tools: Model Picker, Voice & Send -->
             <div class="claude-card-tools-right">
-              <div class="claude-model-selector-pill">
-                <select id="model-select-dropdown" class="claude-model-dropdown" onchange="window.handleModelChange(this.value)">
-                  <option value="sonnet-5" selected>Model ⌄</option>
-                  <option value="opus-3.5">Juno Ultra 1.5 ⌄</option>
-                  <option value="haiku-3">Juno Fast ⌄</option>
-                </select>
-              </div>
+              <select id="model-select-dropdown" class="claude-model-dropdown" onchange="window.handleModelChange(this.value)">
+                <option value="gemini-flash" selected>Gemini 1.5 Flash ⌄</option>
+                <option value="gemini-pro">Gemini 1.5 Pro ⌄</option>
+                <option value="local-rag">Second Brain Local RAG ⌄</option>
+              </select>
 
               <button type="button" id="voice-trigger-btn" class="claude-tool-icon-btn" title="Voice Input" onclick="window.toggleVoiceListen()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
               </button>
 
-              <button type="button" class="claude-tool-icon-btn" title="Voice Waveform" onclick="window.toggleVoiceListen()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="10" width="3" height="4" rx="1"/><rect x="7" y="6" width="3" height="12" rx="1"/><rect x="12" y="3" width="3" height="18" rx="1"/><rect x="17" y="8" width="3" height="8" rx="1"/></svg>
-              </button>
-
-              <!-- Astronaut Golden Yellow Send Button -->
               <button type="submit" id="rag-submit-btn" class="claude-send-btn" title="Send message">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                <span>Send</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left: 4px;"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
               </button>
             </div>
           </div>
         </form>
       </div>
 
-      <!-- Share Chat Link Modal (Screenshot 3) -->
-      <div id="share-chat-modal" class="share-chat-modal" style="display: none;" onclick="if(event.target === this) this.style.display='none';">
-        <div class="share-dialog-card glass-card">
-          <div class="share-dialog-header">
-            <div class="share-title-group">
-              <h3>Share a link to chat?</h3>
-              <p>This creates a copy that others can chat with</p>
-            </div>
-            <button type="button" class="share-close-btn" onclick="document.getElementById('share-chat-modal').style.display='none';">✕</button>
-          </div>
-          <div class="share-dialog-body">
-            <div class="share-input-box">
-              <input type="text" id="share-url-input" readonly value="https://second-brain-ai-system.vercel.app/">
-              <button type="button" class="btn-copy-share-url" onclick="window.copyShareLinkInput()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-                <span>Copy Link</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Feature Showcase Cards (Perplexity Style) -->
+      <!-- Feature Cards Underneath Composer -->
       <div class="px-feature-cards-grid">
-        <div class="px-feature-card golden-card" onclick="window.triggerSampleQuery('Search grounded knowledge vault & web for deep synthesis')">
+        <div class="px-feature-card" onclick="window.triggerSampleQuery('Search grounded knowledge vault & web for deep synthesis')">
           <div class="px-card-header">
             <span class="px-card-icon">🔍</span>
-            <strong>Search anything</strong>
+            <strong>Search &amp; Retrieval</strong>
           </div>
-          <p class="px-card-desc">Get fast and accurate answers from your notes, web & trusted knowledge base.</p>
+          <p class="px-card-desc">Get fast, accurate answers grounded in your notes and research base.</p>
         </div>
-        <div class="px-feature-card dark-card" onclick="window.triggerSampleQuery('Hand off project deliverables and modular code synthesis to Juno Computer')">
+        <div class="px-feature-card" onclick="window.triggerSampleQuery('Hand off project deliverables and modular code synthesis to Second Brain Computer')">
           <div class="px-card-header">
             <span class="px-card-icon">💻</span>
-            <strong>Get work done with Computer</strong>
+            <strong>Computer Deliverables</strong>
           </div>
-          <p class="px-card-desc">Hand off complex coding, research & data analysis deliverables around the clock.</p>
+          <p class="px-card-desc">Hand off complex code synthesis, research digests, and structured tasks.</p>
+        </div>
+        <div class="px-feature-card" onclick="window.activateView('graph')">
+          <div class="px-card-header">
+            <span class="px-card-icon">🕸️</span>
+            <strong>Knowledge Graph</strong>
+          </div>
+          <p class="px-card-desc">Explore visual bi-directional maps and concept connections across ideas.</p>
+        </div>
+        <div class="px-feature-card" onclick="window.activateView('resurfacing')">
+          <div class="px-card-header">
+            <span class="px-card-icon">🔮</span>
+            <strong>Memory &amp; Resurfacing</strong>
+          </div>
+          <p class="px-card-desc">Proactively surface relevant past notes tailored to your active focus.</p>
         </div>
       </div>
 
-      <!-- Action Chips directly underneath Input Card -->
+      <!-- Suggested Prompt Chips -->
       <div class="claude-action-chips">
         <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Write clean modular code for frontend UI component')">
           <span class="chip-symbol">&lt;/&gt;</span>
@@ -320,9 +318,9 @@
           <span class="chip-icon">✏️</span>
           <span>Write</span>
         </button>
-        <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Surprise me with Juno AI intelligent recommendations')">
+        <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Surprise me with Second Brain AI recommendations')">
           <span class="chip-icon">💡</span>
-          <span>Juno's choice</span>
+          <span>Second Brain choice</span>
         </button>
       </div>
     </div>

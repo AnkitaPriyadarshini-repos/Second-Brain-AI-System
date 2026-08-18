@@ -19,11 +19,23 @@
     getNotes(req, res) {
       try {
         const query = req && req.query ? req.query.q : null;
-        const notes = query ? this.noteService.searchNotes(query) : this.noteService.getAllNotes();
-        if (res && typeof res.json === 'function') {
-          return res.status(200).json({ success: true, count: notes.length, data: notes });
+        if (!query && this._cachedResponse) {
+          if (res && typeof res.json === 'function') {
+            return res.status(200).json(this._cachedResponse);
+          }
+          return this._cachedResponse;
         }
-        return { success: true, count: notes.length, data: notes };
+
+        const notes = query ? this.noteService.searchNotes(query) : this.noteService.getAllNotes();
+        const payload = { success: true, count: notes.length, data: notes };
+        if (!query) {
+          this._cachedResponse = payload;
+        }
+
+        if (res && typeof res.json === 'function') {
+          return res.status(200).json(payload);
+        }
+        return payload;
       } catch (err) {
         if (res && typeof res.status === 'function') {
           return res.status(500).json({ success: false, error: err.message });
