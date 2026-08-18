@@ -13,11 +13,20 @@ class AIGatewayController {
   async handleQuery(req, res) {
     const requestId = 'req_' + Math.random().toString(36).substring(2, 10);
     const startTime = Date.now();
-    const { prompt, contextNotes, model } = req.body || {};
+    const body = req.body || {};
+    // Accept both the production contract (contextNotes) and the browser's
+    // older `context` field so a cached client can never silently lose RAG context.
+    const prompt = body.prompt;
+    const contextNotes = Array.isArray(body.contextNotes)
+      ? body.contextNotes
+      : Array.isArray(body.context)
+        ? body.context
+        : [];
+    const model = body.model;
     const userId = req.headers['x-user-id'] || req.ip || 'client';
 
     if (process.env.NODE_ENV !== 'test') {
-      console.log(`[${requestId}] AI Query start - user:${userId} model:${model || 'default'}`);
+      console.log(`[${requestId}] AI Query start - user:${userId} model:${model || 'default'} context:${contextNotes.length}`);
     }
 
     try {
