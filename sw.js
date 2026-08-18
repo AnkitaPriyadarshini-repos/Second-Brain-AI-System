@@ -1,6 +1,6 @@
 /* Second Brain AI System — Service Worker for Offline PWA Support */
 
-const CACHE_NAME = 'second-brain-cache-v52.0';
+const CACHE_NAME = 'second-brain-cache-v53.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -21,7 +21,7 @@ const ASSETS_TO_CACHE = [
   './js/ai-agents.js',
   './js/app.js',
   './js/utils.js',
-  './js/production-chat.js?v=1.0',
+  './js/production-chat.js?v=2.0',
   './assets/nexus_yellow_bot.png',
   './manifest.json'
 ];
@@ -41,8 +41,6 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Network-first: production code and AI UI updates should arrive immediately.
-// Cache remains a fallback for offline use only.
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   event.respondWith(
