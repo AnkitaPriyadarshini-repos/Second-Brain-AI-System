@@ -1,6 +1,6 @@
 /* Second Brain AI System — Service Worker for Offline PWA Support */
 
-const CACHE_NAME = 'second-brain-cache-v53.0';
+const CACHE_NAME = 'second-brain-cache-v61.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -21,28 +21,25 @@ const ASSETS_TO_CACHE = [
   './js/ai-agents.js',
   './js/app.js',
   './js/utils.js',
-  './js/production-chat.js?v=2.0',
+  './js/production-chat.js?v=3.0',
   './assets/nexus_yellow_bot.png',
   './manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE)));
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => Promise.all(
-      cacheNames.map((cache) => cache !== CACHE_NAME ? caches.delete(cache) : undefined)
-    )).then(() => self.clients.claim())
-  );
+  event.waitUntil(caches.keys().then((cacheNames) => Promise.all(cacheNames.map((cache) => cache !== CACHE_NAME ? caches.delete(cache) : undefined))).then(() => self.clients.claim()));
 });
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  // API calls must always reach the network; static assets use network-first
+  // with a cache fallback so a new deployment is picked up immediately.
+  if (new URL(event.request.url).pathname.startsWith('/api/')) return;
   event.respondWith(
     fetch(event.request).then((networkResponse) => {
       if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
