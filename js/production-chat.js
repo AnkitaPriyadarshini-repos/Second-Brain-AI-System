@@ -1,14 +1,13 @@
 /*
  * Second Brain AI — production chat controller
- * Keeps the browser UI thin and sends AI work to the protected Vercel gateway.
- * Also retrieves a small, relevant slice of the local vault so "Second Brain"
- * actually means the user's own notes are part of the answer.
+ * Thin browser controller for the protected AI gateway plus local-note retrieval.
  */
 (function () {
   'use strict';
 
   let busy = false;
   const clean = (value) => String(value || '').trim();
+  const STOP_WORDS = new Set('a an and are as at be by can could do for from how i if in is it me my of on or please tell that the this to was what when where who why will with you your'.split(' '));
 
   function getHistory() {
     try {
@@ -27,8 +26,9 @@
       const notes = Store.getNotes();
       if (!Array.isArray(notes) || !notes.length) return { context: '', citations: [] };
 
-      const queryTokens = [...new Set(tokenize(query))];
+      const queryTokens = [...new Set(tokenize(query).filter((token) => !STOP_WORDS.has(token)))];
       if (!queryTokens.length) return { context: '', citations: [] };
+      const normalizedQuery = clean(query).toLowerCase();
 
       const scored = notes.map((note) => {
         const title = clean(note.title);
@@ -37,12 +37,15 @@
         const tags = Array.isArray(note.tags) ? note.tags.join(' ') : '';
         const haystack = `${title} ${summary} ${content} ${tags}`.toLowerCase();
         let score = 0;
+
+        // Phrase matches are stronger than isolated terms.
+        if (normalizedQuery.length >= 8 && haystack.includes(normalizedQuery)) score += 8;
         queryTokens.forEach((token) => {
-          const safe = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          if (new RegExp(`\\b${safe}\\b`, 'i').test(haystack)) score += 1;
-          if (title.toLowerCase().includes(token)) score += 2;
-          if (tags.toLowerCase().includes(token)) score += 1.5;
+          if (new RegExp(`\\b${token.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')}\\b`, 'i').test(haystack)) score += 1;
+          if (title.toLowerCase().includes(token)) score += 3;
+          if (tags.toLowerCase().includes(token)) score += 2;
         });
+
         return { note, score };
       }).filter((item) => item.score > 0).sort((a, b) => b.score - a.score).slice(0, 5);
 
@@ -107,6 +110,15 @@
     if (stream) stream.style.display = 'flex';
   }
 
+  function getGreeting(prompt) {
+    const normalized = prompt.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
+    if (!/^(hi|hii|hiii|hello|hey|heyy|yo|sup|good morning|good afternoon|good evening)$/.test(normalized)) return null;
+    if (normalized.startsWith('good morning')) return 'Good morning. What are we working on?';
+    if (normalized.startsWith('good afternoon')) return 'Good afternoon. What can I help you with?';
+    if (normalized.startsWith('good evening')) return 'Good evening. What are you working on?';
+    return 'Hi — good to see you. What are we working on?';
+  }
+
   async function handleRAGQuery(query) {
     const prompt = clean(query);
     if (!prompt || busy) return false;
@@ -114,12 +126,13 @@
     setBusy(true);
     appendMessage('user', prompt);
     const thinking = appendMessage('assistant', 'Thinking…');
+    const startedAt = performance.now();
 
-    const normalized = prompt.toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
-    if (/^(hi|hii|hiii|hello|hey|heyy|yo|sup)$/.test(normalized)) {
-      const greeting = 'Hi Ankita — good to see you. What are we working on?';
+    const greeting = getGreeting(prompt);
+    if (greeting) {
       replaceMessage(thinking, greeting);
       saveTurn(prompt, greeting);
+      window.dispatchEvent(new CustomEvent('juno:answer', { detail: { success: true, local: true, latencyMs: Math.round(performance.now() - startedAt) } }));
       setBusy(false);
       return true;
     }
@@ -159,7 +172,10 @@
   function saveTurn(prompt, answer) {
     try {
       const history = getHistory();
-      history.push({ role: 'user', content: prompt, timestamp: Date.now() }, { role: 'model', content: answer, timestamp: Date.now() });
+      history.push(
+        { role: 'user', content: prompt, timestamp: Date.now() },
+        { role: 'model', content: answer, timestamp: Date.now() }
+      );
       localStorage.setItem('juno_chat_history', JSON.stringify(history.slice(-40)));
     } catch (_) {}
   }
@@ -167,7 +183,6 @@
   function polishInterface() {
     document.title = 'Juno — your notes, in context';
 
-    // Replace copy that reads like a generated product pitch with quieter, human language.
     document.querySelectorAll('h1,h2,h3,p,button').forEach((el) => {
       const text = clean(el.textContent);
       if (text === 'Talk to Your Second Brain like Jarvis') el.textContent = 'Your notes, in context.';
@@ -208,7 +223,6 @@
     document.head.appendChild(style);
   }
 
-  // This file intentionally loads after app.js and becomes the single production submit path.
   window.handleRAGQuery = handleRAGQuery;
   window.submitRAGQuery = function (event) {
     event?.preventDefault?.();
