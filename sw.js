@@ -1,6 +1,6 @@
 /* Second Brain AI System — Service Worker for Offline PWA Support */
 
-const CACHE_NAME = 'second-brain-cache-v51.0';
+const CACHE_NAME = 'second-brain-cache-v53.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -20,6 +20,8 @@ const ASSETS_TO_CACHE = [
   './js/sound-engine.js',
   './js/ai-agents.js',
   './js/app.js',
+  './js/utils.js',
+  './js/production-chat.js?v=2.0',
   './assets/nexus_yellow_bot.png',
   './manifest.json'
 ];
@@ -27,28 +29,18 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
   );
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            console.log('Clearing old Service Worker cache:', cache);
-            return caches.delete(cache);
-          }
-        })
-      );
-    }).then(() => self.clients.claim())
+    caches.keys().then((cacheNames) => Promise.all(
+      cacheNames.map((cache) => cache !== CACHE_NAME ? caches.delete(cache) : undefined)
+    )).then(() => self.clients.claim())
   );
 });
 
-// Network-first strategy: always fetch live code from server first, fallback to cache if offline
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   event.respondWith(
@@ -58,8 +50,6 @@ self.addEventListener('fetch', (event) => {
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
       }
       return networkResponse;
-    }).catch(() => {
-      return caches.match(event.request);
-    })
+    }).catch(() => caches.match(event.request))
   );
 });
