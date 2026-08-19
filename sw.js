@@ -1,6 +1,6 @@
 /* Second Brain AI System — Service Worker for Offline PWA Support */
 
-const CACHE_NAME = 'second-brain-cache-v62.0';
+const CACHE_NAME = 'second-brain-cache-v63.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -21,7 +21,7 @@ const ASSETS_TO_CACHE = [
   './js/ai-agents.js',
   './js/app.js',
   './js/utils.js?v=58.0',
-  './js/production-chat.js?v=4.0',
+  './js/production-chat.js?v=5.0',
   './assets/nexus_yellow_bot.png',
   './manifest.json'
 ];
@@ -32,7 +32,11 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(caches.keys().then((cacheNames) => Promise.all(cacheNames.map((cache) => cache !== CACHE_NAME ? caches.delete(cache) : undefined))).then(() => self.clients.claim()));
+  event.waitUntil(
+    caches.keys()
+      .then((cacheNames) => Promise.all(cacheNames.map((cache) => cache !== CACHE_NAME ? caches.delete(cache) : undefined)))
+      .then(() => self.clients.claim())
+  );
 });
 
 self.addEventListener('fetch', (event) => {
