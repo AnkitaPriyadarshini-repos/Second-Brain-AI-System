@@ -98,12 +98,57 @@ window.runInCanvasFromBlock = runInCanvasFromBlock;
 // ------------------------------------------------------------
 // Production chat compatibility bridge
 // ------------------------------------------------------------
-// There used to be a second, legacy chat implementation here. It called an
-// older model directly and could overwrite the real production controller,
-// which made the UI appear to answer unrelated questions identically.
-// The production controller now owns all AI requests. This tiny compatibility
-// layer only delegates to it and never calls a model itself.
+// The production controller is loaded separately. If a user submits before
+// that controller finishes loading, preserve the prompt and retry instead of
+// clearing the composer and silently dropping the first message.
 (function installProductionChatCompatibilityBridge() {
+  const PRODUCTION_CHAT_SRC = 'js/production-chat.js?v=3.1';
+
+  function ensureProductionChatLoaded(prompt) {
+    const existingHandler = window.handleRAGQuery;
+    if (typeof existingHandler === 'function') {
+      existingHandler(prompt);
+      return;
+    }
+
+    let script = document.querySelector('script[data-juno-production-chat]');
+    if (!script) {
+      script = document.createElement('script');
+      script.src = PRODUCTION_CHAT_SRC;
+      script.dataset.junoProductionChat = 'true';
+      script.async = true;
+      script.onload = () => {
+        if (typeof window.handleRAGQuery === 'function') {
+          window.handleRAGQuery(prompt);
+        } else {
+          showToast('Juno chat controller loaded, but is not ready yet.', 'warning');
+        }
+      };
+      script.onerror = () => {
+        showToast('Juno chat controller could not be loaded. Please refresh once.', 'error');
+      };
+      document.body.appendChild(script);
+      return;
+    }
+
+    // A controller script is already loading. Poll briefly so the current
+    // prompt is delivered once the global handler is installed.
+    let attempts = 0;
+    const retry = () => {
+      if (typeof window.handleRAGQuery === 'function') {
+        window.handleRAGQuery(prompt);
+        return;
+      }
+      attempts += 1;
+      if (attempts < 40) {
+        setTimeout(retry, 50);
+      } else {
+        showToast('Juno is taking too long to initialize. Please refresh once.', 'warning');
+      }
+    };
+    retry();
+  }
+
   window.submitRAGQuery = function (event) {
     event?.preventDefault?.();
     event?.stopPropagation?.();
@@ -112,14 +157,16 @@ window.runInCanvasFromBlock = runInCanvasFromBlock;
     const prompt = String(input?.value || '').trim();
     if (!prompt) return false;
 
-    const handler = window.handleRAGQuery;
-    if (typeof handler === 'function') {
+    // Only clear after a real production handler exists. This prevents the
+    // exact failure mode where the first typed message disappears with no reply.
+    if (typeof window.handleRAGQuery === 'function') {
       if (input) input.value = '';
-      handler(prompt);
+      window.handleRAGQuery(prompt);
       return false;
     }
 
-    showToast('Juno is still loading. Please try again in a moment.', 'info');
+    showToast('Juno is loading — sending your message as soon as chat is ready.', 'info');
+    ensureProductionChatLoaded(prompt);
     return false;
   };
 })();
