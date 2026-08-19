@@ -96,77 +96,120 @@ window.copyCodeFromBlock = copyCodeFromBlock;
 window.runInCanvasFromBlock = runInCanvasFromBlock;
 
 // ------------------------------------------------------------
-// Production chat compatibility bridge
+// Production chat bootstrap / single-submit guard
 // ------------------------------------------------------------
-// The production controller is loaded separately. If a user submits before
-// that controller finishes loading, preserve the prompt and retry instead of
-// clearing the composer and silently dropping the first message.
-(function installProductionChatCompatibilityBridge() {
-  const PRODUCTION_CHAT_SRC = 'js/production-chat.js?v=3.1';
+// The chat controller used to be loaded only after the first message. That
+// created a race: Enter could clear the textarea before the controller existed.
+// This bootstrap loads the controller early and owns the first Enter/submit
+// event at document-capture level, so inline handlers and late listeners cannot
+// swallow the user's first message.
+(function installProductionChatBootstrap() {
+  const PRODUCTION_CHAT_SRC = 'js/production-chat.js?v=4.0';
+  let controllerPromise = null;
+  let queuedPrompt = null;
+  let dispatching = false;
 
-  function ensureProductionChatLoaded(prompt) {
-    const existingHandler = window.handleRAGQuery;
-    if (typeof existingHandler === 'function') {
-      existingHandler(prompt);
-      return;
-    }
+  function loadProductionChat() {
+    if (typeof window.handleRAGQuery === 'function') return Promise.resolve(true);
+    if (controllerPromise) return controllerPromise;
 
-    let script = document.querySelector('script[data-juno-production-chat]');
-    if (!script) {
-      script = document.createElement('script');
+    controllerPromise = new Promise((resolve) => {
+      const existing = document.querySelector('script[data-juno-production-chat]');
+      if (existing) {
+        existing.addEventListener('load', () => resolve(typeof window.handleRAGQuery === 'function'), { once: true });
+        existing.addEventListener('error', () => resolve(false), { once: true });
+        return;
+      }
+
+      const script = document.createElement('script');
       script.src = PRODUCTION_CHAT_SRC;
       script.dataset.junoProductionChat = 'true';
       script.async = true;
-      script.onload = () => {
-        if (typeof window.handleRAGQuery === 'function') {
-          window.handleRAGQuery(prompt);
-        } else {
-          showToast('Juno chat controller loaded, but is not ready yet.', 'warning');
-        }
-      };
-      script.onerror = () => {
-        showToast('Juno chat controller could not be loaded. Please refresh once.', 'error');
-      };
-      document.body.appendChild(script);
-      return;
-    }
+      script.onload = () => resolve(typeof window.handleRAGQuery === 'function');
+      script.onerror = () => resolve(false);
+      (document.head || document.documentElement).appendChild(script);
+    });
 
-    // A controller script is already loading. Poll briefly so the current
-    // prompt is delivered once the global handler is installed.
-    let attempts = 0;
-    const retry = () => {
-      if (typeof window.handleRAGQuery === 'function') {
-        window.handleRAGQuery(prompt);
-        return;
-      }
-      attempts += 1;
-      if (attempts < 40) {
-        setTimeout(retry, 50);
-      } else {
-        showToast('Juno is taking too long to initialize. Please refresh once.', 'warning');
-      }
-    };
-    retry();
+    return controllerPromise;
   }
 
-  window.submitRAGQuery = function (event) {
-    event?.preventDefault?.();
-    event?.stopPropagation?.();
+  function clearInput(input) {
+    if (!input) return;
+    input.value = '';
+    input.style.height = 'auto';
+  }
 
-    const input = document.getElementById('rag-query-input');
+  async function dispatchPrompt(input, event) {
+    if (dispatching) return true;
     const prompt = String(input?.value || '').trim();
     if (!prompt) return false;
 
-    // Only clear after a real production handler exists. This prevents the
-    // exact failure mode where the first typed message disappears with no reply.
-    if (typeof window.handleRAGQuery === 'function') {
-      if (input) input.value = '';
-      window.handleRAGQuery(prompt);
-      return false;
-    }
+    // Stop every other submit/keydown path. The original message remains in
+    // the textarea until the real production controller accepts it.
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    event?.stopImmediatePropagation?.();
 
-    showToast('Juno is loading — sending your message as soon as chat is ready.', 'info');
-    ensureProductionChatLoaded(prompt);
-    return false;
+    dispatching = true;
+    try {
+      if (typeof window.handleRAGQuery !== 'function') {
+        queuedPrompt = prompt;
+        if (typeof showToast === 'function') {
+          showToast('Juno is starting… your message is being kept safely.', 'info');
+        }
+        const ready = await loadProductionChat();
+        if (!ready || typeof window.handleRAGQuery !== 'function') {
+          if (typeof showToast === 'function') {
+            showToast('Juno could not start. Your message is still in the composer.', 'error');
+          }
+          return false;
+        }
+      }
+
+      const handler = window.handleRAGQuery;
+      const accepted = handler(prompt);
+      // handleRAGQuery is async, so reaching this point means it has already
+      // synchronously accepted the prompt and rendered the user/thinking state.
+      clearInput(input);
+      queuedPrompt = null;
+      return accepted;
+    } catch (error) {
+      console.error('[Juno submit guard]', error);
+      if (typeof showToast === 'function') showToast('Message was not sent. It remains in the composer.', 'error');
+      return false;
+    } finally {
+      dispatching = false;
+    }
+  }
+
+  // Capture Enter before the textarea's inline onkeydown and before any late
+  // module can attach another handler.
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' || event.shiftKey) return;
+    const target = event.target;
+    if (!target || target.id !== 'rag-query-input') return;
+    void dispatchPrompt(target, event);
+  }, true);
+
+  // Also cover clicking the Send button / form submission.
+  document.addEventListener('submit', (event) => {
+    const form = event.target;
+    if (!form || form.id !== 'rag-query-form') return;
+    const input = document.getElementById('rag-query-input');
+    void dispatchPrompt(input, event);
+  }, true);
+
+  // Preload the controller as early as possible. The guarded event path above
+  // remains the fallback if the network is still loading when the user presses Enter.
+  loadProductionChat();
+
+  // Keep the public function for existing UI code, but route it through the
+  // same safe dispatcher rather than clearing the composer first.
+  window.submitRAGQuery = function (event) {
+    const input = document.getElementById('rag-query-input');
+    return dispatchPrompt(input, event);
   };
+
+  window.junoChatReady = loadProductionChat;
+  window.junoQueuedPrompt = () => queuedPrompt;
 })();
