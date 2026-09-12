@@ -13,12 +13,12 @@ class AuthService {
     this.JWT_SECRET = process.env.JWT_SECRET || 'sb_second_brain_secure_jwt_secret_key_2026';
 
     // Seed default user if not existing
-    const defaultEmail = 'ankita@secondbrain.ai';
+    const defaultEmail = 'user@secondbrain.ai';
     if (!this.db.getUser(defaultEmail)) {
       const defaultUser = {
         id: 'usr_default_001',
         email: defaultEmail,
-        name: 'Ankita Priyadarshini Pallai',
+        name: 'User',
         role: 'Pro Developer',
         createdAt: new Date().toISOString(),
         passwordHash: this.hashPassword('sb_pass_hash_123')

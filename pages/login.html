@@ -583,8 +583,8 @@
 
     function triggerSocialAuth(provider) {
       alert(`🔐 Authenticating via ${provider} Single Sign-On...`);
-      localStorage.setItem('second_brain_user_name', 'Ankita Priyadarshini');
-      localStorage.setItem('second_brain_user_email', 'ankita@junoai.io');
+      localStorage.setItem('second_brain_user_name', 'User');
+      localStorage.setItem('second_brain_user_email', 'user@junoai.io');
       window.location.href = '../index.html';
     }
 
@@ -593,8 +593,8 @@
       const rawName = document.getElementById('input-name').value.trim();
       const rawEmail = document.getElementById('input-email').value.trim();
       
-      const name = rawName || 'Ankita Priyadarshini';
-      const email = rawEmail || 'ankita@junoai.io';
+      const name = rawName || 'User';
+      const email = rawEmail || 'user@junoai.io';
       const submitBtn = document.getElementById('submit-btn');
 
       submitBtn.textContent = currentMode === 'login' ? 'Signing in...' : 'Creating Account...';

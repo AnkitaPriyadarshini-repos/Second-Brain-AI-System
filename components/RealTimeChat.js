@@ -224,7 +224,7 @@ function RealTimeChat({ initialHistory = [], initialMetrics = {} }) {
           'div',
           { className: 'ws-user-item' },
           React.createElement('span', { className: 'ws-pulse-dot' }),
-          React.createElement('span', null, 'Ankita Priyadarshini')
+          React.createElement('span', null, 'User')
         )
       ),
 

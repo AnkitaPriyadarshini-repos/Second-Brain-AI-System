@@ -40,7 +40,7 @@
       
       if (greetings.includes(qClean)) {
         return {
-          answer: `Hello Ankita! 👋 How can I help you today? Ask me anything about your saved notes, architecture, code, or technical ideas!`,
+          answer: `Hello User! 👋 How can I help you today? Ask me anything about your saved notes, architecture, code, or technical ideas!`,
           citations: [],
           isGrounded: false,
           isGeneralKnowledge: true,

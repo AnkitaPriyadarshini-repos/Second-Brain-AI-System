@@ -160,10 +160,10 @@
   function getGreeting(prompt) {
     const normalized = clean(prompt).toLowerCase().replace(/[^a-z0-9 ]/g, '').trim();
     if (!/^(hi|hii|hiii|hello|hey|heyy|yo|sup|good morning|good afternoon|good evening)$/.test(normalized)) return null;
-    if (normalized === 'good morning') return 'Good morning, Ankita. What are we working on?';
-    if (normalized === 'good afternoon') return 'Good afternoon, Ankita. What can I help you with?';
-    if (normalized === 'good evening') return 'Good evening, Ankita. What are you working on?';
-    return 'Hi, Ankita — good to see you. What are we working on?';
+    if (normalized === 'good morning') return 'Good morning, User. What are we working on?';
+    if (normalized === 'good afternoon') return 'Good afternoon, User. What can I help you with?';
+    if (normalized === 'good evening') return 'Good evening, User. What are you working on?';
+    return 'Hi, User — good to see you. What are we working on?';
   }
 
   function localFallback(prompt, retrieved) {

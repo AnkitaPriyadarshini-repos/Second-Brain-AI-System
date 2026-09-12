@@ -5,7 +5,7 @@ const React = require('react');
  */
 function MessageBubble({ message }) {
   if (!message) return null;
-  const isOutgoing = message.sender && message.sender.includes('Ankita');
+  const isOutgoing = message.sender && (message.sender.includes('Ankita') || message.sender.includes('User'));
 
   return React.createElement(
     'div',

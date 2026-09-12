@@ -220,7 +220,7 @@
       if (!bubble) return;
       
       const greetings = [
-        "Bzzzt! Hi Ankita! I'm your Second Brain Bee helper! 🐝🍯",
+        "Bzzzt! Hi User! I'm your Second Brain Bee helper! 🐝🍯",
         "Buzzing with 100+ grounded notes & memories! 🍯✨",
         "Need a quick study quiz? Click 'Ask My Brain'! 🧠🐝",
         "Sweet knowledge collected in your Second Brain! 🍯📚"
@@ -534,12 +534,12 @@
       let name = rawName;
       let userEmail = rawEmail;
 
-      if (!name || name.startsWith('User_')) {
-        name = 'Ankita Priyadarshini';
+      if (!name || name.startsWith('User_') || name === 'Ankita Priyadarshini') {
+        name = 'User';
         localStorage.setItem('second_brain_user_name', name);
       }
-      if (!userEmail || userEmail.includes('google.com') || userEmail.includes('github.com')) {
-        userEmail = 'ankita@junoai.io';
+      if (!userEmail || userEmail.includes('google.com') || userEmail.includes('github.com') || userEmail === 'ankita@junoai.io') {
+        userEmail = 'user@junoai.io';
         localStorage.setItem('second_brain_user_email', userEmail);
       }
 
