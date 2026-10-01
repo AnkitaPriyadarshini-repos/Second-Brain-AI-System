@@ -207,10 +207,20 @@
   user-select: none !important;
 }
 
+.nori-shortcut-hint {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 12px !important;
+  color: #FFFFFF !important;
+  opacity: 0.9 !important;
+  user-select: none !important;
+}
+
 .nori-shortcut-hint span {
   font-family: inherit !important;
   font-size: 12px !important;
-  color: #94A3B8 !important;
+  color: #FFFFFF !important;
 }
 
 /* EXPLICIT HIGH-CONTRAST TEXTAREA TYPED TEXT & PLACEHOLDER COLOR */
@@ -236,9 +246,9 @@ textarea.nori-reference-textarea {
 #rag-query-input::placeholder,
 .nori-reference-textarea::placeholder,
 textarea.nori-reference-textarea::placeholder {
-  color: #94A3B8 !important;
-  -webkit-text-fill-color: #94A3B8 !important;
-  opacity: 1 !important;
+  color: #E2E8F0 !important;
+  -webkit-text-fill-color: #E2E8F0 !important;
+  opacity: 0.85 !important;
 }
 
 .nori-composer-bottom-row {
@@ -251,7 +261,7 @@ textarea.nori-reference-textarea::placeholder {
 .nori-at-tag-btn {
   background: #222530 !important;
   border: 1px solid #334155 !important;
-  color: #CBD5E1 !important;
+  color: #FFFFFF !important;
   font-size: 15px !important;
   font-weight: 600 !important;
   width: 34px !important;
@@ -276,7 +286,7 @@ textarea.nori-reference-textarea::placeholder {
   border-radius: 50% !important;
   background: #222530 !important;
   border: 1px solid #334155 !important;
-  color: #CBD5E1 !important;
+  color: #FFFFFF !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -291,11 +301,11 @@ textarea.nori-reference-textarea::placeholder {
   transform: scale(1.05) !important;
 }
 
-/* Tufy Prompt Starter Chips */
+/* Prompt Starter Chips */
 .tufy-starter-chip {
   background: #141519 !important;
   border: 1px solid #334155 !important;
-  color: #CBD5E1 !important;
+  color: #FFFFFF !important;
   padding: 8px 16px !important;
   border-radius: 9999px !important;
   font-size: 13px !important;
@@ -310,7 +320,7 @@ textarea.nori-reference-textarea::placeholder {
   border-color: #6366F1 !important;
   color: #FFFFFF !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
 }
 
 /* Top Navigation Bar Explicit Dark Theme Overrides */
@@ -318,31 +328,32 @@ textarea.nori-reference-textarea::placeholder {
 header.claude-top-navbar {
   background: #0B0C0E !important;
   border-bottom: 1px solid #1E2028 !important;
-  color: #F4F4F6 !important;
+  color: #FFFFFF !important;
 }
 
 .claude-top-navbar span {
-  color: #F4F4F6 !important;
+  color: #FFFFFF !important;
 }
 
 .status-pill-badge,
 .claude-plan-pill {
   background: #141519 !important;
   border: 1px solid #334155 !important;
-  color: #F4F4F6 !important;
+  color: #FFFFFF !important;
 }
 
 /* Hero Section Text Overrides */
 .claude-serif-headline {
   color: #FFFFFF !important;
-  font-size: 32px !important;
+  font-size: 28px !important;
   font-weight: 700 !important;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5) !important;
 }
 
 .hero-subtitle-text {
-  color: #CBD5E1 !important;
+  color: #FFFFFF !important;
   font-size: 15px !important;
+  opacity: 0.95 !important;
 }
 
 .view-credits-link {
