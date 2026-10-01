@@ -1,6 +1,6 @@
 /* ==========================================================================
-   NORI SEAHARSE PIXEL COMPANION DESIGN SYSTEM STYLES
-   Original Lavender Seahorse with Mouth Flash Beam & Answer Emergence
+   TUFITY / NORI COMPANION DESIGN SYSTEM STYLES
+   Cute Soft Pink Droplet Mascot with Blue Scarf, Mouth Flash & Sleek Dark UI
    ========================================================================== */
 
 .nori-companion-container {
@@ -26,7 +26,7 @@
   justify-content: center;
   padding: 12px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(216, 180, 248, 0.2) 0%, rgba(167, 243, 208, 0.1) 50%, rgba(15, 17, 23, 0) 75%);
+  background: radial-gradient(circle, rgba(255, 174, 193, 0.15) 0%, rgba(67, 97, 238, 0.08) 50%, rgba(17, 18, 21, 0) 75%);
   transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -35,14 +35,14 @@
   position: absolute;
   inset: -6px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(192, 132, 252, 0.25) 0%, transparent 75%);
-  opacity: 0.6;
+  background: radial-gradient(circle, rgba(255, 174, 193, 0.2) 0%, transparent 75%);
+  opacity: 0.5;
   animation: noriGlowPulse 4s ease-in-out infinite alternate;
 }
 
 @keyframes noriGlowPulse {
   0% { transform: scale(0.92); opacity: 0.3; }
-  100% { transform: scale(1.15); opacity: 0.7; }
+  100% { transform: scale(1.12); opacity: 0.6; }
 }
 
 .nori-pixel-canvas {
@@ -52,7 +52,7 @@
   height: 170px;
   display: block;
   z-index: 2;
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.6));
 }
 
 /* Mouth Flash Glow Beam Overlay */
@@ -63,7 +63,7 @@
   width: 140px;
   height: 50px;
   pointer-events: none;
-  background: radial-gradient(ellipse at left, rgba(255, 15, 128, 0.85) 0%, rgba(254, 78, 0, 0.6) 45%, transparent 85%);
+  background: radial-gradient(ellipse at left, rgba(255, 101, 132, 0.85) 0%, rgba(67, 97, 238, 0.6) 45%, transparent 85%);
   opacity: 0;
   transform: translateY(-50%) scaleX(0.2);
   transform-origin: left center;
@@ -92,15 +92,15 @@
   0% {
     opacity: 0;
     transform: translateY(-16px) scale(0.95);
-    box-shadow: 0 0 35px rgba(255, 15, 128, 0.7);
+    box-shadow: 0 0 35px rgba(255, 101, 132, 0.5);
   }
   50% {
-    box-shadow: 0 0 25px rgba(254, 78, 0, 0.6);
+    box-shadow: 0 0 25px rgba(67, 97, 238, 0.4);
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   }
 }
 
@@ -108,7 +108,7 @@
 .nori-compact .nori-pixel-canvas {
   width: 36px;
   height: 36px;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
 }
 .nori-compact .nori-canvas-wrapper {
   padding: 2px;
@@ -118,15 +118,15 @@
   display: none;
 }
 
-/* Nori Speech Bubble */
+/* Mascot Speech Bubble */
 .nori-speech-bubble {
   position: absolute;
   top: -46px;
   left: 50%;
   transform: translateX(-50%) translateY(4px);
-  background: #191424;
-  color: #F8FAFC;
-  border: 1px solid #2F2742;
+  background: #18191E;
+  color: #F4F4F5;
+  border: 1px solid #282932;
   padding: 6px 14px;
   border-radius: 14px;
   font-size: 13px;
@@ -134,7 +134,7 @@
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
   transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 10;
 }
@@ -147,7 +147,7 @@
   transform: translateX(-50%);
   border-width: 6px 6px 0 6px;
   border-style: solid;
-  border-color: #191424 transparent transparent transparent;
+  border-color: #18191E transparent transparent transparent;
 }
 
 .nori-speech-bubble.active {
@@ -155,7 +155,7 @@
   transform: translateX(-50%) translateY(0);
 }
 
-/* Reference-Style Clean Composer Card */
+/* Reference-Style Sleek Dark Composer Card (Matching Screenshot) */
 .nori-reference-composer-wrapper {
   width: 100%;
   max-width: 680px;
@@ -163,20 +163,20 @@
 }
 
 .nori-reference-composer-card {
-  background: #191424;
-  border: 1px solid #2F2742;
-  border-radius: 24px;
+  background: #18191E;
+  border: 1px solid #282932;
+  border-radius: 20px;
   padding: 16px 20px 14px 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .nori-reference-composer-card:focus-within {
-  border-color: #FF0F80;
-  box-shadow: 0 20px 48px rgba(255, 15, 128, 0.25);
+  border-color: #3B82F6;
+  box-shadow: 0 16px 40px rgba(59, 130, 246, 0.15);
 }
 
 .nori-shortcut-hint {
@@ -184,13 +184,14 @@
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #6E6A7F;
+  color: #71717A;
   user-select: none;
 }
 
-.nori-shortcut-hint kbd {
+.nori-shortcut-hint span {
   font-family: inherit;
-  font-size: 11px;
+  font-size: 12px;
+  color: #71717A;
 }
 
 .nori-reference-textarea {
@@ -198,7 +199,7 @@
   background: transparent;
   border: none;
   outline: none;
-  color: #F8FAFC;
+  color: #F4F4F5;
   font-family: 'Inter', sans-serif;
   font-size: 15px;
   line-height: 1.5;
@@ -207,7 +208,7 @@
 }
 
 .nori-reference-textarea::placeholder {
-  color: #554F65;
+  color: #52525B;
 }
 
 .nori-composer-bottom-row {
@@ -218,37 +219,44 @@
 }
 
 .nori-at-tag-btn {
-  background: transparent;
-  border: none;
-  color: #6E6A7F;
-  font-size: 18px;
-  padding: 6px 10px;
+  background: #24252E;
+  border: 1px solid #32333E;
+  color: #94A3B8;
+  font-size: 15px;
+  font-weight: 600;
+  width: 34px;
+  height: 34px;
   border-radius: 10px;
-  cursor: pointer;
-  transition: color 0.2s ease, background 0.2s ease;
-}
-
-.nori-at-tag-btn:hover {
-  color: #FF0F80;
-  background: rgba(255, 15, 128, 0.1);
-}
-
-.nori-round-send-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #FF0F80, #FE4E00);
-  border: none;
-  color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(255, 15, 128, 0.4);
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.nori-at-tag-btn:hover {
+  color: #FFFFFF;
+  background: #2D2E39;
+  border-color: #3B82F6;
+}
+
+.nori-round-send-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #262732;
+  border: 1px solid #343542;
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .nori-round-send-btn:hover {
-  transform: scale(1.08);
-  box-shadow: 0 6px 20px rgba(254, 78, 0, 0.6);
+  background: #3B82F6;
+  border-color: #3B82F6;
+  color: #FFFFFF;
+  transform: scale(1.05);
 }
