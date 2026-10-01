@@ -17,43 +17,41 @@
 [data-theme="golden-harmony"],
 [data-theme="aqua-aesthetic"],
 [data-theme="sunflower-sunrise"] {
-  --navy-primary: #FF0F80;
-  --primary-blue: #FE4E00;
-  --interactive-blue: #FFAE03;
-  --accent-blue: #FF0F80;
-  --soft-accent: #E67F0D;
-  --main-bg: #0F0C15;
-  --surface-bg: #191424;
-  --border-color: #2F2742;
+  --navy-primary: #D6E85A;
+  --primary-blue: #8FD6D3;
+  --interactive-blue: #E85B4A;
+  --accent-blue: #D6E85A;
+  --soft-accent: #8FD6D3;
+  --main-bg: #0C1214;
+  --surface-bg: #141E22;
+  --border-color: #24353C;
 
-  --bg-dark: #0F0C15;
-  --bg-dark-gradient: #0F0C15;
-  --bg-card: #191424;
-  --bg-card-hover: #231C33;
-  --bg-card-active: #2E2542;
+  --bg-dark: #0C1214;
+  --bg-dark-gradient: #0C1214;
+  --bg-card: #141E22;
+  --bg-card-hover: #1C2B30;
+  --bg-card-active: #24353C;
 
-  --text-primary: #F8FAFC;
-  --text-secondary: #A49FB6;
-  --text-muted: #6E6A7F;
+  --text-primary: #FFFFFF;
+  --text-secondary: #A0C4C7;
+  --text-muted: #6B8E92;
 
-  --accent-primary: #FF0F80;
-  --accent-primary-hover: #FE4E00;
-  --accent-primary-light: rgba(255, 15, 128, 0.15);
+  --accent-primary: #D6E85A;
+  --accent-primary-hover: #E85B4A;
+  --accent-primary-light: rgba(214, 232, 90, 0.15);
 
-  --accent-summer-bloom: #FF0F80;
-  --accent-tropic-blaze: #E9190F;
-  --accent-solar-flare: #FE4E00;
-  --accent-papaya-pop: #E67F0D;
-  --accent-neon-nectar: #FFAE03;
+  --accent-lime-yellow: #D6E85A;
+  --accent-mint-teal: #8FD6D3;
+  --accent-coral-grapefruit: #E85B4A;
 
-  --sidebar-bg: #121019;
-  --sidebar-text: #A49FB6;
+  --sidebar-bg: #0A0F11;
+  --sidebar-text: #A0C4C7;
   --sidebar-text-active: #FFFFFF;
-  --sidebar-item-hover: rgba(255, 15, 128, 0.08);
-  --sidebar-item-active: #231C33;
+  --sidebar-item-hover: rgba(214, 232, 90, 0.08);
+  --sidebar-item-active: #1C2B30;
 
-  --topbar-bg: #0F0C15;
-  --topbar-border: #2F2742;
+  --topbar-bg: #0C1214;
+  --topbar-border: #24353C;
 
   --font-main: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-code: "Fira Code", monospace;
@@ -7283,17 +7281,17 @@ body[data-theme="gemini-dark"] .chat-action-btn {
 .app-layout-wrapper.claude-layout,
 .app-main-canvas.claude-main-canvas,
 .claude-hero-section {
-  background-color: #0F0C15 !important;
-  color: #F8FAFC !important;
+  background-color: #0C1214 !important;
+  color: #FFFFFF !important;
 }
 
-/* Compact Navy Sidebar (#121019) */
+/* Compact Sidebar (#0A0F11) */
 .app-sidebar.claude-sidebar {
   width: 240px !important;
   min-width: 240px !important;
   max-width: 240px !important;
-  background-color: #121019 !important;
-  border-right: 1px solid #2F2742 !important;
+  background-color: #0A0F11 !important;
+  border-right: 1px solid #24353C !important;
   padding: 16px 14px !important;
   display: flex !important;
   flex-direction: column !important;

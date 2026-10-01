@@ -197,27 +197,27 @@ class NoriCompanion {
     const floatY = Math.sin(this.tick * 0.04) * 1.2;
     const baseY = 3 + floatY;
 
-    // Palette: User Color Swatch Palette (Summer Bloom, Tropic Blaze, Solar Flare, Papaya Pop, Neon Nectar)
+    // Palette: User Color Swatch Palette (Lime Yellow #D6E85A, Mint Teal #8FD6D3, Coral Grapefruit #E85B4A)
     const C = {
-      outline: '#1F0B18',
-      body: '#FF0F80',        // Summer Bloom (#FF0F80)
-      bodyDark: '#D40065',    // Deep Bloom Shadow
-      bodyLight: '#FF54A8',   // Highlight Pink
-      spots: '#E9190F',       // Tropic Blaze (#E9190F)
-      belly: '#FFAE03',       // Neon Nectar (#FFAE03)
-      bellyDark: '#E67F0D',   // Papaya Pop (#E67F0D)
-      cheek: '#FE4E00',       // Solar Flare (#FE4E00)
-      fin: '#FE4E00',         // Solar Flare Fin
-      finLight: '#FFAE03',
-      snout: '#FE4E00',       // Snout Trumpet Mouth
-      snoutHole: '#8A003E',
-      eye: '#140810',         // Dark Glossy Eye
+      outline: '#0A1417',
+      body: '#8FD6D3',        // Bright Mint Teal Aqua (#8FD6D3)
+      bodyDark: '#62B4B1',    // Deep Mint Shadow
+      bodyLight: '#C2FAF7',   // Highlight Mint Teal
+      spots: '#E85B4A',       // Vibrant Coral Spots (#E85B4A)
+      belly: '#D6E85A',       // Electric Lime Yellow (#D6E85A)
+      bellyDark: '#B8CB38',   // Lime Segment Line
+      cheek: '#E85B4A',       // Vibrant Coral Blush (#E85B4A)
+      fin: '#E85B4A',         // Coral Fin
+      finLight: '#D6E85A',
+      snout: '#E85B4A',       // Snout Trumpet Mouth
+      snoutHole: '#8E281C',
+      eye: '#0A1417',         // Dark Glossy Eye
       eyeGleam: '#FFFFFF',
-      beamGlow: '#FFAE03'     // Mouth Beam Glow
+      beamGlow: '#D6E85A'     // Mouth Beam Glow
     };
 
-    if (this.state === 'thinking') { C.body = '#FE4E00'; C.bodyLight = '#FFAE03'; }
-    if (this.state === 'listening') { C.body = '#FFAE03'; C.bodyLight = '#FFE082'; }
+    if (this.state === 'thinking') { C.body = '#D6E85A'; C.bodyLight = '#F0FC93'; }
+    if (this.state === 'listening') { C.body = '#E85B4A'; C.bodyLight = '#FF8A7A'; }
 
     const px = (x, y, color) => {
       ctx.fillStyle = color;
