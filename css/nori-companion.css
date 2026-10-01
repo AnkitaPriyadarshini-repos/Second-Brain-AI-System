@@ -163,8 +163,8 @@
 }
 
 .nori-reference-composer-card {
-  background: #18191E;
-  border: 1px solid #282932;
+  background: #141519;
+  border: 1px solid #1F2128;
   border-radius: 20px;
   padding: 16px 20px 14px 20px;
   display: flex;
@@ -175,8 +175,8 @@
 }
 
 .nori-reference-composer-card:focus-within {
-  border-color: #3B82F6;
-  box-shadow: 0 16px 40px rgba(59, 130, 246, 0.15);
+  border-color: #6366F1;
+  box-shadow: 0 14px 40px rgba(99, 102, 241, 0.14);
 }
 
 .nori-shortcut-hint {
@@ -184,14 +184,14 @@
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #71717A;
+  color: #6B6D76;
   user-select: none;
 }
 
 .nori-shortcut-hint span {
   font-family: inherit;
   font-size: 12px;
-  color: #71717A;
+  color: #6B6D76;
 }
 
 .nori-reference-textarea {
@@ -199,7 +199,7 @@
   background: transparent;
   border: none;
   outline: none;
-  color: #F4F4F5;
+  color: #F3F4F6;
   font-family: 'Inter', sans-serif;
   font-size: 15px;
   line-height: 1.5;
@@ -208,7 +208,7 @@
 }
 
 .nori-reference-textarea::placeholder {
-  color: #52525B;
+  color: #4B4D56;
 }
 
 .nori-composer-bottom-row {
@@ -219,9 +219,9 @@
 }
 
 .nori-at-tag-btn {
-  background: #24252E;
-  border: 1px solid #32333E;
-  color: #94A3B8;
+  background: #1E2027;
+  border: 1px solid #2B2D37;
+  color: #9EA0A6;
   font-size: 15px;
   font-weight: 600;
   width: 34px;
@@ -236,17 +236,17 @@
 
 .nori-at-tag-btn:hover {
   color: #FFFFFF;
-  background: #2D2E39;
-  border-color: #3B82F6;
+  background: #272A35;
+  border-color: #6366F1;
 }
 
 .nori-round-send-btn {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: #262732;
-  border: 1px solid #343542;
-  color: #94A3B8;
+  background: #1E2027;
+  border: 1px solid #2B2D37;
+  color: #9EA0A6;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -255,8 +255,30 @@
 }
 
 .nori-round-send-btn:hover {
-  background: #3B82F6;
-  border-color: #3B82F6;
+  background: #6366F1;
+  border-color: #6366F1;
   color: #FFFFFF;
   transform: scale(1.05);
+}
+
+/* Tufy Prompt Starter Chips */
+.tufy-starter-chip {
+  background: #141519;
+  border: 1px solid #1F2128;
+  color: #9EA0A6;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.tufy-starter-chip:hover {
+  background: #1B1D23;
+  border-color: #6366F1;
+  color: #F3F4F6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.12);
 }

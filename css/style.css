@@ -17,40 +17,40 @@
 [data-theme="golden-harmony"],
 [data-theme="aqua-aesthetic"],
 [data-theme="sunflower-sunrise"] {
-  --navy-primary: #3B82F6;
-  --primary-blue: #3B82F6;
-  --interactive-blue: #2563EB;
-  --accent-blue: #3B82F6;
-  --soft-accent: #60A5FA;
-  --main-bg: #111215;
-  --surface-bg: #18191E;
-  --border-color: #282932;
+  --navy-primary: #6366F1;
+  --primary-blue: #6366F1;
+  --interactive-blue: #4F46E5;
+  --accent-blue: #818CF8;
+  --soft-accent: #A5B4FC;
+  --main-bg: #0B0C0E;
+  --surface-bg: #141519;
+  --border-color: #1F2128;
 
-  --bg-dark: #111215;
-  --bg-dark-gradient: #111215;
-  --bg-card: #18191E;
-  --bg-card-hover: #22232A;
-  --bg-card-active: #2B2C35;
+  --bg-dark: #0B0C0E;
+  --bg-dark-gradient: #0B0C0E;
+  --bg-card: #141519;
+  --bg-card-hover: #1B1D23;
+  --bg-card-active: #22252D;
 
-  --text-primary: #F4F4F5;
-  --text-secondary: #A1A1AA;
-  --text-muted: #71717A;
+  --text-primary: #F3F4F6;
+  --text-secondary: #9EA0A6;
+  --text-muted: #6B6D76;
 
-  --accent-primary: #3B82F6;
-  --accent-primary-hover: #2563EB;
-  --accent-primary-light: rgba(59, 130, 246, 0.15);
+  --accent-primary: #6366F1;
+  --accent-primary-hover: #4F46E5;
+  --accent-primary-light: rgba(99, 102, 241, 0.12);
 
   --accent-pink-tufy: #FFAEC1;
-  --accent-blue-scarf: #4361EE;
+  --accent-blue-scarf: #4F46E5;
 
-  --sidebar-bg: #0E0F12;
-  --sidebar-text: #A1A1AA;
+  --sidebar-bg: #090A0C;
+  --sidebar-text: #9EA0A6;
   --sidebar-text-active: #FFFFFF;
-  --sidebar-item-hover: rgba(255, 255, 255, 0.05);
-  --sidebar-item-active: #18191E;
+  --sidebar-item-hover: rgba(255, 255, 255, 0.04);
+  --sidebar-item-active: #141519;
 
-  --topbar-bg: #111215;
-  --topbar-border: #282932;
+  --topbar-bg: #0B0C0E;
+  --topbar-border: #1F2128;
 
   --font-main: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-code: "Fira Code", monospace;
@@ -60,9 +60,9 @@
   --radius-lg: 14px;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
-  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.3);
-  --shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 4px 18px rgba(0, 0, 0, 0.4);
+  --shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.5);
   --transition: all 0.18s ease-in-out;
 }
 
