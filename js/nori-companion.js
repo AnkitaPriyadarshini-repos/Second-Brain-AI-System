@@ -22,7 +22,7 @@ class NoriCompanion {
 
     this.phrases = {
       idle: [
-        "Hey! I'm Tufy. How can I help you today?",
+        "Hey! I'm Mochi. How can I help you today?",
         "Ready to work through your code step by step!",
         "Your Second Brain is active and synced.",
         "Got a question? Ask me anything!"
@@ -334,6 +334,7 @@ class NoriCompanion {
   }
 }
 
-// Global Singleton Access (Supporting both TufyCompanion and NoriCompanion for 100% backward compatibility)
+// Global Singleton Access (Supporting MochiCompanion, TufyCompanion and NoriCompanion for 100% backward compatibility)
+window.MochiCompanion = NoriCompanion;
 window.NoriCompanion = NoriCompanion;
 window.TufyCompanion = NoriCompanion;
