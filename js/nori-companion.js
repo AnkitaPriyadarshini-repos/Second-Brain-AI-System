@@ -56,33 +56,57 @@ class NoriCompanion {
     this.container = document.getElementById(this.containerId);
     if (!this.container) return;
 
-    this.container.innerHTML = '';
-    this.container.className = 'nori-companion-container' + (this.compact ? ' nori-compact' : '');
-
-    // Canvas Wrapper
-    this.wrapper = document.createElement('div');
-    this.wrapper.className = 'nori-canvas-wrapper';
+    // Reuse existing wrapper if pre-rendered in HTML, or create one
+    let existingWrapper = this.container.querySelector('.nori-canvas-wrapper');
+    if (existingWrapper) {
+      this.wrapper = existingWrapper;
+    } else {
+      this.wrapper = document.createElement('div');
+      this.wrapper.className = 'nori-canvas-wrapper';
+      this.container.appendChild(this.wrapper);
+    }
 
     // Speech Bubble
-    this.speechBubble = document.createElement('div');
-    this.speechBubble.className = 'nori-speech-bubble';
-    this.wrapper.appendChild(this.speechBubble);
+    if (!this.wrapper.querySelector('.nori-speech-bubble')) {
+      this.speechBubble = document.createElement('div');
+      this.speechBubble.className = 'nori-speech-bubble';
+      this.wrapper.appendChild(this.speechBubble);
+    } else {
+      this.speechBubble = this.wrapper.querySelector('.nori-speech-bubble');
+    }
 
     // Mouth Flash Glow Overlay
-    this.mouthGlowEl = document.createElement('div');
-    this.mouthGlowEl.className = 'nori-mouth-glow-beam';
-    this.wrapper.appendChild(this.mouthGlowEl);
+    if (!this.wrapper.querySelector('.nori-mouth-glow-beam')) {
+      this.mouthGlowEl = document.createElement('div');
+      this.mouthGlowEl.className = 'nori-mouth-glow-beam';
+      this.wrapper.appendChild(this.mouthGlowEl);
+    } else {
+      this.mouthGlowEl = this.wrapper.querySelector('.nori-mouth-glow-beam');
+    }
 
-    // Canvas Element
-    this.canvas = document.createElement('canvas');
-    this.canvas.className = 'nori-pixel-canvas';
-    this.canvas.width = 36;
-    this.canvas.height = 36;
-    this.ctx = this.canvas.getContext('2d');
-    this.ctx.imageSmoothingEnabled = false;
+    // Canvas Element Overlay for Particles & Expressions
+    if (!this.wrapper.querySelector('canvas.nori-pixel-canvas')) {
+      this.canvas = document.createElement('canvas');
+      this.canvas.className = 'nori-pixel-canvas' + (this.compact ? ' compact-canvas' : '');
+      this.canvas.width = 36;
+      this.canvas.height = 36;
+      this.ctx = this.canvas.getContext('2d');
+      if (this.ctx) this.ctx.imageSmoothingEnabled = false;
 
-    this.wrapper.appendChild(this.canvas);
-    this.container.appendChild(this.wrapper);
+      // If SVG exists, overlay canvas on top of SVG
+      const svg = this.wrapper.querySelector('svg');
+      if (svg) {
+        this.canvas.style.position = 'absolute';
+        this.canvas.style.top = '0';
+        this.canvas.style.left = '0';
+        this.canvas.style.pointerEvents = 'none';
+      }
+
+      this.wrapper.appendChild(this.canvas);
+    } else {
+      this.canvas = this.wrapper.querySelector('canvas.nori-pixel-canvas');
+      if (this.canvas) this.ctx = this.canvas.getContext('2d');
+    }
 
     // Click Interactivity
     this.wrapper.addEventListener('click', () => this.onClickTufy());

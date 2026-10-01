@@ -180,8 +180,53 @@
     <!-- Central Hero Workspace View -->
     <div id="chat-hero-view" class="chat-hero-view claude-hero-center" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; text-align: center; max-width: 680px; margin: 0 auto; padding: 20px;">
       
-      <!-- Nori Pixel Companion Mascot Target -->
-      <div id="nori-companion-target" style="margin-bottom: 12px; min-height: 180px; display: flex; align-items: center; justify-content: center;"></div>
+      <!-- Tufy AI Companion Mascot Target -->
+      <div id="nori-companion-target" class="nori-companion-container" style="margin-bottom: 12px; min-height: 180px; display: flex; align-items: center; justify-content: center;">
+        <div class="nori-canvas-wrapper" style="position: relative;">
+          <!-- High Definition SVG Mascot of Tufy -->
+          <svg class="tufy-svg-mascot" width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5)); transition: transform 0.3s ease;">
+            <defs>
+              <linearGradient id="tufySkinGrad" x1="80" y1="10" x2="80" y2="150" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#FFC2D1"/>
+                <stop offset="50%" stop-color="#FFAEC1"/>
+                <stop offset="100%" stop-color="#FFD4DF"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Ears -->
+            <ellipse cx="26" cy="86" rx="9" ry="11" fill="#FFAEC1" stroke="#3B2229" stroke-width="3"/>
+            <ellipse cx="134" cy="86" rx="9" ry="11" fill="#FFAEC1" stroke="#3B2229" stroke-width="3"/>
+
+            <!-- Droplet Flame Head -->
+            <path d="M 80,12 C 87,24 95,38 104,48 C 120,64 134,84 134,106 C 134,130 110,146 80,146 C 50,146 26,130 26,106 C 26,84 40,64 56,48 C 65,38 73,24 80,12 Z" fill="url(#tufySkinGrad)" stroke="#3B2229" stroke-width="3.5"/>
+
+            <!-- Glossy Black Eyes -->
+            <ellipse cx="63" cy="90" rx="5.5" ry="9" fill="#1C1014"/>
+            <circle cx="61.5" cy="85.5" r="3" fill="#FFFFFF"/>
+            <circle cx="65" cy="92" r="1.2" fill="#FFFFFF"/>
+
+            <ellipse cx="97" cy="90" rx="5.5" ry="9" fill="#1C1014"/>
+            <circle cx="95.5" cy="85.5" r="3" fill="#FFFFFF"/>
+            <circle cx="99" cy="92" r="1.2" fill="#FFFFFF"/>
+
+            <!-- Rosy Blush Cheeks -->
+            <ellipse cx="48" cy="106" rx="10" ry="6.5" fill="#FF6584" opacity="0.85"/>
+            <ellipse cx="112" cy="106" rx="10" ry="6.5" fill="#FF6584" opacity="0.85"/>
+
+            <!-- Cute Smiling Mouth -->
+            <path d="M 72,104 Q 80,113 88,104" fill="none" stroke="#1C1014" stroke-width="3.5" stroke-linecap="round"/>
+
+            <!-- Royal Blue Bandana Scarf -->
+            <path d="M 44,124 Q 80,140 116,124 Q 112,146 80,152 Q 48,146 44,124 Z" fill="#4361EE" stroke="#2B37A0" stroke-width="2.5"/>
+            <text x="80" y="142" font-family="'Inter', sans-serif" font-size="9.5" font-weight="800" fill="#FFFFFF" text-anchor="middle" letter-spacing="0.5">Tufy</text>
+
+            <!-- Cute Body & Stubby Arms -->
+            <path d="M 52,136 C 52,160 108,160 108,136 Z" fill="#FFAEC1" stroke="#3B2229" stroke-width="3"/>
+            <ellipse cx="40" cy="138" rx="9" ry="6.5" fill="#FFAEC1" stroke="#3B2229" stroke-width="3" transform="rotate(-15 40 138)"/>
+            <ellipse cx="120" cy="134" rx="9.5" ry="6.5" fill="#FFAEC1" stroke="#3B2229" stroke-width="3" transform="rotate(25 120 134)"/>
+          </svg>
+        </div>
+      </div>
 
       <!-- Welcome Headline Section -->
       <div class="claude-brand-headline-wrapper" style="margin-bottom: 28px;">

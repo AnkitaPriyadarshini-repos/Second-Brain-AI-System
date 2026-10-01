@@ -28,6 +28,16 @@
   transform: translateY(-4px) scale(1.03);
 }
 
+.tufy-svg-mascot {
+  animation: tufyFloatWave 4s ease-in-out infinite alternate;
+}
+
+@keyframes tufyFloatWave {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(1.2deg); }
+  100% { transform: translateY(2px) rotate(-1deg); }
+}
+
 .nori-canvas-wrapper {
   position: relative;
   display: inline-flex;
