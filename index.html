@@ -178,105 +178,68 @@
       <section id="view-jarvis" class="view-section active claude-hero-section">
         
     <!-- Central Hero Workspace View -->
-    <div id="chat-hero-view" class="chat-hero-view claude-hero-center">
+    <div id="chat-hero-view" class="chat-hero-view claude-hero-center" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; text-align: center; max-width: 680px; margin: 0 auto; padding: 20px;">
       
       <!-- Nori Pixel Companion Mascot Target -->
-      <div id="nori-companion-target" style="margin-bottom: 8px;"></div>
+      <div id="nori-companion-target" style="margin-bottom: 12px;"></div>
 
       <!-- Welcome Headline Section -->
-      <div class="claude-brand-headline-wrapper">
-        <h1 class="claude-serif-headline" style="margin: 0 0 6px 0;">Hey, I'm Nori.</h1>
-        <p class="hero-subtitle-text" style="font-size: 16px; color: #94A3B8; margin: 0 0 24px 0;">What are we working on today?</p>
+      <div class="claude-brand-headline-wrapper" style="margin-bottom: 28px;">
+        <h1 class="claude-serif-headline" style="font-size: 26px; font-weight: 700; color: #F8FAFC; margin: 0 0 10px 0;">Hey, I'm Nori.</h1>
+        <p class="hero-subtitle-text" style="font-size: 14px; line-height: 1.6; color: #64748B; margin: 0 auto; max-width: 460px;">
+          I'll guide you step by step using your code context &amp; knowledge notes without revealing the full solution immediately.
+        </p>
       </div>
 
-      <!-- Composer Card Container -->
-      <div class="claude-prompt-card-wrapper">
-        <form id="rag-query-form" class="claude-prompt-card" autocomplete="off" onsubmit="window.submitRAGQuery(event); return false;">
+      <!-- Reference-Style Composer Card Container -->
+      <div class="nori-reference-composer-wrapper" style="width: 100%;">
+        <form id="rag-query-form" class="nori-reference-composer-card" autocomplete="off" onsubmit="window.submitRAGQuery(event); return false;">
           
+          <!-- Shortcut Hint inside composer box -->
+          <div class="nori-shortcut-hint">
+            <span>⇧</span> <span>↵</span> <span>to insert a line break</span>
+          </div>
+
           <!-- Attachment Preview Container -->
           <div id="prompt-attachment-preview-container" class="prompt-attachment-preview" style="display: none;"></div>
 
-          <div class="claude-textarea-row" style="position: relative;">
-            <textarea id="rag-query-input" class="claude-textarea" placeholder="Talk to Nori..." aria-label="Talk to Nori..." rows="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="window.handleSlashCommandsInput(event)" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); window.submitRAGQuery(event); }"></textarea>
+          <div style="position: relative; width: 100%;">
+            <textarea id="rag-query-input" class="nori-reference-textarea" placeholder="Ask Nori anything..." aria-label="Ask Nori anything..." rows="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="window.handleSlashCommandsInput(event)" onkeydown="if(event.key==='Enter' && !event.shiftKey){ event.preventDefault(); window.submitRAGQuery(event); }"></textarea>
             
             <!-- Slash Commands Menu Popup -->
             <div id="slash-commands-menu" class="slash-commands-menu" style="display: none;">
-              <div class="slash-item" onclick="window.selectSlashCommand('/search')"><span class="slash-icon">🔍</span> <strong>/search</strong> — Knowledge Vault & Deep Search</div>
+              <div class="slash-item" onclick="window.selectSlashCommand('/search')"><span class="slash-icon">🔍</span> <strong>/search</strong> — Knowledge Vault &amp; Deep Search</div>
               <div class="slash-item" onclick="window.selectSlashCommand('/code')"><span class="slash-icon">💻</span> <strong>/code</strong> — Modular Code Synthesis</div>
-              <div class="slash-item" onclick="window.selectSlashCommand('/learn')"><span class="slash-icon">🎓</span> <strong>/learn</strong> — Concept Guides & Tutorials</div>
-              <div class="slash-item" onclick="window.selectSlashCommand('/write')"><span class="slash-icon">✏️</span> <strong>/write</strong> — Research Summary & Drafts</div>
+              <div class="slash-item" onclick="window.selectSlashCommand('/learn')"><span class="slash-icon">🎓</span> <strong>/learn</strong> — Concept Guides &amp; Tutorials</div>
+              <div class="slash-item" onclick="window.selectSlashCommand('/write')"><span class="slash-icon">✏️</span> <strong>/write</strong> — Research Summary &amp; Drafts</div>
             </div>
           </div>
 
-          <div class="claude-card-bottom-row">
-            <!-- Left Tools: File Attachment & Search Mode / Computer -->
-            <div class="claude-card-tools-left" style="display: flex; align-items: center; gap: 8px;">
+          <div class="nori-composer-bottom-row">
+            <!-- Left Tool: Context @ Tag -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" class="nori-at-tag-btn" title="Reference note or vault context (@)" onclick="window.openSearchChatsModal()">@</button>
               <input type="file" id="prompt-file-attach-input" accept="image/*,.pdf,.txt,.js,.json" style="display: none;" onchange="window.handlePromptFileSelected(this.files)">
-              <button type="button" class="claude-plus-btn" title="Add file attachment" onclick="document.getElementById('prompt-file-attach-input').click()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              </button>
-
-              <select id="px-search-mode-select" class="px-search-mode-dropdown" onchange="window.handleSearchModeChange(this.value)">
+              <select id="px-search-mode-select" class="px-search-mode-dropdown" style="display: none;">
                 <option value="search" selected>🔍 Search ⌄</option>
-                <option value="academic">🎓 Academic ⌄</option>
-                <option value="code">💻 Code ⌄</option>
-                <option value="vault">📚 Vault ⌄</option>
               </select>
-
-              <button type="button" id="px-computer-mode-btn" class="px-computer-pill" onclick="window.toggleComputerMode()" title="Toggle Computer Mode">
-                <span class="pill-icon">💻</span>
-                <span>Computer</span>
-              </button>
             </div>
 
-            <!-- Right Tools: Model Picker, Voice & Send -->
-            <div class="claude-card-tools-right">
-              <select id="model-select-dropdown" class="claude-model-dropdown" onchange="window.handleModelChange(this.value)" style="display: none;">
+            <!-- Right Tool: Send Button -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <select id="model-select-dropdown" class="claude-model-dropdown" style="display: none;">
                 <option value="gemini-flash" selected>Gemini 1.5 Flash ⌄</option>
-                <option value="gemini-pro">Gemini 1.5 Pro ⌄</option>
-                <option value="local-rag">Second Brain Local RAG ⌄</option>
               </select>
-
-              <button type="button" id="voice-trigger-btn" class="claude-tool-icon-btn" title="Voice Input" onclick="window.toggleVoiceListen()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-              </button>
-
-              <button type="submit" id="rag-submit-btn" class="claude-send-btn" title="Send message">
-                <span>Send</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left: 4px;"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+              <button type="button" id="voice-trigger-btn" class="claude-tool-icon-btn" style="display: none;" title="Voice Input" onclick="window.toggleVoiceListen()"></button>
+              
+              <button type="submit" id="rag-submit-btn" class="nori-round-send-btn" title="Send message">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
               </button>
             </div>
           </div>
         </form>
       </div>
 
-      <!-- Suggested Warm Prompts -->
-      <div class="claude-action-chips" style="margin-top: 24px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 680px;">
-        <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Help me think through something')">
-          <span class="chip-icon">💡</span>
-          <span>Help me think through something</span>
-        </button>
-        <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Remember this for later')">
-          <span class="chip-icon">🧠</span>
-          <span>Remember this for later</span>
-        </button>
-        <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Explain this simply')">
-          <span class="chip-icon">✨</span>
-          <span>Explain this simply</span>
-        </button>
-        <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Help me plan my day')">
-          <span class="chip-icon">📅</span>
-          <span>Help me plan my day</span>
-        </button>
-        <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Search my knowledge')">
-          <span class="chip-icon">🔍</span>
-          <span>Search my knowledge</span>
-        </button>
-        <button type="button" class="claude-chip" onclick="window.triggerSampleQuery('Let\'s work on an idea')">
-          <span class="chip-icon">🚀</span>
-          <span>Let's work on an idea</span>
-        </button>
-      </div>
     </div>
 
         <!-- Chat Stream Messages Container -->

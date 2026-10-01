@@ -1,61 +1,52 @@
 /**
  * ==========================================================================
  * NORI PIXEL COMPANION ENGINE
- * Original Expressive Pixel-Art Companion for Second Brain AI
+ * Original Cute Expressive Pixel Mascot for Second Brain AI
  * ==========================================================================
  */
 
 class NoriCompanion {
   constructor(options = {}) {
     this.containerId = options.containerId || 'nori-companion-target';
-    this.size = options.size || 140;
+    this.size = options.size || 160;
     this.compact = options.compact || false;
     this.state = 'idle'; // idle | listening | thinking | responding | happy | confused | success | sleeping
-    this.prevRefState = 'idle';
     this.tick = 0;
     this.blinkTimer = 0;
     this.isBlinking = false;
     this.speechTimeout = null;
     this.particles = [];
-    
+
     this.phrases = {
       idle: [
         "Hey! What are we working on today?",
-        "I'm ready whenever you are.",
+        "I'm ready to help you think!",
         "Your Second Brain is synced and ready.",
-        "Got an idea? Tell me!"
+        "Got an idea? Let's talk about it!"
       ],
       listening: [
-        "Listening attentively...",
-        "I'm all ears!",
+        "Listening closely...",
+        "Tell me more!",
         "Taking note..."
       ],
       thinking: [
-        "Connecting your knowledge notes...",
-        "Searching vault and synthesizing...",
-        "Pondering this deeply...",
-        "Thinking through this..."
+        "Thinking through this...",
+        "Searching your Second Brain...",
+        "Connecting your notes..."
       ],
       responding: [
-        "Here's what I found!",
-        "Let me explain this clearly.",
-        "Connecting the pieces for you..."
+        "Here is what I found!",
+        "Let me explain this simply.",
+        "Here's my thought..."
       ],
       happy: [
-        "I love helping you think!",
-        "Great idea!",
-        "Memory captured safely! ✨",
-        "Always happy to assist!"
+        "I love working together! ✨",
+        "Awesome idea!",
+        "Memory stored safely! 🧠"
       ],
       success: [
         "Saved to your Second Brain! 🧠",
-        "Thought stored successfully!",
-        "Awesome! Got it pinned."
-      ],
-      confused: [
-        "Hmm, could you clarify that?",
-        "Let's try rephrasing that.",
-        "Not quite sure, let's try again!"
+        "Thought stored cleanly!"
       ]
     };
 
@@ -81,21 +72,13 @@ class NoriCompanion {
     // Canvas Element
     this.canvas = document.createElement('canvas');
     this.canvas.className = 'nori-pixel-canvas';
-    this.canvas.width = 24;
-    this.canvas.height = 24;
+    this.canvas.width = 32;
+    this.canvas.height = 32;
     this.ctx = this.canvas.getContext('2d');
     this.ctx.imageSmoothingEnabled = false;
 
     this.wrapper.appendChild(this.canvas);
     this.container.appendChild(this.wrapper);
-
-    // Status Tag (only if not compact)
-    if (!this.compact) {
-      this.statusTag = document.createElement('div');
-      this.statusTag.className = 'nori-status-tag idle';
-      this.statusTag.innerHTML = `<span class="nori-status-dot"></span><span class="nori-status-text">Nori is ready</span>`;
-      this.container.appendChild(this.statusTag);
-    }
 
     // Interactivity
     this.wrapper.addEventListener('click', () => this.onClickNori());
@@ -107,24 +90,6 @@ class NoriCompanion {
   setState(newState, customSpeech = null) {
     if (this.state === newState && !customSpeech) return;
     this.state = newState;
-    
-    if (this.statusTag) {
-      this.statusTag.className = `nori-status-tag ${newState}`;
-      const statusTextEl = this.statusTag.querySelector('.nori-status-text');
-      if (statusTextEl) {
-        const labels = {
-          idle: 'Nori is ready',
-          listening: 'Nori is listening...',
-          thinking: 'Nori is thinking...',
-          responding: 'Nori is responding',
-          happy: 'Nori is pleased ✨',
-          success: 'Memory Saved! 🧠',
-          confused: 'Nori is curious',
-          sleeping: 'Nori is resting'
-        };
-        statusTextEl.textContent = labels[newState] || 'Nori';
-      }
-    }
 
     if (customSpeech) {
       this.say(customSpeech);
@@ -147,22 +112,22 @@ class NoriCompanion {
   }
 
   onClickNori() {
-    this.spawnSparkles(6);
-    this.setState('happy', 'Hey! I\'m Nori, your AI companion.');
+    this.spawnSparkles(8);
+    this.setState('happy', 'Hey! I\'m Nori, your AI friend.');
     setTimeout(() => {
       if (this.state === 'happy') this.setState('idle');
     }, 4000);
   }
 
-  spawnSparkles(count = 5) {
+  spawnSparkles(count = 6) {
     for (let i = 0; i < count; i++) {
       this.particles.push({
-        x: 12 + (Math.random() * 8 - 4),
-        y: 10 + (Math.random() * 8 - 4),
-        vx: (Math.random() - 0.5) * 0.8,
-        vy: -0.6 - Math.random() * 0.8,
+        x: 16 + (Math.random() * 12 - 6),
+        y: 12 + (Math.random() * 12 - 6),
+        vx: (Math.random() - 0.5) * 1.0,
+        vy: -0.8 - Math.random() * 1.0,
         alpha: 1.0,
-        color: ['#F59E0B', '#38BDF8', '#EC4899', '#34D399'][Math.floor(Math.random() * 4)]
+        color: ['#FF8A80', '#FFB74D', '#81D4FA', '#F48FB1'][Math.floor(Math.random() * 4)]
       });
     }
   }
@@ -177,9 +142,9 @@ class NoriCompanion {
   update() {
     // Random Blinking
     this.blinkTimer++;
-    if (this.blinkTimer > 180 + Math.random() * 120) {
+    if (this.blinkTimer > 160 + Math.random() * 140) {
       this.isBlinking = true;
-      if (this.blinkTimer > 192 + Math.random() * 120) {
+      if (this.blinkTimer > 172 + Math.random() * 140) {
         this.isBlinking = false;
         this.blinkTimer = 0;
       }
@@ -190,19 +155,18 @@ class NoriCompanion {
       const p = this.particles[i];
       p.x += p.vx;
       p.y += p.vy;
-      p.alpha -= 0.03;
+      p.alpha -= 0.025;
       if (p.alpha <= 0) this.particles.splice(i, 1);
     }
 
-    // State specific periodic animations
-    if (this.state === 'thinking' && this.tick % 15 === 0) {
+    if (this.state === 'thinking' && this.tick % 12 === 0) {
       this.particles.push({
-        x: 18 + (Math.random() * 4 - 2),
-        y: 6 + (Math.random() * 4 - 2),
-        vx: 0.1,
-        vy: -0.4,
+        x: 22 + (Math.random() * 6 - 3),
+        y: 8 + (Math.random() * 6 - 3),
+        vx: 0.15,
+        vy: -0.5,
         alpha: 0.9,
-        color: '#F59E0B'
+        color: '#FFB74D'
       });
     }
   }
@@ -210,31 +174,32 @@ class NoriCompanion {
   render() {
     if (!this.ctx) return;
     const ctx = this.ctx;
-    ctx.clearRect(0, 0, 24, 24);
+    ctx.clearRect(0, 0, 32, 32);
 
-    // Y Float Sine Wave Offset
-    const floatY = Math.sin(this.tick * 0.06) * 0.8;
-    const baseY = 3 + floatY;
+    // Cute Gentle Float Wave Y Offset
+    const floatY = Math.sin(this.tick * 0.05) * 1.0;
+    const baseY = 4 + floatY;
 
-    // Palette
+    // Palette: Soft Cute Coral Peach Flame Buddy with Rosy Scarf
     const C = {
-      outline: '#0B0F19',
-      body: '#38BDF8',       // Crisp Nori Sky Cyan
-      bodyDark: '#0284C7',   // Shadow Cyan
-      bodyLight: '#7DD3FC',  // Highlight Cyan
-      belly: '#F8FAFC',      // White belly
-      cheek: '#F472B6',      // Pink blush
-      eye: '#0F172A',        // Dark Eye
+      outline: '#1E1B2E',
+      body: '#FFB09C',         // Soft Cute Warm Peach Coral
+      bodyDark: '#E07A65',     // Cozy Shadow Coral
+      bodyLight: '#FFD4C8',    // Cute Highlight Soft Peach
+      tipLight: '#FFE8DF',     // Top Sprout Soft Light
+      belly: '#FFF5F2',        // White Soft Cream Belly
+      cheek: '#FF6B8B',        // Rosy Pink Blush
+      scarf: '#6C5CE7',        // Cute Soft Violet Bandana Scarf
+      scarfDark: '#5345C5',
+      eye: '#1E1B2E',          // Dark Cute Eyes
       eyeGleam: '#FFFFFF',
-      antennaSpark: '#F59E0B'// Amber Spark
+      spark: '#FFD166'         // Sparkle Yellow
     };
 
-    // State Color Modifiers
-    if (this.state === 'thinking') { C.body = '#8B5CF6'; C.bodyDark = '#6D28D9'; C.bodyLight = '#C4B5FD'; }
-    if (this.state === 'listening') { C.body = '#10B981'; C.bodyDark = '#059669'; C.bodyLight = '#6EE7B7'; }
-    if (this.state === 'happy' || this.state === 'success') { C.body = '#38BDF8'; C.antennaSpark = '#EC4899'; }
+    if (this.state === 'thinking') { C.body = '#C084FC'; C.bodyDark = '#9333EA'; C.bodyLight = '#E9D5FF'; }
+    if (this.state === 'listening') { C.body = '#4ADE80'; C.bodyDark = '#16A34A'; C.bodyLight = '#BBF7D0'; }
+    if (this.state === 'happy' || this.state === 'success') { C.body = '#FF9999'; C.scarf = '#EC4899'; }
 
-    // Helper Pixel Drawer
     const px = (x, y, color) => {
       ctx.fillStyle = color;
       ctx.fillRect(Math.round(x), Math.round(y + baseY), 1, 1);
@@ -245,100 +210,98 @@ class NoriCompanion {
       ctx.fillRect(Math.round(x), Math.round(y + baseY), w, h);
     };
 
-    // --- 1. ANTENNA & SPARK ---
-    rect(11, 2, 2, 2, C.outline);
-    rect(11, 3, 2, 1, C.antennaSpark);
-    rect(11, 4, 2, 2, C.outline);
-    rect(11.5, 4.5, 1, 1, C.bodyLight);
+    // --- 1. TOP CUTE HEAD SPROUT / TIP (Soft Drop Shape) ---
+    rect(15, 2, 2, 2, C.outline);
+    rect(15, 3, 2, 1, C.tipLight);
+    rect(14, 4, 4, 2, C.outline);
+    rect(14, 4, 4, 1, C.bodyLight);
 
-    // Sparkle animation above antenna if active
-    if (this.state === 'thinking' || this.state === 'responding' || this.state === 'happy') {
-      const sparkGlow = (this.tick % 10 < 5) ? '#F59E0B' : '#FDE047';
-      px(10, 1, sparkGlow);
-      px(13, 1, sparkGlow);
-      px(11.5, 0, sparkGlow);
-    }
-
-    // --- 2. MAIN BODY SILHOUETTE (Round Pixel Creature) ---
+    // --- 2. CUTE CHIBI ROUND BODY SILHOUETTE ---
     // Outer Outline
-    rect(7, 6, 10, 14, C.outline);
-    rect(6, 7, 12, 12, C.outline);
-    rect(5, 9, 14, 8, C.outline);
+    rect(11, 6, 10, 18, C.outline);
+    rect(9, 8, 14, 15, C.outline);
+    rect(8, 10, 16, 12, C.outline);
+    rect(7, 12, 18, 9, C.outline);
 
     // Body Fill
-    rect(7, 7, 10, 12, C.body);
-    rect(6, 8, 12, 10, C.body);
-    rect(6, 9, 12, 8, C.body);
+    rect(11, 6, 10, 17, C.body);
+    rect(9, 8, 14, 14, C.body);
+    rect(8, 10, 16, 11, C.body);
+    rect(8, 12, 16, 8, C.body);
 
-    // Body Highlights & Shadows
-    rect(7, 7, 8, 1, C.bodyLight);
-    rect(6, 8, 1, 6, C.bodyLight);
-    rect(16, 9, 1, 7, C.bodyDark);
-    rect(7, 17, 9, 1, C.bodyDark);
+    // Body Highlights & Soft Shading
+    rect(11, 6, 8, 1, C.bodyLight);
+    rect(9, 8, 3, 10, C.bodyLight);
+    rect(22, 11, 2, 10, C.bodyDark);
+    rect(10, 22, 12, 1, C.bodyDark);
 
-    // --- 3. INNER BELLY / FACE ---
-    rect(8, 10, 8, 6, C.belly);
-    rect(9, 9, 6, 8, C.belly);
+    // --- 3. INNER CREAM FACE / BELLY ---
+    rect(11, 12, 10, 9, C.belly);
+    rect(12, 11, 8, 11, C.belly);
 
-    // --- 4. CHEEKS (Blush) ---
-    rect(7, 13, 2, 1, C.cheek);
-    rect(15, 13, 2, 1, C.cheek);
+    // --- 4. ROSY CHEEKS ---
+    rect(9, 16, 3, 2, C.cheek);
+    rect(20, 16, 3, 2, C.cheek);
 
-    // --- 5. EYES & EXPRESSION ---
+    // --- 5. ADORABLE BIG GLOSSY EYES ---
     if (this.isBlinking || this.state === 'sleeping') {
-      // Closed Line Eyes
-      rect(8, 11, 2, 1, C.eye);
-      rect(14, 11, 2, 1, C.eye);
+      // Curved Closed Line Eyes
+      rect(11, 14, 3, 1, C.eye);
+      rect(18, 14, 3, 1, C.eye);
     } else if (this.state === 'happy' || this.state === 'success') {
-      // Happy Curve Eyes ^ ^
-      px(8, 11, C.eye); px(9, 10, C.eye); px(10, 11, C.eye);
-      px(13, 11, C.eye); px(14, 10, C.eye); px(15, 11, C.eye);
-    } else if (this.state === 'confused') {
-      // Confused o.O Eyes
-      rect(8, 11, 2, 2, C.eye); px(8, 11, C.eyeGleam);
-      rect(14, 11, 1, 1, C.eye);
+      // Cute Happy Eyes ^ ^
+      px(11, 14, C.eye); px(12, 13, C.eye); px(13, 14, C.eye);
+      px(18, 14, C.eye); px(19, 13, C.eye); px(20, 14, C.eye);
     } else if (this.state === 'thinking') {
       // Looking up-right thinking
-      rect(9, 10, 2, 2, C.eye); px(10, 10, C.eyeGleam);
-      rect(14, 10, 2, 2, C.eye); px(15, 10, C.eyeGleam);
+      rect(12, 13, 3, 3, C.eye);
+      px(13, 13, C.eyeGleam); px(14, 14, C.eyeGleam);
+      rect(19, 13, 3, 3, C.eye);
+      px(20, 13, C.eyeGleam); px(21, 14, C.eyeGleam);
     } else {
-      // Default / Listening / Responding Eyes
-      rect(8, 11, 2, 2, C.eye); px(8, 11, C.eyeGleam);
-      rect(14, 11, 2, 2, C.eye); px(14, 11, C.eyeGleam);
+      // Big Chibi Glossy Eyes with double gleam dots
+      rect(11, 13, 3, 4, C.eye);
+      px(11, 13, C.eyeGleam); px(12, 13, C.eyeGleam); px(12, 14, C.eyeGleam);
+
+      rect(18, 13, 3, 4, C.eye);
+      px(18, 13, C.eyeGleam); px(19, 13, C.eyeGleam); px(19, 14, C.eyeGleam);
     }
 
-    // --- 6. MOUTH ---
+    // --- 6. CUTE MOUTH ---
     if (this.state === 'responding') {
-      // Talking animated mouth
-      const mouthH = (this.tick % 8 < 4) ? 2 : 1;
-      rect(11, 13, 2, mouthH, C.eye);
+      const mouthH = (this.tick % 8 < 4) ? 3 : 1;
+      rect(15, 17, 2, mouthH, C.eye);
     } else if (this.state === 'happy' || this.state === 'success') {
-      // Cute Smile
-      px(11, 13, C.eye); px(12, 13, C.eye); px(10, 12, C.eye); px(13, 12, C.eye);
-    } else if (this.state === 'confused') {
-      // Small wavy mouth
-      px(11, 13, C.eye); px(12, 14, C.eye);
+      // Open Happy Smile
+      px(15, 17, C.eye); px(16, 17, C.eye); px(14, 16, C.eye); px(17, 16, C.eye);
     } else {
-      // Gentle dot smile
-      px(11, 13, C.eye); px(12, 13, C.eye);
+      // Cute Small Wavy Dot Smile
+      px(15, 17, C.eye); px(16, 17, C.eye);
     }
 
-    // --- 7. LITTLE PIXEL HANDS ---
+    // --- 7. BANDANA SCARF AROUND NECK ---
+    rect(9, 20, 14, 2, C.scarf);
+    rect(10, 21, 12, 1, C.scarfDark);
+    // Cute Scarf Knot / Tail
+    rect(19, 21, 3, 3, C.scarf);
+    rect(20, 23, 2, 2, C.scarfDark);
+
+    // --- 8. LITTLE CHIBI HANDS ---
     if (this.state === 'listening' || this.state === 'happy') {
-      // Raised hands
-      rect(5, 11, 2, 2, C.body); rect(5, 11, 1, 1, C.bodyLight);
-      rect(17, 11, 2, 2, C.body); rect(17, 11, 1, 1, C.bodyLight);
+      // Raised little paws
+      rect(7, 15, 2, 3, C.body); rect(7, 15, 1, 1, C.bodyLight);
+      rect(23, 15, 2, 3, C.body); rect(23, 15, 1, 1, C.bodyLight);
     } else {
-      // Side hands resting
-      rect(5, 13, 2, 2, C.body);
-      rect(17, 13, 2, 2, C.body);
+      // Side little paws
+      rect(7, 17, 2, 3, C.body);
+      rect(23, 17, 2, 3, C.body);
     }
 
-    // --- 8. RENDER PARTICLES ---
+    // --- 9. RENDER PARTICLES ---
     this.particles.forEach(p => {
       ctx.fillStyle = p.color;
       ctx.globalAlpha = Math.max(0, p.alpha);
-      ctx.fillRect(Math.round(p.x), Math.round(p.y), 1.5, 1.5);
+      ctx.fillRect(Math.round(p.x), Math.round(p.y), 1.8, 1.8);
     });
     ctx.globalAlpha = 1.0;
   }

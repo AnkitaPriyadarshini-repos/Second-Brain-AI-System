@@ -26,40 +26,40 @@
   justify-content: center;
   padding: 12px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(15, 23, 42, 0) 70%);
+  background: radial-gradient(circle, rgba(255, 176, 156, 0.15) 0%, rgba(15, 17, 23, 0) 70%);
   transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .nori-canvas-wrapper::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: -6px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, transparent 75%);
-  opacity: 0.5;
+  background: radial-gradient(circle, rgba(255, 138, 128, 0.2) 0%, transparent 75%);
+  opacity: 0.6;
   animation: noriGlowPulse 4s ease-in-out infinite alternate;
 }
 
 @keyframes noriGlowPulse {
   0% { transform: scale(0.92); opacity: 0.3; }
-  100% { transform: scale(1.12); opacity: 0.7; }
+  100% { transform: scale(1.15); opacity: 0.7; }
 }
 
 .nori-pixel-canvas {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  width: 140px;
-  height: 140px;
+  width: 150px;
+  height: 150px;
   display: block;
   z-index: 2;
-  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
 }
 
 /* Compact Nori (for Header / Navbar) */
 .nori-compact .nori-pixel-canvas {
-  width: 36px;
-  height: 36px;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  width: 34px;
+  height: 34px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
 }
 .nori-compact .nori-canvas-wrapper {
   padding: 2px;
@@ -75,17 +75,17 @@
   top: -46px;
   left: 50%;
   transform: translateX(-50%) translateY(4px);
-  background: #1E293B;
+  background: #1F2128;
   color: #F3F4F6;
-  border: 1px solid #334155;
+  border: 1px solid #333644;
   padding: 6px 14px;
-  border-radius: 12px;
+  border-radius: 14px;
   font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
   transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 10;
 }
@@ -98,7 +98,7 @@
   transform: translateX(-50%);
   border-width: 6px 6px 0 6px;
   border-style: solid;
-  border-color: #1E293B transparent transparent transparent;
+  border-color: #1F2128 transparent transparent transparent;
 }
 
 .nori-speech-bubble.active {
@@ -114,7 +114,7 @@
   gap: 6px;
   padding: 4px 12px;
   border-radius: 20px;
-  background: rgba(30, 41, 59, 0.7);
+  background: rgba(31, 33, 40, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(8px);
   font-size: 12px;
@@ -139,7 +139,106 @@
 }
 
 /* State-specific dot colors */
-.nori-status-tag.thinking .nori-status-dot { background: #F59E0B; box-shadow: 0 0 8px #F59E0B; }
-.nori-status-tag.listening .nori-status-dot { background: #10B981; box-shadow: 0 0 8px #10B981; }
-.nori-status-tag.happy .nori-status-dot { background: #EC4899; box-shadow: 0 0 8px #EC4899; }
+.nori-status-tag.thinking .nori-status-dot { background: #FFB74D; box-shadow: 0 0 8px #FFB74D; }
+.nori-status-tag.listening .nori-status-dot { background: #4ADE80; box-shadow: 0 0 8px #4ADE80; }
+.nori-status-tag.happy .nori-status-dot { background: #F48FB1; box-shadow: 0 0 8px #F48FB1; }
 .nori-status-tag.success .nori-status-dot { background: #34D399; box-shadow: 0 0 8px #34D399; }
+
+/* Reference-Style Clean Composer Card */
+.nori-reference-composer-wrapper {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.nori-reference-composer-card {
+  background: #181A20;
+  border: 1px solid #2B2E38;
+  border-radius: 24px;
+  padding: 16px 20px 14px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nori-reference-composer-card:focus-within {
+  border-color: #3B3E4F;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
+}
+
+.nori-shortcut-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #64748B;
+  user-select: none;
+}
+
+.nori-shortcut-hint kbd {
+  font-family: inherit;
+  font-size: 11px;
+}
+
+.nori-reference-textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #F8FAFC;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  resize: none;
+  min-height: 48px;
+}
+
+.nori-reference-textarea::placeholder {
+  color: #475569;
+}
+
+.nori-composer-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 4px;
+}
+
+.nori-at-tag-btn {
+  background: transparent;
+  border: none;
+  color: #64748B;
+  font-size: 18px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.nori-at-tag-btn:hover {
+  color: #94A3B8;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nori-round-send-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #252833;
+  border: 1px solid #333746;
+  color: #94A3B8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nori-round-send-btn:hover {
+  background: #3B82F6;
+  border-color: #3B82F6;
+  color: #FFFFFF;
+  transform: scale(1.05);
+}
