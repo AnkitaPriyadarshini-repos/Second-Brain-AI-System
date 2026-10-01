@@ -1,6 +1,6 @@
 /* ==========================================================================
-   NORI PIXEL COMPANION DESIGN SYSTEM STYLES
-   Original AI Companion Identity for Second Brain AI
+   NORI SEAHARSE PIXEL COMPANION DESIGN SYSTEM STYLES
+   Original Lavender Seahorse with Mouth Flash Beam & Answer Emergence
    ========================================================================== */
 
 .nori-companion-container {
@@ -26,7 +26,7 @@
   justify-content: center;
   padding: 12px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 176, 156, 0.15) 0%, rgba(15, 17, 23, 0) 70%);
+  background: radial-gradient(circle, rgba(216, 180, 248, 0.2) 0%, rgba(167, 243, 208, 0.1) 50%, rgba(15, 17, 23, 0) 75%);
   transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -35,7 +35,7 @@
   position: absolute;
   inset: -6px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 138, 128, 0.2) 0%, transparent 75%);
+  background: radial-gradient(circle, rgba(192, 132, 252, 0.25) 0%, transparent 75%);
   opacity: 0.6;
   animation: noriGlowPulse 4s ease-in-out infinite alternate;
 }
@@ -48,17 +48,66 @@
 .nori-pixel-canvas {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  width: 150px;
-  height: 150px;
+  width: 170px;
+  height: 170px;
   display: block;
   z-index: 2;
   filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
 }
 
+/* Mouth Flash Glow Beam Overlay */
+.nori-mouth-glow-beam {
+  position: absolute;
+  top: 50%;
+  left: -20px;
+  width: 140px;
+  height: 50px;
+  pointer-events: none;
+  background: radial-gradient(ellipse at left, rgba(167, 243, 208, 0.8) 0%, rgba(244, 114, 182, 0.5) 45%, transparent 85%);
+  opacity: 0;
+  transform: translateY(-50%) scaleX(0.2);
+  transform-origin: left center;
+  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 1;
+  filter: blur(5px);
+}
+
+.nori-mouth-glow-beam.active {
+  opacity: 1;
+  transform: translateY(-50%) scaleX(1);
+  animation: mouthBeamPulse 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes mouthBeamPulse {
+  0% { opacity: 0.6; filter: blur(4px); }
+  100% { opacity: 1; filter: blur(8px); }
+}
+
+/* AI Message Bubble Emerging Flash Animation */
+.chat-bubble.ai-bubble {
+  animation: messageMouthFlashEmergence 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes messageMouthFlashEmergence {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.95);
+    box-shadow: 0 0 35px rgba(167, 243, 208, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(244, 114, 182, 0.6);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+}
+
 /* Compact Nori (for Header / Navbar) */
 .nori-compact .nori-pixel-canvas {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
 }
 .nori-compact .nori-canvas-wrapper {
@@ -105,44 +154,6 @@
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
-
-/* State Status Badge under Nori */
-.nori-status-tag {
-  margin-top: 10px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
-  border-radius: 20px;
-  background: rgba(31, 33, 40, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(8px);
-  font-size: 12px;
-  color: #94A3B8;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.nori-status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #38BDF8;
-  box-shadow: 0 0 8px #38BDF8;
-  animation: statusPulse 2s infinite;
-}
-
-@keyframes statusPulse {
-  0% { opacity: 0.5; transform: scale(0.9); }
-  50% { opacity: 1; transform: scale(1.2); }
-  100% { opacity: 0.5; transform: scale(0.9); }
-}
-
-/* State-specific dot colors */
-.nori-status-tag.thinking .nori-status-dot { background: #FFB74D; box-shadow: 0 0 8px #FFB74D; }
-.nori-status-tag.listening .nori-status-dot { background: #4ADE80; box-shadow: 0 0 8px #4ADE80; }
-.nori-status-tag.happy .nori-status-dot { background: #F48FB1; box-shadow: 0 0 8px #F48FB1; }
-.nori-status-tag.success .nori-status-dot { background: #34D399; box-shadow: 0 0 8px #34D399; }
 
 /* Reference-Style Clean Composer Card */
 .nori-reference-composer-wrapper {
@@ -237,8 +248,8 @@
 }
 
 .nori-round-send-btn:hover {
-  background: #3B82F6;
-  border-color: #3B82F6;
+  background: #C084FC;
+  border-color: #C084FC;
   color: #FFFFFF;
   transform: scale(1.05);
 }

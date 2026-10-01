@@ -1736,6 +1736,11 @@
           answerText = window.adaptiveFusionEngine.formatFusedMessageOutput(cleanQuery, answerText);
         }
 
+        // Trigger Nori Mouth Flash Beam right as answer emerges!
+        if (window.noriCompanion) {
+          window.noriCompanion.flashMouth(3000);
+        }
+
         // Render final AI message card with typewriter streaming
         appendChatMessage('ai', answerText, citations, false, cleanQuery, providerName, true);
 
