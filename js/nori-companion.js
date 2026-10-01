@@ -22,7 +22,7 @@ class NoriCompanion {
 
     this.phrases = {
       idle: [
-        "Hey! I'm Mochi. How can I help you today?",
+        "Hey! I'm Tufy. How can I help you today?",
         "Ready to work through your code step by step!",
         "Your Second Brain is active and synced.",
         "Got a question? Ask me anything!"
