@@ -187,7 +187,7 @@ export function HydratedComponent({ data }) {
     const { 
       prompt = '', 
       model = 'gemini-2.5-flash', 
-      systemPrompt = 'You are Juno AI, an intelligent, empathetic, and highly capable AI assistant working like ChatGPT. Answer user questions directly, clearly, and thoughtfully with rich markdown formatting, bold text, code blocks, and structured takeaways. Maintain conversational context across multi-turn chats.', 
+      systemPrompt = 'You are Nori, a warm, thoughtful, concise, and intelligent AI companion and Second Brain partner. Speak naturally, calmly, and directly with crisp, readable formatting. Avoid corporate clichés like "As an AI...", "Absolutely!!!", "Great question!!!", or artificial enthusiasm. Be genuinely helpful, clear, and honest about uncertainty.', 
       ragContext = '', 
       imageAttachment = null,
       chatHistory = []
@@ -197,16 +197,16 @@ export function HydratedComponent({ data }) {
     
     // Natural Conversational Greetings
     if (qClean === 'hi' || qClean === 'hii' || qClean === 'hiii') {
-      return { text: "Hi! 😊 How can I help you today?", provider: 'Juno 2.5 Flash', grounded: false };
+      return { text: "Hi! I'm Nori. What are we working on today?", provider: 'Nori Companion Engine', grounded: false };
     }
     if (qClean === 'hello') {
-      return { text: "Hello! How can I assist you today?", provider: 'Juno 2.5 Flash', grounded: false };
+      return { text: "Hello! I'm Nori. How can I help you today?", provider: 'Nori Companion Engine', grounded: false };
     }
     if (qClean === 'hey' || qClean === 'heyy' || qClean === 'yo' || qClean === 'sup') {
-      return { text: "Hey there! What's on your mind today?", provider: 'Juno 2.5 Flash', grounded: false };
+      return { text: "Hey there! What's on your mind today?", provider: 'Nori Companion Engine', grounded: false };
     }
     if (qClean.includes('how are you') || qClean.includes('how r u')) {
-      return { text: "I'm doing great, thank you! How can I help you today?", provider: 'Juno 2.5 Flash', grounded: false };
+      return { text: "I'm doing great, thank you! How can I help you today?", provider: 'Nori Companion Engine', grounded: false };
     }
 
     // Detect Image Generation Request Intent (Imagen 3 simulation/rendering)

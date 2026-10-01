@@ -100,6 +100,31 @@
     Store.init();
     updateHeaderStats();
 
+    // Initialize Nori AI Companion Engine
+    try {
+      if (typeof NoriCompanion !== 'undefined') {
+        window.noriCompanion = new NoriCompanion({ containerId: 'nori-companion-target', size: 140 });
+        window.noriHeaderCompanion = new NoriCompanion({ containerId: 'nori-header-target', compact: true, size: 36 });
+      }
+    } catch (e) { console.warn('NoriCompanion init warning:', e); }
+
+    // Connect Nori Companion Input Handlers
+    if (ragQueryInput) {
+      ragQueryInput.addEventListener('focus', () => {
+        if (window.noriCompanion) window.noriCompanion.setState('listening');
+      });
+      ragQueryInput.addEventListener('input', () => {
+        if (window.noriCompanion && ragQueryInput.value.length > 0) {
+          window.noriCompanion.setState('listening');
+        }
+      });
+      ragQueryInput.addEventListener('blur', () => {
+        if (window.noriCompanion && window.noriCompanion.state === 'listening') {
+          window.noriCompanion.setState('idle');
+        }
+      });
+    }
+
     // Initialize Subsystem Engines
     try {
       if (typeof DeveloperHUDEngine !== 'undefined' && DeveloperHUDEngine.init) {
@@ -1593,14 +1618,14 @@
             targetContainer.scrollTop = targetContainer.scrollHeight;
           }
           window.adaptiveFusionEngine.startLiveStreamingAnimation(cardId);
-        } else {
-          thinkingCard.innerHTML = `<div class="chat-header" style="display: flex; align-items: center; gap: 8px; font-weight: 800;">
-            <div class="ai-avatar" style="width: 24px; height: 24px; border-radius: 50%; background: #00f2fe; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #2c1d00;">✨</div>
-            <strong style="color: #e65100;">Juno Thinking Process</strong>
+          if (window.noriCompanion) window.noriCompanion.setState('thinking');
+          thinkingCard.innerHTML = `<div class="chat-header" style="display: flex; align-items: center; gap: 8px; font-weight: 700;">
+            <span style="font-size: 16px;">✨</span>
+            <strong style="color: #38BDF8;">Nori is thinking...</strong>
           </div>
-          <div class="chat-text" style="display: flex; align-items: center; gap: 8px; font-style: italic; color: #8c5a00; font-size: 13.5px; margin-top: 6px;">
-            <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #00f2fe; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
-            <span>Synthesizing response & searching knowledge vault...</span>
+          <div class="chat-text" style="display: flex; align-items: center; gap: 8px; color: #94A3B8; font-size: 13.5px; margin-top: 6px;">
+            <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #38BDF8; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
+            <span>Searching your Second Brain &amp; synthesizing answer...</span>
           </div>`;
           if (targetContainer) {
             targetContainer.appendChild(thinkingCard);
@@ -1750,11 +1775,15 @@
         if (thinkingCard && thinkingCard.parentNode) {
           thinkingCard.parentNode.removeChild(thinkingCard);
         }
-        const fallbackAnswer = `⚠️ **Query Synthesis Diagnostics**:\n\n${mainErr.message || 'An unexpected error occurred while generating a response.'}\n\nPlease verify your network connection or API settings and try again.`;
-        appendChatMessage('ai', fallbackAnswer, [], false, cleanQuery, 'Juno System', false);
+        if (window.noriCompanion) window.noriCompanion.setState('confused');
+        const fallbackAnswer = `Something went wrong while connecting. Let's try that again.`;
+        appendChatMessage('ai', fallbackAnswer, [], false, cleanQuery, 'Nori Companion', false);
       } finally {
         window.isAIProcessing = false;
         window.isAIAborted = false;
+        if (window.noriCompanion && window.noriCompanion.state !== 'confused') {
+          window.noriCompanion.setState('idle');
+        }
         const inputEl = document.getElementById('rag-query-input');
         const submitBtn = document.getElementById('rag-submit-btn');
         if (inputEl) {
@@ -1879,12 +1908,12 @@
         msgCard.className = `chat-bubble ai-bubble claude-ai-bubble`;
         let citationsHTML = '';
         if (citations && citations.length > 0) {
-          citationsHTML = `<div class="citations-container">
-            <div class="citations-title">Grounded Sources (${citations.length} Notes Cited):</div>
-            <div class="citations-list">
+          citationsHTML = `<div class="citations-container" style="margin-top: 12px; padding: 10px 14px; background: rgba(56, 189, 248, 0.08); border-radius: 10px; border: 1px solid rgba(56, 189, 248, 0.18);">
+            <div class="citations-title" style="font-size: 12px; color: #38BDF8; font-weight: 600; margin-bottom: 6px;">🧠 Remembered from ${citations.length} note${citations.length > 1 ? 's' : ''}:</div>
+            <div class="citations-list" style="display: flex; flex-wrap: wrap; gap: 6px;">
               ${citations.map(c => `
-                <a class="citation-pill" data-id="${c.id}">
-                  ${escapeHTML(c.title)} <span class="citation-date">(${escapeHTML(c.dateStr || c.date || '')})</span>
+                <a class="citation-pill" data-id="${c.id}" style="font-size: 11.5px; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,0.06); color: #E2E8F0; text-decoration: none; border: 1px solid rgba(255,255,255,0.1); cursor: pointer;">
+                  ${escapeHTML(c.title)}
                 </a>
               `).join('')}
             </div>
@@ -1895,11 +1924,13 @@
           <button class="chat-action-btn copy-btn" title="Copy answer text">📋 Copy</button>
           <button class="chat-action-btn regen-btn" title="Regenerate response">🔄 Retry</button>
           <button class="chat-action-btn speak-btn" title="Listen to answer">🔊 Read</button>
-          <button class="chat-action-btn thumb-up-btn" title="Good response">👍</button>
-          <button class="chat-action-btn thumb-down-btn" title="Bad response">👎</button>
         </div>`;
 
         msgCard.innerHTML = `
+          <div class="chat-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+            <span style="font-size: 16px;">✨</span>
+            <strong style="font-size: 14px; font-weight: 700; color: #38BDF8;">Nori</strong>
+          </div>
           <div class="chat-text" style="color: #f3f0e8; font-size: 15.5px; line-height: 1.65; font-family: 'Inter', sans-serif;"></div>
           ${citationsHTML}
           ${actionsHTML}

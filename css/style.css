@@ -17,45 +17,45 @@
 [data-theme="golden-harmony"],
 [data-theme="aqua-aesthetic"],
 [data-theme="sunflower-sunrise"] {
-  --navy-primary: #153A50;
-  --primary-blue: #5B8094;
-  --interactive-blue: #7198AF;
-  --accent-blue: #87B1C8;
-  --soft-accent: #AAD0E2;
-  --main-bg: #F5F9FC;
-  --surface-bg: #FFFFFF;
-  --border-color: #D8E6EE;
+  --navy-primary: #38BDF8;
+  --primary-blue: #0284C7;
+  --interactive-blue: #0EA5E9;
+  --accent-blue: #38BDF8;
+  --soft-accent: #94A3B8;
+  --main-bg: #0B0F17;
+  --surface-bg: #131B2E;
+  --border-color: #212D45;
 
-  --bg-dark: #F5F9FC;
-  --bg-dark-gradient: #F5F9FC;
-  --bg-card: #FFFFFF;
-  --bg-card-hover: #F8FAFC;
-  --bg-card-active: #F1F5F9;
+  --bg-dark: #0B0F17;
+  --bg-dark-gradient: #0B0F17;
+  --bg-card: #131B2E;
+  --bg-card-hover: #1A243B;
+  --bg-card-active: #212D45;
 
-  --text-primary: #153A50;
-  --text-secondary: #5B8094;
-  --text-muted: #7198AF;
+  --text-primary: #F3F4F6;
+  --text-secondary: #9CA3AF;
+  --text-muted: #6B7280;
 
-  --accent-primary: #153A50;
-  --accent-primary-hover: #0E2738;
-  --accent-primary-light: #EBF3F8;
+  --accent-primary: #38BDF8;
+  --accent-primary-hover: #0284C7;
+  --accent-primary-light: rgba(56, 189, 248, 0.12);
 
-  --accent-indigo: #153A50;
-  --accent-violet: #5B8094;
+  --accent-indigo: #6366F1;
+  --accent-violet: #8B5CF6;
   --accent-emerald: #10B981;
-  --accent-amber: #5B8094;
-  --accent-pink: #7198AF;
-  --accent-blue: #87B1C8;
-  --accent-cyan: #5B8094;
+  --accent-amber: #F59E0B;
+  --accent-pink: #EC4899;
+  --accent-blue: #38BDF8;
+  --accent-cyan: #06B6D4;
 
-  --sidebar-bg: #153A50;
-  --sidebar-text: #AAD0E2;
+  --sidebar-bg: #0E1422;
+  --sidebar-text: #94A3B8;
   --sidebar-text-active: #FFFFFF;
-  --sidebar-item-hover: rgba(255, 255, 255, 0.08);
-  --sidebar-item-active: #5B8094;
+  --sidebar-item-hover: rgba(255, 255, 255, 0.06);
+  --sidebar-item-active: #1E293B;
 
-  --topbar-bg: #FFFFFF;
-  --topbar-border: #D8E6EE;
+  --topbar-bg: #0B0F17;
+  --topbar-border: #212D45;
 
   --font-main: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-code: "Fira Code", monospace;
