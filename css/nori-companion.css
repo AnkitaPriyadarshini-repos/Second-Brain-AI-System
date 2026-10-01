@@ -63,7 +63,7 @@
   width: 140px;
   height: 50px;
   pointer-events: none;
-  background: radial-gradient(ellipse at left, rgba(167, 243, 208, 0.8) 0%, rgba(244, 114, 182, 0.5) 45%, transparent 85%);
+  background: radial-gradient(ellipse at left, rgba(255, 15, 128, 0.85) 0%, rgba(254, 78, 0, 0.6) 45%, transparent 85%);
   opacity: 0;
   transform: translateY(-50%) scaleX(0.2);
   transform-origin: left center;
@@ -92,10 +92,10 @@
   0% {
     opacity: 0;
     transform: translateY(-16px) scale(0.95);
-    box-shadow: 0 0 35px rgba(167, 243, 208, 0.7);
+    box-shadow: 0 0 35px rgba(255, 15, 128, 0.7);
   }
   50% {
-    box-shadow: 0 0 25px rgba(244, 114, 182, 0.6);
+    box-shadow: 0 0 25px rgba(254, 78, 0, 0.6);
   }
   100% {
     opacity: 1;
@@ -124,9 +124,9 @@
   top: -46px;
   left: 50%;
   transform: translateX(-50%) translateY(4px);
-  background: #1F2128;
-  color: #F3F4F6;
-  border: 1px solid #333644;
+  background: #191424;
+  color: #F8FAFC;
+  border: 1px solid #2F2742;
   padding: 6px 14px;
   border-radius: 14px;
   font-size: 13px;
@@ -147,7 +147,7 @@
   transform: translateX(-50%);
   border-width: 6px 6px 0 6px;
   border-style: solid;
-  border-color: #1F2128 transparent transparent transparent;
+  border-color: #191424 transparent transparent transparent;
 }
 
 .nori-speech-bubble.active {
@@ -163,20 +163,20 @@
 }
 
 .nori-reference-composer-card {
-  background: #181A20;
-  border: 1px solid #2B2E38;
+  background: #191424;
+  border: 1px solid #2F2742;
   border-radius: 24px;
   padding: 16px 20px 14px 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .nori-reference-composer-card:focus-within {
-  border-color: #3B3E4F;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.5);
+  border-color: #FF0F80;
+  box-shadow: 0 20px 48px rgba(255, 15, 128, 0.25);
 }
 
 .nori-shortcut-hint {
@@ -184,7 +184,7 @@
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #64748B;
+  color: #6E6A7F;
   user-select: none;
 }
 
@@ -207,7 +207,7 @@
 }
 
 .nori-reference-textarea::placeholder {
-  color: #475569;
+  color: #554F65;
 }
 
 .nori-composer-bottom-row {
@@ -220,7 +220,7 @@
 .nori-at-tag-btn {
   background: transparent;
   border: none;
-  color: #64748B;
+  color: #6E6A7F;
   font-size: 18px;
   padding: 6px 10px;
   border-radius: 10px;
@@ -229,27 +229,26 @@
 }
 
 .nori-at-tag-btn:hover {
-  color: #94A3B8;
-  background: rgba(255, 255, 255, 0.05);
+  color: #FF0F80;
+  background: rgba(255, 15, 128, 0.1);
 }
 
 .nori-round-send-btn {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #252833;
-  border: 1px solid #333746;
-  color: #94A3B8;
+  background: linear-gradient(135deg, #FF0F80, #FE4E00);
+  border: none;
+  color: #FFFFFF;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  box-shadow: 0 4px 14px rgba(255, 15, 128, 0.4);
   transition: all 0.2s ease;
 }
 
 .nori-round-send-btn:hover {
-  background: #C084FC;
-  border-color: #C084FC;
-  color: #FFFFFF;
-  transform: scale(1.05);
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(254, 78, 0, 0.6);
 }

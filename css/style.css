@@ -17,45 +17,43 @@
 [data-theme="golden-harmony"],
 [data-theme="aqua-aesthetic"],
 [data-theme="sunflower-sunrise"] {
-  --navy-primary: #38BDF8;
-  --primary-blue: #0284C7;
-  --interactive-blue: #0EA5E9;
-  --accent-blue: #38BDF8;
-  --soft-accent: #94A3B8;
-  --main-bg: #0B0F17;
-  --surface-bg: #131B2E;
-  --border-color: #212D45;
+  --navy-primary: #FF0F80;
+  --primary-blue: #FE4E00;
+  --interactive-blue: #FFAE03;
+  --accent-blue: #FF0F80;
+  --soft-accent: #E67F0D;
+  --main-bg: #0F0C15;
+  --surface-bg: #191424;
+  --border-color: #2F2742;
 
-  --bg-dark: #0B0F17;
-  --bg-dark-gradient: #0B0F17;
-  --bg-card: #131B2E;
-  --bg-card-hover: #1A243B;
-  --bg-card-active: #212D45;
+  --bg-dark: #0F0C15;
+  --bg-dark-gradient: #0F0C15;
+  --bg-card: #191424;
+  --bg-card-hover: #231C33;
+  --bg-card-active: #2E2542;
 
-  --text-primary: #F3F4F6;
-  --text-secondary: #9CA3AF;
-  --text-muted: #6B7280;
+  --text-primary: #F8FAFC;
+  --text-secondary: #A49FB6;
+  --text-muted: #6E6A7F;
 
-  --accent-primary: #38BDF8;
-  --accent-primary-hover: #0284C7;
-  --accent-primary-light: rgba(56, 189, 248, 0.12);
+  --accent-primary: #FF0F80;
+  --accent-primary-hover: #FE4E00;
+  --accent-primary-light: rgba(255, 15, 128, 0.15);
 
-  --accent-indigo: #6366F1;
-  --accent-violet: #8B5CF6;
-  --accent-emerald: #10B981;
-  --accent-amber: #F59E0B;
-  --accent-pink: #EC4899;
-  --accent-blue: #38BDF8;
-  --accent-cyan: #06B6D4;
+  --accent-summer-bloom: #FF0F80;
+  --accent-tropic-blaze: #E9190F;
+  --accent-solar-flare: #FE4E00;
+  --accent-papaya-pop: #E67F0D;
+  --accent-neon-nectar: #FFAE03;
 
-  --sidebar-bg: #0E1422;
-  --sidebar-text: #94A3B8;
+  --sidebar-bg: #121019;
+  --sidebar-text: #A49FB6;
   --sidebar-text-active: #FFFFFF;
-  --sidebar-item-hover: rgba(255, 255, 255, 0.06);
-  --sidebar-item-active: #1E293B;
+  --sidebar-item-hover: rgba(255, 15, 128, 0.08);
+  --sidebar-item-active: #231C33;
 
-  --topbar-bg: #0B0F17;
-  --topbar-border: #212D45;
+  --topbar-bg: #0F0C15;
+  --topbar-border: #2F2742;
 
   --font-main: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-code: "Fira Code", monospace;
@@ -7285,17 +7283,17 @@ body[data-theme="gemini-dark"] .chat-action-btn {
 .app-layout-wrapper.claude-layout,
 .app-main-canvas.claude-main-canvas,
 .claude-hero-section {
-  background-color: #F5F9FC !important;
-  color: #153A50 !important;
+  background-color: #0F0C15 !important;
+  color: #F8FAFC !important;
 }
 
-/* Compact Navy Sidebar (#153A50) */
+/* Compact Navy Sidebar (#121019) */
 .app-sidebar.claude-sidebar {
   width: 240px !important;
   min-width: 240px !important;
   max-width: 240px !important;
-  background-color: #153A50 !important;
-  border-right: 1px solid #D8E6EE !important;
+  background-color: #121019 !important;
+  border-right: 1px solid #2F2742 !important;
   padding: 16px 14px !important;
   display: flex !important;
   flex-direction: column !important;

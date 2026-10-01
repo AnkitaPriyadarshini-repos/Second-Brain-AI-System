@@ -127,7 +127,7 @@ class NoriCompanion {
         vy: Math.sin(angle) * 1.2 + (Math.random() - 0.5) * 0.8,
         alpha: 1.0,
         size: 1.5 + Math.random() * 2,
-        color: ['#A7F3D0', '#6EE7B7', '#F472B6', '#E9D5FF', '#FDE047', '#38BDF8'][Math.floor(Math.random() * 6)]
+        color: ['#FF0F80', '#E9190F', '#FE4E00', '#E67F0D', '#FFAE03', '#FFFFFF'][Math.floor(Math.random() * 6)]
       });
     }
   }
@@ -197,27 +197,27 @@ class NoriCompanion {
     const floatY = Math.sin(this.tick * 0.04) * 1.2;
     const baseY = 3 + floatY;
 
-    // Palette: Cute Lavender Seahorse with Mint Green Segmented Belly
+    // Palette: User Color Swatch Palette (Summer Bloom, Tropic Blaze, Solar Flare, Papaya Pop, Neon Nectar)
     const C = {
-      outline: '#2A1B4E',
-      body: '#D8B4F8',        // Pastel Lavender Body
-      bodyDark: '#B488E5',    // Shadow Lavender
-      bodyLight: '#F3E8FF',   // Highlight Soft Lavender
-      spots: '#A855F7',       // Purple Spots
-      belly: '#A7F3D0',       // Mint Green Belly
-      bellyDark: '#34D399',   // Dark Mint Segment Line
-      cheek: '#F472B6',       // Bright Rosy Pink Blush
-      fin: '#C084FC',         // Back Fin Soft Purple
-      finLight: '#E9D5FF',
-      snout: '#C084FC',       // Snout Trumpet Mouth
-      snoutHole: '#6B21A8',
-      eye: '#1E1B2E',         // Glossy Eye
+      outline: '#1F0B18',
+      body: '#FF0F80',        // Summer Bloom (#FF0F80)
+      bodyDark: '#D40065',    // Deep Bloom Shadow
+      bodyLight: '#FF54A8',   // Highlight Pink
+      spots: '#E9190F',       // Tropic Blaze (#E9190F)
+      belly: '#FFAE03',       // Neon Nectar (#FFAE03)
+      bellyDark: '#E67F0D',   // Papaya Pop (#E67F0D)
+      cheek: '#FE4E00',       // Solar Flare (#FE4E00)
+      fin: '#FE4E00',         // Solar Flare Fin
+      finLight: '#FFAE03',
+      snout: '#FE4E00',       // Snout Trumpet Mouth
+      snoutHole: '#8A003E',
+      eye: '#140810',         // Dark Glossy Eye
       eyeGleam: '#FFFFFF',
-      beamGlow: '#6EE7B7'     // Mouth Beam Glow
+      beamGlow: '#FFAE03'     // Mouth Beam Glow
     };
 
-    if (this.state === 'thinking') { C.body = '#C084FC'; C.bodyLight = '#F3E8FF'; }
-    if (this.state === 'listening') { C.body = '#F472B6'; C.bodyLight = '#FBCFE8'; }
+    if (this.state === 'thinking') { C.body = '#FE4E00'; C.bodyLight = '#FFAE03'; }
+    if (this.state === 'listening') { C.body = '#FFAE03'; C.bodyLight = '#FFE082'; }
 
     const px = (x, y, color) => {
       ctx.fillStyle = color;
