@@ -3,6 +3,15 @@
    Cute Soft Pink Droplet Mascot with Blue Scarf, Mouth Flash & Sleek Dark UI
    ========================================================================== */
 
+#nori-companion-target {
+  min-height: 180px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
 .nori-companion-container {
   display: flex;
   flex-direction: column;
@@ -26,7 +35,7 @@
   justify-content: center;
   padding: 12px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 174, 193, 0.15) 0%, rgba(67, 97, 238, 0.08) 50%, rgba(17, 18, 21, 0) 75%);
+  background: radial-gradient(circle, rgba(255, 174, 193, 0.18) 0%, rgba(67, 97, 238, 0.1) 50%, rgba(11, 12, 14, 0) 75%);
   transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -35,7 +44,7 @@
   position: absolute;
   inset: -6px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 174, 193, 0.2) 0%, transparent 75%);
+  background: radial-gradient(circle, rgba(255, 174, 193, 0.25) 0%, transparent 75%);
   opacity: 0.5;
   animation: noriGlowPulse 4s ease-in-out infinite alternate;
 }
@@ -155,7 +164,7 @@
   transform: translateX(-50%) translateY(0);
 }
 
-/* Reference-Style Sleek Dark Composer Card (Matching Screenshot) */
+/* Reference-Style Sleek Dark Composer Card & Text Area High Contrast Overrides */
 .nori-reference-composer-wrapper {
   width: 100%;
   max-width: 680px;
@@ -163,122 +172,169 @@
 }
 
 .nori-reference-composer-card {
-  background: #141519;
-  border: 1px solid #1F2128;
-  border-radius: 20px;
-  padding: 16px 20px 14px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: #141519 !important;
+  border: 1.5px solid #334155 !important;
+  border-radius: 20px !important;
+  padding: 16px 20px 14px 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 .nori-reference-composer-card:focus-within {
-  border-color: #6366F1;
-  box-shadow: 0 14px 40px rgba(99, 102, 241, 0.14);
+  border-color: #6366F1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25), 0 14px 40px rgba(0, 0, 0, 0.6) !important;
 }
 
 .nori-shortcut-hint {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: #6B6D76;
-  user-select: none;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 12px !important;
+  color: #94A3B8 !important;
+  user-select: none !important;
 }
 
 .nori-shortcut-hint span {
-  font-family: inherit;
-  font-size: 12px;
-  color: #6B6D76;
+  font-family: inherit !important;
+  font-size: 12px !important;
+  color: #94A3B8 !important;
 }
 
-.nori-reference-textarea {
-  width: 100%;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #F3F4F6;
-  font-family: 'Inter', sans-serif;
-  font-size: 15px;
-  line-height: 1.5;
-  resize: none;
-  min-height: 48px;
+/* EXPLICIT HIGH-CONTRAST TEXTAREA TYPED TEXT & PLACEHOLDER COLOR */
+#rag-query-input,
+.nori-reference-textarea,
+textarea.nori-reference-textarea {
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
+  resize: none !important;
+  min-height: 48px !important;
+  caret-color: #60A5FA !important;
+  opacity: 1 !important;
 }
 
-.nori-reference-textarea::placeholder {
-  color: #4B4D56;
+#rag-query-input::placeholder,
+.nori-reference-textarea::placeholder,
+textarea.nori-reference-textarea::placeholder {
+  color: #94A3B8 !important;
+  -webkit-text-fill-color: #94A3B8 !important;
+  opacity: 1 !important;
 }
 
 .nori-composer-bottom-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-top: 4px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding-top: 4px !important;
 }
 
 .nori-at-tag-btn {
-  background: #1E2027;
-  border: 1px solid #2B2D37;
-  color: #9EA0A6;
-  font-size: 15px;
-  font-weight: 600;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  background: #222530 !important;
+  border: 1px solid #334155 !important;
+  color: #CBD5E1 !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease !important;
 }
 
 .nori-at-tag-btn:hover {
-  color: #FFFFFF;
-  background: #272A35;
-  border-color: #6366F1;
+  color: #FFFFFF !important;
+  background: #2D3142 !important;
+  border-color: #6366F1 !important;
 }
 
 .nori-round-send-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: #1E2027;
-  border: 1px solid #2B2D37;
-  color: #9EA0A6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50% !important;
+  background: #222530 !important;
+  border: 1px solid #334155 !important;
+  color: #CBD5E1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
 }
 
 .nori-round-send-btn:hover {
-  background: #6366F1;
-  border-color: #6366F1;
-  color: #FFFFFF;
-  transform: scale(1.05);
+  background: #6366F1 !important;
+  border-color: #6366F1 !important;
+  color: #FFFFFF !important;
+  transform: scale(1.05) !important;
 }
 
 /* Tufy Prompt Starter Chips */
 .tufy-starter-chip {
-  background: #141519;
-  border: 1px solid #1F2128;
-  color: #9EA0A6;
-  padding: 8px 16px;
-  border-radius: 9999px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  user-select: none;
+  background: #141519 !important;
+  border: 1px solid #334155 !important;
+  color: #CBD5E1 !important;
+  padding: 8px 16px !important;
+  border-radius: 9999px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  user-select: none !important;
 }
 
 .tufy-starter-chip:hover {
-  background: #1B1D23;
-  border-color: #6366F1;
-  color: #F3F4F6;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.12);
+  background: #1E2028 !important;
+  border-color: #6366F1 !important;
+  color: #FFFFFF !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15) !important;
+}
+
+/* Top Navigation Bar Explicit Dark Theme Overrides */
+.claude-top-navbar,
+header.claude-top-navbar {
+  background: #0B0C0E !important;
+  border-bottom: 1px solid #1E2028 !important;
+  color: #F4F4F6 !important;
+}
+
+.claude-top-navbar span {
+  color: #F4F4F6 !important;
+}
+
+.status-pill-badge,
+.claude-plan-pill {
+  background: #141519 !important;
+  border: 1px solid #334155 !important;
+  color: #F4F4F6 !important;
+}
+
+/* Hero Section Text Overrides */
+.claude-serif-headline {
+  color: #FFFFFF !important;
+  font-size: 32px !important;
+  font-weight: 700 !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5) !important;
+}
+
+.hero-subtitle-text {
+  color: #CBD5E1 !important;
+  font-size: 15px !important;
+}
+
+.view-credits-link {
+  color: #60A5FA !important;
 }
