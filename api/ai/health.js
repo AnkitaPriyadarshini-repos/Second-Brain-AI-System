@@ -29,7 +29,9 @@ export default function handler(req, res) {
   const deploymentContext = {
     vercelEnv: process.env.VERCEL_ENV || 'unknown',
     vercelGitRef: process.env.VERCEL_GIT_COMMIT_REF || 'unknown',
-    vercelRegion: process.env.VERCEL_REGION || 'unknown'
+    vercelRegion: process.env.VERCEL_REGION || 'unknown',
+    vercelProjectName: process.env.VERCEL_PROJECT_NAME || 'unknown',
+    vercelProjectProductionUrl: process.env.VERCEL_PROJECT_PRODUCTION_URL || 'unknown'
   };
   const keyDiagnostics = {};
   for (const key of Object.keys(process.env)) {
