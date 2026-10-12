@@ -22,7 +22,10 @@ export default function handler(req, res) {
     return res.status(405).json({ ok: false, error: 'Method not allowed.' });
   }
 
+  const apiKey = getApiKey();
   const rawKey = process.env.GEMINI_API_KEY;
+  const configured = Boolean(apiKey);
+  const matchingKeys = Object.keys(process.env).filter((k) => /gemini|google/i.test(k));
   const keyInfo = {
     type: typeof rawKey,
     isUndefined: rawKey === undefined,
