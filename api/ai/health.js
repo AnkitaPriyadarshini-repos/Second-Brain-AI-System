@@ -6,6 +6,7 @@ const MODELS = {
 
 function getApiKey() {
   return (
+    process.env.JUNO_GEMINI_KEY ||
     process.env.GEMINI_API_KEY ||
     process.env.GOOGLE_API_KEY ||
     process.env.GOOGLE_GEMINI_API_KEY ||
@@ -26,7 +27,7 @@ export default function handler(req, res) {
   const apiKey = getApiKey();
   const rawKey = process.env.GEMINI_API_KEY;
   const configured = Boolean(apiKey);
-  const matchingKeys = Object.keys(process.env).filter((k) => /gemini|google|ai_key/i.test(k));
+  const matchingKeys = Object.keys(process.env).filter((k) => /gemini|google|ai_key|juno/i.test(k));
   const deploymentContext = {
     vercelEnv: process.env.VERCEL_ENV || 'unknown',
     vercelGitRef: process.env.VERCEL_GIT_COMMIT_REF || 'unknown',
@@ -39,7 +40,7 @@ export default function handler(req, res) {
   };
   const keyDiagnostics = {};
   for (const key of Object.keys(process.env)) {
-    if (/gemini|google|ai_key/i.test(key)) {
+    if (/gemini|google|ai_key|juno/i.test(key)) {
       const val = process.env[key];
       keyDiagnostics[key] = {
         type: typeof val,
