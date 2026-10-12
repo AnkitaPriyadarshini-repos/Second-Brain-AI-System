@@ -212,7 +212,9 @@ async function callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey
         contents,
         generationConfig: {
           maxOutputTokens: model === PRIMARY_MODEL ? 8192 : 4096,
-          thinkingConfig: { thinkingLevel }
+          thinkingConfig: {
+            thinkingLevel: String(thinkingLevel || 'LOW').toUpperCase()
+          }
         }
       }),
       signal: controller.signal
