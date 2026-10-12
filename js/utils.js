@@ -96,7 +96,7 @@ window.runInCanvasFromBlock = runInCanvasFromBlock;
 // Production chat loader — parser-blocking, no first-message race
 // ------------------------------------------------------------
 (function installProductionChatLoader() {
-  const SRC = 'js/production-chat.js?v=5.0';
+  const SRC = 'js/production-chat.js?v=6.0';
 
   function installCaptureGuards() {
     let dispatching = false;
@@ -157,12 +157,13 @@ window.runInCanvasFromBlock = runInCanvasFromBlock;
   }
 
   if (typeof window.handleRAGQuery !== 'function' && document.readyState === 'loading') {
-    document.write(`<script src="${SRC}"><\/script>`);
+    document.write(`<script src="${SRC}" data-juno-production-chat="true"><\/script>`);
   }
 
   if (typeof window.handleRAGQuery !== 'function' && document.readyState !== 'loading') {
     const script = document.createElement('script');
     script.src = SRC;
+    script.dataset.junoProductionChat = 'true';
     script.async = false;
     document.head.appendChild(script);
   }
