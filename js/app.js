@@ -9,8 +9,9 @@
 
   function initApp() {
     // ----------------------------------------------------
-    // DOM Element References
+    // DOM Element References & State
     // ----------------------------------------------------
+    let vaultViewMode = 'grid';
     const navTabs = document.querySelectorAll('.nav-tab');
     const viewSections = document.querySelectorAll('.view-section');
 
@@ -519,29 +520,33 @@
     };
 
     // 3. Robust Chat Composer Submit Architecture
-    window.submitRAGQuery = function(e) {
-      try {
-        if (e) {
-          if (typeof e.preventDefault === 'function') e.preventDefault();
-          if (typeof e.stopPropagation === 'function') e.stopPropagation();
+    if (typeof window.submitRAGQuery !== 'function') {
+      window.submitRAGQuery = function(e) {
+        try {
+          if (e) {
+            if (typeof e.preventDefault === 'function') e.preventDefault();
+            if (typeof e.stopPropagation === 'function') e.stopPropagation();
+          }
+        } catch (err) {}
+
+        if (window.isAIProcessing) return false;
+
+        const inputEl = document.getElementById('rag-query-input');
+        const query = inputEl ? inputEl.value.trim() : '';
+        if (!query && !window.activePromptAttachment) {
+          return false;
         }
-      } catch (err) {}
 
-      if (window.isAIProcessing) return false;
-
-      const inputEl = document.getElementById('rag-query-input');
-      const query = inputEl ? inputEl.value.trim() : '';
-      if (!query && !window.activePromptAttachment) {
+        const handler = window.handleRAGQuery || (typeof handleRAGQuery === 'function' ? handleRAGQuery : null);
+        if (typeof handler === 'function') {
+          handler(query);
+        }
         return false;
-      }
-
-      const handler = window.handleRAGQuery || (typeof handleRAGQuery === 'function' ? handleRAGQuery : null);
-      if (typeof handler === 'function') {
-        handler(query);
-      }
-      return false;
-    };
-    window.sendMessage = window.submitRAGQuery;
+      };
+    }
+    if (typeof window.sendMessage !== 'function') {
+      window.sendMessage = window.submitRAGQuery;
+    }
 
     let currentSessionOTP = '582914';
     let pendingUserDetails = { firstName: '', lastName: '', email: '' };
@@ -1546,7 +1551,7 @@
     };
 
     async function handleRAGQuery(query) {
-      window.handleRAGQuery = handleRAGQuery;
+      if (typeof window.handleRAGQuery !== 'function') window.handleRAGQuery = handleRAGQuery;
       const cleanQuery = (typeof query === 'string' ? query : (query ? String(query) : '')).trim();
       if (!cleanQuery && !activePromptAttachment) {
         return;
@@ -1580,10 +1585,26 @@
         const targetContainer = document.getElementById('chat-container') || document.querySelector('.chat-stream') || document.querySelector('.chat-card-wrapper');
         const heroView = document.getElementById('chat-hero-view');
 
-        if (heroView) heroView.style.display = 'none';
+        if (heroView) {
+          heroView.style.display = 'none';
+          heroView.classList.add('hidden');
+        }
         if (targetContainer) {
           targetContainer.style.display = 'flex';
           targetContainer.style.flexDirection = 'column';
+        }
+
+        // Fast greeting check
+        const isGreeting = /^(hi|hii|hiii|hello|hey|heyy|yo|sup|good morning|good afternoon|good evening)$/i.test(cleanQuery.toLowerCase());
+        if (isGreeting) {
+          appendChatMessage('user', cleanQuery);
+          if (inputEl) { inputEl.value = ''; inputEl.style.height = 'auto'; }
+          const greetingText = cleanQuery.toLowerCase().includes('morning') ? 'Good morning, User. What are we working on?'
+            : cleanQuery.toLowerCase().includes('afternoon') ? 'Good afternoon, User. What can I help you with?'
+            : cleanQuery.toLowerCase().includes('evening') ? 'Good evening, User. What are you working on?'
+            : 'Hi, User — good to see you. What are we working on?';
+          appendChatMessage('ai', greetingText, [], false, cleanQuery, 'Nori Companion', false);
+          return;
         }
 
         // Render user message card immediately
@@ -1619,6 +1640,7 @@
           }
           window.adaptiveFusionEngine.startLiveStreamingAnimation(cardId);
           if (window.noriCompanion) window.noriCompanion.setState('thinking');
+        } else {
           thinkingCard.innerHTML = `<div class="chat-header" style="display: flex; align-items: center; gap: 8px; font-weight: 700;">
             <span style="font-size: 16px;">✨</span>
             <strong style="color: #38BDF8;">Nori is thinking...</strong>
@@ -1631,6 +1653,7 @@
             targetContainer.appendChild(thinkingCard);
             targetContainer.scrollTop = targetContainer.scrollHeight;
           }
+          if (window.noriCompanion) window.noriCompanion.setState('thinking');
         }
 
         // Toggle submit button into Stop Generation button
@@ -1805,7 +1828,9 @@
         }
       }
     }
-    window.handleRAGQuery = handleRAGQuery;
+    if (typeof window.handleRAGQuery !== 'function') {
+      window.handleRAGQuery = handleRAGQuery;
+    }
     function generateWeatherWidgetHTML(query) {
       const qLower = (query || '').toLowerCase();
       let locationName = "Sambalpur, Odisha, India";
@@ -2454,7 +2479,7 @@
       });
     }
 
-    let vaultViewMode = 'grid';
+    vaultViewMode = 'grid';
 
     const vaultViewGridBtn = document.getElementById('vault-view-grid-btn');
     const vaultViewTreeBtn = document.getElementById('vault-view-tree-btn');
@@ -3808,7 +3833,6 @@
     };
 
     // PWA Install Event Listener & In-App Prompt Handler
-    let deferredPWAInstallPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPWAInstallPrompt = e;

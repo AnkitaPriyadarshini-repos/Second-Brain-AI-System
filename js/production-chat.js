@@ -132,28 +132,49 @@
   function replaceMessage(bubble, text) {
     if (!bubble) return;
     const content = bubble.querySelector('.chat-message-content') || bubble;
-    content.innerHTML = typeof window.formatMarkdownText === 'function'
-      ? window.formatMarkdownText(text)
-      : clean(text).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    let formatted = '';
+    try {
+      if (typeof window.formatMarkdownText === 'function') {
+        formatted = window.formatMarkdownText(text);
+      }
+    } catch (_) {}
+    if (!formatted) {
+      formatted = clean(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br>');
+    }
+    content.innerHTML = formatted;
   }
 
   function setBusy(value) {
     busy = Boolean(value);
+    window.isAIProcessing = busy;
     const input = document.getElementById('rag-query-input');
     const button = document.getElementById('rag-submit-btn');
-    if (input) input.setAttribute('aria-busy', busy ? 'true' : 'false');
+    if (input) {
+      input.setAttribute('aria-busy', busy ? 'true' : 'false');
+      input.disabled = busy;
+    }
     if (button) {
       button.disabled = busy;
       button.setAttribute('aria-busy', busy ? 'true' : 'false');
       button.setAttribute('aria-label', busy ? 'Juno is thinking' : 'Send message');
       button.title = busy ? 'Juno is thinking…' : 'Send message';
+      button.innerHTML = busy
+        ? '<span class="spinner" style="display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></span>'
+        : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
     }
   }
 
   function showChat() {
     const hero = document.getElementById('chat-hero-view');
     const stream = document.getElementById('chat-container');
-    if (hero) hero.style.display = 'none';
+    if (hero) {
+      hero.style.display = 'none';
+      hero.classList.add('hidden');
+    }
     if (stream) stream.style.display = 'flex';
   }
 
@@ -191,12 +212,16 @@
       replaceMessage(thinking, greeting);
       saveTurn(prompt, greeting);
       setBusy(false);
+      window.isAIProcessing = false;
       window.dispatchEvent(new CustomEvent('juno:answer', {
         detail: { success: true, local: true, latencyMs: Math.round(performance.now() - startedAt) }
       }));
       focusComposer();
       return true;
     }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
 
     try {
       const retrieved = retrieveNotes(prompt);
@@ -213,7 +238,8 @@
           // IMPORTANT: the gateway expects note objects, not a formatted string.
           contextNotes: retrieved.contextNotes,
           citations: retrieved.citations
-        })
+        }),
+        signal: controller.signal
       });
 
       const data = await response.json().catch(() => ({}));
@@ -231,16 +257,28 @@
       return true;
     } catch (error) {
       console.error('[Juno chat]', error);
+      const isTimeout = error?.name === 'AbortError';
       const retrieved = retrieveNotes(prompt);
-      const fallback = localFallback(prompt, retrieved);
-      replaceMessage(thinking, fallback);
-      if (typeof window.showToast === 'function') window.showToast('Cloud AI unavailable — local knowledge mode is still active.', 'warning');
+      if (retrieved.contextNotes && retrieved.contextNotes.length > 0) {
+        const fallback = localFallback(prompt, retrieved);
+        replaceMessage(thinking, fallback);
+      } else {
+        const userMsg = isTimeout
+          ? 'Request timed out after 25 seconds. Please try asking again.'
+          : (error?.message || 'The AI service could not complete this request. Please try again.');
+        replaceMessage(thinking, `⚠️ ${userMsg}`);
+      }
+      if (typeof window.showToast === 'function') {
+        window.showToast(isTimeout ? 'Request timed out.' : 'Cloud AI temporarily unavailable.', 'warning');
+      }
       window.dispatchEvent(new CustomEvent('juno:answer', {
         detail: { success: false, fallback: true, error: error?.message || 'Gateway unavailable' }
       }));
       return false;
     } finally {
+      clearTimeout(timeoutId);
       setBusy(false);
+      window.isAIProcessing = false;
       focusComposer();
     }
   }
@@ -423,6 +461,13 @@
   };
   window.sendMessage = window.submitRAGQuery;
   window.junoResetChat = createFallbackNewChat;
+  window.insertSampleQuery = function (text) {
+    const input = document.getElementById('rag-query-input');
+    if (input) {
+      input.value = text;
+      input.focus();
+    }
+  };
 
   function boot() {
     polishInterface();
