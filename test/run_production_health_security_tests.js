@@ -42,4 +42,10 @@ const wrongMethod = invoke({ GEMINI_API_KEY: secret }, 'POST');
 assert.strictEqual(wrongMethod.statusCode, 405);
 assert.strictEqual(wrongMethod.headers.Allow, 'GET');
 
-console.log('PASS: public health endpoint provides readiness without exposing secrets or environment metadata.');
+// Verify pages/api/ai/health.js as well
+const pagesSource = fs.readFileSync(path.join(__dirname, '..', 'pages', 'api', 'ai', 'health.js'), 'utf8');
+const pagesConfigured = invoke({ GEMINI_API_KEY: secret, VERCEL_GIT_COMMIT_SHA: 'private-sha' });
+assert.strictEqual(pagesConfigured.statusCode, 200);
+assert.strictEqual(pagesConfigured.payload.configured, true);
+
+console.log('PASS: public health endpoints (both root and pages/api) provide readiness without exposing secrets or environment metadata.');
