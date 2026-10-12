@@ -1,0 +1,7 @@
+scratch/
+scratch Bart/
+test/
+docs/
+*.py
+*.md
+.git/
