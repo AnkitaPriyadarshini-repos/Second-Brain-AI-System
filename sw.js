@@ -1,6 +1,6 @@
 /* Second Brain AI System — Service Worker for Offline PWA Support */
 
-const CACHE_NAME = 'second-brain-cache-v63.0';
+const CACHE_NAME = 'second-brain-cache-v64.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -20,8 +20,9 @@ const ASSETS_TO_CACHE = [
   './js/sound-engine.js',
   './js/ai-agents.js',
   './js/app.js',
-  './js/utils.js?v=58.0',
-  './js/production-chat.js?v=5.0',
+  './js/utils.js?v=59.0',
+  './js/production-chat.js?v=6.0',
+  './js/pwa-installer.js?v=61.0',
   './assets/nexus_yellow_bot.png',
   './manifest.json'
 ];
