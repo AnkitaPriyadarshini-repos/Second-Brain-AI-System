@@ -152,7 +152,11 @@
           },
           onStateChange: (state) => {
             if (voiceTriggerBtn) {
-              voiceTriggerBtn.style.color = state === 'listening' ? '#10b981' : '#e65100';
+              if (state === 'listening') {
+                voiceTriggerBtn.classList.add('listening');
+              } else {
+                voiceTriggerBtn.classList.remove('listening');
+              }
             }
             if (typeof SoundEngine !== 'undefined' && state === 'listening') {
               SoundEngine.playClick();
@@ -1103,15 +1107,21 @@
             NexusBotEngine.setState(state);
           }
           if (voiceTriggerBtn) {
+            const micSvg = `<svg class="nori-voice-mic-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>`;
             if (state === 'listening') {
               voiceTriggerBtn.classList.add('listening');
-              voiceTriggerBtn.innerHTML = 'Listening...';
+              voiceTriggerBtn.classList.remove('speaking');
+              voiceTriggerBtn.title = 'Listening to you...';
+              voiceTriggerBtn.innerHTML = `${micSvg}<span class="nori-voice-label">Listening…</span>`;
             } else if (state === 'speaking') {
               voiceTriggerBtn.classList.add('speaking');
-              voiceTriggerBtn.innerHTML = 'Speaking...';
+              voiceTriggerBtn.classList.remove('listening');
+              voiceTriggerBtn.title = 'Milo is speaking...';
+              voiceTriggerBtn.innerHTML = `🔊<span class="nori-voice-label">Speaking…</span>`;
             } else {
               voiceTriggerBtn.classList.remove('listening', 'speaking');
-              voiceTriggerBtn.innerHTML = '🎙️ Talk to Milo';
+              voiceTriggerBtn.title = 'Talk to Milo (Voice Input)';
+              voiceTriggerBtn.innerHTML = `${micSvg}<span class="nori-voice-label">Talk to Milo</span>`;
             }
           }
         }

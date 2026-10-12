@@ -575,6 +575,98 @@ textarea.nori-reference-textarea::placeholder {
   transform: scale(1.05) !important;
 }
 
+/* Sleek Voice Trigger Pill Button ("Talk to Milo") in Composer */
+.nori-voice-tool-btn,
+#voice-trigger-btn.nori-voice-tool-btn,
+#voice-trigger-btn {
+  background: #222530 !important;
+  border: 1px solid #334155 !important;
+  color: #E2E8F0 !important;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  width: auto !important;
+  min-width: 34px !important;
+  padding: 0 12px !important;
+  border-radius: 9999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  box-sizing: border-box !important;
+  line-height: 1 !important;
+  transition: all 0.2s ease !important;
+  user-select: none !important;
+  margin: 0 !important;
+  vertical-align: middle !important;
+}
+
+.nori-voice-tool-btn:hover,
+#voice-trigger-btn:hover {
+  background: #2D3142 !important;
+  border-color: #00F2FE !important;
+  color: #00F2FE !important;
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.25) !important;
+}
+
+.nori-voice-tool-btn.listening,
+#voice-trigger-btn.listening {
+  background: rgba(16, 185, 129, 0.18) !important;
+  border-color: #10B981 !important;
+  color: #10B981 !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.35) !important;
+  animation: nori-mic-pulse 1.4s infinite ease-in-out !important;
+}
+
+.nori-voice-tool-btn.speaking,
+#voice-trigger-btn.speaking {
+  background: rgba(0, 242, 254, 0.18) !important;
+  border-color: #00F2FE !important;
+  color: #00F2FE !important;
+  box-shadow: 0 0 14px rgba(0, 242, 254, 0.35) !important;
+}
+
+.nori-voice-mic-icon {
+  width: 15px !important;
+  height: 15px !important;
+  flex-shrink: 0 !important;
+  stroke: currentColor !important;
+}
+
+.nori-voice-label {
+  display: inline-block !important;
+  white-space: nowrap !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  color: inherit !important;
+}
+
+@keyframes nori-mic-pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  50% { transform: scale(1.03); box-shadow: 0 0 12px 3px rgba(16, 185, 129, 0.6); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+@media (max-width: 600px) {
+  .nori-voice-label {
+    display: none !important;
+  }
+  .nori-voice-tool-btn,
+  #voice-trigger-btn {
+    width: 34px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+  }
+}
+
+
 /* Prompt Starter Chips */
 .tufy-starter-chip {
   background: #141519 !important;
