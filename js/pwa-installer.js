@@ -84,12 +84,13 @@
     });
   } else if (!isStandalone && sessionStorage.getItem('juno_pwa_banner_dismissed') !== 'true') window.showPWABanner();
 
-  // Load the single production chat controller after legacy app bootstrap.
-  // Version is bumped so stale PWA/browser caches cannot retain the old controller.
+  // Fallback only: utils.js installs the controller parser-blocking when possible.
+  // Never load a second controller or overwrite a working instance.
   setTimeout(() => {
-    if (document.querySelector('script[data-juno-production-chat]')) return;
+    if (typeof window.handleRAGQuery === 'function') return;
+    if (document.querySelector('script[data-juno-production-chat], script[src*="js/production-chat.js"]')) return;
     const script = document.createElement('script');
-    script.src = 'js/production-chat.js?v=3.0';
+    script.src = 'js/production-chat.js?v=6.0';
     script.dataset.junoProductionChat = 'true';
     script.onload = () => window.dispatchEvent(new CustomEvent('juno:production-chat-ready'));
     script.onerror = () => { if (typeof window.showToast === 'function') window.showToast('Juno chat controller failed to load. Refresh once to retry.', 'error'); };
