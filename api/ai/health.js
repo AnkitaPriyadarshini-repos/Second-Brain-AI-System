@@ -1,9 +1,6 @@
-// Second Brain AI Gateway Health & Readiness Endpoint
-const MODELS = {
-  primary: 'gemini-3.6-flash',
-  fast: 'gemini-3.5-flash-lite'
-};
-
+// Minimal public readiness endpoint for the Juno AI gateway.
+// Never return environment-variable names, secret lengths, deployment metadata,
+// model configuration, or raw provider error details from a public health route.
 function getApiKey() {
   return (
     process.env.JUNO_GEMINI_KEY ||
@@ -24,44 +21,21 @@ export default function handler(req, res) {
     return res.status(405).json({ ok: false, error: 'Method not allowed.' });
   }
 
-  const apiKey = getApiKey();
-  const rawKey = process.env.GEMINI_API_KEY;
-  const configured = Boolean(apiKey);
-  const matchingKeys = Object.keys(process.env).filter((k) => /gemini|google|ai_key|juno/i.test(k));
-  const deploymentContext = {
-    vercelEnv: process.env.VERCEL_ENV || 'unknown',
-    vercelGitRef: process.env.VERCEL_GIT_COMMIT_REF || 'unknown',
-    vercelGitCommitSha: process.env.VERCEL_GIT_COMMIT_SHA || 'unknown',
-    vercelDeploymentId: process.env.VERCEL_DEPLOYMENT_ID || 'unknown',
-    vercelRegion: process.env.VERCEL_REGION || 'unknown',
-    vercelProjectId: process.env.VERCEL_PROJECT_ID || 'unknown',
-    vercelProjectName: process.env.VERCEL_PROJECT_NAME || 'unknown',
-    vercelProjectProductionUrl: process.env.VERCEL_PROJECT_PRODUCTION_URL || 'unknown'
-  };
-  const keyDiagnostics = {};
-  for (const key of Object.keys(process.env)) {
-    if (/gemini|google|ai_key|juno/i.test(key)) {
-      const val = process.env[key];
-      keyDiagnostics[key] = {
-        type: typeof val,
-        length: typeof val === 'string' ? val.length : 0,
-        isEmpty: val === ''
-      };
-    }
-  }
-
-  const envKeys = Object.keys(process.env).sort();
-
-  return res.status(200).json({
-    ok: true,
+  const configured = Boolean(getApiKey());
+  const payload = {
+    ok: configured,
     service: 'juno-ai-gateway',
     configured,
-    matchingKeys,
-    keyDiagnostics,
-    envKeys,
-    deploymentContext,
-    models: MODELS,
     timestamp: new Date().toISOString()
-  });
-}
+  };
 
+  if (!configured) {
+    // Readiness should fail until a server-side provider credential is present.
+    return res.status(503).json({
+      ...payload,
+      error: 'AI provider is not configured.'
+    });
+  }
+
+  return res.status(200).json(payload);
+}
