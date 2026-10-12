@@ -109,6 +109,24 @@ nextApp.prepare().then(() => {
   app.post('/api/auth/otp', (req, res) => authController.sendOTP(req, res));
   app.get('/api/auth/me', (req, res) => authController.me(req, res));
   app.post('/api/auth/logout', (req, res) => authController.logout(req, res));
+  app.get('/api/ai/health', (req, res) => {
+    const direct = (
+      process.env.JUNO_GEMINI_KEY ||
+      process.env.GEMINI_API_KEY ||
+      process.env.GOOGLE_API_KEY ||
+      process.env.GOOGLE_GEMINI_API_KEY ||
+      process.env.GEMINI_KEY ||
+      ''
+    ).trim().replace(/^["']|["']$/g, '');
+    const configured = Boolean(direct);
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    const payload = { ok: configured, service: 'juno-ai-gateway', configured, timestamp: new Date().toISOString() };
+    if (!configured) {
+      return res.status(503).json({ ...payload, error: 'AI provider is not configured.' });
+    }
+    return res.status(200).json(payload);
+  });
   app.post('/api/ai/gateway', (req, res) => aiGatewayController.handleQuery(req, res));
   app.post('/api/share', (req, res) => shareController.createShareLink(req, res));
   app.get('/api/share/:id', (req, res) => shareController.getShareLink(req, res));
