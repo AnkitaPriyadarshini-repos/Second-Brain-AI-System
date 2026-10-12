@@ -1,3 +1,4 @@
+// Second Brain AI Gateway Health & Readiness Endpoint
 const MODELS = {
   primary: 'gemini-3.6-flash',
   fast: 'gemini-3.5-flash-lite'
