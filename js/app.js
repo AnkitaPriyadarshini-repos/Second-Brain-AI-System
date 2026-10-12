@@ -101,27 +101,34 @@
     Store.init();
     updateHeaderStats();
 
-    // Initialize Nori AI Companion Engine
+    // Initialize Milo Animated Robot AI Companion Engine
     try {
-      if (typeof NoriCompanion !== 'undefined') {
-        window.noriCompanion = new NoriCompanion({ containerId: 'nori-companion-target', size: 140 });
-        window.noriHeaderCompanion = new NoriCompanion({ containerId: 'nori-header-target', compact: true, size: 36 });
+      const CompanionClass = window.MiloCompanion || window.NoriCompanion;
+      if (typeof CompanionClass !== 'undefined') {
+        window.miloCompanion = new CompanionClass({ containerId: 'nori-companion-target', size: 160 });
+        window.miloHeaderCompanion = new CompanionClass({ containerId: 'nori-header-target', compact: true, size: 34 });
+        window.miloChatCompanion = new CompanionClass({ containerId: 'milo-chat-avatar-target', compact: true, size: 30 });
+        window.noriCompanion = window.miloCompanion;
+        window.noriHeaderCompanion = window.miloHeaderCompanion;
       }
-    } catch (e) { console.warn('NoriCompanion init warning:', e); }
+    } catch (e) { console.warn('MiloCompanion init warning:', e); }
 
     // Connect Milo Companion Input Handlers
     if (ragQueryInput) {
       ragQueryInput.addEventListener('focus', () => {
-        if (window.noriCompanion) window.noriCompanion.setState('listening');
+        if (typeof MiloCompanion !== 'undefined') MiloCompanion.setGlobalState('listening');
+        else if (window.miloCompanion) window.miloCompanion.setState('listening');
       });
       ragQueryInput.addEventListener('input', () => {
-        if (window.noriCompanion && ragQueryInput.value.length > 0) {
-          window.noriCompanion.setState('listening');
+        if (ragQueryInput.value.length > 0) {
+          if (typeof MiloCompanion !== 'undefined') MiloCompanion.setGlobalState('listening');
+          else if (window.miloCompanion) window.miloCompanion.setState('listening');
         }
       });
       ragQueryInput.addEventListener('blur', () => {
-        if (window.noriCompanion && window.noriCompanion.state === 'listening') {
-          window.noriCompanion.setState('idle');
+        if (ragQueryInput.value.length === 0) {
+          if (typeof MiloCompanion !== 'undefined') MiloCompanion.setGlobalState('idle');
+          else if (window.miloCompanion) window.miloCompanion.setState('idle');
         }
       });
     }
@@ -1639,7 +1646,8 @@
             targetContainer.scrollTop = targetContainer.scrollHeight;
           }
           window.adaptiveFusionEngine.startLiveStreamingAnimation(cardId);
-          if (window.noriCompanion) window.noriCompanion.setState('thinking');
+          if (typeof MiloCompanion !== 'undefined') MiloCompanion.setGlobalState('thinking');
+          else if (window.noriCompanion) window.noriCompanion.setState('thinking');
         } else {
           thinkingCard.innerHTML = `<div class="chat-header" style="display: flex; align-items: center; gap: 8px; font-weight: 700;">
             <span style="font-size: 16px;">✨</span>
@@ -1653,7 +1661,8 @@
             targetContainer.appendChild(thinkingCard);
             targetContainer.scrollTop = targetContainer.scrollHeight;
           }
-          if (window.noriCompanion) window.noriCompanion.setState('thinking');
+          if (typeof MiloCompanion !== 'undefined') MiloCompanion.setGlobalState('thinking');
+          else if (window.noriCompanion) window.noriCompanion.setState('thinking');
         }
 
         // Toggle submit button into Stop Generation button
@@ -1759,13 +1768,16 @@
           answerText = window.adaptiveFusionEngine.formatFusedMessageOutput(cleanQuery, answerText);
         }
 
-        // Trigger Nori Mouth Flash Beam right as answer emerges!
-        if (window.noriCompanion) {
+        // Trigger Milo Responding State as answer emerges
+        if (typeof MiloCompanion !== 'undefined') {
+          MiloCompanion.setGlobalState('responding');
+          setTimeout(() => MiloCompanion.setGlobalState('idle'), 3500);
+        } else if (window.noriCompanion) {
           window.noriCompanion.flashMouth(3000);
         }
 
         // Render final AI message card with typewriter streaming
-        appendChatMessage('ai', answerText, citations, false, cleanQuery, providerName, true);
+        appendChatMessage('ai', answerText, citations, false, cleanQuery, providerName || 'Milo', true);
 
         // Save into current Chat Thread
         if (typeof Store !== 'undefined' && Store.saveChatThread && !window.isAIAborted) {
@@ -1784,7 +1796,7 @@
             }
             if (answerText && !answerText.includes('I encountered a temporary issue')) {
               currentThread.messages.push({ id: `msg-u-${Date.now()}`, role: 'user', content: cleanQuery, timestamp: Date.now() });
-              currentThread.messages.push({ id: `msg-a-${Date.now()}`, role: 'assistant', content: answerText, timestamp: Date.now(), provider: providerName });
+              currentThread.messages.push({ id: `msg-a-${Date.now()}`, role: 'assistant', content: answerText, timestamp: Date.now(), provider: providerName || 'Milo' });
               Store.saveChatThread(currentThread);
               if (typeof window.renderChatThreadsList === 'function') {
                 window.renderChatThreadsList();
@@ -1803,13 +1815,16 @@
         if (thinkingCard && thinkingCard.parentNode) {
           thinkingCard.parentNode.removeChild(thinkingCard);
         }
-        if (window.noriCompanion) window.noriCompanion.setState('confused');
+        if (typeof MiloCompanion !== 'undefined') MiloCompanion.setGlobalState('error');
+        else if (window.noriCompanion) window.noriCompanion.setState('confused');
         const fallbackAnswer = `Something went wrong while connecting. Let's try that again.`;
-        appendChatMessage('ai', fallbackAnswer, [], false, cleanQuery, 'Milo Companion', false);
+        appendChatMessage('ai', fallbackAnswer, [], false, cleanQuery, 'Milo', false);
       } finally {
         window.isAIProcessing = false;
         window.isAIAborted = false;
-        if (window.noriCompanion && window.noriCompanion.state !== 'confused') {
+        if (typeof MiloCompanion !== 'undefined') {
+          setTimeout(() => MiloCompanion.setGlobalState('idle'), 3500);
+        } else if (window.noriCompanion && window.noriCompanion.state !== 'confused') {
           window.noriCompanion.setState('idle');
         }
         const inputEl = document.getElementById('rag-query-input');

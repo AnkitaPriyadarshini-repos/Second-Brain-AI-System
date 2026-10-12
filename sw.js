@@ -1,10 +1,11 @@
 /* Second Brain AI System — Service Worker for Offline PWA Support */
 
-const CACHE_NAME = 'second-brain-cache-v64.0';
+const CACHE_NAME = 'second-brain-cache-v65.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './css/style.css',
+  './css/nori-companion.css',
   './css/responsive.css',
   './js/nlp-engine.js',
   './js/store.js',
@@ -19,6 +20,7 @@ const ASSETS_TO_CACHE = [
   './js/developer-hud.js',
   './js/sound-engine.js',
   './js/ai-agents.js',
+  './js/nori-companion.js',
   './js/app.js',
   './js/utils.js?v=59.0',
   './js/production-chat.js?v=6.0',

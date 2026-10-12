@@ -171,11 +171,13 @@
   function showChat() {
     const hero = document.getElementById('chat-hero-view');
     const stream = document.getElementById('chat-container');
+    const miloBar = document.getElementById('milo-chat-companion-bar');
     if (hero) {
       hero.style.display = 'none';
       hero.classList.add('hidden');
     }
     if (stream) stream.style.display = 'flex';
+    if (miloBar) miloBar.style.display = 'flex';
   }
 
   function getGreeting(prompt) {
@@ -203,6 +205,9 @@
 
     showChat();
     setBusy(true);
+    if (typeof MiloCompanion !== 'undefined') {
+      MiloCompanion.setGlobalState('thinking');
+    }
     const startedAt = performance.now();
     appendMessage('user', prompt);
     const thinking = appendMessage('assistant', 'Thinking…');
@@ -213,6 +218,10 @@
       saveTurn(prompt, greeting);
       setBusy(false);
       window.isAIProcessing = false;
+      if (typeof MiloCompanion !== 'undefined') {
+        MiloCompanion.setGlobalState('responding', 'Hi! Great to see you.');
+        setTimeout(() => MiloCompanion.setGlobalState('idle'), 3000);
+      }
       window.dispatchEvent(new CustomEvent('juno:answer', {
         detail: { success: true, local: true, latencyMs: Math.round(performance.now() - startedAt) }
       }));
@@ -253,6 +262,10 @@
       }
       replaceMessage(thinking, answer);
       saveTurn(prompt, answer);
+      if (typeof MiloCompanion !== 'undefined') {
+        MiloCompanion.setGlobalState('responding');
+        setTimeout(() => MiloCompanion.setGlobalState('idle'), 3500);
+      }
       window.dispatchEvent(new CustomEvent('juno:answer', { detail: data }));
       return true;
     } catch (error) {
@@ -270,6 +283,10 @@
       }
       if (typeof window.showToast === 'function') {
         window.showToast(isTimeout ? 'Request timed out.' : 'Cloud AI temporarily unavailable.', 'warning');
+      }
+      if (typeof MiloCompanion !== 'undefined') {
+        MiloCompanion.setGlobalState('error', 'I encountered an issue reaching the cloud AI.');
+        setTimeout(() => MiloCompanion.setGlobalState('idle'), 4000);
       }
       window.dispatchEvent(new CustomEvent('juno:answer', {
         detail: { success: false, fallback: true, error: error?.message || 'Gateway unavailable' }
@@ -303,8 +320,16 @@
     const container = document.getElementById('chat-container');
     if (container) container.innerHTML = '';
     const hero = document.getElementById('chat-hero-view');
-    if (hero) hero.style.display = '';
+    if (hero) {
+      hero.style.display = '';
+      hero.classList.remove('hidden');
+    }
     if (container) container.style.display = 'none';
+    const miloBar = document.getElementById('milo-chat-companion-bar');
+    if (miloBar) miloBar.style.display = 'none';
+    if (typeof MiloCompanion !== 'undefined') {
+      MiloCompanion.setGlobalState('idle');
+    }
     clearComposer();
   }
 

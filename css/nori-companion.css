@@ -1,9 +1,11 @@
 /* ==========================================================================
-   TUFITY / NORI COMPANION DESIGN SYSTEM STYLES
-   Cute Soft Pink Droplet Mascot with Blue Scarf, Mouth Flash & Sleek Dark UI
+   MILO ANIMATED ROBOT AI COMPANION DESIGN SYSTEM
+   White Ceramic Robot, Glossy Obsidian Visor, Cyan Glowing Eyes
+   Sleek Dark Teal/Navy Palette & Hardware-Accelerated Micro-Animations
    ========================================================================== */
 
-#nori-companion-target {
+#nori-companion-target,
+#milo-companion-target {
   min-height: 180px;
   width: 100%;
   display: flex;
@@ -12,7 +14,8 @@
   margin-bottom: 12px;
 }
 
-.nori-companion-container {
+.nori-companion-container,
+.milo-companion-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -21,144 +24,382 @@
   user-select: none;
   cursor: pointer;
   margin: 0 auto;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.nori-companion-container:hover {
-  transform: translateY(-4px) scale(1.03);
-}
-
-.tufy-svg-mascot {
-  animation: tufyFloatWave 4s ease-in-out infinite alternate;
-}
-
-@keyframes tufyFloatWave {
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-6px) rotate(1.2deg); }
-  100% { transform: translateY(2px) rotate(-1deg); }
-}
-
-.nori-canvas-wrapper {
+/* ==========================================================
+   MILO ROBOT CONTAINER & AMBIENT BACKLIGHT
+   ========================================================== */
+.milo-container {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 174, 193, 0.18) 0%, rgba(67, 97, 238, 0.1) 50%, rgba(11, 12, 14, 0) 75%);
-  transition: background 0.3s ease, box-shadow 0.3s ease;
+  user-select: none;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.nori-canvas-wrapper::before {
-  content: '';
+.milo-container:hover {
+  transform: translateY(-3px) scale(1.02);
+}
+
+/* Subtle Ambient Glow Behind Robot */
+.milo-ambient-glow {
   position: absolute;
-  inset: -6px;
+  width: 140%;
+  height: 140%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 174, 193, 0.25) 0%, transparent 75%);
-  opacity: 0.5;
-  animation: noriGlowPulse 4s ease-in-out infinite alternate;
-}
-
-@keyframes noriGlowPulse {
-  0% { transform: scale(0.92); opacity: 0.3; }
-  100% { transform: scale(1.12); opacity: 0.6; }
-}
-
-.nori-pixel-canvas {
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  width: 170px;
-  height: 170px;
-  display: block;
-  z-index: 2;
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.6));
-}
-
-/* Mouth Flash Glow Beam Overlay */
-.nori-mouth-glow-beam {
-  position: absolute;
-  top: 50%;
-  left: -20px;
-  width: 140px;
-  height: 50px;
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.16) 0%, rgba(6, 78, 99, 0.08) 45%, transparent 70%);
   pointer-events: none;
-  background: radial-gradient(ellipse at left, rgba(255, 101, 132, 0.85) 0%, rgba(67, 97, 238, 0.6) 45%, transparent 85%);
-  opacity: 0;
-  transform: translateY(-50%) scaleX(0.2);
-  transform-origin: left center;
-  transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 0;
+  animation: miloAmbientPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes miloAmbientPulse {
+  0% { transform: scale(0.92); opacity: 0.65; }
+  100% { transform: scale(1.08); opacity: 0.95; }
+}
+
+.milo-svg {
+  display: block;
+  position: relative;
   z-index: 1;
-  filter: blur(5px);
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.55));
+  overflow: visible;
+  transition: filter 0.3s ease;
 }
 
-.nori-mouth-glow-beam.active {
+/* ==========================================================
+   HOVERING FLOATING ASSEMBLY & GROUND SHADOW
+   ========================================================== */
+.milo-floater {
+  animation: miloHoverFloat 3.4s ease-in-out infinite alternate;
+  transform-origin: 80px 90px;
+  will-change: transform;
+}
+
+.milo-ground-shadow {
+  animation: miloShadowScale 3.4s ease-in-out infinite alternate;
+  transform-origin: 80px 158px;
+  will-change: transform, opacity;
+}
+
+@keyframes miloHoverFloat {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(0.8deg); }
+  100% { transform: translateY(-12px) rotate(-0.8deg); }
+}
+
+@keyframes miloShadowScale {
+  0% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(0.92); opacity: 0.38; }
+  100% { transform: scale(0.84); opacity: 0.25; }
+}
+
+/* ==========================================================
+   ORGANIC BLINKING & GLOW PULSE
+   ========================================================== */
+.milo-eye {
+  transform-origin: 64px 64px;
+  transition: transform 0.2s ease, opacity 0.2s ease, filter 0.3s ease;
+}
+.milo-eye-right {
+  transform-origin: 96px 64px;
+}
+
+.milo-blinking .milo-eye {
+  animation: miloBlink 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes miloBlink {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.08); }
+}
+
+/* Ear Pucks Subtle Cyan Pulse */
+.milo-ear-glow {
+  animation: miloEarPulse 2.8s ease-in-out infinite alternate;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+@keyframes miloEarPulse {
+  0% { opacity: 0.7; filter: drop-shadow(0 0 2px #00F2FE); }
+  100% { opacity: 1; filter: drop-shadow(0 0 6px #00F2FE); }
+}
+
+/* Chest Core Pulse */
+.milo-chest-core {
+  animation: miloChestPulse 2.4s ease-in-out infinite alternate;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+@keyframes miloChestPulse {
+  0% { opacity: 0.75; }
+  100% { opacity: 1; filter: drop-shadow(0 0 6px #00F2FE); }
+}
+
+/* Arm Idle Sway */
+.milo-arm-left {
+  transform-origin: 44px 114px;
+  animation: miloArmSwayLeft 3.4s ease-in-out infinite alternate;
+}
+.milo-arm-right {
+  transform-origin: 116px 114px;
+  animation: miloArmSwayRight 3.4s ease-in-out infinite alternate;
+}
+
+@keyframes miloArmSwayLeft {
+  0% { transform: rotate(14deg); }
+  100% { transform: rotate(22deg); }
+}
+@keyframes miloArmSwayRight {
+  0% { transform: rotate(-14deg); }
+  100% { transform: rotate(-22deg); }
+}
+
+/* ==========================================================
+   STATE: LISTENING (Turns slightly toward user, brightens eyes)
+   ========================================================== */
+.milo-state-listening .milo-floater {
+  transform: translateY(-8px) rotate(3deg);
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.milo-state-listening .milo-eye {
+  transform: scale(1.18);
+}
+.milo-state-listening .milo-eye-pupil {
+  filter: drop-shadow(0 0 10px #00F2FE) !important;
+}
+.milo-state-listening .milo-ear-glow {
+  filter: drop-shadow(0 0 9px #00F2FE) !important;
   opacity: 1;
-  transform: translateY(-50%) scaleX(1);
-  animation: mouthBeamPulse 0.8s ease-in-out infinite alternate;
+}
+.milo-state-listening .milo-ambient-glow {
+  background: radial-gradient(circle, rgba(0, 242, 254, 0.28) 0%, rgba(6, 78, 99, 0.18) 45%, transparent 70%);
 }
 
-@keyframes mouthBeamPulse {
-  0% { opacity: 0.6; filter: blur(4px); }
-  100% { opacity: 1; filter: blur(8px); }
+/* ==========================================================
+   STATE: THINKING (Focused eyes, subtle thought scan & hover)
+   ========================================================== */
+.milo-state-thinking .milo-floater {
+  animation: miloThinkingHover 1.6s ease-in-out infinite alternate;
+}
+@keyframes miloThinkingHover {
+  0% { transform: translateY(-4px) rotate(-1deg); }
+  100% { transform: translateY(-10px) rotate(1deg); }
+}
+.milo-state-thinking .milo-eye-left {
+  animation: miloEyeScanLeft 1.2s ease-in-out infinite alternate;
+}
+.milo-state-thinking .milo-eye-right {
+  animation: miloEyeScanRight 1.2s ease-in-out infinite alternate;
+}
+@keyframes miloEyeScanLeft {
+  0% { transform: scaleX(1.1) scaleY(0.7) translateX(-2.5px); }
+  100% { transform: scaleX(1.1) scaleY(0.7) translateX(2.5px); }
+}
+@keyframes miloEyeScanRight {
+  0% { transform: scaleX(1.1) scaleY(0.7) translateX(-2.5px); }
+  100% { transform: scaleX(1.1) scaleY(0.7) translateX(2.5px); }
+}
+.milo-state-thinking .milo-chest-core {
+  animation: miloChestThinkPulse 0.75s ease-in-out infinite alternate;
+}
+@keyframes miloChestThinkPulse {
+  0% { filter: drop-shadow(0 0 3px #00F2FE); opacity: 0.6; }
+  100% { filter: drop-shadow(0 0 10px #00F2FE); opacity: 1; }
 }
 
-/* AI Message Bubble Emerging Flash Animation */
-.chat-bubble.ai-bubble {
-  animation: messageMouthFlashEmergence 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+/* ==========================================================
+   STATE: RESPONDING / HAPPY (Smiling eyes, cheerful bounce & wave)
+   ========================================================== */
+.milo-state-responding .milo-floater,
+.milo-state-happy .milo-floater {
+  animation: miloHappyBounce 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) infinite alternate;
+}
+@keyframes miloHappyBounce {
+  0% { transform: translateY(-5px) scale(0.98); }
+  100% { transform: translateY(-13px) scale(1.02); }
+}
+.milo-state-responding .milo-arm-right,
+.milo-state-happy .milo-arm-right {
+  animation: miloWaveArm 0.35s ease-in-out infinite alternate;
+}
+@keyframes miloWaveArm {
+  0% { transform: rotate(-32deg); }
+  100% { transform: rotate(-62deg); }
+}
+.milo-state-responding .milo-eye-pupil,
+.milo-state-happy .milo-eye-pupil {
+  filter: drop-shadow(0 0 7px #00F2FE);
 }
 
-@keyframes messageMouthFlashEmergence {
-  0% {
-    opacity: 0;
-    transform: translateY(-16px) scale(0.95);
-    box-shadow: 0 0 35px rgba(255, 101, 132, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 25px rgba(67, 97, 238, 0.4);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  }
+/* ==========================================================
+   STATE: ERROR (Sympathetic expression, soft warm amber glow)
+   ========================================================== */
+.milo-state-error .milo-floater {
+  transform: translateY(-2px) rotate(-3deg);
+  transition: transform 0.4s ease;
+}
+.milo-state-error .milo-eye-pupil {
+  fill: #F59E0B !important;
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.85)) !important;
+}
+.milo-state-error .milo-ear-glow,
+.milo-state-error .milo-chest-core,
+.milo-state-error .milo-top-light {
+  fill: #F59E0B !important;
+  filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.8)) !important;
 }
 
-/* Compact Nori (for Header / Navbar) */
-.nori-compact .nori-pixel-canvas {
-  width: 36px;
+/* ==========================================================
+   COMPACT AVATAR MODE (Sidebar 34px & In-Chat Bar 30px)
+   ========================================================== */
+.milo-compact {
+  width: 34px;
   height: 36px;
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+  cursor: pointer;
 }
-.nori-compact .nori-canvas-wrapper {
-  padding: 2px;
-  background: transparent;
+.milo-compact .milo-ambient-glow {
+  display: none !important;
 }
-.nori-compact .nori-canvas-wrapper::before {
-  display: none;
+.milo-compact .milo-ground-shadow {
+  display: none !important;
+}
+.milo-compact .milo-floater {
+  animation: none !important;
+  transform: translateY(0) !important;
+}
+.milo-compact:hover {
+  transform: scale(1.08);
 }
 
-/* Mascot Speech Bubble */
-.nori-speech-bubble {
+/* ==========================================================
+   MILO CHAT COMPANION BAR (Lightweight, Non-Intrusive, In-Chat)
+   ========================================================== */
+.milo-chat-companion-bar {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto 12px auto;
+  padding: 8px 16px;
+  background: #11141B;
+  border: 1px solid #1E293B;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  transition: all 0.25s ease;
+  z-index: 5;
+}
+
+.milo-chat-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.milo-chat-avatar-target {
+  width: 32px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.milo-chat-status-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.milo-chat-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.2px;
+}
+
+.milo-chat-status-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #38BDF8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 2px 8px;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.milo-chat-status-badge[data-state="thinking"] {
+  color: #818CF8;
+  background: rgba(129, 140, 248, 0.14);
+  border-color: rgba(129, 140, 248, 0.3);
+  animation: badgePulse 1.2s ease-in-out infinite alternate;
+}
+
+.milo-chat-status-badge[data-state="listening"] {
+  color: #34D399;
+  background: rgba(52, 211, 153, 0.14);
+  border-color: rgba(52, 211, 153, 0.3);
+}
+
+.milo-chat-status-badge[data-state="error"] {
+  color: #FBBF24;
+  background: rgba(251, 191, 36, 0.14);
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+@keyframes badgePulse {
+  0% { opacity: 0.75; transform: scale(0.97); }
+  100% { opacity: 1; transform: scale(1.02); }
+}
+
+.milo-clear-chat-btn {
+  background: #1E2330;
+  border: 1px solid #334155;
+  color: #E2E8F0;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.milo-clear-chat-btn:hover {
+  background: #283042;
+  border-color: #60A5FA;
+  color: #FFFFFF;
+}
+
+/* ==========================================================
+   MASCOT SPEECH BUBBLE
+   ========================================================== */
+.milo-speech-bubble {
   position: absolute;
   top: -46px;
   left: 50%;
   transform: translateX(-50%) translateY(4px);
-  background: #18191E;
-  color: #F4F4F5;
-  border: 1px solid #282932;
-  padding: 6px 14px;
+  background: #141824;
+  color: #FFFFFF;
+  border: 1px solid #28354A;
+  padding: 7px 16px;
   border-radius: 14px;
   font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.6), 0 0 12px rgba(0, 242, 254, 0.15);
   transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 10;
 }
 
-.nori-speech-bubble::after {
+.milo-speech-bubble::after {
   content: '';
   position: absolute;
   bottom: -6px;
@@ -166,15 +407,57 @@
   transform: translateX(-50%);
   border-width: 6px 6px 0 6px;
   border-style: solid;
-  border-color: #18191E transparent transparent transparent;
+  border-color: #141824 transparent transparent transparent;
 }
 
-.nori-speech-bubble.active {
+.milo-speech-bubble.active {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
 
-/* Reference-Style Sleek Dark Composer Card & Text Area High Contrast Overrides */
+/* ==========================================================
+   REDUCED MOTION ACCESSIBILITY OVERRIDES
+   ========================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .milo-floater,
+  .milo-ground-shadow,
+  .milo-ambient-glow,
+  .milo-arm-left,
+  .milo-arm-right,
+  .milo-ear-glow,
+  .milo-chest-core,
+  .milo-chat-status-badge[data-state="thinking"] {
+    animation: none !important;
+    transition: opacity 0.2s ease !important;
+  }
+}
+
+/* ==========================================================
+   MOBILE RESPONSIVENESS (<= 640px)
+   ========================================================== */
+@media (max-width: 640px) {
+  #nori-companion-target,
+  #milo-companion-target {
+    min-height: 150px;
+    margin-bottom: 8px;
+  }
+  .milo-chat-companion-bar {
+    padding: 6px 12px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+  }
+  .milo-chat-name {
+    font-size: 12px;
+  }
+  .milo-chat-status-badge {
+    font-size: 10px;
+    padding: 1px 6px;
+  }
+}
+
+/* ==========================================================
+   REFERENCE-STYLE SLEEK DARK COMPOSER & HIGH CONTRAST (PRESERVED)
+   ========================================================== */
 .nori-reference-composer-wrapper {
   width: 100%;
   max-width: 680px;
@@ -196,15 +479,6 @@
 .nori-reference-composer-card:focus-within {
   border-color: #6366F1 !important;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25), 0 14px 40px rgba(0, 0, 0, 0.6) !important;
-}
-
-.nori-shortcut-hint {
-  display: flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-  font-size: 12px !important;
-  color: #94A3B8 !important;
-  user-select: none !important;
 }
 
 .nori-shortcut-hint {

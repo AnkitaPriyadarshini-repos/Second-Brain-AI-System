@@ -1,341 +1,348 @@
 /**
  * ==========================================================================
- * TUFY / NORI COMPANION CANVAS ENGINE
- * Cute Soft Peach-Pink Droplet Mascot wearing Royal Blue Scarf
- * Features Mouth Flash Particle Stream when answers are generated.
+ * MILO ROBOT AI COMPANION ENGINE
+ * Floating White Ceramic Robot with Glossy Black Visor, Cyan Glowing Eyes,
+ * Small Articulated Arms, and Reactive Interactive Animations.
+ *
+ * Supports multi-instance mounting (Welcome Screen, Sidebar, In-Chat Bar).
+ * Maintains full backward compatibility with NoriCompanion / TufyCompanion.
  * ==========================================================================
  */
 
-class NoriCompanion {
-  constructor(options = {}) {
-    this.containerId = options.containerId || 'nori-companion-target';
-    this.size = options.size || 180;
-    this.compact = options.compact || false;
-    this.state = 'idle'; // idle | listening | thinking | responding | happy
-    this.tick = 0;
-    this.blinkTimer = 0;
-    this.isBlinking = false;
-    this.speechTimeout = null;
-    this.particles = [];
-    this.mouthBeamActive = false;
-    this.mouthBeamTimer = 0;
+(function () {
+  'use strict';
 
-    this.phrases = {
-      idle: [
-        "Hey! I'm Milo. How can I help you today?",
-        "Ready to work through your code step by step!",
-        "Your Second Brain is active and synced.",
-        "Got a question? Ask me anything!"
-      ],
-      listening: [
-        "Listening closely...",
-        "Tell me more!",
-        "Gathering context..."
-      ],
-      thinking: [
-        "Analyzing code context...",
-        "Searching Second Brain notes...",
-        "Synthesizing answer..."
-      ],
-      responding: [
-        "Here's your answer! ✨",
-        "Watch this! ✨",
-        "Flashing answer from Second Brain..."
-      ],
-      happy: [
-        "I love exploring code and notes with you! ✨",
-        "Awesome idea!",
-        "Knowledge captured! 🧠"
-      ]
-    };
+  class MiloCompanion {
+    static instances = [];
 
-    this.init();
-  }
-
-  init() {
-    this.container = document.getElementById(this.containerId);
-    if (!this.container) return;
-
-    // Reuse existing wrapper if pre-rendered in HTML, or create one
-    let existingWrapper = this.container.querySelector('.nori-canvas-wrapper');
-    if (existingWrapper) {
-      this.wrapper = existingWrapper;
-    } else {
-      this.wrapper = document.createElement('div');
-      this.wrapper.className = 'nori-canvas-wrapper';
-      this.container.appendChild(this.wrapper);
-    }
-
-    // Speech Bubble
-    if (!this.wrapper.querySelector('.nori-speech-bubble')) {
-      this.speechBubble = document.createElement('div');
-      this.speechBubble.className = 'nori-speech-bubble';
-      this.wrapper.appendChild(this.speechBubble);
-    } else {
-      this.speechBubble = this.wrapper.querySelector('.nori-speech-bubble');
-    }
-
-    // Mouth Flash Glow Overlay
-    if (!this.wrapper.querySelector('.nori-mouth-glow-beam')) {
-      this.mouthGlowEl = document.createElement('div');
-      this.mouthGlowEl.className = 'nori-mouth-glow-beam';
-      this.wrapper.appendChild(this.mouthGlowEl);
-    } else {
-      this.mouthGlowEl = this.wrapper.querySelector('.nori-mouth-glow-beam');
-    }
-
-    // Canvas Element Overlay for Particles & Expressions
-    if (!this.wrapper.querySelector('canvas.nori-pixel-canvas')) {
-      this.canvas = document.createElement('canvas');
-      this.canvas.className = 'nori-pixel-canvas' + (this.compact ? ' compact-canvas' : '');
-      this.canvas.width = 36;
-      this.canvas.height = 36;
-      this.ctx = this.canvas.getContext('2d');
-      if (this.ctx) this.ctx.imageSmoothingEnabled = false;
-
-      // If SVG exists, overlay canvas on top of SVG
-      const svg = this.wrapper.querySelector('svg');
-      if (svg) {
-        this.canvas.style.position = 'absolute';
-        this.canvas.style.top = '0';
-        this.canvas.style.left = '0';
-        this.canvas.style.pointerEvents = 'none';
-      }
-
-      this.wrapper.appendChild(this.canvas);
-    } else {
-      this.canvas = this.wrapper.querySelector('canvas.nori-pixel-canvas');
-      if (this.canvas) this.ctx = this.canvas.getContext('2d');
-    }
-
-    // Click Interactivity
-    this.wrapper.addEventListener('click', () => this.onClickTufy());
-
-    // Start Render Loop
-    this.loop();
-  }
-
-  setState(newState, customSpeech = null) {
-    if (this.state === newState && !customSpeech) return;
-    this.state = newState;
-
-    if (newState === 'responding' || newState === 'thinking') {
-      this.flashMouth(2500);
-    }
-
-    if (customSpeech) {
-      this.say(customSpeech);
-    } else if (newState === 'happy') {
-      const list = this.phrases[newState];
-      const p = list[Math.floor(Math.random() * list.length)];
-      this.say(p);
-    }
-  }
-
-  flashMouth(duration = 2500) {
-    this.mouthBeamActive = true;
-    this.mouthBeamTimer = duration;
-    if (this.mouthGlowEl) {
-      this.mouthGlowEl.classList.add('active');
-    }
-    this.spawnMouthParticles(25);
-  }
-
-  spawnMouthParticles(count = 15) {
-    // Mouth origin (x: 17, y: 16)
-    for (let i = 0; i < count; i++) {
-      const angle = (Math.random() - 0.5) * 1.2;
-      this.particles.push({
-        x: 17,
-        y: 16 + (Math.random() * 2 - 1),
-        vx: (Math.random() - 0.5) * 2.2,
-        vy: -0.8 - Math.random() * 1.5,
-        alpha: 1.0,
-        size: 1.2 + Math.random() * 2,
-        color: ['#FF6584', '#3B82F6', '#60A5FA', '#FFB6C1', '#FFFFFF'][Math.floor(Math.random() * 5)]
+    /**
+     * Broadcasts a state change across all mounted Milo companions on the page
+     * @param {string} newState - 'idle' | 'listening' | 'thinking' | 'responding' | 'error' | 'happy'
+     * @param {string|null} customSpeech - optional speech bubble message
+     */
+    static setGlobalState(newState, customSpeech = null) {
+      MiloCompanion.instances.forEach((inst) => {
+        try {
+          inst.setState(newState, customSpeech);
+        } catch (_) {}
       });
-    }
-  }
 
-  say(text, duration = 3500) {
-    if (!this.speechBubble) return;
-    this.speechBubble.textContent = text;
-    this.speechBubble.classList.add('active');
-
-    if (this.speechTimeout) clearTimeout(this.speechTimeout);
-    this.speechTimeout = setTimeout(() => {
-      this.speechBubble.classList.remove('active');
-    }, duration);
-  }
-
-  onClickTufy() {
-    this.flashMouth(2000);
-    this.setState('happy', 'Hey! I\'m Tufy your personal companion.');
-  }
-
-  loop() {
-    this.tick++;
-    this.update();
-    this.render();
-    requestAnimationFrame(() => this.loop());
-  }
-
-  update() {
-    // Blinking
-    this.blinkTimer++;
-    if (this.blinkTimer > 160 + Math.random() * 120) {
-      this.isBlinking = true;
-      if (this.blinkTimer > 172 + Math.random() * 120) {
-        this.isBlinking = false;
-        this.blinkTimer = 0;
+      // Update in-chat status badge text if present
+      const badge = document.getElementById('milo-chat-status-badge');
+      if (badge) {
+        const labels = {
+          idle: 'Ready to assist',
+          listening: 'Listening…',
+          thinking: 'Thinking & searching…',
+          responding: 'Answering…',
+          error: 'Connection issue',
+          happy: 'Ready to code!'
+        };
+        badge.textContent = labels[newState] || 'Ready';
+        badge.setAttribute('data-state', newState);
       }
     }
 
-    // Mouth Flash Timer
-    if (this.mouthBeamActive) {
-      this.mouthBeamTimer -= 16;
-      if (this.tick % 3 === 0) {
-        this.spawnMouthParticles(2);
+    constructor(options = {}) {
+      this.containerId = options.containerId || 'nori-companion-target';
+      this.compact = Boolean(options.compact);
+      this.size = options.size || (this.compact ? 34 : 160);
+      this.state = 'idle'; // idle | listening | thinking | responding | error | happy
+      this.instanceId = 'milo_' + Math.random().toString(36).substring(2, 9);
+      this.speechTimeout = null;
+      this.blinkTimer = null;
+      this.container = null;
+      this.wrapper = null;
+      this.speechBubble = null;
+
+      this.phrases = {
+        idle: [
+          "Hey! I'm Milo, your AI companion.",
+          "Your Second Brain is active and synced.",
+          "Got a question? Ask me anything!",
+          "Ready to work through code step by step."
+        ],
+        listening: [
+          "Listening closely…",
+          "Ready! What's on your mind?",
+          "Tell me more!"
+        ],
+        thinking: [
+          "Searching Second Brain notes…",
+          "Analyzing code context…",
+          "Synthesizing your answer…"
+        ],
+        responding: [
+          "Here's what I found! ✨",
+          "Found in your Second Brain notes:",
+          "Step-by-step answer ready! ✨"
+        ],
+        error: [
+          "I couldn't reach the AI service right now. Please try again.",
+          "Local notes are still safe in your vault!"
+        ],
+        happy: [
+          "Happy to help with your code and notes! ✨",
+          "Milo is ready for another question!",
+          "Knowledge captured! 🧠"
+        ]
+      };
+
+      MiloCompanion.instances.push(this);
+      this.init();
+    }
+
+    init() {
+      this.container = document.getElementById(this.containerId);
+      if (!this.container) return;
+
+      this.container.innerHTML = '';
+      this.wrapper = document.createElement('div');
+      this.wrapper.className = 'milo-wrapper';
+      this.wrapper.style.position = 'relative';
+      this.wrapper.style.display = 'inline-flex';
+      this.wrapper.style.alignItems = 'center';
+      this.wrapper.style.justifyContent = 'center';
+
+      // Speech bubble for full-size companion
+      if (!this.compact) {
+        this.speechBubble = document.createElement('div');
+        this.speechBubble.className = 'milo-speech-bubble';
+        this.speechBubble.setAttribute('role', 'status');
+        this.speechBubble.setAttribute('aria-live', 'polite');
+        this.wrapper.appendChild(this.speechBubble);
       }
-      if (this.mouthBeamTimer <= 0) {
-        this.mouthBeamActive = false;
-        if (this.mouthGlowEl) this.mouthGlowEl.classList.remove('active');
+
+      // Initial SVG render
+      this.render();
+
+      this.container.appendChild(this.wrapper);
+
+      // Click interaction
+      this.wrapper.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.onClickMilo();
+      });
+
+      // Start organic blink cycle
+      this.startBlinkLoop();
+    }
+
+    render() {
+      if (!this.wrapper) return;
+      const existingContainer = this.wrapper.querySelector('.milo-container');
+      if (existingContainer) {
+        existingContainer.remove();
+      }
+
+      const svgHtml = this.generateSVG(this.state, this.size);
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = svgHtml.trim();
+      const newEl = tempDiv.firstElementChild;
+      if (newEl) {
+        this.wrapper.appendChild(newEl);
       }
     }
 
-    // Update Particles
-    for (let i = this.particles.length - 1; i >= 0; i--) {
-      const p = this.particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      p.alpha -= 0.025;
-      if (p.alpha <= 0) this.particles.splice(i, 1);
+    generateSVG(state, size) {
+      const isCompact = this.compact || size <= 48;
+      const h = Math.round(size * 1.06);
+      const p = this.instanceId;
+
+      return `
+      <div class="milo-container milo-state-${state} ${isCompact ? 'milo-compact' : ''}" style="width: ${size}px; height: ${h}px;" title="Milo AI Companion">
+        ${!isCompact ? '<div class="milo-ambient-glow"></div>' : ''}
+        <svg class="milo-svg" width="${size}" height="${h}" viewBox="0 0 160 170" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Milo Animated Robot">
+          <defs>
+            <!-- White Ceramic Shell Gradient -->
+            <linearGradient id="${p}_shell" x1="80" y1="12" x2="80" y2="148" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#FFFFFF"/>
+              <stop offset="40%" stop-color="#F8FAFC"/>
+              <stop offset="85%" stop-color="#E2E8F0"/>
+              <stop offset="100%" stop-color="#CBD5E1"/>
+            </linearGradient>
+
+            <!-- Metallic Ear Puck Gradient -->
+            <linearGradient id="${p}_ear" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#FFFFFF"/>
+              <stop offset="100%" stop-color="#CBD5E1"/>
+            </linearGradient>
+
+            <!-- Deep Obsidian Visor Gradient -->
+            <linearGradient id="${p}_visor" x1="80" y1="36" x2="80" y2="92" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#080C14"/>
+              <stop offset="50%" stop-color="#0E1626"/>
+              <stop offset="100%" stop-color="#05080E"/>
+            </linearGradient>
+
+            <!-- Visor Specular Glass Arc -->
+            <linearGradient id="${p}_glass" x1="80" y1="38" x2="80" y2="60" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="rgba(255, 255, 255, 0.45)"/>
+              <stop offset="40%" stop-color="rgba(255, 255, 255, 0.15)"/>
+              <stop offset="100%" stop-color="rgba(255, 255, 255, 0)"/>
+            </linearGradient>
+
+            <!-- Floating Ground Shadow -->
+            <radialGradient id="${p}_shadow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(0, 0, 0, 0.6)"/>
+              <stop offset="45%" stop-color="rgba(0, 242, 254, 0.22)"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+
+            <!-- Electric Cyan Glow Filter -->
+            <filter id="${p}_glow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="3.2" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- Ground Hover Shadow (Full Size Only) -->
+          ${!isCompact ? `<ellipse class="milo-ground-shadow" cx="80" cy="158" rx="42" ry="7" fill="url(#${p}_shadow)"/>` : ''}
+
+          <!-- Floating Robot Assembly -->
+          <g class="milo-floater">
+            
+            <!-- Left Headphone Ear Puck -->
+            <rect class="milo-ear milo-ear-left" x="18" y="50" width="13" height="28" rx="6.5" fill="url(#${p}_ear)" stroke="#94A3B8" stroke-width="1.5"/>
+            <rect class="milo-ear-glow" x="22" y="55" width="5.5" height="18" rx="2.75" fill="#00F2FE" filter="url(#${p}_glow)"/>
+
+            <!-- Right Headphone Ear Puck -->
+            <rect class="milo-ear milo-ear-right" x="129" y="50" width="13" height="28" rx="6.5" fill="url(#${p}_ear)" stroke="#94A3B8" stroke-width="1.5"/>
+            <rect class="milo-ear-glow" x="132.5" y="55" width="5.5" height="18" rx="2.75" fill="#00F2FE" filter="url(#${p}_glow)"/>
+
+            <!-- Head Shell Helmet Dome -->
+            <rect class="milo-head-shell" x="26" y="24" width="108" height="82" rx="41" fill="url(#${p}_shell)" stroke="#CBD5E1" stroke-width="1.6"/>
+            
+            <!-- Helmet Top Light Node -->
+            <path d="M 73,24 L 73,17 Q 80,14 87,17 L 87,24 Z" fill="url(#${p}_shell)" stroke="#CBD5E1" stroke-width="1.2"/>
+            <circle class="milo-top-light" cx="80" cy="17" r="3.2" fill="#00F2FE" filter="url(#${p}_glow)"/>
+
+            <!-- Glossy Black Visor Face Screen -->
+            <rect class="milo-visor-frame" x="38" y="36" width="84" height="58" rx="26" fill="#020408" stroke="#1E293B" stroke-width="2"/>
+            <rect class="milo-visor-screen" x="40" y="38" width="80" height="54" rx="24" fill="url(#${p}_visor)"/>
+            
+            <!-- Visor Specular Highlight Arc -->
+            <path class="milo-visor-reflection" d="M 47,47 C 65,40 95,40 113,47 C 104,43 76,43 47,47 Z" fill="url(#${p}_glass)"/>
+
+            <!-- Glowing Expressive Cyan Eyes -->
+            <g class="milo-eyes-group">
+              <!-- Left Eye -->
+              <g class="milo-eye milo-eye-left" transform-origin="64 64">
+                ${state === 'responding' || state === 'happy'
+                  ? `<path class="milo-eye-pupil" d="M 58,67 Q 64,57 70,67" stroke="#00F2FE" stroke-width="3.5" stroke-linecap="round" fill="none" filter="url(#${p}_glow)"/>`
+                  : state === 'error'
+                  ? `<ellipse class="milo-eye-pupil" cx="64" cy="65" rx="6" ry="7" fill="#F59E0B" filter="url(#${p}_glow)"/><circle cx="62" cy="63" r="1.8" fill="#FFFFFF"/>`
+                  : `<ellipse class="milo-eye-pupil" cx="64" cy="64" rx="6.5" ry="10.5" fill="#00F2FE" filter="url(#${p}_glow)"/><circle cx="62.2" cy="60" r="2.2" fill="#FFFFFF"/>`
+                }
+              </g>
+
+              <!-- Right Eye -->
+              <g class="milo-eye milo-eye-right" transform-origin="96 64">
+                ${state === 'responding' || state === 'happy'
+                  ? `<path class="milo-eye-pupil" d="M 90,67 Q 96,57 102,67" stroke="#00F2FE" stroke-width="3.5" stroke-linecap="round" fill="none" filter="url(#${p}_glow)"/>`
+                  : state === 'error'
+                  ? `<ellipse class="milo-eye-pupil" cx="96" cy="65" rx="6" ry="7" fill="#F59E0B" filter="url(#${p}_glow)"/><circle cx="94" cy="63" r="1.8" fill="#FFFFFF"/>`
+                  : `<ellipse class="milo-eye-pupil" cx="96" cy="64" rx="6.5" ry="10.5" fill="#00F2FE" filter="url(#${p}_glow)"/><circle cx="94.2" cy="60" r="2.2" fill="#FFFFFF"/>`
+                }
+              </g>
+            </g>
+
+            <!-- Compact Torso Pod -->
+            <path class="milo-torso-pod" d="M 52,112 C 52,106 108,106 108,112 C 108,138 52,138 52,112 Z" fill="url(#${p}_shell)" stroke="#CBD5E1" stroke-width="1.5"/>
+
+            <!-- Chest Status Core Pill -->
+            <rect class="milo-chest-core" x="72" y="117" width="16" height="5.5" rx="2.75" fill="#00F2FE" filter="url(#${p}_glow)"/>
+
+            <!-- Articulated Arms -->
+            <ellipse class="milo-arm milo-arm-left" cx="44" cy="120" rx="6" ry="12" fill="url(#${p}_shell)" stroke="#CBD5E1" stroke-width="1.2" transform="rotate(16 44 120)"/>
+            <ellipse class="milo-arm milo-arm-right" cx="116" cy="120" rx="6" ry="12" fill="url(#${p}_shell)" stroke="#CBD5E1" stroke-width="1.2" transform="rotate(-16 116 120)"/>
+
+          </g>
+        </svg>
+      </div>
+      `;
+    }
+
+    setState(newState, customSpeech = null) {
+      if (this.state === newState && !customSpeech) return;
+      this.state = newState;
+      this.render();
+
+      if (customSpeech) {
+        this.say(customSpeech);
+      } else if (newState === 'happy') {
+        const list = this.phrases[newState];
+        const p = list[Math.floor(Math.random() * list.length)];
+        this.say(p);
+      }
+    }
+
+    say(text, duration = 3500) {
+      if (!this.speechBubble || this.compact) return;
+      this.speechBubble.textContent = text;
+      this.speechBubble.classList.add('active');
+
+      if (this.speechTimeout) clearTimeout(this.speechTimeout);
+      this.speechTimeout = setTimeout(() => {
+        if (this.speechBubble) this.speechBubble.classList.remove('active');
+      }, duration);
+    }
+
+    flashMouth(duration = 2000) {
+      this.pulseGlow(duration);
+    }
+
+    pulseGlow(duration = 2000) {
+      const container = this.wrapper?.querySelector('.milo-container');
+      if (container) {
+        container.classList.add('milo-state-listening');
+        setTimeout(() => {
+          if (container && this.state !== 'listening') {
+            container.classList.remove('milo-state-listening');
+          }
+        }, duration);
+      }
+    }
+
+    onClickMilo() {
+      MiloCompanion.setGlobalState('happy', "Hey! I'm Milo, your Second Brain companion. Ready to help!");
+      setTimeout(() => {
+        if (this.state === 'happy') MiloCompanion.setGlobalState('idle');
+      }, 4000);
+    }
+
+    startBlinkLoop() {
+      const scheduleNextBlink = () => {
+        const nextDelay = 3500 + Math.random() * 2500;
+        this.blinkTimer = setTimeout(() => {
+          const container = this.wrapper?.querySelector('.milo-container');
+          if (container && this.state === 'idle') {
+            container.classList.add('milo-blinking');
+            setTimeout(() => {
+              if (container) container.classList.remove('milo-blinking');
+            }, 190);
+          }
+          scheduleNextBlink();
+        }, nextDelay);
+      };
+      scheduleNextBlink();
+    }
+
+    destroy() {
+      if (this.blinkTimer) clearTimeout(this.blinkTimer);
+      if (this.speechTimeout) clearTimeout(this.speechTimeout);
+      const index = MiloCompanion.instances.indexOf(this);
+      if (index !== -1) MiloCompanion.instances.splice(index, 1);
     }
   }
 
-  render() {
-    if (!this.ctx) return;
-    const ctx = this.ctx;
-    ctx.clearRect(0, 0, 36, 36);
+  // Global Exports & Backward Compatibility
+  window.MiloCompanion = MiloCompanion;
+  window.NoriCompanion = MiloCompanion;
+  window.TufyCompanion = MiloCompanion;
+  window.MochiCompanion = MiloCompanion;
 
-    // Floating animation
-    const floatY = Math.sin(this.tick * 0.05) * 1.2;
-    const baseY = 3 + floatY;
-
-    // Palette for Tufy: Cute Peach-Pink Droplet with Blue Scarf
-    const C = {
-      outline: '#3B2229',
-      body: '#FFAEC1',
-      bodyLight: '#FFE2E8',
-      bodyDark: '#E5889C',
-      cheek: '#FF6584',
-      scarf: '#4361EE',
-      scarfDark: '#2B37A0',
-      scarfText: '#FFFFFF',
-      eye: '#1C1014',
-      eyeGleam: '#FFFFFF',
-      beamGlow: '#FF6584'
-    };
-
-    if (this.state === 'thinking') { C.body = '#FFC2D1'; C.bodyLight = '#FFF0F5'; }
-    if (this.state === 'listening') { C.body = '#FF9ebb'; C.bodyLight = '#FFC2D1'; }
-
-    const px = (x, y, color) => {
-      ctx.fillStyle = color;
-      ctx.fillRect(Math.round(x), Math.round(y + baseY), 1, 1);
-    };
-
-    const rect = (x, y, w, h, color) => {
-      ctx.fillStyle = color;
-      ctx.fillRect(Math.round(x), Math.round(y + baseY), w, h);
-    };
-
-    // --- 1. TOP FLAME / DROPLET TIP ---
-    px(17, 1, C.bodyLight); px(18, 1, C.bodyLight);
-    rect(16, 2, 4, 2, C.bodyLight);
-    rect(15, 4, 6, 2, C.body);
-    rect(14, 6, 8, 2, C.body);
-
-    // --- 2. SIDE ROUND EARS ---
-    rect(8, 12, 3, 4, C.bodyDark);
-    rect(25, 12, 3, 4, C.bodyDark);
-
-    // --- 3. MAIN CUTE ROUNDED HEAD & CHEEKS ---
-    rect(11, 8, 14, 11, C.body);
-    rect(10, 10, 16, 8, C.body);
-    rect(12, 7, 12, 2, C.bodyLight);
-
-    // Forehead highlight
-    rect(15, 7, 6, 2, C.bodyLight);
-
-    // --- 4. FACIAL FEATURES ---
-    // Left Eye
-    if (this.isBlinking) {
-      rect(13, 12, 3, 1, C.eye);
-    } else if (this.state === 'happy') {
-      px(13, 13, C.eye); px(14, 12, C.eye); px(15, 13, C.eye);
-    } else {
-      rect(13, 11, 3, 4, C.eye);
-      px(13, 11, C.eyeGleam);
-    }
-
-    // Right Eye
-    if (this.isBlinking) {
-      rect(20, 12, 3, 1, C.eye);
-    } else if (this.state === 'happy') {
-      px(20, 13, C.eye); px(21, 12, C.eye); px(22, 13, C.eye);
-    } else {
-      rect(20, 11, 3, 4, C.eye);
-      px(20, 11, C.eyeGleam);
-    }
-
-    // Rosy Pink Blush Cheeks
-    rect(11, 15, 3, 2, C.cheek);
-    rect(22, 15, 3, 2, C.cheek);
-
-    // Sweet Smile Mouth
-    px(17, 16, C.eye); px(18, 16, C.eye);
-    px(16, 15, C.eye); px(19, 15, C.eye);
-
-    // Glowing Mouth Flash Beam Effect
-    if (this.mouthBeamActive) {
-      const beamCol = (this.tick % 4 < 2) ? '#FFFFFF' : '#FF6584';
-      rect(16, 15, 4, 3, beamCol);
-    }
-
-    // --- 5. ROYAL BLUE SCARF / BANDANA ---
-    rect(11, 19, 14, 3, C.scarf);
-    rect(12, 21, 12, 1, C.scarfDark);
-    // Scarf knot & hanging tail
-    rect(17, 22, 3, 3, C.scarf);
-    px(18, 23, C.scarfDark);
-    // White text detail "Tufy" on scarf
-    px(13, 20, C.scarfText);
-    px(15, 20, C.scarfText);
-    px(20, 20, C.scarfText);
-    px(22, 20, C.scarfText);
-
-    // --- 6. CUTE LOWER BODY & STUBBY ARMS ---
-    // Body
-    rect(13, 22, 10, 6, C.body);
-    rect(14, 28, 8, 2, C.bodyDark);
-    
-    // Stubby Arms
-    rect(9, 21, 3, 3, C.body);
-    rect(24, 21, 3, 3, C.body);
-
-    // --- 7. MOUTH FLASH BEAM PARTICLES ---
-    this.particles.forEach(p => {
-      ctx.fillStyle = p.color;
-      ctx.globalAlpha = Math.max(0, p.alpha);
-      ctx.fillRect(Math.round(p.x), Math.round(p.y + baseY), p.size, p.size);
-    });
-    ctx.globalAlpha = 1.0;
-  }
-}
-
-// Global Singleton Access (Supporting MiloCompanion, MochiCompanion, TufyCompanion and NoriCompanion for 100% backward compatibility)
-window.MiloCompanion = NoriCompanion;
-window.MochiCompanion = NoriCompanion;
-window.NoriCompanion = NoriCompanion;
-window.TufyCompanion = NoriCompanion;
+})();

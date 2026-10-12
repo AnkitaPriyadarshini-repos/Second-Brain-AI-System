@@ -19,7 +19,7 @@ assert.ok(pwa.includes("if (typeof window.handleRAGQuery === 'function') return;
 assert.ok(pwa.includes('script[src*="js/production-chat.js"]'), 'Fallback must detect an already requested controller script');
 assert.ok(pwa.includes("script.src = 'js/production-chat.js?v=6.0';"), 'Fallback must use the same current controller version');
 assert.ok(!pwa.includes("js/production-chat.js?v=3.0"), 'Stale v3 controller must not be loaded');
-assert.ok(sw.includes("second-brain-cache-v64.0"), 'Service worker cache must be version-bumped');
+assert.ok(sw.includes("second-brain-cache-v65.0"), 'Service worker cache must be version-bumped');
 assert.ok(sw.includes("./js/utils.js?v=59.0"), 'Service worker must cache current utils');
 assert.ok(sw.includes("./js/production-chat.js?v=6.0"), 'Service worker must cache current chat controller');
 assert.ok(sw.includes("./js/pwa-installer.js?v=61.0"), 'Service worker must cache current PWA installer');
