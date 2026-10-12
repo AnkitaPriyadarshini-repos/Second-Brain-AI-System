@@ -326,7 +326,7 @@ export default async function handler(req, res) {
 
     // If the lightweight model is temporarily throttled, retry once with the
     // primary model. This is a resilience path, not a silent answer change.
-    if (!result.response.ok && model === FAST_MODEL && [429, 500, 502, 503, 504].includes(result.response.status)) {
+    if (!result.response.ok && model === FAST_MODEL && [404, 429, 500, 502, 503, 504].includes(result.response.status)) {
       model = PRIMARY_MODEL;
       thinkingLevel = 'medium';
       result = await callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey, requestId });
