@@ -43,12 +43,15 @@ export default function handler(req, res) {
     }
   }
 
+  const envKeys = Object.keys(process.env).sort();
+
   return res.status(200).json({
     ok: true,
     service: 'juno-ai-gateway',
     configured,
     matchingKeys,
     keyDiagnostics,
+    envKeys,
     deploymentContext,
     models: MODELS,
     timestamp: new Date().toISOString()
