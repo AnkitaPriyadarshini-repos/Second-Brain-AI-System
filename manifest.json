@@ -1,6 +1,6 @@
 {
-  "name": "Juno AI — Personal Knowledge & Intelligence System",
-  "short_name": "Juno AI",
+  "name": "Milo — Personal Knowledge & Intelligence System",
+  "short_name": "Milo",
   "description": "High-performance AI assistant for notes, research, code synthesis, and grounded knowledge retrieval.",
   "start_url": "/",
   "scope": "/",
@@ -27,7 +27,7 @@
     {
       "name": "New Chat",
       "short_name": "New Chat",
-      "description": "Start a new Juno AI conversation",
+      "description": "Start a new Milo conversation",
       "url": "/?action=new",
       "icons": [{ "src": "assets/nexus_yellow_bot.png", "sizes": "192x192" }]
     }

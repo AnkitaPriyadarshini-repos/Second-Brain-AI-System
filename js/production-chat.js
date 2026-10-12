@@ -97,7 +97,7 @@
 
       return { contextNotes, citations };
     } catch (error) {
-      console.warn('[Juno retrieval]', error);
+      console.warn('[Milo retrieval]', error);
       return { contextNotes: [], citations: [] };
     }
   }
@@ -160,8 +160,8 @@
     if (button) {
       button.disabled = busy;
       button.setAttribute('aria-busy', busy ? 'true' : 'false');
-      button.setAttribute('aria-label', busy ? 'Juno is thinking' : 'Send message');
-      button.title = busy ? 'Juno is thinking…' : 'Send message';
+      button.setAttribute('aria-label', busy ? 'Milo is thinking' : 'Send message');
+      button.title = busy ? 'Milo is thinking…' : 'Send message';
       button.innerHTML = busy
         ? '<span class="spinner" style="display:inline-block;width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></span>'
         : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
@@ -256,7 +256,7 @@
       window.dispatchEvent(new CustomEvent('juno:answer', { detail: data }));
       return true;
     } catch (error) {
-      console.error('[Juno chat]', error);
+      console.error('[Milo chat]', error);
       const isTimeout = error?.name === 'AbortError';
       const retrieved = retrieveNotes(prompt);
       if (retrieved.contextNotes && retrieved.contextNotes.length > 0) {
@@ -384,15 +384,15 @@
   }
 
   function polishInterface() {
-    document.title = 'Juno — your notes, in context';
+    document.title = 'Milo — your notes, in context';
 
     document.querySelectorAll('h1,h2,h3,p,button').forEach((el) => {
       const text = clean(el.textContent);
       if (text === 'Talk to Your Second Brain like Jarvis') el.textContent = 'Your notes, in context.';
       if (text.includes('Ask questions out loud or via text. Answers are synthesized strictly from your saved notes')) {
-        el.textContent = 'Ask about something you saved, or ask a normal question. Juno uses your notes when they help.';
+        el.textContent = 'Ask about something you saved, or ask a normal question. Milo uses your notes when they help.';
       }
-      if (text === 'Query RAG') el.textContent = 'Ask Juno';
+      if (text === 'Query RAG') el.textContent = 'Ask Milo';
       if (text === 'Talk to Jarvis') el.textContent = 'Use voice';
       if (text === 'Grounded Conversation Stream & Source Citations') el.textContent = 'Conversation';
     });

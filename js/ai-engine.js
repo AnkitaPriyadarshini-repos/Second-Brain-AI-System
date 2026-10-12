@@ -187,7 +187,7 @@ export function HydratedComponent({ data }) {
     const { 
       prompt = '', 
       model = 'gemini-2.5-flash', 
-      systemPrompt = 'You are Nori, a warm, thoughtful, concise, and intelligent AI companion and Second Brain partner. Speak naturally, calmly, and directly with crisp, readable formatting. Avoid corporate clichés like "As an AI...", "Absolutely!!!", "Great question!!!", or artificial enthusiasm. Be genuinely helpful, clear, and honest about uncertainty.', 
+      systemPrompt = 'You are Milo, a warm, thoughtful, concise, and intelligent AI companion and Second Brain partner. Speak naturally, calmly, and directly with crisp, readable formatting. Avoid corporate clichés like "As an AI...", "Absolutely!!!", "Great question!!!", or artificial enthusiasm. Be genuinely helpful, clear, and honest about uncertainty.', 
       ragContext = '', 
       imageAttachment = null,
       chatHistory = []
@@ -197,16 +197,16 @@ export function HydratedComponent({ data }) {
     
     // Natural Conversational Greetings
     if (qClean === 'hi' || qClean === 'hii' || qClean === 'hiii') {
-      return { text: "Hi! I'm Nori. What are we working on today?", provider: 'Nori Companion Engine', grounded: false };
+      return { text: "Hi! I'm Milo. What are we working on today?", provider: 'Milo Companion Engine', grounded: false };
     }
     if (qClean === 'hello') {
-      return { text: "Hello! I'm Nori. How can I help you today?", provider: 'Nori Companion Engine', grounded: false };
+      return { text: "Hello! I'm Milo. How can I help you today?", provider: 'Milo Companion Engine', grounded: false };
     }
     if (qClean === 'hey' || qClean === 'heyy' || qClean === 'yo' || qClean === 'sup') {
-      return { text: "Hey there! What's on your mind today?", provider: 'Nori Companion Engine', grounded: false };
+      return { text: "Hey there! What's on your mind today?", provider: 'Milo Companion Engine', grounded: false };
     }
     if (qClean.includes('how are you') || qClean.includes('how r u')) {
-      return { text: "I'm doing great, thank you! How can I help you today?", provider: 'Nori Companion Engine', grounded: false };
+      return { text: "I'm doing great, thank you! How can I help you today?", provider: 'Milo Companion Engine', grounded: false };
     }
 
     // Detect Image Generation Request Intent (Imagen 3 simulation/rendering)
@@ -266,7 +266,7 @@ export function HydratedComponent({ data }) {
     const encodedPrompt = encodeURIComponent(cleanSubject);
     const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=800&height=500&seed=${Math.floor(Math.random() * 99999)}&nologo=true`;
 
-    const markdownOutput = `### 🎨 Juno Imagen 3 Generation\n\n` +
+    const markdownOutput = `### 🎨 Milo Image Studio\n\n` +
       `Here is the AI generated artwork based on your prompt: **"${cleanSubject}"**\n\n` +
       `<div class="gemini-generated-image-card" style="margin: 14px 0; background: rgba(0,0,0,0.2); border: 1.5px solid var(--border-color, #00f2fe); border-radius: 16px; padding: 12px; text-align: center;">\n` +
       `  <img src="${imageUrl}" alt="${cleanSubject}" style="width: 100%; max-width: 700px; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);" loading="lazy" onerror="this.onerror=null; this.src='assets/pinterest_color.jpg';">\n` +
@@ -274,11 +274,11 @@ export function HydratedComponent({ data }) {
       `    <a href="${imageUrl}" target="_blank" download="juno_artwork.jpg" class="chat-action-btn" style="text-decoration: none; padding: 6px 14px; background: #00f2fe; color: #2c1d00; font-weight: 700; border-radius: 10px;">📥 Download Image</a>\n` +
       `  </div>\n` +
       `</div>\n\n` +
-      `*Generated with Juno AI Imagen 3 Engine.*`;
+      `*Generated with Milo Image Studio.*`;
 
     return {
       text: markdownOutput,
-      provider: 'Juno Imagen 3',
+      provider: 'Milo Image Studio',
       grounded: false
     };
   }

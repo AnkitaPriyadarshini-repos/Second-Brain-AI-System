@@ -25,20 +25,20 @@
     deferredInstallPrompt = null;
     isStandalone = true;
     localStorage.setItem('juno_pwa_installed', 'true');
-    if (typeof window.showToast === 'function') window.showToast('Juno AI installed successfully.');
+    if (typeof window.showToast === 'function') window.showToast('Milo installed successfully.');
     const modal = document.getElementById('pwa-install-modal');
     if (modal) modal.style.display = 'none';
   });
 
   window.triggerPWAInstall = function () {
     if (isStandalone) {
-      if (typeof window.showToast === 'function') window.showToast('You are using the installed Juno AI app.');
+      if (typeof window.showToast === 'function') window.showToast('You are using the installed Milo app.');
       return;
     }
     if (deferredInstallPrompt) {
       deferredInstallPrompt.prompt();
       deferredInstallPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted' && typeof window.showToast === 'function') window.showToast('Installing Juno AI…');
+        if (choiceResult.outcome === 'accepted' && typeof window.showToast === 'function') window.showToast('Installing Milo…');
         deferredInstallPrompt = null;
       }).catch((err) => console.warn('Error during PWA installation prompt:', err));
     } else window.openPWAInstallInstructionsModal();
@@ -59,7 +59,7 @@
     if (isIOS) instructionHTML = '<div class="pwa-step-item"><span class="step-num">1</span><span>Tap <strong>Share</strong> in Safari.</span></div><div class="pwa-step-item"><span class="step-num">2</span><span>Select <strong>Add to Home Screen</strong>.</span></div><div class="pwa-step-item"><span class="step-num">3</span><span>Tap <strong>Add</strong>.</span></div>';
     else if (isAndroid) instructionHTML = '<div class="pwa-step-item"><span class="step-num">1</span><span>Open the Chrome browser menu.</span></div><div class="pwa-step-item"><span class="step-num">2</span><span>Select <strong>Add to Home screen</strong> or <strong>Install app</strong>.</span></div><div class="pwa-step-item"><span class="step-num">3</span><span>Confirm the installation.</span></div>';
     else instructionHTML = '<div class="pwa-step-item"><span class="step-num">1</span><span>Look for the browser <strong>Install</strong> icon near the address bar.</span></div><div class="pwa-step-item"><span class="step-num">2</span><span>Click <strong>Install</strong>.</span></div>';
-    modal.innerHTML = `<div class="pwa-install-dialog glass-panel"><div class="pwa-dialog-header"><div class="pwa-dialog-title"><span class="pwa-app-icon">J</span><div><h3>Install Juno AI</h3><p>A focused workspace for your notes and ideas.</p></div></div><button class="pwa-close-btn" onclick="document.getElementById('pwa-install-modal').style.display='none'">✕</button></div><div class="pwa-dialog-body">${instructionHTML}</div><div class="pwa-dialog-footer"><button class="btn-pwa-close" onclick="document.getElementById('pwa-install-modal').style.display='none'">Got it</button></div></div>`;
+    modal.innerHTML = `<div class="pwa-install-dialog glass-panel"><div class="pwa-dialog-header"><div class="pwa-dialog-title"><span class="pwa-app-icon">M</span><div><h3>Install Milo</h3><p>A focused workspace for your notes and ideas.</p></div></div><button class="pwa-close-btn" onclick="document.getElementById('pwa-install-modal').style.display='none'">✕</button></div><div class="pwa-dialog-body">${instructionHTML}</div><div class="pwa-dialog-footer"><button class="btn-pwa-close" onclick="document.getElementById('pwa-install-modal').style.display='none'">Got it</button></div></div>`;
     modal.style.display = 'flex';
   };
 
@@ -93,7 +93,7 @@
     script.src = 'js/production-chat.js?v=6.0';
     script.dataset.junoProductionChat = 'true';
     script.onload = () => window.dispatchEvent(new CustomEvent('juno:production-chat-ready'));
-    script.onerror = () => { if (typeof window.showToast === 'function') window.showToast('Juno chat controller failed to load. Refresh once to retry.', 'error'); };
+    script.onerror = () => { if (typeof window.showToast === 'function') window.showToast('Milo chat controller failed to load. Refresh once to retry.', 'error'); };
     document.body.appendChild(script);
   }, 0);
 })();

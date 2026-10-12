@@ -109,7 +109,7 @@
       }
     } catch (e) { console.warn('NoriCompanion init warning:', e); }
 
-    // Connect Nori Companion Input Handlers
+    // Connect Milo Companion Input Handlers
     if (ragQueryInput) {
       ragQueryInput.addEventListener('focus', () => {
         if (window.noriCompanion) window.noriCompanion.setState('listening');
@@ -599,7 +599,7 @@
         }
       }
       if (circularSub) {
-        circularSub.textContent = `Talk to Jarvis • Grounded Vault RAG for ${userEmail || firstName}`;
+        circularSub.textContent = `Talk to Milo • Grounded Vault RAG for ${userEmail || firstName}`;
       }
 
       const avatarInitialsEl = document.getElementById('user-avatar-initials');
@@ -707,7 +707,7 @@
       }
 
       if (typeof VoiceEngine !== 'undefined' && typeof Store !== 'undefined' && Store.settings && Store.settings.ttsEnabled) {
-        VoiceEngine.speak(`${timeSalutation} ${firstName}! Welcome to Juno AI.`);
+        VoiceEngine.speak(`${timeSalutation} ${firstName}! Welcome to Milo.`);
       }
     };
 
@@ -906,7 +906,7 @@
           }
         });
       } else {
-        alert('📲 Juno AI is ready for offline installation! Tap your browser menu ("..." or Share) and select "Add to Home Screen" or "Install App".');
+        alert('📲 Milo is ready for offline installation! Tap your browser menu ("..." or Share) and select "Add to Home Screen" or "Install App".');
       }
       if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) SoundEngine.playClick();
     };
@@ -1104,7 +1104,7 @@
               voiceTriggerBtn.innerHTML = 'Speaking...';
             } else {
               voiceTriggerBtn.classList.remove('listening', 'speaking');
-              voiceTriggerBtn.innerHTML = '🎙️ Talk to Jarvis';
+              voiceTriggerBtn.innerHTML = '🎙️ Talk to Milo';
             }
           }
         }
@@ -1197,7 +1197,7 @@
 
     window.triggerAstronautQuote = function() {
       if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
-      showToast('👨‍🚀 Space Juno: "Floating through space with Second Brain AI!"');
+      showToast('👨‍🚀 Space Milo: "Floating through space with Second Brain AI!"');
     };
 
     window.openCyberneticMeshModal = function() {
@@ -1288,7 +1288,7 @@
       if (iconEl) iconEl.textContent = newTheme === 'gemini-dark' ? '☀️' : '🌙';
 
       if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) SoundEngine.playClick();
-      if (typeof showToast === 'function') showToast(`✨ Theme switched to: ${newTheme === 'gemini-dark' ? 'Juno Dark' : 'Juno Light'}`);
+      if (typeof showToast === 'function') showToast(`✨ Theme switched to: ${newTheme === 'gemini-dark' ? 'Milo Dark' : 'Milo Light'}`);
     };
 
     window.runInCanvas = function(codeText) {
@@ -1316,7 +1316,7 @@
       iframe.srcdoc = htmlDoc;
       modal.style.display = 'flex';
       if (typeof SoundEngine !== 'undefined' && SoundEngine.playClick) SoundEngine.playClick();
-      if (typeof showToast === 'function') showToast('🚀 Juno Canvas: Executing live interactive web sandbox!');
+      if (typeof showToast === 'function') showToast('🚀 Milo Canvas: Executing live interactive web sandbox!');
     };
 
     window.closeCanvasModal = function() {
@@ -1603,7 +1603,7 @@
             : cleanQuery.toLowerCase().includes('afternoon') ? 'Good afternoon, User. What can I help you with?'
             : cleanQuery.toLowerCase().includes('evening') ? 'Good evening, User. What are you working on?'
             : 'Hi, User — good to see you. What are we working on?';
-          appendChatMessage('ai', greetingText, [], false, cleanQuery, 'Nori Companion', false);
+          appendChatMessage('ai', greetingText, [], false, cleanQuery, 'Milo Companion', false);
           return;
         }
 
@@ -1643,7 +1643,7 @@
         } else {
           thinkingCard.innerHTML = `<div class="chat-header" style="display: flex; align-items: center; gap: 8px; font-weight: 700;">
             <span style="font-size: 16px;">✨</span>
-            <strong style="color: #38BDF8;">Nori is thinking...</strong>
+            <strong style="color: #38BDF8;">Milo is thinking...</strong>
           </div>
           <div class="chat-text" style="display: flex; align-items: center; gap: 8px; color: #94A3B8; font-size: 13.5px; margin-top: 6px;">
             <span class="spinner" style="display: inline-block; width: 14px; height: 14px; border: 2px solid #38BDF8; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
@@ -1673,7 +1673,7 @@
         }
 
         let answerText = "";
-        let providerName = isAdaptiveFusion ? "Claves Adaptive Fusion AI" : "Juno 2.5 Flash";
+        let providerName = isAdaptiveFusion ? "Claves Adaptive Fusion AI" : "Milo AI";
         let citations = [];
 
         try {
@@ -1805,7 +1805,7 @@
         }
         if (window.noriCompanion) window.noriCompanion.setState('confused');
         const fallbackAnswer = `Something went wrong while connecting. Let's try that again.`;
-        appendChatMessage('ai', fallbackAnswer, [], false, cleanQuery, 'Nori Companion', false);
+        appendChatMessage('ai', fallbackAnswer, [], false, cleanQuery, 'Milo Companion', false);
       } finally {
         window.isAIProcessing = false;
         window.isAIAborted = false;
@@ -1959,7 +1959,7 @@
         msgCard.innerHTML = `
           <div class="chat-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
             <span style="font-size: 16px;">✨</span>
-            <strong style="font-size: 14px; font-weight: 700; color: #38BDF8;">Nori</strong>
+            <strong style="font-size: 14px; font-weight: 700; color: #38BDF8;">Milo</strong>
           </div>
           <div class="chat-text" style="color: #f3f0e8; font-size: 15.5px; line-height: 1.65; font-family: 'Inter', sans-serif;"></div>
           ${citationsHTML}
@@ -2344,7 +2344,7 @@
         } else {
           // Automatic OCR & Binary File Ingestion
           setTimeout(() => {
-            const simulatedText = `Extracted Text Content from ${file.name}:\nComprehensive overview of parameters, functional bounds, research citations, and experimental validation results (${(file.size / 1024).toFixed(1)} KB). Grounded for Juno AI search.`;
+            const simulatedText = `Extracted Text Content from ${file.name}:\nComprehensive overview of parameters, functional bounds, research citations, and experimental validation results (${(file.size / 1024).toFixed(1)} KB). Grounded for Milo search.`;
             const newNote = Store.addNote({
               title: `Document: ${file.name}`,
               content: simulatedText,
@@ -3173,14 +3173,14 @@
       }
       eqBars.forEach(bar => bar.classList.add('active'));
 
-      if (typeof showToast === 'function') showToast('Playing Juno AI Deep-Dive Podcast Audio Overview! 🎙️');
+      if (typeof showToast === 'function') showToast('Playing Milo Deep-Dive Podcast Audio Overview! 🎙️');
 
       // Speech Synthesis Audio Playback
       if (typeof VoiceEngine !== 'undefined' && VoiceEngine.speak) {
         if (window.speechSynthesis && window.speechSynthesis.paused) {
           window.speechSynthesis.resume();
         } else {
-          VoiceEngine.speak("Welcome to Juno AI Deep-Dive Podcast! Today, Host Alex and Host Sarah analyze your research notes on deep learning, neural networks, and distributed systems.");
+          VoiceEngine.speak("Welcome to Milo Deep-Dive Podcast! Today, Host Alex and Host Sarah analyze your research notes on deep learning, neural networks, and distributed systems.");
         }
       } else if (typeof SoundEngine !== 'undefined' && SoundEngine.playBeep) {
         SoundEngine.playBeep(440, 'sine', 0.5);
@@ -3471,7 +3471,7 @@
         deferredPWAInstallPrompt.prompt();
         const { outcome } = await deferredPWAInstallPrompt.userChoice;
         if (outcome === 'accepted') {
-          showToast('Thank you for installing Juno AI App! 🎉');
+          showToast('Thank you for installing Milo App! 🎉');
         }
         deferredPWAInstallPrompt = null;
       } else {
@@ -3713,8 +3713,8 @@
 
     window.handleModelChange = function(modelVal) {
       const names = {
-        'juno-flash': '✨ Juno Ultra Flash',
-        'juno-pro': '🧠 Juno Deep Reasoning',
+        'juno-flash': '✨ Milo Ultra Flash',
+        'juno-pro': '🧠 Milo Deep Reasoning',
         'agentic-architect': '⚡ Agentic System Architect & Code Generator',
         'deep-research': '🔮 Deep Research & Vault Synthesizer',
         'juno-rag': '🔒 Local Vault RAG (100% On-Device)'
@@ -3836,7 +3836,7 @@
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPWAInstallPrompt = e;
-      console.log('📱 Juno AI PWA install prompt captured!');
+      console.log('📱 Milo PWA install prompt captured!');
     });
 
     window.triggerPWAInstall = function() {
@@ -3844,13 +3844,13 @@
         deferredPWAInstallPrompt.prompt();
         deferredPWAInstallPrompt.userChoice.then((choiceResult) => {
           if (choiceResult.outcome === 'accepted') {
-            if (typeof showToast === 'function') showToast('📱 Installing Juno AI on home screen...');
+            if (typeof showToast === 'function') showToast('📱 Installing Milo on home screen...');
           }
           deferredPWAInstallPrompt = null;
         });
       } else {
         if (typeof showToast === 'function') {
-          showToast('📱 To install Juno AI: tap your browser menu (⋮ or Share) and select "Add to Home Screen"');
+          showToast('📱 To install Milo: tap your browser menu (⋮ or Share) and select "Add to Home Screen"');
         }
       }
     };
