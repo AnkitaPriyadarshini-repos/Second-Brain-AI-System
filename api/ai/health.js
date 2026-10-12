@@ -33,6 +33,7 @@ export default function handler(req, res) {
     vercelGitCommitSha: process.env.VERCEL_GIT_COMMIT_SHA || 'unknown',
     vercelDeploymentId: process.env.VERCEL_DEPLOYMENT_ID || 'unknown',
     vercelRegion: process.env.VERCEL_REGION || 'unknown',
+    vercelProjectId: process.env.VERCEL_PROJECT_ID || 'unknown',
     vercelProjectName: process.env.VERCEL_PROJECT_NAME || 'unknown',
     vercelProjectProductionUrl: process.env.VERCEL_PROJECT_PRODUCTION_URL || 'unknown'
   };
