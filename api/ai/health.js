@@ -2,14 +2,27 @@
 // Never return environment-variable names, secret lengths, deployment metadata,
 // model configuration, or raw provider error details from a public health route.
 function getApiKey() {
-  return (
+  const direct = (
     process.env.JUNO_GEMINI_KEY ||
     process.env.GEMINI_API_KEY ||
     process.env.GOOGLE_API_KEY ||
     process.env.GOOGLE_GEMINI_API_KEY ||
     process.env.GEMINI_KEY ||
     ''
-  ).trim();
+  ).trim().replace(/^["']|["']$/g, '');
+
+  if (direct) return direct;
+
+  if (process.env && typeof process.env === 'object') {
+    for (const [key, value] of Object.entries(process.env)) {
+      if (typeof value === 'string' && /(?:gemini|juno|google).*key/i.test(key)) {
+        const cleaned = value.trim().replace(/^["']|["']$/g, '');
+        if (cleaned.length > 10) return cleaned;
+      }
+    }
+  }
+
+  return '';
 }
 
 export default function handler(req, res) {

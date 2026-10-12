@@ -84,8 +84,33 @@ class AIGatewayService {
     return complex ? 'gemini-2.0-flash' : 'gemini-1.5-flash';
   }
 
+  getApiKey(apiKey) {
+    if (apiKey && typeof apiKey === 'string') {
+      const clean = apiKey.trim().replace(/^["']|["']$/g, '');
+      if (clean) return clean;
+    }
+    const direct = (
+      process.env.JUNO_GEMINI_KEY ||
+      process.env.GEMINI_API_KEY ||
+      process.env.GOOGLE_API_KEY ||
+      process.env.GOOGLE_GEMINI_API_KEY ||
+      process.env.GEMINI_KEY ||
+      ''
+    ).trim().replace(/^["']|["']$/g, '');
+    if (direct) return direct;
+    if (process.env && typeof process.env === 'object') {
+      for (const [key, value] of Object.entries(process.env)) {
+        if (typeof value === 'string' && /(?:gemini|juno|google).*key/i.test(key)) {
+          const cleaned = value.trim().replace(/^["']|["']$/g, '');
+          if (cleaned.length > 10) return cleaned;
+        }
+      }
+    }
+    return '';
+  }
+
   async invokeGeminiAPI({ prompt, contextSnippets, history = [], model, apiKey }) {
-    const geminiKey = apiKey || process.env.GEMINI_API_KEY;
+    const geminiKey = this.getApiKey(apiKey);
     if (!geminiKey) return null;
     const selectedModel = this.selectModel(model, prompt);
     const endpointUrl = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${encodeURIComponent(geminiKey)}`;

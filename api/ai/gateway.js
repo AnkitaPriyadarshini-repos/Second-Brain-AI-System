@@ -230,6 +230,30 @@ async function callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey
   }
 }
 
+function getApiKey() {
+  const direct = (
+    process.env.JUNO_GEMINI_KEY ||
+    process.env.GEMINI_API_KEY ||
+    process.env.GOOGLE_API_KEY ||
+    process.env.GOOGLE_GEMINI_API_KEY ||
+    process.env.GEMINI_KEY ||
+    ''
+  ).trim().replace(/^["']|["']$/g, '');
+
+  if (direct) return direct;
+
+  if (process.env && typeof process.env === 'object') {
+    for (const [key, value] of Object.entries(process.env)) {
+      if (typeof value === 'string' && /(?:gemini|juno|google).*key/i.test(key)) {
+        const cleaned = value.trim().replace(/^["']|["']$/g, '');
+        if (cleaned.length > 10) return cleaned;
+      }
+    }
+  }
+
+  return '';
+}
+
 export default async function handler(req, res) {
   const requestId = `juno_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`;
   const startedAt = Date.now();
@@ -255,14 +279,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const apiKey = (
-    process.env.JUNO_GEMINI_KEY ||
-    process.env.GEMINI_API_KEY ||
-    process.env.GOOGLE_API_KEY ||
-    process.env.GOOGLE_GEMINI_API_KEY ||
-    process.env.GEMINI_KEY ||
-    ''
-  ).trim();
+  const apiKey = getApiKey();
   if (!apiKey) {
     return res.status(503).json({
       success: false,
