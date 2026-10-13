@@ -133,6 +133,14 @@ nextApp.prepare().then(() => {
     const ingestHandler = require('./api/ingest/url');
     return ingestHandler(req, res);
   });
+  app.post('/api/media/image', (req, res) => {
+    const imageHandler = require('./api/media/image');
+    return imageHandler(req, res);
+  });
+  app.post('/api/media/video', (req, res) => {
+    const videoHandler = require('./api/media/video');
+    return videoHandler(req, res);
+  });
   app.post('/api/share', (req, res) => shareController.createShareLink(req, res));
   app.get('/api/share/:id', (req, res) => shareController.getShareLink(req, res));
 

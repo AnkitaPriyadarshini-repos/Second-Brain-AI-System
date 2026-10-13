@@ -175,11 +175,17 @@
       const viewAliasMap = {
         'chat': 'jarvis',
         'ask': 'jarvis',
+        'create': 'create',
+        'studio': 'create',
+        'media': 'create',
+        'code': 'code',
+        'diff': 'code',
         'search': 'vault',
         'notes': 'capture',
         'library': 'vault',
         'memories': 'resurfacing',
         'learn': 'flashcards',
+        'agent': 'agents',
         'agents': 'agents',
         'research': 'agents',
         'tasks': 'goals',
@@ -227,6 +233,14 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
 
+      if (canonicalView === 'create' && window.MiloCreateStudio) {
+        window.MiloCreateStudio.init();
+      } else if (canonicalView === 'code' && window.MiloDiffCodingAgent) {
+        window.MiloDiffCodingAgent.init();
+      } else if (canonicalView === 'agents' && window.MiloAutonomousAgent) {
+        window.MiloAutonomousAgent.init();
+      }
+
       if (canonicalView === 'graph' && typeof GraphVisualizer !== 'undefined') {
         setTimeout(() => {
           const graphCanvas = document.getElementById('graph-canvas');
@@ -251,6 +265,58 @@
 
     window.activateView = activateView;
     window.applyTheme = applyTheme;
+
+    // Milo Workspace Studio, Diff-Coding, and Autonomous Agent Bridges
+    window.switchStudioTab = function(tab) {
+      if (window.MiloCreateStudio && typeof window.MiloCreateStudio.switchTab === 'function') {
+        window.MiloCreateStudio.switchTab(tab);
+      }
+    };
+    window.triggerStudioImageGeneration = function() {
+      if (window.MiloCreateStudio && typeof window.MiloCreateStudio.generateImageFromStudio === 'function') {
+        window.MiloCreateStudio.generateImageFromStudio();
+      }
+    };
+    window.triggerStudioVideoRender = function() {
+      if (window.MiloCreateStudio && typeof window.MiloCreateStudio.renderVideoFromStudio === 'function') {
+        window.MiloCreateStudio.renderVideoFromStudio();
+      }
+    };
+    window.refreshStudioGallery = function() {
+      if (window.MiloCreateStudio && typeof window.MiloCreateStudio.renderGallery === 'function') {
+        window.MiloCreateStudio.renderGallery();
+      }
+    };
+    window.triggerCodingInspection = function() {
+      if (window.MiloDiffCodingAgent && typeof window.MiloDiffCodingAgent.startInspection === 'function') {
+        window.MiloDiffCodingAgent.startInspection();
+      }
+    };
+    window.approveAndApplyCodePatch = function() {
+      if (window.MiloDiffCodingAgent && typeof window.MiloDiffCodingAgent.approveAndApplyPatch === 'function') {
+        window.MiloDiffCodingAgent.approveAndApplyPatch();
+      }
+    };
+    window.rejectCodePatch = function() {
+      if (window.MiloDiffCodingAgent && typeof window.MiloDiffCodingAgent.rejectPatch === 'function') {
+        window.MiloDiffCodingAgent.rejectPatch();
+      }
+    };
+    window.loadSampleCodeProject = function() {
+      if (window.MiloDiffCodingAgent && typeof window.MiloDiffCodingAgent.loadSampleProject === 'function') {
+        window.MiloDiffCodingAgent.loadSampleProject();
+      }
+    };
+    window.triggerAutonomousMission = function() {
+      if (window.MiloAutonomousAgent && typeof window.MiloAutonomousAgent.startMission === 'function') {
+        window.MiloAutonomousAgent.startMission();
+      }
+    };
+    window.stopAutonomousAgent = function() {
+      if (window.MiloAutonomousAgent && typeof window.MiloAutonomousAgent.stopMission === 'function') {
+        window.MiloAutonomousAgent.stopMission();
+      }
+    };
 
     window.triggerBeeGreeting = function() {
       const bubble = document.getElementById('bee-speech-bubble');

@@ -244,8 +244,95 @@
       return true;
     }
 
-    // Check for Specialized Agent Execution or Slash Commands (/code, /learn, /study, /write, /research, /organize)
+    // Match any leading slash command (/image, /draw, /code, /research, etc.)
     const slashMatch = prompt.match(/^\/([a-zA-Z]+)(?:\s+(.*))?$/);
+
+    // Check for Image Creation Request (Natural Language or Slash Command /image, /draw)
+    const isImageCommand = slashMatch && (slashMatch[1].toLowerCase() === 'image' || slashMatch[1].toLowerCase() === 'draw');
+    const isNaturalImageRequest = (
+      /^(?:create|generate|make|draw|paint|render)\s+(?:an?\s+)?(?:image|picture|photo|illustration|drawing|artwork|background|wallpaper|avatar|mascot|logo|render|graphic)\b/i.test(prompt) ||
+      /(?:draw a|draw an|generate an image of|generate a picture of|create an image of|make an illustration of)\b/i.test(prompt)
+    );
+
+    if (isImageCommand || isNaturalImageRequest) {
+      let imagePrompt = '';
+      if (isImageCommand) {
+        imagePrompt = (slashMatch[2] || '').trim();
+      } else {
+        imagePrompt = prompt
+          .replace(/^(?:please\s+)?(?:can you\s+)?(?:create|generate|make|draw|paint|render)\s+(?:an?\s+)?(?:image|picture|photo|illustration|drawing|artwork|background|wallpaper|avatar|mascot|logo|render|graphic)\s*(?:of|for|with)?\s*/i, '')
+          .replace(/^(?:draw a|draw an|generate an image of|generate a picture of|create an image of|make an illustration of)\s*/i, '')
+          .trim();
+      }
+      if (!imagePrompt) imagePrompt = prompt;
+
+      replaceMessage(thinking, `🎨 **Milo Image Studio Active**\n\n*Synthesizing visual concepts for "${escapeHTML(imagePrompt)}"...*`);
+      if (typeof MiloCompanion !== 'undefined') {
+        MiloCompanion.setGlobalState('thinking', 'Synthesizing visual concepts…');
+      }
+
+      try {
+        let mediaItem = null;
+        if (typeof window !== 'undefined' && window.MiloCreateStudio) {
+          mediaItem = await window.MiloCreateStudio.generateImage({ prompt: imagePrompt, style: 'cinematic', aspectRatio: '1:1' });
+        } else {
+          const res = await fetch('/api/media/image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: imagePrompt, aspectRatio: '1:1' })
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data.success || !data.imageUrl) throw new Error(data.error || 'Image generation failed');
+          mediaItem = {
+            id: `img_${Date.now()}`,
+            url: data.imageUrl,
+            prompt: imagePrompt,
+            provider: data.provider || 'Milo Image Studio',
+            aspectRatio: data.aspectRatio || '1:1',
+            dimensions: data.dimensions || { width: 1024, height: 1024 }
+          };
+        }
+
+        const cardHTML = `
+<div class="chat-generated-media-card" data-inline-media="true" style="margin-top: 12px; background: rgba(15, 23, 42, 0.85); border: 1px solid #1E293B; border-radius: 14px; overflow: hidden; max-width: 480px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);">
+  <div style="position: relative; overflow: hidden; background: #000; text-align: center;">
+    <img src="${mediaItem.url}" alt="${escapeHTML(imagePrompt)}" style="width: 100%; height: auto; max-height: 420px; object-fit: contain; display: block; cursor: pointer; transition: transform 0.2s ease;" onclick="window.open('${mediaItem.url}', '_blank')" />
+  </div>
+  <div style="padding: 12px 14px; background: rgba(11, 15, 25, 0.95);">
+    <div style="font-size: 13px; font-weight: 600; color: #F1F5F9; line-height: 1.4; margin-bottom: 8px;">🎨 ${escapeHTML(imagePrompt)}</div>
+    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;">
+      <span style="font-size: 11px; padding: 2px 8px; border-radius: 6px; background: rgba(56, 189, 248, 0.15); color: #38BDF8; font-weight: 500;">${escapeHTML(mediaItem.provider)}</span>
+      <span style="font-size: 11px; padding: 2px 8px; border-radius: 6px; background: rgba(148, 163, 184, 0.15); color: #94A3B8;">${escapeHTML(mediaItem.aspectRatio || '1:1')}</span>
+      <span style="font-size: 11px; padding: 2px 8px; border-radius: 6px; background: rgba(16, 185, 129, 0.15); color: #10B981;">100% Complete</span>
+    </div>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <a href="${mediaItem.url}" download="milo_image_${Date.now()}.jpg" target="_blank" style="text-decoration: none; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 8px; background: #00F2FE; color: #090D16; display: inline-flex; align-items: center; gap: 4px;">📥 Download</a>
+      <button type="button" onclick="window.activateView && window.activateView('create')" style="font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #F1F5F9; cursor: pointer;">✨ Open in Studio</button>
+      <button type="button" onclick="window.submitRAGQuery && window.submitRAGQuery('/image ' + '${escapeHTML(imagePrompt).replace(/'/g, "\\'")}')" style="font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #F1F5F9; cursor: pointer;">🔄 Regenerate</button>
+    </div>
+  </div>
+</div>`;
+
+        replaceMessage(thinking, cardHTML);
+        saveTurn(prompt, `[Image Generated: ${imagePrompt}]`);
+        setBusy(false);
+        window.isAIProcessing = false;
+        if (typeof MiloCompanion !== 'undefined') {
+          MiloCompanion.setGlobalState('happy', 'Here is your created image!');
+          setTimeout(() => MiloCompanion.setGlobalState('idle'), 3500);
+        }
+        focusComposer();
+        return true;
+      } catch (imgErr) {
+        replaceMessage(thinking, `⚠️ **Image Studio Notice**: ${imgErr.message}\n\n*Make sure an image provider is configured or test via the Create Studio.*`);
+        setBusy(false);
+        window.isAIProcessing = false;
+        focusComposer();
+        return false;
+      }
+    }
+
+    // Check for Specialized Agent Execution or Slash Commands (/code, /learn, /study, /write, /research, /organize)
     if (slashMatch) {
       const command = slashMatch[1].toLowerCase();
       const taskPrompt = (slashMatch[2] || '').trim();

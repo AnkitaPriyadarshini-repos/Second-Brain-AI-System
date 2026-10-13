@@ -31,6 +31,10 @@ const ASSETS_TO_CACHE = [
   './js/artifacts-engine.js?v=1.0',
   './js/agent-system.js?v=1.0',
   './js/deep-research-engine.js?v=1.0',
+  './js/create-studio.js?v=1.0',
+  './js/diff-coding-agent.js?v=1.0',
+  './js/autonomous-agent.js?v=1.0',
+  './css/milo-workspace-studio.css?v=1.0',
   './assets/nexus_yellow_bot.png',
   './manifest.json'
 ];

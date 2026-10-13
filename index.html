@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="css/responsive.css?v=58.0">
   <link rel="stylesheet" href="css/websocket-chat.css?v=58.0">
   <link rel="stylesheet" href="css/adaptive-fusion.css?v=1.0">
+  <link rel="stylesheet" href="css/milo-workspace-studio.css?v=1.0">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0B0F19">
 </head>
@@ -63,9 +64,19 @@
             <span>Chat</span>
           </button>
 
-          <button class="sidebar-menu-item" data-view="search" onclick="window.openSearchChatsModal()" title="Search Past Conversations">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <span>Conversations</span>
+          <button class="sidebar-menu-item" data-view="create" onclick="window.activateView('create')" title="Image & Video Studio">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>Create</span>
+          </button>
+
+          <button class="sidebar-menu-item" data-view="code" onclick="window.activateView('code')" title="Diff-First Coding Agent">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>Code</span>
+          </button>
+
+          <button class="sidebar-menu-item" data-view="agents" onclick="window.activateView('agents')" title="Autonomous Agent Mode & Specialized AI Fleet">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>
+            <span>Agent</span>
           </button>
 
           <button class="sidebar-menu-item" data-view="vault" onclick="window.activateView('vault')" title="Memory, Notes & Knowledge Base">
@@ -73,9 +84,9 @@
             <span>Memory &amp; Knowledge</span>
           </button>
 
-          <button class="sidebar-menu-item" data-view="agents" onclick="window.activateView('agents')" title="Specialized AI Working Agents Fleet">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>
-            <span>Agents</span>
+          <button class="sidebar-menu-item" data-view="search" onclick="window.openSearchChatsModal()" title="Search Past Conversations">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <span>Conversations</span>
           </button>
 
           <button class="sidebar-menu-item" data-view="settings" onclick="window.activateView('settings')" title="Preferences & Account Settings">
@@ -115,6 +126,14 @@
         <button class="drawer-nav-item" onclick="window.activateView('jarvis'); window.toggleMobileDrawer(false);">
           <span class="nav-icon">💬</span>
           <span>Chat</span>
+        </button>
+        <button class="drawer-nav-item" onclick="window.activateView('create'); window.toggleMobileDrawer(false);">
+          <span class="nav-icon">✨</span>
+          <span>Create Studio</span>
+        </button>
+        <button class="drawer-nav-item" onclick="window.activateView('code'); window.toggleMobileDrawer(false);">
+          <span class="nav-icon">💻</span>
+          <span>Code Agent</span>
         </button>
         <button class="drawer-nav-item" onclick="window.openSearchChatsModal(); window.toggleMobileDrawer(false);">
           <span class="nav-icon">🔍</span>
@@ -298,6 +317,288 @@
     </button>
   </section>
 
+
+    <!-- View: Milo Create Studio (Image & Video) -->
+    <section id="view-create" class="view-section" aria-label="Milo Create Studio" style="display: none;">
+      <div class="workspace-wrapper">
+        <div class="workspace-header">
+          <div class="workspace-title-row">
+            <div>
+              <h1 class="workspace-headline">
+                <span>✨ Milo Create Studio</span>
+              </h1>
+              <p class="workspace-subtext">
+                Generate high-resolution visual artwork, edit existing images, and synthesize temporal videos in a unified workspace.
+              </p>
+            </div>
+            <div class="workspace-tabs" role="tablist">
+              <button id="studio-tab-image" class="workspace-tab-btn active" onclick="window.switchStudioTab('image')">🖼️ Image Studio</button>
+              <button id="studio-tab-video" class="workspace-tab-btn" onclick="window.switchStudioTab('video')">🎬 Video Studio</button>
+              <button id="studio-tab-gallery" class="workspace-tab-btn" onclick="window.switchStudioTab('gallery')">📁 Media Gallery (<span id="gallery-count-badge">0</span>)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 1: Image Studio -->
+        <div id="studio-panel-image">
+          <div class="studio-layout-grid">
+            <div class="studio-control-card">
+              <div class="studio-form-group">
+                <label class="studio-label" for="studio-image-prompt">Image Prompt</label>
+                <textarea id="studio-image-prompt" class="studio-textarea" placeholder="A futuristic research workspace with glowing cyan holographic terminals, dark obsidian walls, cinematic lighting, 8k masterpiece..."></textarea>
+              </div>
+
+              <div class="studio-form-group">
+                <label class="studio-label" for="studio-image-negative">Negative Prompt (Optional)</label>
+                <input type="text" id="studio-image-negative" class="studio-textarea" style="min-height: auto; height: 38px;" placeholder="blurry, distorted, low quality, watermark, grain" />
+              </div>
+
+              <div class="studio-form-group">
+                <label class="studio-label">Visual Style</label>
+                <div class="studio-pill-group" id="studio-style-pills">
+                  <button type="button" class="studio-pill-btn active" data-style="cinematic">Cinematic</button>
+                  <button type="button" class="studio-pill-btn" data-style="photorealistic">Photorealistic</button>
+                  <button type="button" class="studio-pill-btn" data-style="anime">Anime Art</button>
+                  <button type="button" class="studio-pill-btn" data-style="digital-art">Digital Art</button>
+                  <button type="button" class="studio-pill-btn" data-style="3d-render">3D Render</button>
+                  <button type="button" class="studio-pill-btn" data-style="minimalist">Minimalist</button>
+                </div>
+              </div>
+
+              <div class="studio-form-group">
+                <label class="studio-label">Aspect Ratio</label>
+                <div class="studio-pill-group" id="studio-ratio-pills">
+                  <button type="button" class="studio-pill-btn active" data-ratio="1:1">1:1 Square</button>
+                  <button type="button" class="studio-pill-btn" data-ratio="16:9">16:9 Landscape</button>
+                  <button type="button" class="studio-pill-btn" data-ratio="9:16">9:16 Portrait</button>
+                  <button type="button" class="studio-pill-btn" data-ratio="4:3">4:3 Standard</button>
+                </div>
+              </div>
+
+              <div class="studio-form-group">
+                <label class="studio-label">Provider</label>
+                <select id="studio-provider-select" class="studio-textarea" style="min-height: auto; height: 38px;">
+                  <option value="auto">✨ Auto (Flux / Imagen)</option>
+                  <option value="pollinations">Pollinations Flux (Public Fast GPU)</option>
+                  <option value="imagen">Gemini Imagen 3</option>
+                </select>
+              </div>
+
+              <div class="studio-form-group">
+                <label class="studio-label">Reference Image (Image-to-Image)</label>
+                <div id="studio-image-dropzone" style="border: 1px dashed rgba(255,255,255,0.15); border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; background: rgba(2,6,23,0.4);" onclick="document.getElementById('studio-image-file-input').click()">
+                  <span id="studio-dropzone-text" style="font-size: 12px; color: #94A3B8;">📷 Click or drag reference image</span>
+                  <input type="file" id="studio-image-file-input" accept="image/*" style="display: none;" onchange="window.handleStudioReferenceImage(event)" />
+                  <div id="studio-reference-preview" style="display: none; margin-top: 8px;">
+                    <img id="studio-reference-thumb" src="" alt="Reference" style="max-height: 80px; border-radius: 6px;" />
+                    <button type="button" onclick="event.stopPropagation(); window.clearStudioReferenceImage()" style="margin-left: 8px; font-size: 11px; background: rgba(239,68,68,0.2); color: #EF4444; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer;">Remove</button>
+                  </div>
+                </div>
+              </div>
+
+              <button id="studio-generate-image-btn" class="studio-btn-primary" onclick="window.triggerStudioImageGeneration()">
+                <span>✨ Generate Artwork</span>
+              </button>
+            </div>
+
+            <!-- Preview Card -->
+            <div class="studio-preview-card">
+              <div class="studio-viewport-area" id="studio-image-viewport">
+                <div class="studio-empty-state" id="studio-image-empty-state">
+                  <div style="font-size: 38px; margin-bottom: 12px;">🎨</div>
+                  <h3 style="color: #F1F5F9; font-size: 16px; margin: 0 0 6px 0;">No Artwork Generated Yet</h3>
+                  <p style="margin: 0; font-size: 13px;">Describe a scene and click Generate Artwork to synthesize visual concepts.</p>
+                </div>
+                <img id="studio-image-result" class="studio-active-img" style="display: none;" alt="Generated Result" />
+                <div id="studio-image-loading-state" style="display: none; text-align: center; color: #00F2FE;">
+                  <div class="spinner" style="margin: 0 auto 16px auto; width: 44px; height: 44px; border: 3px solid rgba(0,242,254,0.2); border-top-color: #00F2FE; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                  <div style="font-weight: 700; font-size: 15px;">Synthesizing Visual Concepts...</div>
+                  <div style="font-size: 12px; color: #94A3B8; margin-top: 4px;">Running latent diffusion pipeline</div>
+                </div>
+              </div>
+              <div class="studio-action-toolbar" id="studio-image-toolbar" style="display: none;">
+                <div id="studio-image-meta-info" style="font-size: 12px; color: #94A3B8;"></div>
+                <div style="display: flex; gap: 8px;">
+                  <button type="button" class="btn btn-secondary" onclick="window.downloadStudioImage()" style="font-size: 12px; padding: 6px 12px;">📥 Download</button>
+                  <button type="button" class="btn btn-secondary" onclick="window.createImageVariation()" style="font-size: 12px; padding: 6px 12px;">🔄 Variation</button>
+                  <button type="button" class="btn btn-primary" onclick="window.sendStudioImageToChat()" style="font-size: 12px; padding: 6px 12px;">💬 Send to Chat</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 2: Video Studio -->
+        <div id="studio-panel-video" style="display: none;">
+          <div class="studio-layout-grid">
+            <div class="studio-control-card">
+              <div class="studio-form-group">
+                <label class="studio-label" for="studio-video-prompt">Video Scene &amp; Motion Prompt</label>
+                <textarea id="studio-video-prompt" class="studio-textarea" placeholder="Cinematic drone sweep across a neon-lit cyberpunk metropolis, rain reflections on asphalt, smooth 60fps camera tracking..."></textarea>
+              </div>
+
+              <div class="studio-form-group">
+                <label class="studio-label">Duration</label>
+                <div class="studio-pill-group" id="studio-video-duration-pills">
+                  <button type="button" class="studio-pill-btn active" data-duration="5">5 Seconds</button>
+                  <button type="button" class="studio-pill-btn" data-duration="3">3 Seconds</button>
+                </div>
+              </div>
+
+              <div class="studio-form-group">
+                <label class="studio-label">Aspect Ratio</label>
+                <div class="studio-pill-group" id="studio-video-ratio-pills">
+                  <button type="button" class="studio-pill-btn active" data-ratio="16:9">16:9 Widescreen</button>
+                  <button type="button" class="studio-pill-btn" data-ratio="9:16">9:16 Reel/Short</button>
+                  <button type="button" class="studio-pill-btn" data-ratio="1:1">1:1 Square</button>
+                </div>
+              </div>
+
+              <div class="studio-form-group">
+                <label class="studio-label" for="studio-motion-slider">Motion Strength: <span id="studio-motion-val">5</span>/10</label>
+                <input type="range" id="studio-motion-slider" min="1" max="10" value="5" style="width: 100%; accent-color: #00F2FE;" oninput="document.getElementById('studio-motion-val').textContent = this.value" />
+              </div>
+
+              <button id="studio-render-video-btn" class="studio-btn-primary" onclick="window.triggerStudioVideoRender()">
+                <span>🎬 Render Video</span>
+              </button>
+            </div>
+
+            <!-- Video Preview Card -->
+            <div class="studio-preview-card">
+              <div class="studio-viewport-area" id="studio-video-viewport">
+                <div class="studio-empty-state" id="studio-video-empty-state">
+                  <div style="font-size: 38px; margin-bottom: 12px;">🎬</div>
+                  <h3 style="color: #F1F5F9; font-size: 16px; margin: 0 0 6px 0;">No Video Rendered Yet</h3>
+                  <p style="margin: 0; font-size: 13px;">Describe camera motion, duration, and scene parameters to begin rendering.</p>
+                </div>
+
+                <div id="studio-video-progress-card" style="display: none; width: 80%; max-width: 420px; background: rgba(15,23,42,0.9); border: 1px solid rgba(0,242,254,0.3); border-radius: 14px; padding: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                  <div style="font-weight: 700; color: #F1F5F9; margin-bottom: 8px;" id="studio-video-step-text">Allocating GPU pipeline...</div>
+                  <div style="background: rgba(2,6,23,0.8); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px;">
+                    <div id="studio-video-progress-bar" style="background: linear-gradient(90deg, #00F2FE, #38BDF8); width: 15%; height: 100%; transition: width 0.4s ease;"></div>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; font-size: 12px; color: #94A3B8; margin-bottom: 16px;">
+                    <span id="studio-video-progress-pct">15% Complete</span>
+                    <span id="studio-video-job-id">Job: ...</span>
+                  </div>
+                  <button type="button" class="btn btn-secondary" onclick="window.cancelActiveVideoJob()" style="font-size: 12px; padding: 6px 14px; background: rgba(239,68,68,0.15); color: #EF4444; border-color: rgba(239,68,68,0.3);">⏹️ Cancel Job</button>
+                </div>
+
+                <video id="studio-video-player" controls autoplay loop playsinline style="display: none; max-width: 100%; max-height: 520px; border-radius: 10px;"></video>
+              </div>
+
+              <div class="studio-action-toolbar" id="studio-video-toolbar" style="display: none;">
+                <div id="studio-video-meta-info" style="font-size: 12px; color: #94A3B8;"></div>
+                <div style="display: flex; gap: 8px;">
+                  <button type="button" class="btn btn-secondary" onclick="window.downloadStudioVideo()" style="font-size: 12px; padding: 6px 12px;">📥 Download MP4</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 3: Media Gallery -->
+        <div id="studio-panel-gallery" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+            <div class="workspace-tabs" style="padding: 2px;">
+              <button class="workspace-tab-btn active" id="gallery-filter-all" onclick="window.filterGallery('all')">All Media</button>
+              <button class="workspace-tab-btn" id="gallery-filter-image" onclick="window.filterGallery('image')">Images</button>
+              <button class="workspace-tab-btn" id="gallery-filter-video" onclick="window.filterGallery('video')">Videos</button>
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="window.refreshStudioGallery()" style="font-size: 12px; padding: 6px 12px;">🔄 Refresh Gallery</button>
+          </div>
+          <div id="studio-gallery-container" class="gallery-grid">
+            <!-- Rendered dynamically from IndexedDB -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- View: Milo Code (Diff-First Coding Agent) -->
+    <section id="view-code" class="view-section" aria-label="Milo Diff-First Code Agent" style="display: none;">
+      <div class="workspace-wrapper">
+        <div class="workspace-header">
+          <div class="workspace-title-row">
+            <div>
+              <h1 class="workspace-headline">
+                <span>💻 Milo Code — Diff-First Coding Agent</span>
+              </h1>
+              <p class="workspace-subtext">
+                Inspect first. Propose a plan. Show the diff. Ask for approval. Then apply only the approved changes.
+              </p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" class="btn btn-secondary" onclick="window.loadCodingTemplate('default')" style="font-size: 12px; padding: 6px 14px;">📂 Sample Project</button>
+              <button type="button" class="btn btn-secondary" onclick="window.rollbackCodingAgent()" style="font-size: 12px; padding: 6px 14px;" title="Rollback to previous snapshot">↺ Rollback</button>
+              <button type="button" class="btn btn-secondary" onclick="window.downloadGitPatch()" style="font-size: 12px; padding: 6px 14px;">📥 Export .patch</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="coding-layout-grid">
+          <!-- VFS File Tree -->
+          <div class="vfs-tree-card">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #94A3B8; letter-spacing: 0.05em; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+              <span>Workspace Files</span>
+              <span id="vfs-file-count" style="color: #00F2FE;">3</span>
+            </div>
+            <div id="vfs-file-list" style="display: flex; flex-direction: column; gap: 4px;">
+              <!-- File items populated dynamically -->
+            </div>
+          </div>
+
+          <!-- Diff & Workspace Center -->
+          <div class="diff-workspace-card">
+            <div class="diff-task-header">
+              <label class="studio-label" for="code-task-input">Coding Task / Bugfix Prompt</label>
+              <div style="display: flex; gap: 10px; align-items: flex-start;">
+                <textarea id="code-task-input" class="studio-textarea" style="min-height: 52px; height: 52px;" placeholder="e.g. Fix null-pointer in session auth token, or add reset() method to rate limiter..."></textarea>
+                <button type="button" class="studio-btn-primary" style="width: auto; min-width: 140px; height: 52px;" onclick="window.triggerCodingInspection()">
+                  <span>⚡ Inspect &amp; Plan</span>
+                </button>
+              </div>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px;">
+                <button type="button" class="studio-pill-btn" onclick="document.getElementById('code-task-input').value = 'Fix null check in auth token'; window.triggerCodingInspection()">Fix null check in auth token</button>
+                <button type="button" class="studio-pill-btn" onclick="document.getElementById('code-task-input').value = 'Add reset() method to rate limiter'; window.triggerCodingInspection()">Add reset() method to rate limiter</button>
+              </div>
+            </div>
+
+            <!-- Diff Review Container -->
+            <div id="diff-review-container" style="display: none;">
+              <div class="diff-review-banner">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                    <strong id="diff-target-filename" style="color: #F1F5F9; font-family: 'Fira Code', monospace; font-size: 14px;">src/session/auth.js</strong>
+                    <span id="diff-tag-add-badge" class="diff-tag-add">+0</span>
+                    <span id="diff-tag-del-badge" class="diff-tag-del">-0</span>
+                  </div>
+                  <div id="diff-plan-explanation" style="font-size: 13px; color: #94A3B8;">Reviewing proposed patch...</div>
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                  <button type="button" class="btn btn-primary" onclick="window.approveAndApplyCodePatch()" style="background: #10B981; color: #000; font-weight: 700; font-size: 13px; padding: 8px 16px;">✅ Approve &amp; Apply</button>
+                  <button type="button" class="btn btn-secondary" onclick="window.rejectCodePatch()" style="background: rgba(239,68,68,0.15); color: #EF4444; border-color: rgba(239,68,68,0.3); font-size: 13px; padding: 8px 16px;">❌ Reject</button>
+                </div>
+              </div>
+
+              <div id="diff-view-lines" class="diff-view-pane">
+                <!-- Rendered unified diff lines -->
+              </div>
+            </div>
+
+            <!-- Standard File Viewer when not diffing -->
+            <div id="code-file-viewer-container">
+              <div style="padding: 10px 18px; background: rgba(2,6,23,0.9); border-bottom: 1px solid rgba(255,255,255,0.06); font-family: 'Fira Code', monospace; font-size: 12px; color: #94A3B8; display: flex; justify-content: space-between;">
+                <span id="code-active-filename">src/session/auth.js</span>
+                <span style="color: #10B981;">Clean / Unmodified</span>
+              </div>
+              <pre id="code-viewer-content" style="margin: 0; padding: 16px; font-family: 'Fira Code', monospace; font-size: 13px; color: #E2E8F0; line-height: 1.6; background: #020617; max-height: 480px; overflow-y: auto;"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- View 2: Multi-Surface Capture Hub -->
     <section id="view-capture" class="view-section" aria-label="Multi-Surface Capture Hub">
@@ -696,6 +997,58 @@
 
     <!-- View 7: AI Working Agents Fleet Hub -->
     <section id="view-agents" class="view-section" aria-label="AI Working Agents Fleet Hub">
+      <!-- Autonomous Agent Mode Runner Panel -->
+      <div id="autonomous-agent-workspace" class="agent-runner-banner">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+          <div>
+            <h2 style="font-size: 20px; font-weight: 800; color: #F1F5F9; margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
+              <span>🤖 Autonomous Agent Mode</span>
+              <span id="autonomous-agent-status-badge" class="status-badge" style="background: rgba(0, 242, 254, 0.15); color: #00F2FE; border: 1px solid rgba(0, 242, 254, 0.3);">IDLE / READY</span>
+            </h2>
+            <p style="font-size: 13px; color: #94A3B8; margin: 0;">
+              Delegate bounded multi-step missions with a typed tool registry, visible planning, and approval gates for mutations.
+            </p>
+          </div>
+          <button id="autonomous-agent-stop-btn" type="button" class="btn btn-secondary" onclick="window.stopAutonomousAgent()" style="display: none; background: rgba(239, 68, 68, 0.15); color: #EF4444; border-color: rgba(239, 68, 68, 0.3); font-size: 13px; padding: 6px 16px;">⏹️ Stop Agent</button>
+        </div>
+
+        <!-- Task Input Bar -->
+        <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+          <input type="text" id="autonomous-agent-input" class="studio-textarea" style="min-height: auto; height: 46px;" placeholder="Describe a multi-step task for Milo (e.g., Inspect workspace for bugs & propose diff, Research 3 approaches for vector databases...)" />
+          <button type="button" id="autonomous-agent-run-btn" class="studio-btn-primary" style="width: auto; min-width: 130px; height: 46px;" onclick="window.triggerAutonomousMission()">
+            <span>⚡ Run Mission</span>
+          </button>
+        </div>
+
+        <!-- Mission Prompt Chips -->
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;">
+          <button type="button" class="studio-pill-btn" onclick="document.getElementById('autonomous-agent-input').value = 'Inspect workspace code and propose bugfix patch'; window.triggerAutonomousMission()">Inspect workspace code &amp; propose patch</button>
+          <button type="button" class="studio-pill-btn" onclick="document.getElementById('autonomous-agent-input').value = 'Research 3 approaches for vector databases and draft note'; window.triggerAutonomousMission()">Research vector databases &amp; save report</button>
+          <button type="button" class="studio-pill-btn" onclick="document.getElementById('autonomous-agent-input').value = 'Search knowledge vault and summarize recent concepts'; window.triggerAutonomousMission()">Search vault &amp; summarize concepts</button>
+        </div>
+
+        <!-- Pipeline Steps View -->
+        <div id="autonomous-agent-pipeline" class="agent-step-pipeline" style="display: none;">
+          <!-- Dynamically populated step cards -->
+        </div>
+
+        <!-- Approval Gate Banner -->
+        <div id="autonomous-agent-approval-gate" class="agent-approval-gate" style="display: none;">
+          <div>
+            <div style="font-weight: 700; color: #F59E0B; font-size: 14px; margin-bottom: 2px;">⚠️ Approval Required Before Mutation</div>
+            <div id="autonomous-agent-approval-text" style="font-size: 13px; color: #F1F5F9;">The agent wishes to execute an action. Please confirm to proceed.</div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-primary" onclick="window.confirmAgentApproval(true)" style="background: #10B981; color: #000; font-weight: 700; font-size: 12px; padding: 6px 14px;">✅ Approve Action</button>
+            <button type="button" class="btn btn-secondary" onclick="window.confirmAgentApproval(false)" style="background: rgba(239, 68, 68, 0.15); color: #EF4444; border-color: rgba(239, 68, 68, 0.3); font-size: 12px; padding: 6px 14px;">❌ Deny</button>
+          </div>
+        </div>
+
+        <!-- Execution Stream Log -->
+        <div id="autonomous-agent-console" class="agent-console-stream" style="display: none;">
+          <!-- Live step execution logs -->
+        </div>
+      </div>
       <div class="glass-card" style="margin-bottom: 24px;">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
           <div>
@@ -1544,6 +1897,9 @@
   <script src="js/artifacts-engine.js?v=1.0"></script>
   <script src="js/agent-system.js?v=1.0"></script>
   <script src="js/deep-research-engine.js?v=1.0"></script>
+  <script src="js/create-studio.js?v=1.0"></script>
+  <script src="js/diff-coding-agent.js?v=1.0"></script>
+  <script src="js/autonomous-agent.js?v=1.0"></script>
   <script src="js/pwa-installer.js?v=61.0"></script>
   <script src="js/nori-companion.js?v=65.0"></script>
   <script src="js/app.js?v=66.0"></script>
