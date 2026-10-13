@@ -449,7 +449,7 @@
 
   class OnyxInterfaceController {
     constructor() {
-      this.currentModel = 'gemini-2.5-flash';
+      this.currentModel = 'gemini-1.5-flash';
       this.currentSessionId = 'onyx_use_cases';
       this.activeAgent = 'support';
       this.activeProject = null;

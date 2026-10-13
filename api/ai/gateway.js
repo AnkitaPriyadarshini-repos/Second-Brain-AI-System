@@ -1,7 +1,7 @@
 import authGuard from '../auth-guard.js';
 
-const PRIMARY_MODEL = 'gemini-3.6-flash';
-const FAST_MODEL = 'gemini-3.5-flash-lite';
+const PRIMARY_MODEL = 'gemini-1.5-flash';
+const FAST_MODEL = 'gemini-1.5-flash';
 const MAX_CONTEXT = 9000;
 const MAX_HISTORY_ITEMS = 16;
 const MAX_MESSAGE = 12000;
@@ -16,19 +16,19 @@ const REQUEST_TIMEOUT_MS = 24_000;
 
 // Upstream model registry: maps requested/advertised tiers to active, verified Google Gemini endpoints
 const MODEL_REGISTRY = {
-  'gemini-2.5-flash': 'gemini-2.5-flash',
-  'gemini-2.0-flash': 'gemini-2.0-flash',
   'gemini-1.5-flash': 'gemini-1.5-flash',
   'gemini-1.5-pro': 'gemini-1.5-pro',
-  'gemini-3.6-flash': 'gemini-2.5-flash', // mapped alias for current primary tier
-  'gemini-3.5-flash-lite': 'gemini-2.0-flash', // mapped alias for current fast tier
-  'default': 'gemini-2.5-flash'
+  'gemini-2.0-flash': 'gemini-2.0-flash',
+  'gemini-2.5-flash': 'gemini-1.5-flash', // mapped alias to GA flash model
+  'gemini-3.6-flash': 'gemini-1.5-flash', // mapped alias for current primary tier
+  'gemini-3.5-flash-lite': 'gemini-1.5-flash', // mapped alias for current fast tier
+  'default': 'gemini-1.5-flash'
 };
 
 function resolveUpstreamModel(modelName) {
-  if (!modelName || typeof modelName !== 'string') return 'gemini-2.5-flash';
+  if (!modelName || typeof modelName !== 'string') return 'gemini-1.5-flash';
   const cleanName = modelName.trim().toLowerCase();
-  return MODEL_REGISTRY[cleanName] || 'gemini-2.5-flash';
+  return MODEL_REGISTRY[cleanName] || 'gemini-1.5-flash';
 }
 
 const rateBuckets = globalThis.__junoRateBuckets || new Map();
@@ -399,21 +399,23 @@ export default async function handler(req, res) {
 
     // If initial model returns 404/400 (unsupported on configured account), fallback to standard production models
     if (!result.response.ok && [400, 404].includes(result.response.status)) {
-      model = 'gemini-2.0-flash';
+      model = 'gemini-1.5-flash';
       result = await callGemini({ model, systemPrompt, contents, thinkingLevel: 'low', apiKey, requestId });
       if (!result.response.ok && [400, 404].includes(result.response.status)) {
-        model = 'gemini-1.5-flash';
+        model = 'gemini-1.5-pro';
         result = await callGemini({ model, systemPrompt, contents, thinkingLevel: 'low', apiKey, requestId });
       }
     }
 
     const { response, data } = result;
     if (!response.ok) {
-      // Record failure for circuit breaker
-      circuitBreaker.consecutiveFailures++;
-      if (circuitBreaker.consecutiveFailures >= circuitBreaker.threshold) {
-        circuitBreaker.cooldownUntil = Date.now() + circuitBreaker.cooldownDurationMs;
-        console.warn('[milo/gateway] Circuit breaker tripped for 15s due to repeated upstream 503/500 errors.');
+      // Record failure for circuit breaker only on upstream 5xx/overload outages
+      if ([500, 502, 503, 504].includes(response.status)) {
+        circuitBreaker.consecutiveFailures++;
+        if (circuitBreaker.consecutiveFailures >= circuitBreaker.threshold) {
+          circuitBreaker.cooldownUntil = Date.now() + circuitBreaker.cooldownDurationMs;
+          console.warn('[milo/gateway] Circuit breaker tripped for 15s due to repeated upstream 503/500 errors.');
+        }
       }
 
       const providerMessage = data?.error?.message || `Gemini returned HTTP ${response.status}`;
@@ -423,6 +425,8 @@ export default async function handler(req, res) {
         error: response.status === 429
           ? 'The AI service is temporarily busy. Please try again in a moment.'
           : 'The AI service could not complete this request. Please try again.',
+        providerStatus: response.status,
+        providerMessage: data?.error?.message ? String(data.error.message).replace(/[A-Za-z0-9_-]{35,}/g, '[REDACTED]') : null,
         requestId
       });
     }
