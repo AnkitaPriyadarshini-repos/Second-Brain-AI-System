@@ -449,7 +449,7 @@
 
   class OnyxInterfaceController {
     constructor() {
-      this.currentModel = 'GPT-5.0 Sol';
+      this.currentModel = 'gemini-2.5-flash';
       this.currentSessionId = 'onyx_use_cases';
       this.activeAgent = 'support';
       this.activeProject = null;
@@ -464,10 +464,12 @@
       this.bindKeyboardShortcuts();
       this.bindComposerTools();
 
-      // Ensure initial session is loaded with Onyx thread
+      // On initial boot, do not overwrite live chat with demo session.
+      // Leave composer hero ready for genuine user questions.
       const container = document.getElementById('chat-container');
-      if (container && (!container.children.length || container.innerHTML.trim() === '' || !container.querySelector('.onyx-turn-actions-bar'))) {
-        this.loadSession(this.currentSessionId);
+      const hero = document.getElementById('chat-hero-view');
+      if (container && (!container.children.length || container.innerHTML.trim() === '')) {
+        if (hero) hero.style.display = 'flex';
       }
     }
 
@@ -509,7 +511,12 @@
 
       const options = dropdown.querySelectorAll('.onyx-model-option');
       options.forEach((opt) => {
-        opt.onclick = () => {
+        opt.onclick = (e) => {
+          e.stopPropagation();
+          if (opt.classList.contains('disabled')) {
+            if (window.showToast) window.showToast('Provider credentials not configured for this model.', 'warning');
+            return;
+          }
           const modelName = opt.getAttribute('data-model');
           if (modelName) this.selectModel(modelName);
         };
@@ -583,6 +590,11 @@
     }
 
     loadSession(sessionId) {
+      if (window.isAIProcessing) {
+        if (window.showToast) window.showToast('Please wait for current generation to finish before switching sessions.', 'warning');
+        return;
+      }
+
       this.currentSessionId = sessionId;
       const s = ONYX_SESSIONS[sessionId] || ONYX_SESSIONS.onyx_use_cases;
 
@@ -608,6 +620,11 @@
 
     renderSessionHTML(s) {
       return `
+        <!-- Demo Session Indicator -->
+        <div class="milo-demo-session-header" style="padding: 6px 12px; margin-bottom: 12px; border-radius: 8px; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); font-size: 11.5px; color: #38BDF8; font-weight: 500; display: flex; align-items: center; gap: 6px;">
+          <span>📋</span> <span>Sample Enterprise Thread: <strong>${this.escapeHTML(s.title)}</strong> (Demonstration Mode)</span>
+        </div>
+
         <!-- User Question Bubble -->
         <div class="chat-message-bubble user-bubble">
           <div class="chat-message-content">${this.escapeHTML(s.userQuery)}</div>

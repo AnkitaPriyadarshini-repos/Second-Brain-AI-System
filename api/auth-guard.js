@@ -11,13 +11,20 @@
 
 const crypto = require('crypto');
 
-// Server secret for signing tokens. In production, set MILO_SESSION_SECRET in Vercel environment.
-const SESSION_SECRET = (
+const configuredSecret = (
   process.env.MILO_SESSION_SECRET ||
   process.env.SESSION_SECRET ||
   process.env.JUNO_SESSION_SECRET ||
-  'milo_production_hardening_secret_fallback_2026'
+  ''
 ).trim();
+
+// Never use a predictable static fallback in production. If no server secret is configured,
+// generate a secure cryptographic random key in-memory per runtime instance.
+const isSecretConfigured = configuredSecret.length >= 16;
+const EPHEMERAL_RANDOM_SECRET = crypto.randomBytes(32).toString('hex');
+const SESSION_SECRET = isSecretConfigured ? configuredSecret : EPHEMERAL_RANDOM_SECRET;
+
+const LEGACY_KNOWN_FALLBACK = 'milo_production_hardening_secret_fallback_2026';
 
 const GUEST_TTL_MS = 1000 * 60 * 60 * 24; // 24 hours
 const USER_TTL_MS = 1000 * 60 * 60 * 24 * 14; // 14 days
@@ -88,9 +95,20 @@ function verifySessionToken(token) {
 
   const [idWithPrefix, timestampStr, signature] = parts;
   const payload = `${idWithPrefix}.${timestampStr}`;
-  const expectedSig = signString(payload);
 
-  if (signature !== expectedSig) {
+  // Explicit security policy: Invalidate and reject any token signed with the legacy known fallback secret
+  const legacySig = crypto.createHmac('sha256', LEGACY_KNOWN_FALLBACK).update(payload).digest('hex').slice(0, 32);
+  if (signature === legacySig) {
+    return null; // Reject legacy predictable token
+  }
+
+  const expectedSig = signString(payload);
+  if (signature.length !== expectedSig.length) return null;
+
+  // Use timing-safe comparison to prevent side-channel timing attacks
+  const bufA = Buffer.from(signature);
+  const bufB = Buffer.from(expectedSig);
+  if (!crypto.timingSafeEqual(bufA, bufB)) {
     return null; // Tampered or forged token
   }
 
@@ -193,8 +211,18 @@ function checkRateLimit(key, maxRequests = 30, windowMs = 60000) {
   const allowed = entry.count <= maxRequests;
   const remaining = Math.max(0, maxRequests - entry.count);
   const resetSeconds = Math.ceil((entry.resetAt - now) / 1000);
-
   return { allowed, remaining, resetSeconds, count: entry.count };
+}
+
+function assertAuthenticatedUser(clientIdentity) {
+  if (!clientIdentity || !clientIdentity.verified || clientIdentity.isGuest) {
+    return false;
+  }
+  // Fail closed if the production session secret is not configured
+  if (!isSecretConfigured) {
+    return false;
+  }
+  return true;
 }
 
 module.exports = {
@@ -203,5 +231,7 @@ module.exports = {
   verifySessionToken,
   extractClientIdentity,
   assertOwnership,
-  checkRateLimit
+  assertAuthenticatedUser,
+  checkRateLimit,
+  isSecretConfigured: () => isSecretConfigured
 };

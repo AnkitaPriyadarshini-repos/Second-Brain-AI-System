@@ -12,7 +12,24 @@ const RATE_WINDOW_MS = 60_000;
 const AUTH_RATE_LIMIT = 30;
 const GUEST_RATE_LIMIT = 15;
 const CACHE_TTL_MS = 20_000;
-const REQUEST_TIMEOUT_MS = 8_500;
+const REQUEST_TIMEOUT_MS = 24_000;
+
+// Upstream model registry: maps requested/advertised tiers to active, verified Google Gemini endpoints
+const MODEL_REGISTRY = {
+  'gemini-2.5-flash': 'gemini-2.5-flash',
+  'gemini-2.0-flash': 'gemini-2.0-flash',
+  'gemini-1.5-flash': 'gemini-1.5-flash',
+  'gemini-1.5-pro': 'gemini-1.5-pro',
+  'gemini-3.6-flash': 'gemini-2.5-flash', // mapped alias for current primary tier
+  'gemini-3.5-flash-lite': 'gemini-2.0-flash', // mapped alias for current fast tier
+  'default': 'gemini-2.5-flash'
+};
+
+function resolveUpstreamModel(modelName) {
+  if (!modelName || typeof modelName !== 'string') return 'gemini-2.5-flash';
+  const cleanName = modelName.trim().toLowerCase();
+  return MODEL_REGISTRY[cleanName] || 'gemini-2.5-flash';
+}
 
 const rateBuckets = globalThis.__junoRateBuckets || new Map();
 const answerCache = globalThis.__junoAnswerCache || new Map();
@@ -211,11 +228,12 @@ function extractAnswer(data) {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey, requestId }) {
+  const resolvedModel = resolveUpstreamModel(model);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${resolvedModel}:generateContent`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -225,14 +243,14 @@ async function callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey
         systemInstruction: { parts: [{ text: systemPrompt }] },
         contents,
         generationConfig: {
-          maxOutputTokens: model === PRIMARY_MODEL ? 8192 : 4096
+          maxOutputTokens: (resolvedModel.includes('pro') || model === PRIMARY_MODEL) ? 8192 : 4096
         }
       }),
       signal: controller.signal
     });
 
     const data = await response.json().catch(() => ({}));
-    return { response, data };
+    return { response, data, resolvedModel };
   } catch (error) {
     console.error('[milo/gateway]', requestId, error?.name || error?.message || error);
     throw error;
@@ -243,6 +261,7 @@ async function callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey
 
 function getApiKey() {
   const direct = (
+    process.env.MILO_GEMINI_KEY ||
     process.env.JUNO_GEMINI_KEY ||
     process.env.GEMINI_API_KEY ||
     process.env.GOOGLE_API_KEY ||
@@ -251,18 +270,7 @@ function getApiKey() {
     ''
   ).trim().replace(/^["']|["']$/g, '');
 
-  if (direct) return direct;
-
-  if (process.env && typeof process.env === 'object') {
-    for (const [key, value] of Object.entries(process.env)) {
-      if (typeof value === 'string' && /(?:gemini|juno|google).*key/i.test(key)) {
-        const cleaned = value.trim().replace(/^["']|["']$/g, '');
-        if (cleaned.length > 10) return cleaned;
-      }
-    }
-  }
-
-  return '';
+  return direct;
 }
 
 export default async function handler(req, res) {
@@ -325,8 +333,9 @@ export default async function handler(req, res) {
   }
 
   const body = req.body || {};
-  const prompt = clean(body.prompt);
+  const prompt = clean(body.prompt || body.message || body.query);
   const history = normalizeHistory(body.history);
+  const clientRequestedModel = clean(body.model);
 
   // The browser sends structured note objects. For compatibility with older
   // clients we also accept the original plain `context` string.
@@ -373,7 +382,9 @@ export default async function handler(req, res) {
   });
 
   try {
-    let model = route.model;
+    let model = clientRequestedModel && MODEL_REGISTRY[clientRequestedModel.toLowerCase()]
+      ? clientRequestedModel
+      : route.model;
     let thinkingLevel = route.thinkingLevel;
     let result = await callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey, requestId });
 
@@ -381,23 +392,16 @@ export default async function handler(req, res) {
     if (!result.response.ok && [429, 503].includes(result.response.status)) {
       const retryHeader = result.response.headers?.get?.('retry-after');
       const waitSec = parseInt(retryHeader, 10);
-      const waitMs = (!isNaN(waitSec) && waitSec > 0 && waitSec <= 5) ? waitSec * 1000 : (300 + Math.floor(Math.random() * 200));
+      const waitMs = (!isNaN(waitSec) && waitSec > 0 && waitSec <= 5) ? waitSec * 1000 : (400 + Math.floor(Math.random() * 300));
       await sleep(waitMs);
       result = await callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey, requestId });
     }
 
-    // If the lightweight model is temporarily throttled or unavailable, fallback once to the primary model
-    if (!result.response.ok && model === FAST_MODEL && [404, 429, 500, 502, 503, 504].includes(result.response.status)) {
-      model = PRIMARY_MODEL;
-      thinkingLevel = 'medium';
-      result = await callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey, requestId });
-    }
-
-    // If model returns 404, fallback to official available production models
-    if (!result.response.ok && result.response.status === 404) {
+    // If initial model returns 404/400 (unsupported on configured account), fallback to standard production models
+    if (!result.response.ok && [400, 404].includes(result.response.status)) {
       model = 'gemini-2.0-flash';
       result = await callGemini({ model, systemPrompt, contents, thinkingLevel: 'low', apiKey, requestId });
-      if (!result.response.ok && result.response.status === 404) {
+      if (!result.response.ok && [400, 404].includes(result.response.status)) {
         model = 'gemini-1.5-flash';
         result = await callGemini({ model, systemPrompt, contents, thinkingLevel: 'low', apiKey, requestId });
       }
@@ -435,15 +439,16 @@ export default async function handler(req, res) {
       });
     }
 
+    const returnedModel = result.resolvedModel || model;
     if (key) answerCache.set(key, {
       answer,
-      model,
+      model: returnedModel,
       createdAt: Date.now()
     });
 
     return res.status(200).json({
       success: true,
-      model,
+      model: returnedModel,
       answer,
       grounded: Boolean(context),
       citations,

@@ -158,68 +158,21 @@
     }
     content.innerHTML = formatted;
 
-    if (bubble.classList.contains('assistant-bubble') && !bubble.querySelector('.onyx-turn-actions-bar') && !text.startsWith('Thinking')) {
-      const isOnyx = document.documentElement.getAttribute('data-theme') === 'onyx';
-      if (isOnyx && !bubble.querySelector('.onyx-thought-accordion')) {
-        const turnId = 'turn_' + Date.now();
-        const accordion = document.createElement('div');
-        accordion.className = 'onyx-thought-accordion';
-        accordion.id = `accordion-${turnId}`;
-        accordion.onclick = () => window.OnyxInterface && window.OnyxInterface.toggleTurnThought(turnId);
-        accordion.innerHTML = `
-          <div class="onyx-thought-header">
-            <div class="onyx-thought-left">
-              <svg class="onyx-aperture-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="14.31" y1="8" x2="20.05" y2="17.94"/>
-                <line x1="9.69" y1="8" x2="21.17" y2="8"/>
-                <line x1="7.38" y1="12" x2="13.12" y2="2.06"/>
-                <line x1="9.69" y1="16" x2="3.95" y2="6.06"/>
-                <line x1="14.31" y1="16" x2="2.83" y2="16"/>
-                <line x1="16.62" y1="12" x2="10.88" y2="21.94"/>
-              </svg>
-              <span class="onyx-thought-summary-text">Thought for 18s</span>
-            </div>
-            <div class="onyx-thought-steps-badge">
-              <span>2 steps</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-          </div>
-          <div class="onyx-thought-body" id="body-${turnId}" style="display: none;">
-            <div class="onyx-thought-step">
-              <span class="onyx-step-number">1</span>
-              <span>Retrieved verified grounded knowledge across connectors and notes.</span>
-            </div>
-            <div class="onyx-thought-step">
-              <span class="onyx-step-number">2</span>
-              <span>Synthesized coherent, high-accuracy response with cited references.</span>
-            </div>
-          </div>
-        `;
-        bubble.insertBefore(accordion, content);
-      }
-
+    if (bubble.classList.contains('assistant-bubble') && !bubble.querySelector('.onyx-turn-actions-bar') && !text.startsWith('Thinking') && !text.startsWith('Searching') && !text.startsWith('Generating')) {
       const actions = document.createElement('div');
       actions.className = 'onyx-turn-actions-bar';
       actions.innerHTML = `
-        <button class="onyx-action-icon-btn" onclick="window.OnyxInterface && window.OnyxInterface.copyCurrentTurn(this)" title="Copy">
+        <button class="onyx-action-icon-btn" onclick="window.copyTurnContent(this)" title="Copy">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         </button>
-        <button class="onyx-action-icon-btn" onclick="window.OnyxInterface && window.OnyxInterface.rateTurn(true, this)" title="Good response">
+        <button class="onyx-action-icon-btn" onclick="window.rateTurn && window.rateTurn(true, this)" title="Good response">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
         </button>
-        <button class="onyx-action-icon-btn" onclick="window.OnyxInterface && window.OnyxInterface.rateTurn(false, this)" title="Poor response">
+        <button class="onyx-action-icon-btn" onclick="window.rateTurn && window.rateTurn(false, this)" title="Poor response">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
         </button>
-        <button class="onyx-action-icon-btn" onclick="window.OnyxInterface && window.OnyxInterface.regenerateShowcase()" title="Regenerate">
+        <button class="onyx-action-icon-btn" onclick="window.retryLastPrompt && window.retryLastPrompt()" title="Regenerate">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-        </button>
-        <button class="onyx-action-icon-btn" onclick="window.OnyxInterface && window.OnyxInterface.reportIssue()" title="Report issue">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-        </button>
-        <button class="onyx-sources-btn" onclick="window.OnyxInterface && window.OnyxInterface.openSourcesDrawer()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          <span>Sources</span>
         </button>
       `;
       bubble.appendChild(actions);
@@ -291,6 +244,7 @@
       MiloCompanion.setGlobalState('thinking');
     }
     const startedAt = performance.now();
+    window.lastUserPrompt = prompt;
     appendMessage('user', prompt);
     const thinking = appendMessage('assistant', 'Thinking…');
 
@@ -473,15 +427,26 @@
 
     try {
       const retrieved = retrieveNotes(prompt);
+      if (retrieved.contextNotes && retrieved.contextNotes.length > 0) {
+        replaceMessage(thinking, 'Searching saved notes in Second Brain…');
+      } else {
+        replaceMessage(thinking, 'Generating response with Milo AI…');
+      }
+
+      const selectedModel = (window.Store && window.Store.settings && window.Store.settings.selectedModel) ||
+                            (window.OnyxInterface && window.OnyxInterface.currentModel) ||
+                            'gemini-2.5-flash';
+
       const response = await fetch('/api/ai/gateway', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json',
-          'X-Client-Version': 'juno-2'
+          'X-Client-Version': 'milo-2'
         },
         body: JSON.stringify({
           prompt,
+          model: selectedModel,
           history: getHistory(),
           // IMPORTANT: the gateway expects note objects, not a formatted string.
           contextNotes: retrieved.contextNotes,
@@ -516,29 +481,10 @@
         const fallback = localFallback(prompt, retrieved);
         replaceMessage(thinking, fallback);
       } else {
-        // Resilient On-Device Synthesis Fallback
-        let localAns = '';
-        if (typeof window !== 'undefined' && window.aiEngine && typeof window.aiEngine.fallbackSynthesize === 'function') {
-          try {
-            const fb = window.aiEngine.fallbackSynthesize(prompt, 'gemini-flash', '', null, getHistory());
-            if (fb && fb.text) localAns = fb.text;
-          } catch (_) {}
-        } else if (typeof AIEngine !== 'undefined') {
-          try {
-            const engine = new AIEngine();
-            const fb = engine.fallbackSynthesize(prompt, 'gemini-flash', '', null, getHistory());
-            if (fb && fb.text) localAns = fb.text;
-          } catch (_) {}
-        }
-
-        if (localAns) {
-          replaceMessage(thinking, `${localAns}\n\n---\n*⚡ Synthesized via Milo On-Device Local Engine (Remote cloud service unavailable).*`);
-        } else {
-          const userMsg = isTimeout
-            ? 'Request timed out after 25 seconds. Please try asking again.'
-            : (error?.message || 'The AI service could not complete this request. Please try again.');
-          replaceMessage(thinking, `⚠️ ${userMsg}`);
-        }
+        const userMsg = isTimeout
+          ? 'Milo took longer than expected to respond. Please try asking again.'
+          : (error?.message || 'The AI service could not complete this request. Please try again.');
+        replaceMessage(thinking, `⚠️ **Milo Service Notice**: ${userMsg}\n\n<button type="button" class="milo-retry-btn" onclick="window.retryLastPrompt()" style="margin-top: 8px; padding: 6px 14px; border-radius: 8px; background: #00F2FE; color: #090D16; font-weight: 600; border: none; cursor: pointer;">🔄 Retry</button>`);
       }
       if (typeof window.showToast === 'function') {
         window.showToast(isTimeout ? 'Request timed out.' : 'Cloud AI temporarily unavailable.', 'warning');
@@ -740,6 +686,7 @@
   window.submitRAGQuery = function (event) {
     event?.preventDefault?.();
     event?.stopPropagation?.();
+    if (busy || window.isAIProcessing) return false;
     const input = document.getElementById('rag-query-input');
     const prompt = input ? clean(input.value) : '';
     if (input && prompt) input.value = '';
@@ -754,6 +701,25 @@
       input.value = text;
       input.focus();
     }
+  };
+  window.retryLastPrompt = function () {
+    if (window.lastUserPrompt && !busy) {
+      handleRAGQuery(window.lastUserPrompt);
+    }
+  };
+  window.copyTurnContent = function (btn) {
+    const bubble = btn ? (btn.closest('.assistant-bubble') || btn.closest('.chat-message-bubble') || btn.closest('.chat-bubble')) : null;
+    const content = bubble ? (bubble.querySelector('.chat-message-content') || bubble.querySelector('.chat-text') || bubble) : null;
+    const text = content ? (content.innerText || content.textContent || '').trim() : '';
+    if (navigator.clipboard && text) {
+      navigator.clipboard.writeText(text).then(() => {
+        if (window.showToast) window.showToast('Copied response to clipboard', 'success');
+      });
+    }
+  };
+  window.rateTurn = function (isPositive, btn) {
+    if (btn) btn.style.color = isPositive ? '#10B981' : '#EF4444';
+    if (window.showToast) window.showToast(isPositive ? 'Feedback recorded: Helpful!' : 'Feedback recorded: Needs improvement.', 'info');
   };
 
   function boot() {

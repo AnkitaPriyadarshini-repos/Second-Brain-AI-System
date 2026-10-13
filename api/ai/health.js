@@ -12,18 +12,7 @@ function getApiKey() {
     ''
   ).trim().replace(/^["']|["']$/g, '');
 
-  if (direct) return direct;
-
-  if (process.env && typeof process.env === 'object') {
-    for (const [key, value] of Object.entries(process.env)) {
-      if (typeof value === 'string' && /(?:gemini|milo|juno|google).*key/i.test(key)) {
-        const cleaned = value.trim().replace(/^["']|["']$/g, '');
-        if (cleaned.length > 10) return cleaned;
-      }
-    }
-  }
-
-  return '';
+  return direct;
 }
 
 export default function handler(req, res) {
