@@ -1,0 +1,167 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1260 740" width="1260" height="740" style="background:#ffffff; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#1D4ED8" />
+    </marker>
+    <marker id="arrow-dashed" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#1D4ED8" />
+    </marker>
+  </defs>
+
+  <!-- 1. Outer Environment Border (VPC, Datacenter, Air-gapped) -->
+  <rect x="25" y="25" width="970" height="685" rx="14" fill="#FFFFFF" stroke="#374151" stroke-width="2" stroke-dasharray="7 5" />
+  <text x="50" y="58" fill="#111827" font-size="18" font-weight="700" letter-spacing="-0.2px">Your environment (VPC, datacenter, or air-gapped)</text>
+
+  <!-- 2. Knowledge sources container -->
+  <g transform="translate(48, 85)">
+    <rect x="0" y="0" width="160" height="585" rx="10" fill="#FFFFFF" stroke="#1F2937" stroke-width="2" />
+    <text x="14" y="34" fill="#111827" font-size="15" font-weight="700">Knowledge sources</text>
+
+    <!-- Slack -->
+    <g transform="translate(14, 52)">
+      <rect x="0" y="0" width="132" height="52" rx="10" fill="#FFFFFF" stroke="#374151" stroke-width="1.8" />
+      <text x="20" y="32" fill="#111827" font-size="15" font-weight="500">Slack</text>
+    </g>
+
+    <!-- Google Drive -->
+    <g transform="translate(14, 120)">
+      <rect x="0" y="0" width="132" height="52" rx="10" fill="#FFFFFF" stroke="#374151" stroke-width="1.8" />
+      <text x="20" y="32" fill="#111827" font-size="15" font-weight="500">Google Drive</text>
+    </g>
+
+    <!-- Confluence -->
+    <g transform="translate(14, 188)">
+      <rect x="0" y="0" width="132" height="52" rx="10" fill="#FFFFFF" stroke="#374151" stroke-width="1.8" />
+      <text x="20" y="32" fill="#111827" font-size="15" font-weight="500">Confluence</text>
+    </g>
+
+    <!-- Jira -->
+    <g transform="translate(14, 256)">
+      <rect x="0" y="0" width="132" height="52" rx="10" fill="#FFFFFF" stroke="#374151" stroke-width="1.8" />
+      <text x="20" y="32" fill="#111827" font-size="15" font-weight="500">Jira</text>
+    </g>
+
+    <!-- GitHub -->
+    <g transform="translate(14, 324)">
+      <rect x="0" y="0" width="132" height="52" rx="10" fill="#FFFFFF" stroke="#374151" stroke-width="1.8" />
+      <text x="20" y="32" fill="#111827" font-size="15" font-weight="500">GitHub</text>
+    </g>
+
+    <!-- 50+ more -->
+    <g transform="translate(14, 392)">
+      <rect x="0" y="0" width="132" height="52" rx="10" fill="#FFFFFF" stroke="#374151" stroke-width="1.8" />
+      <text x="20" y="32" fill="#111827" font-size="15" font-weight="500">50+ more</text>
+    </g>
+  </g>
+
+  <!-- Arrow: Knowledge Sources -> Sync Workers -->
+  <g>
+    <path d="M 208 245 L 340 245" fill="none" stroke="#1D4ED8" stroke-width="2.2" marker-end="url(#arrow-blue)" />
+    <text x="220" y="222" fill="#111827" font-size="13" font-weight="600">documents +</text>
+    <text x="220" y="238" fill="#111827" font-size="13" font-weight="600">permissions</text>
+  </g>
+
+  <!-- 3. Onyx Main System Container -->
+  <g transform="translate(325, 85)">
+    <rect x="20" y="0" width="530" height="585" rx="12" fill="#FFFFFF" stroke="#111827" stroke-width="2.2" />
+    <text x="44" y="42" fill="#111827" font-size="24" font-weight="800" letter-spacing="-0.3px">Onyx</text>
+
+    <!-- Top Row in Onyx -->
+    <!-- Sync workers -->
+    <g transform="translate(44, 75)">
+      <rect x="0" y="0" width="124" height="90" rx="10" fill="#FFFFFF" stroke="#111827" stroke-width="2" />
+      <text x="14" y="50" fill="#111827" font-size="15" font-weight="600">Sync workers</text>
+    </g>
+
+    <!-- Arrow: Sync Workers -> Embedding + reranking -->
+    <path d="M 168 120 L 208 120" fill="none" stroke="#1D4ED8" stroke-width="2.2" marker-end="url(#arrow-blue)" />
+
+    <!-- Embedding + reranking inference servers -->
+    <g transform="translate(212, 75)">
+      <rect x="0" y="0" width="136" height="90" rx="10" fill="#FFFFFF" stroke="#111827" stroke-width="2" />
+      <text x="14" y="35" fill="#111827" font-size="14" font-weight="600">Embedding +</text>
+      <text x="14" y="55" fill="#111827" font-size="14" font-weight="600">reranking</text>
+      <text x="14" y="74" fill="#4B5563" font-size="12" font-weight="500">inference servers</text>
+    </g>
+
+    <!-- Arrow: Embedding -> Hybrid Index -->
+    <path d="M 348 120 L 388 120" fill="none" stroke="#1D4ED8" stroke-width="2.2" marker-end="url(#arrow-blue)" />
+
+    <!-- Hybrid index (OpenSearch) cylinder representation -->
+    <g transform="translate(392, 65)">
+      <path d="M 6 22 C 6 12, 114 12, 114 22 L 114 88 C 114 98, 6 98, 6 88 Z" fill="#FFFFFF" stroke="#111827" stroke-width="2" />
+      <ellipse cx="60" cy="22" rx="54" ry="10" fill="#FFFFFF" stroke="#111827" stroke-width="2" />
+      <text x="18" y="52" fill="#111827" font-size="14" font-weight="600">Hybrid index</text>
+      <text x="18" y="72" fill="#4B5563" font-size="13" font-weight="500">(OpenSearch)</text>
+    </g>
+
+    <!-- Web + API Server -->
+    <g transform="translate(56, 260)">
+      <rect x="0" y="0" width="205" height="175" rx="10" fill="#FFFFFF" stroke="#111827" stroke-width="2.2" />
+      <text x="24" y="94" fill="#111827" font-size="17" font-weight="700">Web + API server</text>
+    </g>
+
+    <!-- Arrow: Web + API Server UP to Sync Workers -->
+    <path d="M 100 260 L 100 171" fill="none" stroke="#1D4ED8" stroke-width="2.2" marker-end="url(#arrow-blue)" />
+
+    <!-- Arrow: Web + API Server DIAGONAL to Hybrid Index -->
+    <path d="M 261 285 L 390 160" fill="none" stroke="#1D4ED8" stroke-width="2.2" marker-end="url(#arrow-blue)" />
+
+    <!-- Postgres Database Cylinder (Raised to y=235) -->
+    <g transform="translate(395, 235)">
+      <path d="M 6 18 C 6 8, 98 8, 98 18 L 98 62 C 98 72, 6 72, 6 62 Z" fill="#FFFFFF" stroke="#111827" stroke-width="2" />
+      <ellipse cx="52" cy="18" rx="46" ry="8" fill="#FFFFFF" stroke="#111827" stroke-width="2" />
+      <text x="24" y="44" fill="#111827" font-size="14" font-weight="600">Postgres</text>
+    </g>
+
+    <!-- Arrow: Web + API Server to Postgres -->
+    <path d="M 261 285 L 393 285" fill="none" stroke="#1D4ED8" stroke-width="2.2" marker-end="url(#arrow-blue)" />
+
+    <!-- Self-hosted LLM Box -->
+    <g transform="translate(365, 435)">
+      <rect x="0" y="0" width="155" height="92" rx="10" fill="#FFFFFF" stroke="#111827" stroke-width="2" />
+      <text x="14" y="30" fill="#111827" font-size="14" font-weight="700">Self-hosted LLM:</text>
+      <text x="14" y="52" fill="#374151" font-size="13" font-weight="500">Ollama, vLLM,</text>
+      <text x="14" y="72" fill="#374151" font-size="13" font-weight="500">open weights</text>
+    </g>
+
+    <!-- Arrow: Web + API Server to Self-hosted LLM -->
+    <path d="M 261 390 L 361 465" fill="none" stroke="#1D4ED8" stroke-width="2.2" marker-end="url(#arrow-blue)" />
+  </g>
+
+  <!-- External Connections (Right Side) -->
+  <!-- 1. People Box -->
+  <g transform="translate(1015, 240)">
+    <rect x="0" y="0" width="185" height="75" rx="10" fill="#FFFFFF" stroke="#1F2937" stroke-width="1.8" />
+    <text x="14" y="34" fill="#111827" font-size="15" font-weight="700">People:</text>
+    <text x="70" y="34" fill="#374151" font-size="14">web, desktop,</text>
+    <text x="14" y="56" fill="#374151" font-size="14">Slack, Chrome</text>
+  </g>
+
+  <!-- Arrow: People -> Web + API server (Orthogonal path) -->
+  <path d="M 1015 277 L 780 277 L 780 370 L 592 370" fill="none" stroke="#1D4ED8" stroke-width="2.2" marker-end="url(#arrow-blue)" />
+
+  <!-- 2. Agents Box -->
+  <g transform="translate(1015, 375)">
+    <rect x="0" y="0" width="185" height="55" rx="10" fill="#FFFFFF" stroke="#1F2937" stroke-width="1.8" />
+    <text x="14" y="34" fill="#111827" font-size="15" font-weight="700">Agents:</text>
+    <text x="72" y="34" fill="#374151" font-size="15" font-weight="500">MCP clients</text>
+  </g>
+
+  <!-- Arrow: Agents -> Web + API server (Direct path below Postgres) -->
+  <path d="M 1015 402 L 592 402" fill="none" stroke="#1D4ED8" stroke-width="2.2" marker-end="url(#arrow-blue)" />
+
+  <!-- 3. Optional Hosted LLM API -->
+  <g transform="translate(1010, 580)">
+    <rect x="0" y="0" width="210" height="70" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.8" stroke-dasharray="4 3" />
+    <text x="32" y="38" fill="#374151" font-size="16" font-weight="600">Hosted LLM API</text>
+    <text x="70" y="58" fill="#6B7280" font-size="13">(optional)</text>
+  </g>
+
+  <!-- Dashed Arrow from Web + API server to Hosted LLM API -->
+  <g>
+    <path d="M 470 520 L 470 615 L 1004 615" fill="none" stroke="#1D4ED8" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-dashed)" />
+    <rect x="585" y="598" width="170" height="20" fill="#FFFFFF" />
+    <text x="590" y="613" fill="#4B5563" font-size="13" font-style="italic">only if you choose to</text>
+  </g>
+</svg>

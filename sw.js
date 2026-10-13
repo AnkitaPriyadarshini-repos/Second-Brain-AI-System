@@ -35,6 +35,8 @@ const ASSETS_TO_CACHE = [
   './js/diff-coding-agent.js?v=1.0',
   './js/autonomous-agent.js?v=1.0',
   './css/milo-workspace-studio.css?v=1.0',
+  './css/onyx-theme.css?v=1.0',
+  './js/onyx-interface.js?v=1.0',
   './assets/nexus_yellow_bot.png',
   './manifest.json'
 ];

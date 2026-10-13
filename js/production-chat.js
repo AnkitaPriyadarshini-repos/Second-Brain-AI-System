@@ -157,6 +157,27 @@
         .replace(/\n/g, '<br>');
     }
     content.innerHTML = formatted;
+
+    if (bubble.classList.contains('assistant-bubble') && !bubble.querySelector('.onyx-turn-actions-bar') && !text.startsWith('Thinking')) {
+      const actions = document.createElement('div');
+      actions.className = 'onyx-turn-actions-bar';
+      actions.innerHTML = `
+        <button class="onyx-action-icon-btn" onclick="window.OnyxInterface && window.OnyxInterface.copyCurrentTurn(this)" title="Copy">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+        <button class="onyx-action-icon-btn" onclick="window.OnyxInterface && window.OnyxInterface.rateTurn(true)" title="Good response">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+        </button>
+        <button class="onyx-action-icon-btn" onclick="window.OnyxInterface && window.OnyxInterface.rateTurn(false)" title="Poor response">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
+        </button>
+        <button class="onyx-sources-btn" onclick="window.OnyxInterface && window.OnyxInterface.openSourcesDrawer()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span>Sources</span>
+        </button>
+      `;
+      bubble.appendChild(actions);
+    }
   }
 
   function setBusy(value) {

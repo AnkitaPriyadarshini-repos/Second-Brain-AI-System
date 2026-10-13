@@ -1125,9 +1125,10 @@
 
     // Theme Switcher Initialization
     const themeCardOpts = document.querySelectorAll('.theme-card-option');
-    let savedTheme = Store.settings ? Store.settings.theme : 'second-brain-navy';
-    if (!savedTheme || savedTheme === 'royal-gold' || savedTheme === 'sunflower-yellow' || savedTheme === 'golden-harmony') {
-      savedTheme = 'second-brain-navy';
+    const initialThemeAttr = (typeof document !== 'undefined' && document.documentElement) ? document.documentElement.getAttribute('data-theme') : 'onyx';
+    let savedTheme = (typeof Store !== 'undefined' && Store.settings && Store.settings.theme) ? Store.settings.theme : (initialThemeAttr || 'onyx');
+    if (!savedTheme || savedTheme === 'royal-gold' || savedTheme === 'sunflower-yellow' || savedTheme === 'golden-harmony' || savedTheme === 'second-brain-navy' || savedTheme === 'aqua-aesthetic') {
+      savedTheme = initialThemeAttr || 'onyx';
     }
     applyTheme(savedTheme);
 

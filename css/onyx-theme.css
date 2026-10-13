@@ -1,0 +1,930 @@
+/*
+ * Onyx Enterprise UI Design System
+ * Pixel-perfect adaptation of the Onyx open-source AI platform interface
+ * Clean, minimalist, high-contrast typography, refined light mode
+ */
+
+:root,
+[data-theme="onyx"],
+html[data-theme="onyx"] {
+  --onyx-bg-canvas: #FFFFFF;
+  --onyx-bg-sidebar: #F9FAFB;
+  --onyx-bg-card: #FFFFFF;
+  --onyx-bg-card-hover: #F3F4F6;
+  --onyx-bg-input: #FFFFFF;
+  --onyx-bg-user-bubble: #F3F4F6;
+  --onyx-bg-pill: #F3F4F6;
+  
+  --onyx-border-subtle: #E5E7EB;
+  --onyx-border-strong: #D1D5DB;
+  --onyx-border-active: #9CA3AF;
+  
+  --onyx-text-primary: #111827;
+  --onyx-text-secondary: #4B5563;
+  --onyx-text-muted: #6B7280;
+  --onyx-text-placeholder: #9CA3AF;
+  
+  --onyx-accent-blue: #2563EB;
+  --onyx-accent-dark: #111827;
+  --onyx-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --onyx-shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --onyx-shadow-composer: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+  --onyx-shadow-popover: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Fira Code", monospace;
+
+  --main-bg: #FFFFFF !important;
+  --surface-bg: #FFFFFF !important;
+  --border-color: #E5E7EB !important;
+  --bg-dark: #FFFFFF !important;
+  --bg-dark-gradient: #FFFFFF !important;
+  --bg-card: #FFFFFF !important;
+  --bg-card-hover: #F9FAFB !important;
+  --bg-card-active: #F3F4F6 !important;
+  --text-primary: #111827 !important;
+  --text-secondary: #4B5563 !important;
+  --text-muted: #6B7280 !important;
+  --sidebar-bg: #F9FAFB !important;
+  --sidebar-border: #E5E7EB !important;
+  --sidebar-text: #4B5563 !important;
+  --sidebar-text-active: #111827 !important;
+  --sidebar-item-hover: #F3F4F6 !important;
+  --sidebar-item-active: #FFFFFF !important;
+  --topbar-bg: #FFFFFF !important;
+  --topbar-border: #E5E7EB !important;
+}
+
+html[data-theme="onyx"] body,
+html[data-theme="onyx"] .app-layout-wrapper,
+html[data-theme="onyx"] .app-main-canvas,
+html[data-theme="onyx"] .claude-main-canvas,
+html[data-theme="onyx"] .claude-hero-section,
+html[data-theme="onyx"] #view-jarvis {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  color: #111827 !important;
+  font-family: var(--font-sans) !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+html[data-theme="onyx"] #gemini-flow-canvas {
+  display: none !important;
+}
+
+html[data-theme="onyx"] .app-layout-wrapper {
+  background-color: #FFFFFF !important;
+  display: flex !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+}
+
+/* ==========================================================================
+   ONYX LEFT SIDEBAR
+   ========================================================================== */
+
+html[data-theme="onyx"] #app-sidebar,
+html[data-theme="onyx"] .claude-sidebar,
+html[data-theme="onyx"] .app-sidebar {
+  background: #F9FAFB !important;
+  background-color: #F9FAFB !important;
+  border-right: 1px solid #E5E7EB !important;
+  width: 260px !important;
+  min-width: 260px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  padding: 12px 10px 14px 10px !important;
+  box-sizing: border-box !important;
+  transition: width 0.2s ease, transform 0.2s ease !important;
+  z-index: 100 !important;
+}
+
+html[data-theme="onyx"] #app-sidebar.sidebar-collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border-right: none !important;
+}
+
+/* Sidebar Top Section */
+.onyx-sidebar-top {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: calc(100vh - 100px);
+  padding-right: 2px;
+}
+
+.onyx-sidebar-top::-webkit-scrollbar {
+  width: 4px;
+}
+.onyx-sidebar-top::-webkit-scrollbar-thumb {
+  background: #E5E7EB;
+  border-radius: 4px;
+}
+
+/* Brand Header */
+.onyx-brand-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px 8px 6px;
+  margin-bottom: 4px;
+}
+
+.onyx-brand-logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.onyx-brand-title {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #111827 !important;
+}
+
+.onyx-icon-btn {
+  background: transparent;
+  border: none;
+  color: #6B7280;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.onyx-icon-btn:hover {
+  background-color: #F3F4F6;
+  color: #111827;
+}
+
+/* Primary Action Buttons */
+.onyx-action-btn-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.onyx-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #4B5563;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.onyx-nav-btn:hover {
+  background-color: #F3F4F6;
+  color: #111827;
+}
+
+.onyx-nav-btn.primary-new-session {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  color: #111827 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  font-weight: 600 !important;
+}
+
+.onyx-nav-btn.primary-new-session:hover {
+  background-color: #F8FAFC !important;
+  border-color: #D1D5DB !important;
+}
+
+/* Sidebar Section Headers */
+.onyx-sidebar-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9CA3AF !important;
+  padding: 10px 8px 4px 8px;
+}
+
+.onyx-sidebar-items-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.onyx-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 450;
+  color: #4B5563 !important;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.onyx-sidebar-item:hover {
+  background-color: #F3F4F6 !important;
+  color: #111827 !important;
+}
+
+.onyx-sidebar-item.active {
+  background-color: #FFFFFF !important;
+  color: #111827 !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+  border: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+.onyx-sidebar-item svg {
+  flex-shrink: 0;
+  color: #6B7280 !important;
+}
+.onyx-sidebar-item.active svg {
+  color: #111827 !important;
+}
+
+/* Sidebar Bottom Section */
+.onyx-sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 10px;
+  border-top: 1px solid #E5E7EB;
+}
+
+.onyx-user-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.onyx-user-row:hover {
+  background-color: #F3F4F6;
+}
+
+.onyx-user-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.onyx-user-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #111827;
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.onyx-user-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #111827 !important;
+}
+
+.onyx-user-badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2563EB;
+  box-shadow: 0 0 0 2px #FFFFFF;
+}
+
+/* ==========================================================================
+   TOP BAR (MINIMALIST WHITE)
+   ========================================================================= */
+
+html[data-theme="onyx"] .claude-top-navbar {
+  background-color: #FFFFFF !important;
+  border-bottom: 1px solid #F3F4F6 !important;
+  padding: 10px 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.onyx-top-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.onyx-top-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.onyx-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 1px solid #E5E7EB;
+  background: #FFFFFF;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.onyx-share-btn:hover {
+  background: #F9FAFB;
+  border-color: #D1D5DB;
+}
+
+/* ==========================================================================
+   CHAT AREA & STREAM
+   ========================================================================== */
+
+html[data-theme="onyx"] .app-main-canvas,
+html[data-theme="onyx"] .claude-main-canvas {
+  background-color: #FFFFFF !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+html[data-theme="onyx"] .view-section.active {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+html[data-theme="onyx"] #chat-container.chat-stream {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding: 24px 20px 10px 20px !important;
+  max-width: 820px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 24px !important;
+}
+
+/* User Message Pill */
+html[data-theme="onyx"] .chat-message-bubble.user-bubble,
+html[data-theme="onyx"] .user-bubble {
+  align-self: flex-end !important;
+  background: #F3F4F6 !important;
+  background-color: #F3F4F6 !important;
+  color: #111827 !important;
+  padding: 12px 18px !important;
+  border-radius: 18px !important;
+  font-size: 14.5px !important;
+  line-height: 1.55 !important;
+  max-width: 640px !important;
+  box-shadow: none !important;
+  border: 1px solid transparent !important;
+  margin-left: auto !important;
+}
+
+html[data-theme="onyx"] .chat-message-bubble.user-bubble .chat-message-content {
+  color: #111827 !important;
+}
+
+/* Assistant Message Turn */
+html[data-theme="onyx"] .chat-message-bubble.assistant-bubble,
+html[data-theme="onyx"] .assistant-bubble {
+  align-self: flex-start !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  color: #111827 !important;
+  padding: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Reasoning / Thought Process Accordion */
+.onyx-thought-box {
+  background: transparent;
+  border: none;
+  margin-bottom: 14px;
+}
+
+.onyx-thought-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0 8px 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.onyx-thought-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #111827 !important;
+}
+
+.onyx-thought-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #6B7280 !important;
+}
+
+.onyx-steps-badge {
+  font-size: 11.5px;
+  color: #6B7280 !important;
+}
+
+.onyx-thought-content {
+  background: #F9FAFB;
+  border-left: 2px solid #D1D5DB;
+  padding: 10px 14px;
+  margin: 6px 0 12px 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #4B5563 !important;
+  border-radius: 0 8px 8px 0;
+  display: none;
+}
+
+.onyx-thought-content.open {
+  display: block;
+}
+
+/* Markdown Text Formatting */
+html[data-theme="onyx"] .chat-message-content {
+  font-size: 14.5px !important;
+  line-height: 1.7 !important;
+  color: #1F2937 !important;
+}
+
+html[data-theme="onyx"] .chat-message-content p {
+  margin-bottom: 12px !important;
+  color: #1F2937 !important;
+}
+
+html[data-theme="onyx"] .chat-message-content ul,
+html[data-theme="onyx"] .chat-message-content ol {
+  padding-left: 20px !important;
+  margin: 10px 0 16px 0 !important;
+  color: #1F2937 !important;
+}
+
+html[data-theme="onyx"] .chat-message-content li {
+  margin-bottom: 10px !important;
+  line-height: 1.65 !important;
+  color: #1F2937 !important;
+}
+
+html[data-theme="onyx"] .chat-message-content strong,
+html[data-theme="onyx"] .chat-message-content b {
+  font-weight: 600 !important;
+  color: #111827 !important;
+}
+
+/* Inline Citation Pill / Chip (e.g. Fireflies) */
+.onyx-source-pill,
+.citation-pill,
+.inline-citation-chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  background-color: #F3F4F6 !important;
+  color: #4B5563 !important;
+  border: 1px solid #E5E7EB !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  padding: 1px 7px !important;
+  border-radius: 9999px !important;
+  margin-left: 6px !important;
+  vertical-align: middle !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  transition: all 0.15s ease !important;
+}
+
+.onyx-source-pill:hover,
+.citation-pill:hover {
+  background-color: #E5E7EB !important;
+  color: #111827 !important;
+}
+
+/* Action Toolbar below assistant answer */
+.onyx-turn-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 6px;
+}
+
+.onyx-action-icon-btn {
+  background: transparent;
+  border: none;
+  color: #9CA3AF;
+  padding: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.onyx-action-icon-btn:hover {
+  background-color: #F3F4F6;
+  color: #111827;
+}
+
+.onyx-sources-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #4B5563;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.onyx-sources-btn:hover {
+  background-color: #F3F4F6;
+  color: #111827;
+}
+
+/* ==========================================================================
+   MODEL SELECTOR PILL (Above Input)
+   ========================================================================== */
+
+.onyx-model-pill-container {
+  max-width: 820px;
+  width: 100%;
+  margin: 0 auto 6px auto;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 20px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.onyx-model-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #111827;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.onyx-model-pill:hover {
+  border-color: #D1D5DB;
+  background-color: #F9FAFB;
+}
+
+.onyx-model-dropdown-menu {
+  position: absolute;
+  bottom: 38px;
+  right: 20px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  width: 220px;
+  padding: 6px;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 1000;
+}
+
+.onyx-model-dropdown-menu.open {
+  display: flex;
+}
+
+.onyx-model-option {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #4B5563;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.onyx-model-option:hover {
+  background-color: #F3F4F6;
+  color: #111827;
+}
+
+.onyx-model-option.selected {
+  background-color: #EFF6FF;
+  color: #2563EB;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   COMPOSER (BOTTOM FLOATING INPUT BOX)
+   ========================================================================== */
+
+html[data-theme="onyx"] .nori-reference-composer-wrapper {
+  max-width: 820px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 20px 8px 20px !important;
+  box-sizing: border-box !important;
+}
+
+html[data-theme="onyx"] .nori-reference-composer-card,
+html[data-theme="onyx"] #rag-query-form {
+  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  border-radius: 18px !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.04) !important;
+  padding: 12px 14px 10px 14px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+html[data-theme="onyx"] #rag-query-form:focus-within,
+html[data-theme="onyx"] .nori-reference-composer-card:focus-within {
+  border-color: #9CA3AF !important;
+  box-shadow: 0 6px 24px -2px rgba(0, 0, 0, 0.08) !important;
+}
+
+html[data-theme="onyx"] .nori-reference-textarea,
+html[data-theme="onyx"] #rag-query-input,
+html[data-theme="onyx"] textarea.nori-reference-textarea {
+  background: transparent !important;
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+  border: none !important;
+  outline: none !important;
+  font-size: 15px !important;
+  line-height: 1.5 !important;
+  font-family: var(--font-sans) !important;
+  resize: none !important;
+  width: 100% !important;
+  padding: 4px 6px !important;
+  box-sizing: border-box !important;
+  min-height: 38px !important;
+}
+
+html[data-theme="onyx"] #rag-query-input::placeholder,
+html[data-theme="onyx"] .nori-reference-textarea::placeholder {
+  color: #9CA3AF !important;
+  -webkit-text-fill-color: #9CA3AF !important;
+}
+
+/* Composer Bottom Toolbar */
+html[data-theme="onyx"] .nori-composer-bottom-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 2px 4px 0 4px !important;
+}
+
+.onyx-composer-tools-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.onyx-composer-tool-btn {
+  background: transparent;
+  border: none;
+  color: #9CA3AF;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.onyx-composer-tool-btn:hover {
+  background-color: #F3F4F6;
+  color: #111827;
+}
+
+.onyx-composer-tools-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Send Button: Circular with Up Arrow */
+html[data-theme="onyx"] .nori-round-send-btn,
+html[data-theme="onyx"] #rag-submit-btn {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background-color: #E5E7EB !important;
+  color: #9CA3AF !important;
+  border: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  padding: 0 !important;
+}
+
+html[data-theme="onyx"] #rag-submit-btn.active,
+html[data-theme="onyx"] #rag-submit-btn:not([disabled]):hover {
+  background-color: #111827 !important;
+  color: #FFFFFF !important;
+}
+
+/* Hide legacy shortcuts or unwanted text inside onyx composer */
+html[data-theme="onyx"] .nori-shortcut-hint,
+html[data-theme="onyx"] #milo-chat-companion-bar {
+  display: none !important;
+}
+
+/* Platform Subtitle Footer */
+.onyx-platform-footer {
+  text-align: center;
+  font-size: 11.5px;
+  color: #9CA3AF;
+  padding: 6px 0 12px 0;
+  letter-spacing: 0.01em;
+}
+
+/* ==========================================================================
+   SOURCES DRAWER / MODAL
+   ========================================================================== */
+
+.onyx-sources-drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 9999;
+  display: none;
+  justify-content: flex-end;
+}
+
+.onyx-sources-drawer-overlay.open {
+  display: flex;
+}
+
+.onyx-sources-drawer {
+  width: 440px;
+  max-width: 90vw;
+  height: 100vh;
+  background: #FFFFFF;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  animation: slideLeft 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideLeft {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.onyx-source-card {
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.15s ease;
+}
+
+.onyx-source-card:hover {
+  border-color: #D1D5DB;
+}
+
+.onyx-source-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.onyx-source-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #F3F4F6;
+  color: #4B5563;
+}
+
+/* ==========================================================================
+   CONNECTORS & TOOLS MODAL
+   ========================================================================== */
+
+.onyx-connectors-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.onyx-connectors-modal-overlay.open {
+  display: flex;
+}
+
+.onyx-connectors-modal {
+  width: 520px;
+  max-width: 92vw;
+  background: #FFFFFF;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  html[data-theme="onyx"] #app-sidebar {
+    position: fixed !important;
+    left: -270px !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.1) !important;
+  }
+  html[data-theme="onyx"] #app-sidebar.mobile-open {
+    transform: translateX(270px) !important;
+    left: 0 !important;
+  }
+}

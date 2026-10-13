@@ -102,7 +102,32 @@ Second-Brain-AI-System/
 ├── server.js                   # Next.js SSR + Express + WebSocket Server
 ├── README.md                   # Project Documentation & Performance Benchmarks
 ├── docs/
+│   ├── assets/
+│   │   ├── architecture.png        # High-Resolution Architecture Diagram
+│   │   └── architecture.svg        # Scalable Vector Architecture Specification
 │   └── ARCHITECTURE.md         # Software Architecture Specification
 ├── package.json                # Project Dependencies & Scripts
 └── LICENSE                     # MIT License
 ```
+
+---
+
+## 4. Enterprise Security and Data Processing Architecture
+
+![Security and Data Processing Architecture](assets/architecture.png)
+
+When connecting up your organization's knowledge, it is critical that this sensitive IP is not leaked to the wrong parties. The enterprise deployment model guarantees strict data perimeter enforcement across VPC, private datacenter, or air-gapped environments.
+
+### 4.1 Knowledge Ingestion & Document-Level ACLs
+- **Connectors**: Sync workers ingest documents and metadata from enterprise sources including Slack, Google Drive, Confluence, Jira, GitHub, and 50+ custom repositories.
+- **Permission Sync**: Every ingested chunk inherits organizational Access Control Lists (ACLs). When a query is initiated, user identity tokens restrict vector/lexical retrieval exclusively to documents the user has permissions to read.
+
+### 4.2 On-Premise Inference & Air-Gapped LLMs
+- **Sync Workers -> Inference Servers**: Embeddings and reranking models are executed on dedicated local inference instances.
+- **Hybrid Index (OpenSearch)**: Stores dense vectors, BM25 indices, and permission metadata in an isolated database within the private network.
+- **Self-Hosted LLMs**: Web and API servers route prompt payloads to internal LLM engines (Ollama, vLLM, open weights) running on private compute. No proprietary training data or sensitive query context leaves the internal network.
+
+### 4.3 Multi-Client & Agent Gateway
+- **People**: Web interface, desktop apps, Slack bots, and Chrome extensions interact with the Web + API server over authenticated TLS.
+- **Agents (MCP Clients)**: Autonomous agents interact via standard Model Context Protocol (MCP) tool endpoints with strict schema validations and user-confirmed mutation boundaries.
+- **Hosted LLM API (Strictly Opt-In)**: External hosted providers (Gemini, Claude, GPT) are disabled by default. If enabled by administrators, requests pass through zero-retention ephemeral gateways with outbound DLP sanitization.
