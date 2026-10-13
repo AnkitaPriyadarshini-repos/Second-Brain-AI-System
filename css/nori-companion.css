@@ -710,16 +710,18 @@ header.claude-top-navbar {
 
 /* Hero Section Text Overrides */
 .claude-serif-headline {
-  color: #FFFFFF !important;
+  color: #111827 !important;
   font-size: 28px !important;
   font-weight: 700 !important;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5) !important;
+  text-shadow: none !important;
+  letter-spacing: -0.02em !important;
 }
 
 .hero-subtitle-text {
-  color: #FFFFFF !important;
-  font-size: 15px !important;
-  opacity: 0.95 !important;
+  color: #4B5563 !important;
+  font-size: 14.5px !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
 }
 
 .view-credits-link {

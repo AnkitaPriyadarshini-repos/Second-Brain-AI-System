@@ -800,7 +800,7 @@
       }
       if (input) {
         input.value = '';
-        input.placeholder = 'How can I help you today?';
+        input.placeholder = 'How can Milo help you today?';
         input.focus();
       }
 
