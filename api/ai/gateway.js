@@ -1,7 +1,7 @@
 import authGuard from '../auth-guard.js';
 
-const PRIMARY_MODEL = 'gemini-1.5-flash';
-const FAST_MODEL = 'gemini-1.5-flash';
+const PRIMARY_MODEL = 'gemini-3.1-flash-lite';
+const FAST_MODEL = 'gemini-3.1-flash-lite';
 const MAX_CONTEXT = 9000;
 const MAX_HISTORY_ITEMS = 16;
 const MAX_MESSAGE = 12000;
@@ -16,19 +16,20 @@ const REQUEST_TIMEOUT_MS = 24_000;
 
 // Upstream model registry: maps requested/advertised tiers to active, verified Google Gemini endpoints
 const MODEL_REGISTRY = {
-  'gemini-1.5-flash': 'gemini-1.5-flash',
-  'gemini-1.5-pro': 'gemini-1.5-pro',
-  'gemini-2.0-flash': 'gemini-2.0-flash',
-  'gemini-2.5-flash': 'gemini-1.5-flash', // mapped alias to GA flash model
-  'gemini-3.6-flash': 'gemini-1.5-flash', // mapped alias for current primary tier
-  'gemini-3.5-flash-lite': 'gemini-1.5-flash', // mapped alias for current fast tier
-  'default': 'gemini-1.5-flash'
+  'gemini-3.1-flash-lite': 'gemini-3.1-flash-lite',
+  'gemini-3.5-flash-lite': 'gemini-3.1-flash-lite',
+  'gemini-flash-latest': 'gemini-3.1-flash-lite',
+  'gemini-2.5-flash': 'gemini-3.1-flash-lite',
+  'gemini-3.6-flash': 'gemini-3.1-flash-lite',
+  'gemini-1.5-flash': 'gemini-3.1-flash-lite',
+  'gemini-1.5-pro': 'gemini-3.1-flash-lite',
+  'default': 'gemini-3.1-flash-lite'
 };
 
 function resolveUpstreamModel(modelName) {
-  if (!modelName || typeof modelName !== 'string') return 'gemini-1.5-flash';
+  if (!modelName || typeof modelName !== 'string') return 'gemini-3.1-flash-lite';
   const cleanName = modelName.trim().toLowerCase();
-  return MODEL_REGISTRY[cleanName] || 'gemini-1.5-flash';
+  return MODEL_REGISTRY[cleanName] || 'gemini-3.1-flash-lite';
 }
 
 const rateBuckets = globalThis.__junoRateBuckets || new Map();
@@ -397,12 +398,12 @@ export default async function handler(req, res) {
       result = await callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey, requestId });
     }
 
-    // If initial model returns 404/400 (unsupported on configured account), fallback to standard production models
-    if (!result.response.ok && [400, 404].includes(result.response.status)) {
-      model = 'gemini-1.5-flash';
+    // If initial model returns 404/400/503 (unsupported or high demand on configured account), fallback to verified production models
+    if (!result.response.ok && [400, 404, 503].includes(result.response.status)) {
+      model = 'gemini-3.1-flash-lite';
       result = await callGemini({ model, systemPrompt, contents, thinkingLevel: 'low', apiKey, requestId });
-      if (!result.response.ok && [400, 404].includes(result.response.status)) {
-        model = 'gemini-1.5-pro';
+      if (!result.response.ok && [400, 404, 503].includes(result.response.status)) {
+        model = 'gemini-3.5-flash-lite';
         result = await callGemini({ model, systemPrompt, contents, thinkingLevel: 'low', apiKey, requestId });
       }
     }
