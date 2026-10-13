@@ -1131,7 +1131,8 @@
     }
     applyTheme('onyx');
 
-    const allThemeButtons = [...themePillBtns, ...themeCardOpts];
+    const themeCardOpts = document.querySelectorAll('.theme-card, .theme-option');
+    const allThemeButtons = [...(themePillBtns || []), ...themeCardOpts];
     allThemeButtons.forEach(btn => {
       btn.addEventListener('click', () => {
         applyTheme('onyx');
