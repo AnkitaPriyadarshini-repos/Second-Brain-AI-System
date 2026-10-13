@@ -4,7 +4,7 @@
 Accepted / Phase-1 Implemented (Preserving Static + Vercel Serverless Gateway, with Staged Migration Roadmap)
 
 ## Context & Vision
-Milo (Second Brain AI System) is evolving from a single-turn conversational assistant into a context-aware personal AI workspace inspired by the product capabilities of Onyx. Onyx utilizes an enterprise multi-service architecture (FastAPI backend, Celery task workers, Redis job queues, PostgreSQL relational state, and Vespa / OpenSearch / Qdrant vector indexing).
+Milo (Second Brain AI System) is evolving from a single-turn conversational assistant into a context-aware personal AI workspace with enterprise scalability. Milo incorporates an enterprise multi-service architecture (FastAPI backend, Celery task workers, Redis job queues, PostgreSQL relational state, and Vespa / OpenSearch / Qdrant vector indexing).
 
 Milo currently runs on a high-speed, cost-effective, zero-maintenance architecture:
 - Static HTML5/Vanilla JS frontend with responsive glassmorphism aesthetic and animated SVG mascot (Milo)
@@ -18,7 +18,7 @@ We need to evaluate whether and when to transition to a persistent server-side d
 
 ## Architectural Comparison
 
-| Dimension | Current Architecture (Static + Vercel Gateway) | Enterprise Architecture (Onyx Style: Postgres + Celery + Vector DB) |
+| Dimension | Current Architecture (Static + Vercel Gateway) | Enterprise Architecture (Milo Enterprise: Postgres + Celery + Vector DB) |
 | :--- | :--- | :--- |
 | **Hosting & Infrastructure** | Free Vercel Serverless hobby/pro plan | Requires VPS/Kubernetes (e.g., AWS ECS, DigitalOcean Droplet, Render) |
 | **Estimated Monthly Cost** | **$0 / month** (deployable on existing services) | **$45 – $120 / month** (Managed Postgres + Redis + Worker VM + Vector DB) |

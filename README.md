@@ -18,7 +18,7 @@
   </a>
 </p>
 
-**Second Brain AI** (powered by Milo & the Onyx Enterprise Design System) is an open, private, and grounded enterprise AI workspace. It combines deep document-level access control, hybrid lexical and semantic search, self-hosted and cloud LLM routing, diff-first coding assistants, image/video creative studios, and multi-step reasoning capabilities.
+**Second Brain AI** (powered by Milo Enterprise System) is an open, private, and grounded enterprise AI workspace. It combines deep document-level access control, hybrid lexical and semantic search, self-hosted and cloud LLM routing, diff-first coding assistants, image/video creative studios, and multi-step reasoning capabilities.
 
 ---
 
@@ -49,7 +49,7 @@ When connecting up your organization's knowledge, it is critical that this sensi
 
 ## ✨ Features & Capabilities
 
-### 1. Onyx Enterprise Interface
+### 1. Milo Enterprise Interface
 - **Modern Minimalist Canvas**: Crisp typography, high-contrast readability, collapsible sidebar, and intuitive session management.
 - **Multi-Step Reasoning Accordion**: Interactive collapsible chain-of-thought blocks (`Thought for 27s · 2 steps`) revealing system reasoning paths.
 - **Inline Grounded Citations**: Interactive source badges (`Fireflies`, `Confluence`, `Google Drive`) linked directly to source passages.
@@ -112,7 +112,7 @@ The codebase is audited continuously across 13 test suites and 60+ automated uni
 |---|---|---|
 | **Core RAG & Search** | Grounded vault retrieval, BM25 + Vector scoring | ✅ 100% Passed |
 | **Chat Safety & Guards** | Prompt injection protection, SSRF guards, DLP | ✅ 100% Passed |
-| **Onyx Enterprise UI** | Layout integrity, theme specificity, responsive views | ✅ 100% Passed |
+| **Milo Enterprise UI** | Layout integrity, theme specificity, responsive views | ✅ 100% Passed |
 | **Diff-First Coding** | Patch generation, rollback snapshots, Git export | ✅ 100% Passed |
 | **Media Studio APIs** | Image & Video generation asynchronous lifecycle | ✅ 100% Passed |
 | **Service Worker & PWA** | Offline cache validation, manifest checksums | ✅ 100% Passed |

@@ -1,6 +1,6 @@
 /**
  * Second Brain AI System — Connector Abstraction Interface
- * Inspired by Onyx Connectors Architecture.
+ * Milo Enterprise Connectors Architecture.
  *
  * Provides a standardized contract for data sources (Local Files, Web URLs,
  * and future cloud integrations like Google Drive, GitHub).
