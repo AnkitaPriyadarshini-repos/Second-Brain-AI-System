@@ -464,6 +464,17 @@ html[data-theme="onyx"] #chat-container.chat-stream.hidden {
   margin: 0 !important;
 }
 
+html[data-theme="onyx"] #chat-hero-view,
+html[data-theme="onyx"] .claude-hero-center {
+  min-height: auto !important;
+  height: auto !important;
+  max-width: 720px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: min(6vh, 48px) 20px 8px 20px !important;
+  text-align: center !important;
+}
+
 html[data-theme="onyx"] #chat-hero-view[style*="display: none"],
 html[data-theme="onyx"] #chat-hero-view.hidden,
 html[data-theme="onyx"] #hero-starter-chips[style*="display: none"],
