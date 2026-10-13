@@ -340,89 +340,83 @@
         </div>
 
         <!-- Panel 1: Image Studio -->
+        <!-- Panel 1: Image Studio (Unified Stage with Side Gallery) -->
         <div id="studio-panel-image">
-          <div class="studio-layout-grid">
-            <div class="studio-control-card">
-              <div class="studio-form-group">
-                <label class="studio-label" for="studio-image-prompt">Image Prompt</label>
-                <textarea id="studio-image-prompt" class="studio-textarea" placeholder="A futuristic research workspace with glowing cyan holographic terminals, dark obsidian walls, cinematic lighting, 8k masterpiece..."></textarea>
-              </div>
-
-              <div class="studio-form-group">
-                <label class="studio-label" for="studio-image-negative">Negative Prompt (Optional)</label>
-                <input type="text" id="studio-image-negative" class="studio-textarea" style="min-height: auto; height: 38px;" placeholder="blurry, distorted, low quality, watermark, grain" />
-              </div>
-
-              <div class="studio-form-group">
-                <label class="studio-label">Visual Style</label>
-                <div class="studio-pill-group" id="studio-style-pills">
-                  <button type="button" class="studio-pill-btn active" data-style="cinematic">Cinematic</button>
-                  <button type="button" class="studio-pill-btn" data-style="photorealistic">Photorealistic</button>
-                  <button type="button" class="studio-pill-btn" data-style="anime">Anime Art</button>
-                  <button type="button" class="studio-pill-btn" data-style="digital-art">Digital Art</button>
-                  <button type="button" class="studio-pill-btn" data-style="3d-render">3D Render</button>
-                  <button type="button" class="studio-pill-btn" data-style="minimalist">Minimalist</button>
+          <div class="studio-unified-stage">
+            <!-- Left: Main Preview Stage & Controls -->
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <!-- Main Preview Viewport -->
+              <div class="studio-preview-card" style="min-height: 440px;">
+                <div class="studio-viewport-area" id="studio-image-viewport">
+                  <div class="studio-empty-state" id="studio-image-empty-state">
+                    <div style="font-size: 38px; margin-bottom: 12px;">🎨</div>
+                    <h3 style="color: #F1F5F9; font-size: 16px; margin: 0 0 6px 0;">Describe your image...</h3>
+                    <p style="margin: 0; font-size: 13px;">Generate high-resolution visual artwork or select a creation from the gallery.</p>
+                  </div>
+                  <img id="studio-image-result" class="studio-active-img" style="display: none;" alt="Generated Result" />
+                  <div id="studio-image-loading-state" style="display: none; text-align: center; color: #00F2FE;">
+                    <div class="spinner" style="margin: 0 auto 16px auto; width: 44px; height: 44px; border: 3px solid rgba(0,242,254,0.2); border-top-color: #00F2FE; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                    <div style="font-weight: 700; font-size: 15px;">Synthesizing Visual Concepts...</div>
+                    <div style="font-size: 12px; color: #94A3B8; margin-top: 4px;">Running latent diffusion pipeline</div>
+                  </div>
                 </div>
-              </div>
-
-              <div class="studio-form-group">
-                <label class="studio-label">Aspect Ratio</label>
-                <div class="studio-pill-group" id="studio-ratio-pills">
-                  <button type="button" class="studio-pill-btn active" data-ratio="1:1">1:1 Square</button>
-                  <button type="button" class="studio-pill-btn" data-ratio="16:9">16:9 Landscape</button>
-                  <button type="button" class="studio-pill-btn" data-ratio="9:16">9:16 Portrait</button>
-                  <button type="button" class="studio-pill-btn" data-ratio="4:3">4:3 Standard</button>
-                </div>
-              </div>
-
-              <div class="studio-form-group">
-                <label class="studio-label">Provider</label>
-                <select id="studio-provider-select" class="studio-textarea" style="min-height: auto; height: 38px;">
-                  <option value="auto">✨ Auto (Flux / Imagen)</option>
-                  <option value="pollinations">Pollinations Flux (Public Fast GPU)</option>
-                  <option value="imagen">Gemini Imagen 3</option>
-                </select>
-              </div>
-
-              <div class="studio-form-group">
-                <label class="studio-label">Reference Image (Image-to-Image)</label>
-                <div id="studio-image-dropzone" style="border: 1px dashed rgba(255,255,255,0.15); border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; background: rgba(2,6,23,0.4);" onclick="document.getElementById('studio-image-file-input').click()">
-                  <span id="studio-dropzone-text" style="font-size: 12px; color: #94A3B8;">📷 Click or drag reference image</span>
-                  <input type="file" id="studio-image-file-input" accept="image/*" style="display: none;" onchange="window.handleStudioReferenceImage(event)" />
-                  <div id="studio-reference-preview" style="display: none; margin-top: 8px;">
-                    <img id="studio-reference-thumb" src="" alt="Reference" style="max-height: 80px; border-radius: 6px;" />
-                    <button type="button" onclick="event.stopPropagation(); window.clearStudioReferenceImage()" style="margin-left: 8px; font-size: 11px; background: rgba(239,68,68,0.2); color: #EF4444; border: none; padding: 2px 6px; border-radius: 4px; cursor: pointer;">Remove</button>
+                <div class="studio-action-toolbar" id="studio-image-toolbar" style="display: none;">
+                  <div id="studio-image-meta-info" style="font-size: 12px; color: #94A3B8;"></div>
+                  <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn btn-secondary" onclick="window.downloadStudioImage()" style="font-size: 12px; padding: 6px 12px;">📥 Download</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.createImageVariation()" style="font-size: 12px; padding: 6px 12px;">🔄 Variation</button>
+                    <button type="button" class="btn btn-primary" onclick="window.sendStudioImageToChat()" style="font-size: 12px; padding: 6px 12px;">💬 Send to Chat</button>
                   </div>
                 </div>
               </div>
 
-              <button id="studio-generate-image-btn" class="studio-btn-primary" onclick="window.triggerStudioImageGeneration()">
-                <span>✨ Generate Artwork</span>
-              </button>
-            </div>
-
-            <!-- Preview Card -->
-            <div class="studio-preview-card">
-              <div class="studio-viewport-area" id="studio-image-viewport">
-                <div class="studio-empty-state" id="studio-image-empty-state">
-                  <div style="font-size: 38px; margin-bottom: 12px;">🎨</div>
-                  <h3 style="color: #F1F5F9; font-size: 16px; margin: 0 0 6px 0;">No Artwork Generated Yet</h3>
-                  <p style="margin: 0; font-size: 13px;">Describe a scene and click Generate Artwork to synthesize visual concepts.</p>
+              <!-- Controls Toolbar Under Stage -->
+              <div class="studio-control-card">
+                <!-- Aspect Ratio & Styles -->
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                  <div class="studio-pill-group" id="studio-ratio-pills">
+                    <button type="button" class="studio-pill-btn active" data-ratio="1:1">1:1</button>
+                    <button type="button" class="studio-pill-btn" data-ratio="3:4">3:4</button>
+                    <button type="button" class="studio-pill-btn" data-ratio="4:3">4:3</button>
+                    <button type="button" class="studio-pill-btn" data-ratio="16:9">16:9</button>
+                  </div>
+                  <div class="studio-pill-group" id="studio-style-pills">
+                    <button type="button" class="studio-pill-btn active" data-style="cinematic">Cinematic</button>
+                    <button type="button" class="studio-pill-btn" data-style="photorealistic">Photorealistic</button>
+                    <button type="button" class="studio-pill-btn" data-style="anime">Anime</button>
+                    <button type="button" class="studio-pill-btn" data-style="digital-art">Digital Art</button>
+                    <button type="button" class="studio-pill-btn" data-style="3d-render">3D</button>
+                  </div>
                 </div>
-                <img id="studio-image-result" class="studio-active-img" style="display: none;" alt="Generated Result" />
-                <div id="studio-image-loading-state" style="display: none; text-align: center; color: #00F2FE;">
-                  <div class="spinner" style="margin: 0 auto 16px auto; width: 44px; height: 44px; border: 3px solid rgba(0,242,254,0.2); border-top-color: #00F2FE; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
-                  <div style="font-weight: 700; font-size: 15px;">Synthesizing Visual Concepts...</div>
-                  <div style="font-size: 12px; color: #94A3B8; margin-top: 4px;">Running latent diffusion pipeline</div>
+
+                <!-- Prompt Input Bar -->
+                <div style="margin-bottom: 12px;">
+                  <textarea id="studio-image-prompt" class="studio-textarea" style="min-height: 60px; height: 60px;" placeholder="Describe your image... (e.g. draw me a blue morpho butterfly on a leaf)"></textarea>
+                </div>
+
+                <!-- Negative Prompt, Provider & Create Button -->
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                  <input type="text" id="studio-image-negative" class="studio-textarea" style="min-height: auto; height: 42px; flex: 1; min-width: 180px;" placeholder="Negative prompt (e.g. blurry, watermark)" />
+                  <select id="studio-provider-select" class="studio-textarea" style="min-height: auto; height: 42px; width: auto; min-width: 170px;">
+                    <option value="auto">✨ Auto (Flux / Imagen)</option>
+                    <option value="pollinations">Pollinations Flux (GPU)</option>
+                    <option value="imagen">Gemini Imagen 3</option>
+                  </select>
+                  <button id="studio-generate-image-btn" class="studio-btn-primary" style="width: auto; min-width: 130px; height: 42px;" onclick="window.triggerStudioImageGeneration()">
+                    <span>✨ Create</span>
+                  </button>
                 </div>
               </div>
-              <div class="studio-action-toolbar" id="studio-image-toolbar" style="display: none;">
-                <div id="studio-image-meta-info" style="font-size: 12px; color: #94A3B8;"></div>
-                <div style="display: flex; gap: 8px;">
-                  <button type="button" class="btn btn-secondary" onclick="window.downloadStudioImage()" style="font-size: 12px; padding: 6px 12px;">📥 Download</button>
-                  <button type="button" class="btn btn-secondary" onclick="window.createImageVariation()" style="font-size: 12px; padding: 6px 12px;">🔄 Variation</button>
-                  <button type="button" class="btn btn-primary" onclick="window.sendStudioImageToChat()" style="font-size: 12px; padding: 6px 12px;">💬 Send to Chat</button>
-                </div>
+            </div>
+
+            <!-- Right: Embedded Side Gallery -->
+            <div class="studio-side-gallery-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div style="font-weight: 700; font-size: 13px; color: #F1F5F9; letter-spacing: 0.04em;">📁 GALLERY (<span id="side-gallery-count">0</span>)</div>
+                <button type="button" onclick="window.refreshStudioGallery()" style="background: none; border: none; color: #38BDF8; font-size: 12px; cursor: pointer;">🔄</button>
+              </div>
+              <div id="studio-side-gallery-grid" class="side-gallery-grid">
+                <!-- Dynamically populated thumbnail tiles -->
               </div>
             </div>
           </div>

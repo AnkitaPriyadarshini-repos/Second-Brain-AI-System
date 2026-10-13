@@ -292,6 +292,171 @@
       await deleteMediaItem(id);
       this.notify('gallery:updated', { deletedId: id });
     }
+
+    async init() {
+      this.bindPillButtons();
+      await this.renderGallery();
+    }
+
+    bindPillButtons() {
+      if (typeof document === 'undefined') return;
+      document.querySelectorAll('#studio-style-pills .studio-pill-btn').forEach(btn => {
+        btn.onclick = () => {
+          document.querySelectorAll('#studio-style-pills .studio-pill-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        };
+      });
+      document.querySelectorAll('#studio-ratio-pills .studio-pill-btn').forEach(btn => {
+        btn.onclick = () => {
+          document.querySelectorAll('#studio-ratio-pills .studio-pill-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        };
+      });
+    }
+
+    switchTab(tab) {
+      if (typeof document === 'undefined') return;
+      const tabs = ['image', 'video', 'gallery'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`studio-tab-${t}`);
+        if (btn) btn.classList.toggle('active', t === tab);
+        const panel = document.getElementById(`studio-panel-${t}`);
+        if (panel) panel.style.display = (t === tab) ? 'block' : 'none';
+      });
+      if (tab === 'gallery') this.renderGallery();
+    }
+
+    previewMedia(item) {
+      if (!item || typeof document === 'undefined') return;
+      const emptyState = document.getElementById('studio-image-empty-state');
+      const imgResult = document.getElementById('studio-image-result');
+      const toolbar = document.getElementById('studio-image-toolbar');
+      const promptInput = document.getElementById('studio-image-prompt');
+      const metaInfo = document.getElementById('studio-image-meta-info');
+
+      if (emptyState) emptyState.style.display = 'none';
+      if (imgResult) {
+        imgResult.src = item.url;
+        imgResult.style.display = 'block';
+      }
+      if (toolbar) toolbar.style.display = 'flex';
+      if (promptInput && item.prompt) promptInput.value = item.prompt;
+      if (metaInfo) {
+        metaInfo.innerHTML = `<span><strong>${item.provider || 'Create Studio'}</strong> • ${item.aspectRatio || '1:1'}</span>`;
+      }
+      this.currentPreviewItem = item;
+    }
+
+    async generateImageFromStudio() {
+      if (typeof document === 'undefined') return;
+      const promptEl = document.getElementById('studio-image-prompt');
+      const negativeEl = document.getElementById('studio-image-negative');
+      const providerEl = document.getElementById('studio-provider-select');
+      const ratioBtn = document.querySelector('#studio-ratio-pills .studio-pill-btn.active');
+      const styleBtn = document.querySelector('#studio-style-pills .studio-pill-btn.active');
+      const btn = document.getElementById('studio-generate-image-btn');
+
+      const prompt = promptEl ? promptEl.value.trim() : '';
+      if (!prompt) {
+        alert('Please enter an image prompt.');
+        return;
+      }
+
+      const negativePrompt = negativeEl ? negativeEl.value.trim() : '';
+      const aspectRatio = ratioBtn ? ratioBtn.getAttribute('data-ratio') : '1:1';
+      const style = styleBtn ? styleBtn.getAttribute('data-style') : 'cinematic';
+      const provider = providerEl ? providerEl.value : 'auto';
+
+      const loadingEl = document.getElementById('studio-image-loading-state');
+      const emptyEl = document.getElementById('studio-image-empty-state');
+      const resultImg = document.getElementById('studio-image-result');
+      const toolbar = document.getElementById('studio-image-toolbar');
+
+      if (emptyEl) emptyEl.style.display = 'none';
+      if (resultImg) resultImg.style.display = 'none';
+      if (toolbar) toolbar.style.display = 'none';
+      if (loadingEl) loadingEl.style.display = 'block';
+      if (btn) { btn.disabled = true; btn.innerText = '✨ Synthesizing...'; }
+
+      try {
+        const item = await this.generateImage({
+          prompt,
+          negativePrompt,
+          aspectRatio,
+          style,
+          provider
+        });
+        this.previewMedia(item);
+        await this.renderGallery();
+      } catch (err) {
+        alert(`Generation failed: ${err.message}`);
+        if (emptyEl) emptyEl.style.display = 'block';
+      } finally {
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (btn) { btn.disabled = false; btn.innerText = '✨ Generate Artwork'; }
+      }
+    }
+
+    async renderGallery() {
+      if (typeof document === 'undefined') return;
+      let items = await this.getGalleryItems();
+      if (!items || items.length === 0) {
+        const demo1 = {
+          id: 'demo_morpho_butterfly',
+          type: 'image',
+          url: 'https://images.unsplash.com/photo-1559253664-ca249d4608c6?w=800&auto=format&fit=crop&q=80',
+          prompt: 'A blue morpho butterfly on a vibrant green leaf, macro lens, photorealistic',
+          provider: 'Pollinations Flux',
+          aspectRatio: '1:1',
+          createdAt: new Date().toISOString()
+        };
+        const demo2 = {
+          id: 'demo_milo_robot',
+          type: 'image',
+          url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+          prompt: 'Futuristic friendly robot mascot Milo floating in space with neon cyber particles',
+          provider: 'Gemini Imagen 3',
+          aspectRatio: '1:1',
+          createdAt: new Date().toISOString()
+        };
+        await saveMediaItem(demo1);
+        await saveMediaItem(demo2);
+        items = [demo1, demo2];
+      }
+
+      const countBadges = [
+        document.getElementById('gallery-count-badge'),
+        document.getElementById('side-gallery-count')
+      ];
+      countBadges.forEach(b => { if (b) b.textContent = items.length; });
+
+      const sideGrid = document.getElementById('studio-side-gallery-grid');
+      if (sideGrid) {
+        sideGrid.innerHTML = items.map(item => `
+          <div class="side-gallery-thumb" onclick="window.MiloCreateStudio.previewMedia(${JSON.stringify(item).replace(/"/g, '&quot;')})" title="${String(item.prompt || '').replace(/"/g, '&quot;')}">
+            <img src="${item.url}" alt="${String(item.prompt || '').replace(/"/g, '&quot;')}" loading="lazy" />
+          </div>
+        `).join('');
+      }
+
+      const fullGrid = document.getElementById('studio-gallery-container');
+      if (fullGrid) {
+        fullGrid.innerHTML = items.map(item => `
+          <div class="gallery-item-card">
+            <div class="gallery-item-thumb" onclick="window.MiloCreateStudio.previewMedia(${JSON.stringify(item).replace(/"/g, '&quot;')}); window.MiloCreateStudio.switchTab('image');">
+              <img src="${item.url}" alt="${String(item.prompt || '').replace(/"/g, '&quot;')}" class="gallery-thumb-img" loading="lazy" />
+            </div>
+            <div class="gallery-item-body">
+              <div class="gallery-prompt-text">${String(item.prompt || '')}</div>
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #94A3B8;">
+                <span>${item.provider || 'Studio'}</span>
+                <a href="${item.url}" download="milo_${item.id}.jpg" target="_blank" style="color: #00F2FE; text-decoration: none; font-weight: 600;">📥 Download</a>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
   }
 
   // Instantiate singleton

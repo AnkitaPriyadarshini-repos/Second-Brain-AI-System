@@ -506,3 +506,83 @@
   overflow-y: auto;
   color: #E2E8F0;
 }
+
+/* ==================================================== */
+/* 5. Locally Uncensored Unified Side Gallery & Stage   */
+/* ==================================================== */
+.studio-unified-stage {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 980px) {
+  .studio-unified-stage {
+    grid-template-columns: 1fr;
+  }
+}
+
+.studio-side-gallery-card {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.15);
+  border-radius: 18px;
+  padding: 16px;
+  backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: column;
+}
+
+.side-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  overflow-y: auto;
+  max-height: 580px;
+  padding-right: 4px;
+}
+
+.side-gallery-thumb {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  background: #020617;
+  cursor: pointer;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.2s ease;
+}
+
+.side-gallery-thumb:hover {
+  border-color: #00F2FE;
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 242, 254, 0.25);
+}
+
+.side-gallery-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.coding-dialog-bubble {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.coding-step-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(56, 189, 248, 0.12);
+  color: #38BDF8;
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
