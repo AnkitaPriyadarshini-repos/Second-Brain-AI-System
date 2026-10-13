@@ -634,31 +634,6 @@
 
         <!-- Assistant Answer Turn -->
         <div class="chat-message-bubble assistant-bubble" id="onyx-assistant-turn-${s.id}">
-          
-          <!-- Collapsible Thought Accordion -->
-          <div class="onyx-thought-box">
-            <div class="onyx-thought-header" onclick="window.OnyxInterface.toggleThought()">
-              <div class="onyx-thought-left">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
-                </svg>
-                <span>Thought for ${s.thoughtTime}</span>
-                <svg id="onyx-thought-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="transition: transform 0.2s ease;">
-                  <polyline points="6 9 12 15 18 9"/>
-                </svg>
-              </div>
-              <div class="onyx-thought-right">
-                <span class="onyx-steps-badge">${s.thoughtSteps} steps</span>
-                <button class="onyx-action-icon-btn" title="Refresh reasoning" onclick="event.stopPropagation(); window.OnyxInterface.refreshReasoning();">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-                </button>
-              </div>
-            </div>
-            <div id="onyx-thought-content" class="onyx-thought-content">
-              ${s.thoughtDetails.map(d => `<div style="margin-bottom: 5px;">• ${this.escapeHTML(d)}</div>`).join('')}
-            </div>
-          </div>
 
           <!-- Answer Markdown Content -->
           <div class="chat-message-content">
@@ -677,6 +652,9 @@
           <div class="onyx-turn-actions-bar" style="margin-top: 8px; margin-bottom: 6px;">
             <button class="onyx-action-icon-btn" onclick="window.OnyxInterface.copyCurrentTurn(this)" title="Copy response">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+            <button class="onyx-action-icon-btn" onclick="window.OnyxInterface.shareCurrentTurn(this)" title="Share response">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
             </button>
             <button class="onyx-action-icon-btn" onclick="window.OnyxInterface.rateTurn(true, this)" title="Good response">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
@@ -758,12 +736,58 @@
     }
 
     copyCurrentTurn(btn) {
-      const activeSession = ONYX_SESSIONS[this.currentSessionId] || ONYX_SESSIONS.onyx_use_cases;
-      const text = `${activeSession.intro}\n` + activeSession.bullets.map(b => `• ${b.title}: ${b.desc}`).join('\n');
-      if (navigator.clipboard) {
+      let text = '';
+      if (btn) {
+        const bubble = btn.closest('.chat-bubble, .chat-message-bubble, .assistant-bubble, .claude-ai-bubble') ||
+                       btn.parentElement?.closest('.chat-bubble, .chat-message-bubble, .assistant-bubble');
+        if (bubble) {
+          const contentEl = bubble.querySelector('.chat-text, .chat-message-content, .onyx-turn-content');
+          if (contentEl) {
+            text = (contentEl.innerText || contentEl.textContent || '').trim();
+          }
+        }
+      }
+      if (!text) {
+        const activeSession = ONYX_SESSIONS[this.currentSessionId] || ONYX_SESSIONS.onyx_use_cases;
+        if (activeSession) {
+          text = `${activeSession.intro || ''}\n` + (activeSession.bullets || []).map(b => `• ${b.title}: ${b.desc}`).join('\n');
+        }
+      }
+      if (window.copyToClipboard) {
+        window.copyToClipboard(text, btn);
+      } else if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
+          if (btn) {
+            const orig = btn.innerHTML;
+            btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+            setTimeout(() => { btn.innerHTML = orig; }, 2000);
+          }
           if (window.showToast) window.showToast('Copied answer to clipboard', 'success');
         });
+      }
+    }
+
+    shareCurrentTurn(btn) {
+      let text = '';
+      if (btn) {
+        const bubble = btn.closest('.chat-bubble, .chat-message-bubble, .assistant-bubble') ||
+                       btn.parentElement?.closest('.chat-bubble, .chat-message-bubble, .assistant-bubble');
+        if (bubble) {
+          const contentEl = bubble.querySelector('.chat-text, .chat-message-content, .onyx-turn-content');
+          if (contentEl) text = (contentEl.innerText || contentEl.textContent || '').trim();
+        }
+      }
+      const shareData = {
+        title: 'Milo AI Response',
+        text: text ? `Milo Answer:\n${text}` : 'Shared via Milo AI Workspace',
+        url: window.location.href
+      };
+      if (navigator.share && typeof navigator.canShare === 'function' && navigator.canShare(shareData)) {
+        navigator.share(shareData).catch(() => this.copyShareLinkToClipboard(shareData));
+      } else if (navigator.share) {
+        navigator.share(shareData).catch(() => this.copyShareLinkToClipboard(shareData));
+      } else {
+        this.copyShareLinkToClipboard(shareData);
       }
     }
 
@@ -821,10 +845,58 @@
     }
 
     shareSession() {
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(window.location.href);
+      const container = document.getElementById('chat-container');
+      let shareText = '';
+      let shareTitle = 'Milo AI Conversation';
+
+      if (container && container.children.length > 0) {
+        const bubbles = container.querySelectorAll('.chat-bubble, .chat-message-bubble');
+        const turns = [];
+        bubbles.forEach(b => {
+          const isUser = b.classList.contains('user-bubble') || b.classList.contains('claude-user-bubble');
+          const textEl = b.querySelector('.chat-text, .chat-message-content');
+          const text = textEl ? (textEl.innerText || textEl.textContent || '').trim() : '';
+          if (text) {
+            turns.push(`${isUser ? 'User' : 'Milo'}: ${text}`);
+          }
+        });
+        if (turns.length > 0) {
+          shareText = turns.join('\n\n---\n\n');
+          const firstUser = turns.find(t => t.startsWith('User:'));
+          if (firstUser) {
+            shareTitle = `Milo Chat: ${firstUser.replace(/^User:\s*/, '').slice(0, 36)}...`;
+          }
+        }
       }
-      if (window.showToast) window.showToast('Shareable session link copied to clipboard!', 'success');
+
+      const shareData = {
+        title: shareTitle,
+        text: shareText ? `${shareTitle}\n\n${shareText}\n\nShared via Milo AI Workspace:` : 'Check out Milo — Personal AI and Knowledge Workspace',
+        url: window.location.href
+      };
+
+      if (navigator.share && typeof navigator.canShare === 'function' && navigator.canShare(shareData)) {
+        navigator.share(shareData).catch(() => {
+          this.copyShareLinkToClipboard(shareData);
+        });
+      } else if (navigator.share) {
+        navigator.share(shareData).catch(() => {
+          this.copyShareLinkToClipboard(shareData);
+        });
+      } else {
+        this.copyShareLinkToClipboard(shareData);
+      }
+    }
+
+    copyShareLinkToClipboard(shareData) {
+      const fullCopy = shareData.text ? `${shareData.text}\n${shareData.url}` : shareData.url;
+      if (window.copyToClipboard) {
+        window.copyToClipboard(fullCopy);
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(fullCopy).then(() => {
+          if (window.showToast) window.showToast('Share link & chat copied to clipboard! 📋', 'success');
+        });
+      }
     }
 
     selectAgent(agentId) {
@@ -869,6 +941,12 @@
   }
 
   window.OnyxInterface = new OnyxInterfaceController();
+  window.shareSession = function() {
+    if (window.OnyxInterface) return window.OnyxInterface.shareSession();
+  };
+  window.copyCurrentTurn = function(btn) {
+    if (window.OnyxInterface) return window.OnyxInterface.copyCurrentTurn(btn);
+  };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => window.OnyxInterface.init());

@@ -1169,28 +1169,48 @@
     if (typeof VoiceEngine !== 'undefined') {
       VoiceEngine.init({
         onTranscript: (text, isFinal) => {
-          if (isFinal && text) {
-            window.triggerSampleQuery(text);
+          const inputEl = document.getElementById('rag-query-input');
+          if (inputEl && text) {
+            inputEl.value = text;
+            inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+          if (isFinal && text && text.trim()) {
+            if (voiceTriggerBtn) {
+              voiceTriggerBtn.classList.remove('listening');
+            }
+            if (window.submitRAGQuery) {
+              window.submitRAGQuery();
+            } else if (typeof window.handleRAGQuery === 'function') {
+              window.handleRAGQuery(text.trim());
+            } else if (window.triggerSampleQuery) {
+              window.triggerSampleQuery(text.trim());
+            }
           }
         },
         onStateChange: (state) => {
+          const s = (state || '').toLowerCase();
           if (typeof GeminiColorFlowEngine !== 'undefined') {
-            GeminiColorFlowEngine.triggerState(state);
+            GeminiColorFlowEngine.triggerState(s);
           }
           if (typeof NexusBotEngine !== 'undefined') {
-            NexusBotEngine.setState(state);
+            NexusBotEngine.setState(s);
+          }
+          if (typeof MiloCompanion !== 'undefined') {
+            if (s === 'listening' || s === 'transcribing') MiloCompanion.setGlobalState('listening');
+            else if (s === 'speaking') MiloCompanion.setGlobalState('speaking');
+            else if (s === 'idle') MiloCompanion.setGlobalState('idle');
           }
           if (voiceTriggerBtn) {
             const micSvg = `<svg class="nori-voice-mic-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>`;
-            if (state === 'listening') {
+            if (s === 'listening' || s === 'transcribing' || s === 'requesting_permission') {
               voiceTriggerBtn.classList.add('listening');
               voiceTriggerBtn.classList.remove('speaking');
-              voiceTriggerBtn.title = 'Listening to you...';
+              voiceTriggerBtn.title = 'Listening to you... Click to stop';
               voiceTriggerBtn.innerHTML = `${micSvg}<span class="nori-voice-label">Listening…</span>`;
-            } else if (state === 'speaking') {
+            } else if (s === 'speaking') {
               voiceTriggerBtn.classList.add('speaking');
               voiceTriggerBtn.classList.remove('listening');
-              voiceTriggerBtn.title = 'Milo is speaking...';
+              voiceTriggerBtn.title = 'Milo is speaking... Click to stop';
               voiceTriggerBtn.innerHTML = `🔊<span class="nori-voice-label">Speaking…</span>`;
             } else {
               voiceTriggerBtn.classList.remove('listening', 'speaking');
@@ -2069,36 +2089,6 @@
         `;
 
         msgCard.innerHTML = `
-          <div class="onyx-thought-accordion" id="accordion-${turnId}" onclick="if(window.OnyxInterface) window.OnyxInterface.toggleTurnThought('${turnId}')">
-            <div class="onyx-thought-header">
-              <div class="onyx-thought-left">
-                <svg class="onyx-aperture-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="14.31" y1="8" x2="20.05" y2="17.94"/>
-                  <line x1="9.69" y1="8" x2="21.17" y2="8"/>
-                  <line x1="7.38" y1="12" x2="13.12" y2="2.06"/>
-                  <line x1="9.69" y1="16" x2="3.95" y2="6.06"/>
-                  <line x1="14.31" y1="16" x2="2.83" y2="16"/>
-                  <line x1="16.62" y1="12" x2="10.88" y2="21.94"/>
-                </svg>
-                <span class="onyx-thought-summary-text">Thought for 12s</span>
-              </div>
-              <div class="onyx-thought-steps-badge">
-                <span>2 steps</span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-              </div>
-            </div>
-            <div class="onyx-thought-body" id="body-${turnId}" style="display: none;">
-              <div class="onyx-thought-step">
-                <span class="onyx-step-number">1</span>
-                <span>Retrieved verified grounded knowledge across connectors and notes.</span>
-              </div>
-              <div class="onyx-thought-step">
-                <span class="onyx-step-number">2</span>
-                <span>Synthesized coherent, high-accuracy response with cited references.</span>
-              </div>
-            </div>
-          </div>
           <div class="chat-text onyx-turn-content" style="color: #111827; font-size: 15px; line-height: 1.6; font-family: 'Inter', sans-serif;"></div>
           ${actionsHTML}
         `;
@@ -4049,23 +4039,93 @@
         }
       }
     };
-    window.copyToClipboard = function(text) {
+    window.copyToClipboard = async function(text, btn) {
       if (!text) return;
+      let copied = false;
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text);
-        } else {
+          await navigator.clipboard.writeText(text);
+          copied = true;
+        }
+      } catch (err) {
+        console.warn('navigator.clipboard writeText failed, trying execCommand fallback:', err);
+      }
+      if (!copied) {
+        try {
           const ta = document.createElement('textarea');
           ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
           document.body.appendChild(ta);
+          ta.focus();
           ta.select();
-          document.execCommand('copy');
+          copied = document.execCommand('copy');
           document.body.removeChild(ta);
-        }
-        showToast('Copied to clipboard! 📋');
-      } catch (_) {
-        showToast('Could not copy to clipboard.');
+        } catch (_) {}
       }
+      if (copied) {
+        if (btn) {
+          const originalHTML = btn.innerHTML;
+          btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+          btn.style.color = '#10B981';
+          setTimeout(() => {
+            btn.innerHTML = originalHTML;
+            btn.style.color = '';
+          }, 2000);
+        }
+        if (typeof showToast === 'function') {
+          showToast('Copied to clipboard! 📋', 'success');
+        }
+      } else {
+        if (typeof showToast === 'function') {
+          showToast('Could not copy to clipboard.');
+        }
+      }
+      return copied;
+    };
+
+    window.pasteFromClipboardToInput = async function() {
+      const inputEl = document.getElementById('rag-query-input');
+      if (!inputEl) return;
+      try {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          const text = await navigator.clipboard.readText();
+          if (text && text.trim()) {
+            const val = inputEl.value;
+            if (val) {
+              inputEl.value = val + (val.endsWith(' ') || val.endsWith('\n') ? '' : ' ') + text;
+            } else {
+              inputEl.value = text;
+            }
+            inputEl.focus();
+            inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+            if (typeof showToast === 'function') showToast('📋 Pasted text from clipboard', 'success');
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('Clipboard readText failed or not permitted:', err);
+      }
+      inputEl.focus();
+      if (typeof showToast === 'function') showToast('Press Ctrl+V to paste into chat', 'info');
+    };
+
+    window.cycleMiloMascot = function() {
+      const img = document.getElementById('milo-hero-robot-img');
+      if (!img) return;
+      const poses = [
+        { src: 'assets/milo_robot_mascot.png', mood: 'Ready to assist' },
+        { src: 'assets/milo_cosmic_orb.png', mood: 'Cosmic Knowledge Illuminator' },
+        { src: 'assets/milo_space_skater.png', mood: 'Space Explorer' }
+      ];
+      let curIdx = poses.findIndex(p => img.src.includes(p.src.replace('assets/', '')));
+      let nextIdx = (curIdx + 1) % poses.length;
+      img.style.transform = 'scale(0.85) rotate(5deg)';
+      setTimeout(() => {
+        img.src = poses[nextIdx].src;
+        img.style.transform = '';
+        if (typeof showToast === 'function') showToast(`✨ Milo Mode: ${poses[nextIdx].mood}`, 'info');
+      }, 150);
     };
 
     window.openInChat = function(text) {

@@ -165,6 +165,9 @@
         <button class="onyx-action-icon-btn" onclick="window.copyTurnContent(this)" title="Copy">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         </button>
+        <button class="onyx-action-icon-btn" onclick="window.shareTurnContent ? window.shareTurnContent(this) : (window.shareSession && window.shareSession())" title="Share response">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        </button>
         <button class="onyx-action-icon-btn" onclick="window.rateTurn && window.rateTurn(true, this)" title="Good response">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
         </button>
@@ -715,10 +718,44 @@
     const bubble = btn ? (btn.closest('.assistant-bubble') || btn.closest('.chat-message-bubble') || btn.closest('.chat-bubble')) : null;
     const content = bubble ? (bubble.querySelector('.chat-message-content') || bubble.querySelector('.chat-text') || bubble) : null;
     const text = content ? (content.innerText || content.textContent || '').trim() : '';
-    if (navigator.clipboard && text) {
+    if (window.copyToClipboard && text) {
+      window.copyToClipboard(text, btn);
+    } else if (navigator.clipboard && text) {
       navigator.clipboard.writeText(text).then(() => {
+        if (btn) {
+          const orig = btn.innerHTML;
+          btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+          setTimeout(() => { btn.innerHTML = orig; }, 2000);
+        }
         if (window.showToast) window.showToast('Copied response to clipboard', 'success');
       });
+    }
+  };
+  window.shareTurnContent = function (btn) {
+    const bubble = btn ? (btn.closest('.assistant-bubble') || btn.closest('.chat-message-bubble') || btn.closest('.chat-bubble')) : null;
+    const content = bubble ? (bubble.querySelector('.chat-message-content') || bubble.querySelector('.chat-text') || bubble) : null;
+    const text = content ? (content.innerText || content.textContent || '').trim() : '';
+    const shareData = {
+      title: 'Milo AI Response',
+      text: text ? `Milo Answer:\n${text}` : 'Shared via Milo AI Workspace',
+      url: window.location.href
+    };
+    if (navigator.share && typeof navigator.canShare === 'function' && navigator.canShare(shareData)) {
+      navigator.share(shareData).catch(() => {
+        if (window.OnyxInterface && window.OnyxInterface.copyShareLinkToClipboard) {
+          window.OnyxInterface.copyShareLinkToClipboard(shareData);
+        }
+      });
+    } else if (navigator.share) {
+      navigator.share(shareData).catch(() => {
+        if (window.OnyxInterface && window.OnyxInterface.copyShareLinkToClipboard) {
+          window.OnyxInterface.copyShareLinkToClipboard(shareData);
+        }
+      });
+    } else if (window.OnyxInterface && window.OnyxInterface.copyShareLinkToClipboard) {
+      window.OnyxInterface.copyShareLinkToClipboard(shareData);
+    } else if (window.copyToClipboard) {
+      window.copyToClipboard(`${shareData.text}\n${shareData.url}`);
     }
   };
   window.rateTurn = function (isPositive, btn) {

@@ -482,6 +482,16 @@ html[data-theme="onyx"] #hero-starter-chips.hidden {
   display: none !important;
 }
 
+/* Hide thought clutter by default */
+.onyx-thought-accordion,
+.onyx-thought-box {
+  display: none !important;
+}
+
+body.deep-reasoning-active .onyx-thought-box {
+  display: block !important;
+}
+
 /* User Message Pill */
 html[data-theme="onyx"] .chat-message-bubble.user-bubble,
 html[data-theme="onyx"] .user-bubble {
