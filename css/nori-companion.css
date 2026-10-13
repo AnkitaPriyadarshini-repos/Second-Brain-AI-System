@@ -667,21 +667,37 @@ textarea.nori-reference-textarea::placeholder {
 }
 
 
-/* Prompt Starter Chips */
+/* Prompt Starter Chips (Clean light style for Onyx & default) */
 .tufy-starter-chip {
-  background: #141519 !important;
-  border: 1px solid #334155 !important;
-  color: #FFFFFF !important;
-  padding: 8px 16px !important;
+  background: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  color: #374151 !important;
+  padding: 7px 14px !important;
   border-radius: 9999px !important;
   font-size: 13px !important;
   font-weight: 500 !important;
   cursor: pointer !important;
   transition: all 0.2s ease !important;
   user-select: none !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
 }
 
 .tufy-starter-chip:hover {
+  background: #F9FAFB !important;
+  border-color: #D1D5DB !important;
+  color: #111827 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Prompt Starter Chips Dark Mode */
+html[data-theme="dark"] .tufy-starter-chip {
+  background: #141519 !important;
+  border: 1px solid #334155 !important;
+  color: #FFFFFF !important;
+}
+
+html[data-theme="dark"] .tufy-starter-chip:hover {
   background: #1E2028 !important;
   border-color: #6366F1 !important;
   color: #FFFFFF !important;
@@ -689,20 +705,20 @@ textarea.nori-reference-textarea::placeholder {
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
 }
 
-/* Top Navigation Bar Explicit Dark Theme Overrides */
-.claude-top-navbar,
-header.claude-top-navbar {
+/* Top Navigation Bar Dark Mode Overrides (Only active in dark mode) */
+html[data-theme="dark"] .claude-top-navbar,
+html[data-theme="dark"] header.claude-top-navbar {
   background: #0B0C0E !important;
   border-bottom: 1px solid #1E2028 !important;
   color: #FFFFFF !important;
 }
 
-.claude-top-navbar span {
+html[data-theme="dark"] .claude-top-navbar span {
   color: #FFFFFF !important;
 }
 
-.status-pill-badge,
-.claude-plan-pill {
+html[data-theme="dark"] .status-pill-badge,
+html[data-theme="dark"] .claude-plan-pill {
   background: #141519 !important;
   border: 1px solid #334155 !important;
   color: #FFFFFF !important;

@@ -793,6 +793,13 @@
       const now = Date.now();
       const defaultThreads = [
         {
+          id: 'thread-default',
+          title: 'New Session',
+          createdAt: now,
+          updatedAt: now,
+          messages: []
+        },
+        {
           id: 'thread-form-filling',
           title: 'Form Filling Instructions',
           createdAt: now,

@@ -1104,3 +1104,37 @@ html[data-theme="onyx"] button.nori-at-tag-btn {
     left: 0 !important;
   }
 }
+
+/* Toast Container (Positioned bottom-right to avoid overriding top header actions) */
+.toast-container,
+html[data-theme="onyx"] .toast-container {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  top: auto !important;
+  z-index: 10002 !important;
+  display: flex !important;
+  flex-direction: column-reverse !important;
+  gap: 10px !important;
+  pointer-events: none !important;
+}
+
+html[data-theme="onyx"] .toast-notification {
+  background: #111827 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #374151 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2) !important;
+}
+
+html[data-theme="onyx"] .tufy-starter-chip {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  color: #374151 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+html[data-theme="onyx"] .tufy-starter-chip:hover {
+  background: #F9FAFB !important;
+  border-color: #D1D5DB !important;
+  color: #111827 !important;
+}

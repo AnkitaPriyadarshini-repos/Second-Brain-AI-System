@@ -1009,6 +1009,10 @@
     };
 
     window.toggleVoiceListen = function() {
+      const inputEl = document.getElementById('rag-query-input');
+      if (inputEl && inputEl.value.trim() && !window._voiceBaseText) {
+        window._voiceBaseText = inputEl.value.trim();
+      }
       if (typeof VoiceEngine !== 'undefined' && VoiceEngine.toggleListen) {
         VoiceEngine.toggleListen();
       }
@@ -1171,19 +1175,22 @@
         onTranscript: (text, isFinal) => {
           const inputEl = document.getElementById('rag-query-input');
           if (inputEl && text) {
-            inputEl.value = text;
+            const combined = window._voiceBaseText ? (window._voiceBaseText + ' ' + text) : text;
+            inputEl.value = combined;
             inputEl.dispatchEvent(new Event('input', { bubbles: true }));
           }
           if (isFinal && text && text.trim()) {
+            const fullText = (inputEl && inputEl.value.trim()) ? inputEl.value.trim() : (window._voiceBaseText ? (window._voiceBaseText + ' ' + text.trim()) : text.trim());
+            window._voiceBaseText = '';
             if (voiceTriggerBtn) {
               voiceTriggerBtn.classList.remove('listening');
             }
             if (window.submitRAGQuery) {
               window.submitRAGQuery();
             } else if (typeof window.handleRAGQuery === 'function') {
-              window.handleRAGQuery(text.trim());
+              window.handleRAGQuery(fullText);
             } else if (window.triggerSampleQuery) {
-              window.triggerSampleQuery(text.trim());
+              window.triggerSampleQuery(fullText);
             }
           }
         },
@@ -3819,13 +3826,12 @@
       if (!container || typeof Store === 'undefined') return;
 
       const activeId = Store.getActiveThreadId();
-      const threads = Store.getChatThreads();
+      const threads = Store.getChatThreads() || [];
       const thread = threads.find(t => t.id === activeId) || threads[0];
-      if (!thread) return;
 
       container.innerHTML = '';
 
-      const msgs = (thread.messages || []).filter(m => {
+      const msgs = (thread && thread.messages ? thread.messages : []).filter(m => {
         if (!m || !m.content) return false;
         if (m.id === 'msg-welcome') return false;
         if (m.content.includes('Urban density') || 
@@ -3839,10 +3845,21 @@
         return true;
       });
 
-      if (msgs.length === 0) {
-        if (heroView) heroView.style.display = 'flex';
+      if (!thread || activeId === 'thread-default' || msgs.length === 0) {
+        if (heroView) {
+          heroView.style.display = 'flex';
+          heroView.classList.remove('hidden');
+        }
+        if (container) {
+          container.style.display = 'none';
+          container.innerHTML = '';
+        }
       } else {
-        if (heroView) heroView.style.display = 'none';
+        if (heroView) {
+          heroView.style.display = 'none';
+          heroView.classList.add('hidden');
+        }
+        if (container) container.style.display = 'flex';
         msgs.forEach(m => {
           const cleanedText = cleanRogueText(m.content);
           if (cleanedText) {
@@ -4091,9 +4108,12 @@
         if (navigator.clipboard && navigator.clipboard.readText) {
           const text = await navigator.clipboard.readText();
           if (text && text.trim()) {
-            const val = inputEl.value;
-            if (val) {
-              inputEl.value = val + (val.endsWith(' ') || val.endsWith('\n') ? '' : ' ') + text;
+            const start = inputEl.selectionStart;
+            const end = inputEl.selectionEnd;
+            if (typeof start === 'number' && typeof end === 'number' && start !== end) {
+              inputEl.setRangeText(text, start, end, 'end');
+            } else if (inputEl.value) {
+              inputEl.value = inputEl.value + (inputEl.value.endsWith(' ') || inputEl.value.endsWith('\n') ? '' : ' ') + text;
             } else {
               inputEl.value = text;
             }
