@@ -637,7 +637,8 @@
 
     const input = document.getElementById('rag-query-input');
     if (input) {
-      input.placeholder = 'Ask anything — or ask about something you saved…';
+      const isOnyx = document.documentElement.getAttribute('data-theme') === 'onyx';
+      input.placeholder = isOnyx ? 'How can I help you today?' : 'Ask anything — or ask about something you saved…';
       input.setAttribute('autocomplete', 'off');
       input.setAttribute('enterkeyhint', 'send');
     }
