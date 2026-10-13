@@ -669,7 +669,7 @@
 
   function polishInterface() {
     const isOnyx = document.documentElement.getAttribute('data-theme') === 'onyx';
-    document.title = isOnyx ? 'Onyx — Open Source AI Platform & Workspace' : 'Milo — your notes, in context';
+    document.title = isOnyx ? 'Milo — Open Source AI Platform & Workspace' : 'Milo — your notes, in context';
 
     document.querySelectorAll('h1,h2,h3,p,button').forEach((el) => {
       const text = clean(el.textContent);

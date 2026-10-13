@@ -12,15 +12,15 @@
   const ONYX_SESSIONS = {
     onyx_use_cases: {
       id: 'onyx_use_cases',
-      title: 'Onyx Use Cases',
-      userQuery: 'What are some good use cases for Onyx? Give me a concise answer.',
+      title: 'Milo Use Cases',
+      userQuery: 'What are some good use cases for Milo? Give me a concise answer.',
       thoughtTime: '27s',
       thoughtSteps: 2,
       thoughtDetails: [
         'Retrieved verified deployment and enterprise capability records across connectors.',
         'Synthesized grounded use cases across search, internal AI assistant, customer intelligence, feedback synthesis, sales enablement, and knowledge preservation.'
       ],
-      intro: 'Good Onyx use cases include:',
+      intro: 'Good Milo use cases include:',
       bullets: [
         {
           title: 'Enterprise search',
@@ -71,7 +71,7 @@
         {
           tool: 'Google Drive',
           type: 'Product Documentation',
-          title: 'Onyx Enterprise Playbook v4.4.6',
+          title: 'Milo Enterprise Playbook v4.4.6',
           snippet: 'Role-based access control, document-level security, hybrid vector+BM25 retrieval, and private air-gapped LLM routing.',
           score: '91% match'
         }
@@ -139,7 +139,7 @@
         'Inspected environment auth configurations and identity provider metadata.',
         'Validated SAML 2.0 endpoint specifications and audience restriction parameters.'
       ],
-      intro: 'Current Onyx SAML 2.0 configuration details:',
+      intro: 'Current Milo SAML 2.0 configuration details:',
       bullets: [
         {
           title: 'SSO Protocol',
@@ -153,7 +153,7 @@
         },
         {
           title: 'Entity ID',
-          desc: 'urn:onyx:enterprise:second-brain-ai',
+          desc: 'urn:milo:enterprise:second-brain-ai',
           pill: 'Google Drive'
         },
         {
@@ -253,7 +253,7 @@
 
     onyx_sso_support_details: {
       id: 'onyx_sso_support_details',
-      title: 'Onyx SSO Support Details',
+      title: 'Milo SSO Support Details',
       userQuery: 'Can you walk me through configuring Azure AD enterprise SSO?',
       thoughtTime: '19s',
       thoughtSteps: 2,
@@ -261,7 +261,7 @@
         'Extracted Microsoft Entra ID (Azure AD) enterprise application setup procedure.',
         'Verified SAML claims configuration and tenant identifier requirements.'
       ],
-      intro: 'To configure Azure AD enterprise SSO for Onyx, follow these steps:',
+      intro: 'To configure Azure AD enterprise SSO for Milo, follow these steps:',
       bullets: [
         {
           title: 'Create Enterprise Application',
@@ -270,7 +270,7 @@
         },
         {
           title: 'Configure Single Sign-On',
-          desc: 'Choose SAML, input Entity ID (urn:onyx:enterprise) and ACS URL into Basic SAML Configuration',
+          desc: 'Choose SAML, input Entity ID (urn:milo:enterprise) and ACS URL into Basic SAML Configuration',
           pill: 'Vault'
         },
         {
@@ -331,7 +331,7 @@
 
     onyx_sso_support: {
       id: 'onyx_sso_support',
-      title: 'Onyx SSO Support',
+      title: 'Milo SSO Support',
       userQuery: 'Users are receiving 403 Forbidden after SAML callback. How do we resolve this?',
       thoughtTime: '11s',
       thoughtSteps: 2,
@@ -353,7 +353,7 @@
         },
         {
           title: 'Audience restriction mismatch',
-          desc: 'Ensure the Entity ID in the SAML response matches urn:onyx:enterprise:second-brain-ai exactly',
+          desc: 'Ensure the Entity ID in the SAML response matches urn:milo:enterprise:second-brain-ai exactly',
           pill: 'Vault'
         }
       ],
@@ -371,13 +371,13 @@
     hello_world_request: {
       id: 'hello_world_request',
       title: 'Hello World Request',
-      userQuery: 'Ping test: is the Onyx platform and all sync connectors operational?',
+      userQuery: 'Ping test: is the Milo platform and all sync connectors operational?',
       thoughtTime: '5s',
       thoughtSteps: 1,
       thoughtDetails: [
         'Executed end-to-end health check across sync workers, hybrid vector index, and inference gateway.'
       ],
-      intro: 'Onyx Enterprise System Status: All Systems Operational.',
+      intro: 'Milo Enterprise System Status: All Systems Operational.',
       bullets: [
         {
           title: 'API Gateway',
@@ -762,7 +762,7 @@
     }
 
     reportIssue() {
-      if (window.showToast) window.showToast('Report submitted to Onyx security & audit log.', 'info');
+      if (window.showToast) window.showToast('Report submitted to Milo security & audit log.', 'info');
     }
 
     regenerateShowcase() {
