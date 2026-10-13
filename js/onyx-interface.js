@@ -796,6 +796,7 @@
         container.style.display = 'none';
       }
       if (hero) {
+        hero.classList.remove('hidden');
         hero.style.display = 'flex';
       }
       if (input) {
@@ -806,6 +807,10 @@
 
       document.querySelectorAll('.onyx-sidebar-item').forEach(i => i.classList.remove('active'));
       if (window.showToast) window.showToast('New session started', 'info');
+    }
+
+    newSession() {
+      return this.createNewSession();
     }
 
     shareSession() {

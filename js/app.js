@@ -1461,6 +1461,7 @@
         targetContainer.style.display = 'none';
       }
       if (heroView) {
+        heroView.classList.remove('hidden');
         heroView.style.display = 'flex';
       }
       if (inputEl) {
