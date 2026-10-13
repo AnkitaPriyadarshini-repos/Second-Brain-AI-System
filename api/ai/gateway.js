@@ -12,7 +12,7 @@ const RATE_WINDOW_MS = 60_000;
 const AUTH_RATE_LIMIT = 30;
 const GUEST_RATE_LIMIT = 15;
 const CACHE_TTL_MS = 20_000;
-const REQUEST_TIMEOUT_MS = 25_000;
+const REQUEST_TIMEOUT_MS = 8_500;
 
 const rateBuckets = globalThis.__junoRateBuckets || new Map();
 const answerCache = globalThis.__junoAnswerCache || new Map();
@@ -225,10 +225,7 @@ async function callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey
         systemInstruction: { parts: [{ text: systemPrompt }] },
         contents,
         generationConfig: {
-          maxOutputTokens: model === PRIMARY_MODEL ? 8192 : 4096,
-          thinkingConfig: {
-            thinkingLevel: String(thinkingLevel || 'LOW').toUpperCase()
-          }
+          maxOutputTokens: model === PRIMARY_MODEL ? 8192 : 4096
         }
       }),
       signal: controller.signal
@@ -394,6 +391,16 @@ export default async function handler(req, res) {
       model = PRIMARY_MODEL;
       thinkingLevel = 'medium';
       result = await callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey, requestId });
+    }
+
+    // If model returns 404, fallback to official available production models
+    if (!result.response.ok && result.response.status === 404) {
+      model = 'gemini-2.0-flash';
+      result = await callGemini({ model, systemPrompt, contents, thinkingLevel: 'low', apiKey, requestId });
+      if (!result.response.ok && result.response.status === 404) {
+        model = 'gemini-1.5-flash';
+        result = await callGemini({ model, systemPrompt, contents, thinkingLevel: 'low', apiKey, requestId });
+      }
     }
 
     const { response, data } = result;
