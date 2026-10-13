@@ -1,8 +1,8 @@
 {
   "packageId": "app.vercel.second_brain_ai_system.twa",
   "host": "second-brain-ai-system.vercel.app",
-  "name": "Second Brain AI System",
-  "launcherName": "Juno AI",
+  "name": "Milo — Second Brain AI System",
+  "launcherName": "Milo",
   "display": "standalone",
   "themeColor": "#FBC02D",
   "themeColorDark": "#000000",

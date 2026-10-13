@@ -159,7 +159,7 @@ function buildSystemPrompt({ context, citations, intent, history }) {
     ? `\nAvailable source labels: ${citations.map((c) => c.title).join(' | ')}.`
     : '';
 
-  return `You are Juno, a personal AI assistant inside Second Brain AI.
+  return `You are Milo, a personal AI assistant inside Second Brain AI.
 
 Your job is to answer the user's LATEST message directly and naturally. The previous conversation is context, not a script. Never repeat a previous answer just because it appeared earlier. If the user changes topic, follow the new topic.
 
@@ -274,7 +274,7 @@ export default async function handler(req, res) {
   if (!limit.allowed) {
     return res.status(429).json({
       success: false,
-      error: 'Juno is receiving a lot of requests right now. Please try again in a minute.',
+      error: 'Milo is receiving a lot of requests right now. Please try again in a minute.',
       requestId
     });
   }
@@ -283,7 +283,7 @@ export default async function handler(req, res) {
   if (!apiKey) {
     return res.status(503).json({
       success: false,
-      error: 'Juno is not connected to its AI service yet. Add GEMINI_API_KEY to the Vercel Production environment and redeploy.',
+      error: 'Milo is not connected to its AI service yet. Add GEMINI_API_KEY to the Vercel Production environment and redeploy.',
       requestId
     });
   }
@@ -352,7 +352,7 @@ export default async function handler(req, res) {
     const { response, data } = result;
     if (!response.ok) {
       const providerMessage = data?.error?.message || `Gemini returned HTTP ${response.status}`;
-      console.error('[juno/gateway]', requestId, response.status, providerMessage);
+      console.error('[milo/gateway]', requestId, response.status, providerMessage);
       return res.status(response.status === 429 ? 429 : 502).json({
         success: false,
         error: response.status === 429
@@ -366,7 +366,7 @@ export default async function handler(req, res) {
     if (!answer) {
       return res.status(502).json({
         success: false,
-        error: 'Juno received an empty answer from the AI service. Please try again.',
+        error: 'Milo received an empty answer from the AI service. Please try again.',
         requestId
       });
     }
@@ -393,8 +393,8 @@ export default async function handler(req, res) {
     return res.status(error?.name === 'AbortError' ? 504 : 502).json({
       success: false,
       error: error?.name === 'AbortError'
-        ? 'Juno took too long to respond. Please try again.'
-        : 'Juno could not reach the AI service. Please try again.',
+        ? 'Milo took too long to respond. Please try again.'
+        : 'Milo could not reach the AI service. Please try again.',
       requestId
     });
   }

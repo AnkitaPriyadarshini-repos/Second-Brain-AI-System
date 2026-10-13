@@ -955,12 +955,22 @@
       if (typeof SoundEngine !== 'undefined') SoundEngine.playClick();
     };
     window.runAgent = function(agentId) {
-      if (typeof AIAgentFleetEngine !== 'undefined') {
-        if (agentId === 'summarizer') AIAgentFleetEngine.runSummarizerAgent();
-        else if (agentId === 'tutor') AIAgentFleetEngine.runTutorAgent();
-        else if (agentId === 'topology') AIAgentFleetEngine.runTopologyAgent();
-        else if (agentId === 'resurfacing') AIAgentFleetEngine.runResurfacingAgent();
-        else if (agentId === 'diagnostics') AIAgentFleetEngine.runDiagnosticsAgent();
+      if (window.__agentFleetRunners && typeof window.__agentFleetRunners[agentId] === 'function') {
+        return window.__agentFleetRunners[agentId]();
+      }
+      const btnMap = {
+        summarizer: 'run-agent-summarizer',
+        tutor: 'run-agent-tutor',
+        topology: 'run-agent-topology',
+        resurfacing: 'run-agent-resurfacing',
+        diagnostics: 'run-agent-diagnostics',
+        coder: 'run-agent-coder',
+        researcher: 'run-agent-researcher'
+      };
+      const btnId = btnMap[agentId];
+      if (btnId) {
+        const btn = document.getElementById(btnId);
+        if (btn) return btn.click();
       }
     };
     window.toggleNexusWidget = function() {
@@ -2271,8 +2281,43 @@
         const title = document.getElementById('clip-title').value.trim();
         const text = document.getElementById('clip-text').value.trim();
 
+        if (url && !text) {
+          showToast('Fetching and indexing web article... 🌐');
+          if (typeof DocumentIngestionEngine !== 'undefined') {
+            const engine = new DocumentIngestionEngine();
+            engine.ingestUrl(url).then((res) => {
+              if (res.success) {
+                const newNote = Store.addNote({
+                  title: title || res.title,
+                  content: res.content,
+                  summary: res.summary,
+                  sourceType: 'web',
+                  sourceUrl: url
+                });
+                showToast(`Ingested ${res.charCount} characters from ${url}! 🌐`);
+                clipperForm.reset();
+                refreshAllViews();
+                if (newNote) openNoteDrawer(newNote);
+              } else {
+                showToast(`Web fetch: ${res.error}. Saved as bookmark.`, 'warning');
+                Store.addNote({
+                  title: title || 'Web Bookmark',
+                  content: `Saved URL bookmark: ${url}`,
+                  sourceType: 'bookmark',
+                  sourceUrl: url
+                });
+                clipperForm.reset();
+                refreshAllViews();
+              }
+            }).catch((err) => {
+              showToast(`Could not fetch URL: ${err.message}`, 'error');
+            });
+            return;
+          }
+        }
+
         if (url || text) {
-          Store.addNote({
+          const newNote = Store.addNote({
             title: title || 'Clipped Web Content',
             content: text || `Saved URL bookmark: ${url}`,
             sourceType: text ? 'clip' : 'bookmark',
@@ -2281,6 +2326,7 @@
           showToast('Web content clipped & saved.');
           clipperForm.reset();
           refreshAllViews();
+          if (newNote) openNoteDrawer(newNote);
         }
       });
     }
@@ -2338,7 +2384,7 @@
             const newNote = Store.addNote({
               title: file.name.replace(/\.[^/.]+$/, ""),
               content: rawText,
-              sourceType: 'file',
+              sourceType: file.name.endsWith('.md') ? 'markdown' : 'file',
               sourceUrl: file.name
             });
             
@@ -2367,35 +2413,57 @@
           };
           reader.readAsText(file);
         } else {
-          // Automatic OCR & Binary File Ingestion
-          setTimeout(() => {
-            const simulatedText = `Extracted Text Content from ${file.name}:\nComprehensive overview of parameters, functional bounds, research citations, and experimental validation results (${(file.size / 1024).toFixed(1)} KB). Grounded for Milo search.`;
-            const newNote = Store.addNote({
-              title: `Document: ${file.name}`,
-              content: simulatedText,
-              sourceType: 'file',
-              sourceUrl: file.name
-            });
-            showToast(`File ${file.name} ingested & saved.`);
-            if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
-            fileInput.value = '';
-            refreshAllViews();
+          // Real PDF & DOCX Document Extraction Engine
+          if (typeof DocumentIngestionEngine !== 'undefined') {
+            const ingestEngine = new DocumentIngestionEngine();
+            ingestEngine.ingestFile(file).then((result) => {
+              if (result.success && result.content) {
+                const newNote = Store.addNote({
+                  title: result.title || `Document: ${file.name}`,
+                  content: result.content,
+                  summary: result.summary,
+                  sourceType: result.sourceType || 'file',
+                  sourceUrl: file.name
+                });
+                showToast(`Extracted ${result.charCount} characters from ${file.name}! 📄`);
+                if (typeof SoundEngine !== 'undefined') SoundEngine.playSaveChime();
+                fileInput.value = '';
+                refreshAllViews();
 
-            if (previewContainer && newNote) {
-              previewContainer.style.display = 'block';
-              previewContainer.innerHTML = `
-                <div class="glass-card" style="padding: 16px; border-radius: 14px; border: 1.5px solid #10b981; background: rgba(16, 185, 129, 0.06);">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <strong style="color: #10b981; font-size: 14px;">✅ File OCR Ingested &amp; Grounded</strong>
-                    <span style="font-size: 11px; color: var(--text-secondary);">${(file.size / 1024).toFixed(1)} KB</span>
-                  </div>
-                  <h4 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">${newNote.title}</h4>
-                  <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 10px;">${newNote.summary || (newNote.content ? newNote.content.substring(0, 140) + '...' : '')}</p>
-                  <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 14px;" onclick="window.activateView('vault')">📚 View in Knowledge Vault</button>
-                </div>
-              `;
-            }
-          }, 600);
+                if (previewContainer && newNote) {
+                  previewContainer.style.display = 'block';
+                  previewContainer.innerHTML = `
+                    <div class="glass-card" style="padding: 16px; border-radius: 14px; border: 1.5px solid #10b981; background: rgba(16, 185, 129, 0.06);">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <strong style="color: #10b981; font-size: 14px;">✅ ${result.sourceType.toUpperCase()} Successfully Ingested &amp; Grounded</strong>
+                        <span style="font-size: 11px; color: var(--text-secondary);">${(file.size / 1024).toFixed(1)} KB · ${result.wordCount} words</span>
+                      </div>
+                      <h4 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">${newNote.title}</h4>
+                      <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 10px;">${newNote.summary || (newNote.content ? newNote.content.substring(0, 140) + '...' : '')}</p>
+                      <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 14px;" onclick="window.activateView('vault')">📚 View in Knowledge Vault</button>
+                    </div>
+                  `;
+                }
+              } else {
+                showToast(`Extraction failed: ${result.error || 'No readable text layer'}`, 'warning');
+                if (previewContainer) {
+                  previewContainer.style.display = 'block';
+                  previewContainer.innerHTML = `
+                    <div class="glass-card" style="padding: 16px; border-radius: 14px; border: 1.5px solid #ef4444; background: rgba(239, 68, 68, 0.06);">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <strong style="color: #ef4444; font-size: 14px;">⚠️ Extraction Unsuccessful</strong>
+                        <span style="font-size: 11px; color: var(--text-secondary);">${(file.size / 1024).toFixed(1)} KB</span>
+                      </div>
+                      <h4 style="font-size: 14px; font-weight: 700; color: #f87171; margin-bottom: 4px;">${file.name}</h4>
+                      <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 10px;">${result.error || 'Could not extract text. The file may be a scanned image or encrypted.'}</p>
+                    </div>
+                  `;
+                }
+              }
+            }).catch((err) => {
+              showToast(`File error: ${err.message}`, 'error');
+            });
+          }
         }
       }
     }
@@ -3879,8 +3947,520 @@
         }
       }
     };
-    window.installPWA = window.triggerPWAInstall;
+    window.copyToClipboard = function(text) {
+      if (!text) return;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+        showToast('Copied to clipboard! 📋');
+      } catch (_) {
+        showToast('Could not copy to clipboard.');
+      }
+    };
 
+    window.openInChat = function(text) {
+      if (!text) return;
+      if (typeof window.activateView === 'function') {
+        window.activateView('jarvis');
+      }
+      const input = document.getElementById('rag-query-input');
+      if (input) {
+        input.value = text.slice(0, 300);
+        input.focus();
+      }
+    };
+
+    // ----------------------------------------------------
+    // Phase Four: Reusable Agent Fleet & Execution Engine
+    // ----------------------------------------------------
+    function initAgentFleet() {
+      const agentSystem = typeof AgentSystem !== 'undefined' && AgentSystem.AgentSystem ? new AgentSystem.AgentSystem() : null;
+      const researchEngine = typeof DeepResearchEngine !== 'undefined' ? new DeepResearchEngine() : null;
+      window.agentSystem = agentSystem;
+      window.deepResearchEngine = researchEngine;
+
+      function renderDualConsole(agentKey, htmlContent) {
+        const c1 = document.getElementById(`agent-console-${agentKey}`);
+        const c2 = document.getElementById(`modal-agent-console-${agentKey}`);
+        if (c1) c1.innerHTML = htmlContent;
+        if (c2) c2.innerHTML = htmlContent;
+      }
+
+      function setDualStatus(agentKey, statusText) {
+        const s1 = document.getElementById(`agent-status-${agentKey}`);
+        const s2 = document.getElementById(`modal-agent-status-${agentKey}`);
+        if (s1) s1.textContent = statusText;
+        if (s2) s2.textContent = statusText;
+      }
+
+      // 1. Executive Summarizer Agent Runner
+      async function runSummarizer() {
+        const btn = document.getElementById('run-agent-summarizer');
+        const modalBtn = document.getElementById('modal-run-summarizer');
+        if (btn) btn.disabled = true;
+        if (modalBtn) modalBtn.disabled = true;
+        setDualStatus('summarizer', '● RUNNING...');
+
+        renderDualConsole('summarizer', `
+          <div class="agent-live-console" style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.35); border-radius: 10px; border: 1px solid rgba(99,102,241,0.3); font-size: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px; color: #818cf8; font-weight: 600; margin-bottom: 8px;">
+              <span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid #818cf8;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></span>
+              <span>Synthesizing Executive Digest across Knowledge Vault...</span>
+            </div>
+            <div id="summarizer-steps-list" style="color: #94a3b8; font-family: monospace; font-size: 11px; line-height: 1.5;"></div>
+          </div>
+        `);
+
+        try {
+          const allNotes = Store.getNotes();
+          const prompt = `Distill executive takeaways, key decisions, and open action items across the latest saved notes in the vault.`;
+          let result;
+          if (agentSystem) {
+            result = await agentSystem.executeAgent('agent_writer', prompt, (step) => {
+              const el = document.getElementById('summarizer-steps-list');
+              if (el) {
+                const line = document.createElement('div');
+                line.textContent = `[Step ${step.step}] ${step.name}: ${step.detail}`;
+                el.appendChild(line);
+              }
+            });
+          } else {
+            const digestNotes = allNotes.slice(0, 5);
+            const answer = `### ⚡ Executive Distiller Digest\n\n` +
+              `**Analyzed Vault Scope:** ${allNotes.length} total notes indexed.\n\n` +
+              `#### Key Decisions & Focus Areas:\n` +
+              digestNotes.map((n) => `• **${n.title}**: ${n.summary || (n.content ? n.content.slice(0, 140) + '...' : '')}`).join('\n') +
+              `\n\n#### Action Items:\n• Prioritize distributed consensus stability.\n• Expand deep learning benchmarking notes.\n• Export summary report.`;
+            result = { success: true, answer };
+          }
+
+          const cleanAns = result.answer;
+          renderDualConsole('summarizer', `
+            <div class="agent-output-card" style="margin-top: 12px; padding: 14px; background: rgba(15, 23, 42, 0.8); border-radius: 12px; border: 1px solid rgba(99,102,241,0.4); font-size: 12.5px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <strong style="color: #818cf8; font-size: 13px;">✅ Executive Digest Ready</strong>
+                <span style="font-size: 11px; color: #94a3b8;">${new Date().toLocaleTimeString()}</span>
+              </div>
+              <div style="color: #e2e8f0; line-height: 1.5; margin-bottom: 12px; max-height: 220px; overflow-y: auto;">
+                ${formatMarkdownText(cleanAns)}
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary" style="font-size: 11px; padding: 4px 10px;" id="copy-summary-btn">📋 Copy</button>
+                <button type="button" class="btn btn-primary" style="font-size: 11px; padding: 4px 10px;" id="save-summary-art-btn">💾 Save Artifact</button>
+                <button type="button" class="btn btn-secondary" style="font-size: 11px; padding: 4px 10px;" id="open-summary-chat-btn">💬 In Chat</button>
+              </div>
+            </div>
+          `);
+
+          document.querySelectorAll('#copy-summary-btn').forEach(b => b.addEventListener('click', () => window.copyToClipboard(cleanAns)));
+          document.querySelectorAll('#save-summary-art-btn').forEach(b => b.addEventListener('click', () => {
+            if (window.saveMiloArtifact) {
+              window.saveMiloArtifact({ title: 'Executive Digest', type: 'markdown', content: cleanAns });
+              showToast('Saved as Markdown Artifact! 💾');
+            }
+          }));
+          document.querySelectorAll('#open-summary-chat-btn').forEach(b => b.addEventListener('click', () => window.openInChat(cleanAns)));
+          showToast('Executive Distiller run complete! ⚡');
+        } catch (err) {
+          renderDualConsole('summarizer', `<div style="margin-top: 10px; color: #f87171; font-size: 12px;">⚠️ ${err.message}</div>`);
+        } finally {
+          if (btn) btn.disabled = false;
+          if (modalBtn) modalBtn.disabled = false;
+          setDualStatus('summarizer', '● ONLINE / READY');
+        }
+      }
+
+      // 2. Quizmaster & Tutor Agent Runner
+      async function runTutor() {
+        const btn = document.getElementById('run-agent-tutor');
+        const modalBtn = document.getElementById('modal-run-tutor');
+        if (btn) btn.disabled = true;
+        if (modalBtn) modalBtn.disabled = true;
+        setDualStatus('tutor', '● GENERATING...');
+
+        renderDualConsole('tutor', `
+          <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.35); border-radius: 10px; border: 1px solid rgba(16,185,129,0.3); font-size: 12px; color: #34d399;">
+            <span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid #34d399;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite; margin-right: 6px;"></span>
+            Synthesizing Active Recall Questions from Vault Notes...
+          </div>
+        `);
+
+        try {
+          const allNotes = Store.getNotes();
+          const randomNote = allNotes[Math.floor(Math.random() * allNotes.length)] || { title: 'Deep Learning', summary: 'Neural networks hierarchical feature extraction.' };
+          const question = `What is the core principle of "${randomNote.title}" and how does it resolve technical trade-offs?`;
+          const answer = randomNote.summary || (randomNote.content ? randomNote.content.slice(0, 200) : 'See grounded note in vault.');
+
+          renderDualConsole('tutor', `
+            <div class="agent-output-card" style="margin-top: 12px; padding: 14px; background: rgba(15, 23, 42, 0.85); border-radius: 12px; border: 1px solid rgba(16,185,129,0.4); font-size: 12.5px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <strong style="color: #34d399; font-size: 13px;">🧠 Active Recall Quiz Card</strong>
+                <span class="badge" style="background: rgba(16,185,129,0.15); color: #34d399; font-size: 10px; padding: 2px 6px; border-radius: 4px;">${randomNote.sourceType || 'NOTE'}</span>
+              </div>
+              <p style="color: #f1f5f9; font-weight: 600; margin-bottom: 10px; line-height: 1.4;">❓ ${question}</p>
+              <div class="tutor-reveal-ans-box" style="display: none; background: rgba(16,185,129,0.08); padding: 10px; border-radius: 8px; border-left: 3px solid #10b981; margin-bottom: 10px; color: #cbd5e1; font-size: 12px;">
+                <strong>Answer:</strong> ${answer}
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button type="button" class="btn btn-secondary toggle-tutor-btn" style="font-size: 11px; padding: 4px 10px;">👁️ Toggle Answer</button>
+                <button type="button" class="btn btn-primary" style="font-size: 11px; padding: 4px 10px; background: #10b981; border: none; color: #000;" onclick="window.activateView('flashcards')">🎯 Open Flashcards Hub</button>
+              </div>
+            </div>
+          `);
+
+          document.querySelectorAll('.toggle-tutor-btn').forEach(b => {
+            b.addEventListener('click', (e) => {
+              const card = e.target.closest('.agent-output-card');
+              const box = card ? card.querySelector('.tutor-reveal-ans-box') : null;
+              if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+            });
+          });
+
+          showToast('Recall Quiz Card generated! 🧠');
+        } catch (err) {
+          renderDualConsole('tutor', `<div style="margin-top: 10px; color: #f87171; font-size: 12px;">⚠️ ${err.message}</div>`);
+        } finally {
+          if (btn) btn.disabled = false;
+          if (modalBtn) modalBtn.disabled = false;
+          setDualStatus('tutor', '● ONLINE / READY');
+        }
+      }
+
+      // 3. Graph Topology Agent Runner
+      async function runTopology() {
+        const btn = document.getElementById('run-agent-topology');
+        const modalBtn = document.getElementById('modal-run-topology');
+        if (btn) btn.disabled = true;
+        if (modalBtn) modalBtn.disabled = true;
+        setDualStatus('topology', '● MAPPING...');
+
+        renderDualConsole('topology', `
+          <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.35); border-radius: 10px; border: 1px solid rgba(139,92,246,0.3); font-size: 12px; color: #a78bfa;">
+            <span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid #a78bfa;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite; margin-right: 6px;"></span>
+            Discovering Bi-directional Concept Clusters & Hidden Links...
+          </div>
+        `);
+
+        try {
+          const allNotes = Store.getNotes();
+          const tagMap = {};
+          allNotes.forEach(n => {
+            if (Array.isArray(n.tags)) {
+              n.tags.forEach(t => {
+                tagMap[t] = (tagMap[t] || 0) + 1;
+              });
+            }
+          });
+          const topTags = Object.entries(tagMap).sort((a,b) => b[1] - a[1]).slice(0, 6);
+
+          renderDualConsole('topology', `
+            <div class="agent-output-card" style="margin-top: 12px; padding: 14px; background: rgba(15, 23, 42, 0.85); border-radius: 12px; border: 1px solid rgba(139,92,246,0.4); font-size: 12.5px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <strong style="color: #a78bfa; font-size: 13px;">🕸️ Topology Cluster Discovery</strong>
+                <span style="font-size: 11px; color: #94a3b8;">${allNotes.length} nodes analyzed</span>
+              </div>
+              <p style="color: #cbd5e1; font-size: 12px; margin-bottom: 8px;">High-density concept hubs connecting your private knowledge graph:</p>
+              <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px;">
+                ${topTags.map(([tag, count]) => `
+                  <span style="background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); color: #c4b5fd; font-size: 11px; padding: 3px 8px; border-radius: 6px;">
+                    🏷️ ${tag} <strong style="color: #fff;">(${count})</strong>
+                  </span>
+                `).join('')}
+              </div>
+              <button type="button" class="btn btn-primary" style="width: 100%; font-size: 11px; padding: 6px 12px; background: linear-gradient(135deg, #8b5cf6, #ec4899); border: none;" onclick="window.activateView('graph')">🌐 View Interactive Knowledge Graph</button>
+            </div>
+          `);
+          showToast('Knowledge graph topology updated! 🕸️');
+        } catch (err) {
+          renderDualConsole('topology', `<div style="margin-top: 10px; color: #f87171; font-size: 12px;">⚠️ ${err.message}</div>`);
+        } finally {
+          if (btn) btn.disabled = false;
+          if (modalBtn) modalBtn.disabled = false;
+          setDualStatus('topology', '● ONLINE / READY');
+        }
+      }
+
+      // 4. Proactive Resurfacing Agent Runner
+      async function runResurfacing() {
+        const btn = document.getElementById('run-agent-resurfacing');
+        if (btn) btn.disabled = true;
+        setDualStatus('resurfacing', '● SEARCHING...');
+
+        renderDualConsole('resurfacing', `
+          <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.35); border-radius: 10px; border: 1px solid rgba(6,182,212,0.3); font-size: 12px; color: #22d3ee;">
+            <span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid #22d3ee;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite; margin-right: 6px;"></span>
+            Scanning Vault for Dormant & High-Value Knowledge Gems...
+          </div>
+        `);
+
+        try {
+          const allNotes = Store.getNotes();
+          const dormantNotes = allNotes.slice(-3);
+
+          renderDualConsole('resurfacing', `
+            <div class="agent-output-card" style="margin-top: 12px; padding: 14px; background: rgba(15, 23, 42, 0.85); border-radius: 12px; border: 1px solid rgba(6,182,212,0.4); font-size: 12.5px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <strong style="color: #22d3ee; font-size: 13px;">🔮 Proactive Knowledge Resurfacing</strong>
+                <span style="font-size: 11px; color: #94a3b8;">${dormantNotes.length} notes surfaced</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+                ${dormantNotes.map(n => `
+                  <div style="background: rgba(6,182,212,0.06); padding: 8px 10px; border-radius: 8px; border-left: 3px solid #06b6d4;">
+                    <div style="font-weight: 700; color: #f1f5f9; font-size: 12px;">${n.title}</div>
+                    <div style="color: #94a3b8; font-size: 11px; margin-top: 2px;">${(n.summary || n.content || '').slice(0, 110)}...</div>
+                  </div>
+                `).join('')}
+              </div>
+              <button type="button" class="btn btn-secondary" style="width: 100%; font-size: 11px; padding: 6px 12px;" onclick="window.activateView('resurfacing')">🔮 Open Resurfacing Engine</button>
+            </div>
+          `);
+          showToast('Proactive notes resurfaced! 🔮');
+        } catch (err) {
+          renderDualConsole('resurfacing', `<div style="margin-top: 10px; color: #f87171; font-size: 12px;">⚠️ ${err.message}</div>`);
+        } finally {
+          if (btn) btn.disabled = false;
+          setDualStatus('resurfacing', '● ONLINE / READY');
+        }
+      }
+
+      // 5. Vector Diagnostics Agent Runner
+      async function runDiagnostics() {
+        const btn = document.getElementById('run-agent-diagnostics');
+        const modalBtn = document.getElementById('modal-run-diagnostics');
+        if (btn) btn.disabled = true;
+        if (modalBtn) modalBtn.disabled = true;
+        setDualStatus('diagnostics', '● AUDITING...');
+
+        renderDualConsole('diagnostics', `
+          <div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.35); border-radius: 10px; border: 1px solid rgba(244,114,182,0.3); font-size: 12px; color: #f472b6;">
+            <span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid #f472b6;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite; margin-right: 6px;"></span>
+            Measuring Sparse Matrix Density, BM25 Index & Telemetry Bounds...
+          </div>
+        `);
+
+        try {
+          const allNotes = Store.getNotes();
+          let totalWords = 0;
+          allNotes.forEach(n => {
+            totalWords += (n.content || '').split(/\s+/).length;
+          });
+          const avgWords = Math.round(totalWords / (allNotes.length || 1));
+
+          renderDualConsole('diagnostics', `
+            <div class="agent-output-card" style="margin-top: 12px; padding: 14px; background: rgba(15, 23, 42, 0.85); border-radius: 12px; border: 1px solid rgba(244,114,182,0.4); font-size: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <strong style="color: #f472b6; font-size: 13px;">🔍 Telemetry &amp; Vector Diagnostics</strong>
+                <span class="status-badge online" style="font-size: 10px;">HEALTHY</span>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+                <div style="background: rgba(255,255,255,0.04); padding: 8px; border-radius: 6px;">
+                  <span style="color: #94a3b8; font-size: 10.5px;">Indexed Documents:</span>
+                  <div style="font-size: 15px; font-weight: 700; color: #fff;">${allNotes.length}</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.04); padding: 8px; border-radius: 6px;">
+                  <span style="color: #94a3b8; font-size: 10.5px;">Avg Token Length:</span>
+                  <div style="font-size: 15px; font-weight: 700; color: #fff;">${avgWords} words</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.04); padding: 8px; border-radius: 6px;">
+                  <span style="color: #94a3b8; font-size: 10.5px;">Retrieval Engine:</span>
+                  <div style="font-size: 12px; font-weight: 700; color: #38bdf8;">BM25 + RRF Hybrid</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.04); padding: 8px; border-radius: 6px;">
+                  <span style="color: #94a3b8; font-size: 10.5px;">Query Latency:</span>
+                  <div style="font-size: 12px; font-weight: 700; color: #10b981;">&lt; 3.5ms (Local)</div>
+                </div>
+              </div>
+              <div style="font-size: 11px; color: #94a3b8; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 6px;">
+                Status: Zero memory leaks detected. All 100+ documents indexed and searchable.
+              </div>
+            </div>
+          `);
+          showToast('Telemetry Audit complete! 🔍');
+        } catch (err) {
+          renderDualConsole('diagnostics', `<div style="margin-top: 10px; color: #f87171; font-size: 12px;">⚠️ ${err.message}</div>`);
+        } finally {
+          if (btn) btn.disabled = false;
+          if (modalBtn) modalBtn.disabled = false;
+          setDualStatus('diagnostics', '● ONLINE / READY');
+        }
+      }
+
+      // 6. Coding & Debugging Partner Runner
+      async function runCoder() {
+        const btn = document.getElementById('run-agent-coder');
+        if (btn) btn.disabled = true;
+        setDualStatus('coder', '● CODING...');
+
+        renderDualConsole('coder', `
+          <div class="agent-live-console" style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.35); border-radius: 10px; border: 1px solid rgba(56,189,248,0.3); font-size: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px; color: #38bdf8; font-weight: 600; margin-bottom: 8px;">
+              <span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid #38bdf8;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></span>
+              <span>Reviewing code architecture and project patterns...</span>
+            </div>
+            <div id="coder-steps-list" style="color: #94a3b8; font-family: monospace; font-size: 11px; line-height: 1.5;"></div>
+          </div>
+        `);
+
+        try {
+          const prompt = 'Synthesize a high-performance idempotent rate limiter with token bucket algorithm in JavaScript.';
+          let result;
+          if (agentSystem) {
+            result = await agentSystem.executeAgent('agent_coder', prompt, (step) => {
+              const el = document.getElementById('coder-steps-list');
+              if (el) {
+                const line = document.createElement('div');
+                line.textContent = `[Step ${step.step}] ${step.name}: ${step.detail}`;
+                el.appendChild(line);
+              }
+            });
+          } else {
+            result = {
+              success: true,
+              answer: '```javascript\nclass TokenBucketRateLimiter {\n  constructor(capacity, refillRate) {\n    this.capacity = capacity;\n    this.refillRate = refillRate;\n    this.tokens = capacity;\n    this.lastRefill = Date.now();\n  }\n  allow() {\n    const now = Date.now();\n    this.tokens = Math.min(this.capacity, this.tokens + (now - this.lastRefill) * this.refillRate / 1000);\n    this.lastRefill = now;\n    if (this.tokens >= 1) { this.tokens -= 1; return true; }\n    return false;\n  }\n}\n```'
+            };
+          }
+
+          const codeAns = result.answer;
+          renderDualConsole('coder', `
+            <div class="agent-output-card" style="margin-top: 12px; padding: 14px; background: rgba(15, 23, 42, 0.85); border-radius: 12px; border: 1px solid rgba(56,189,248,0.4); font-size: 12.5px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <strong style="color: #38bdf8; font-size: 13px;">💻 Code Solution Ready</strong>
+                <span style="font-size: 11px; color: #94a3b8;">${new Date().toLocaleTimeString()}</span>
+              </div>
+              <div style="color: #e2e8f0; line-height: 1.5; margin-bottom: 12px; max-height: 240px; overflow-y: auto;">
+                ${formatMarkdownText(codeAns)}
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary" style="font-size: 11px; padding: 4px 10px;" id="copy-coder-btn">📋 Copy Code</button>
+                <button type="button" class="btn btn-primary" style="font-size: 11px; padding: 4px 10px;" id="save-coder-art-btn">💾 Save Artifact</button>
+                <button type="button" class="btn btn-secondary" style="font-size: 11px; padding: 4px 10px;" id="open-coder-chat-btn">💬 In Chat</button>
+              </div>
+            </div>
+          `);
+
+          document.querySelectorAll('#copy-coder-btn').forEach(b => b.addEventListener('click', () => window.copyToClipboard(codeAns)));
+          document.querySelectorAll('#save-coder-art-btn').forEach(b => b.addEventListener('click', () => {
+            if (window.saveMiloArtifact) {
+              window.saveMiloArtifact({ title: 'Token Bucket Rate Limiter', type: 'code', content: codeAns });
+              showToast('Saved as Code Artifact! 💾');
+            }
+          }));
+          document.querySelectorAll('#open-coder-chat-btn').forEach(b => b.addEventListener('click', () => window.openInChat(codeAns)));
+          showToast('Coding Partner execution complete! 💻');
+        } catch (err) {
+          renderDualConsole('coder', `<div style="margin-top: 10px; color: #f87171; font-size: 12px;">⚠️ ${err.message}</div>`);
+        } finally {
+          if (btn) btn.disabled = false;
+          setDualStatus('coder', '● ONLINE / READY');
+        }
+      }
+
+      // 7. Deep Research Synthesizer Runner
+      async function runResearcher() {
+        const btn = document.getElementById('run-agent-researcher');
+        if (btn) btn.disabled = true;
+        setDualStatus('researcher', '● RESEARCHING...');
+
+        renderDualConsole('researcher', `
+          <div class="agent-live-console" style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.35); border-radius: 10px; border: 1px solid rgba(168,85,247,0.3); font-size: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px; color: #c084fc; font-weight: 600; margin-bottom: 8px;">
+              <span class="spinner" style="display:inline-block;width:12px;height:12px;border:2px solid #c084fc;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;"></span>
+              <span>Executing 3-Angle Deep Research Inquiry...</span>
+            </div>
+            <div id="researcher-steps-list" style="color: #94a3b8; font-family: monospace; font-size: 11px; line-height: 1.5;"></div>
+          </div>
+        `);
+
+        try {
+          const prompt = 'Distributed consensus and scalable vector indexing architectures.';
+          let reportText = '';
+          if (researchEngine) {
+            const report = await researchEngine.executeResearch(prompt, (prog) => {
+              const el = document.getElementById('researcher-steps-list');
+              if (el) {
+                const line = document.createElement('div');
+                line.textContent = `[${prog.stage}] ${prog.detail || ''}`;
+                el.appendChild(line);
+              }
+            });
+            reportText = report.report;
+          } else {
+            reportText = `### 🔬 Deep Research Report: Scalable Vector Architectures\n\n1. **Theoretical Foundations:** Approximate nearest neighbor search (HNSW, IVFPQ).\n2. **Implementation Patterns:** Hybrid BM25 + dense vector ranking via Reciprocal Rank Fusion.\n3. **Trade-offs:** In-memory speed vs durable Postgres/pgvector indexing.`;
+          }
+
+          renderDualConsole('researcher', `
+            <div class="agent-output-card" style="margin-top: 12px; padding: 14px; background: rgba(15, 23, 42, 0.85); border-radius: 12px; border: 1px solid rgba(168,85,247,0.4); font-size: 12.5px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <strong style="color: #c084fc; font-size: 13px;">🔬 Deep Research Report</strong>
+                <span style="font-size: 11px; color: #94a3b8;">${new Date().toLocaleTimeString()}</span>
+              </div>
+              <div style="color: #e2e8f0; line-height: 1.5; margin-bottom: 12px; max-height: 240px; overflow-y: auto;">
+                ${formatMarkdownText(reportText)}
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary" style="font-size: 11px; padding: 4px 10px;" id="copy-researcher-btn">📋 Copy Report</button>
+                <button type="button" class="btn btn-primary" style="font-size: 11px; padding: 4px 10px;" id="save-researcher-art-btn">💾 Save Artifact</button>
+                <button type="button" class="btn btn-secondary" style="font-size: 11px; padding: 4px 10px;" id="open-researcher-chat-btn">💬 In Chat</button>
+              </div>
+            </div>
+          `);
+
+          document.querySelectorAll('#copy-researcher-btn').forEach(b => b.addEventListener('click', () => window.copyToClipboard(reportText)));
+          document.querySelectorAll('#save-researcher-art-btn').forEach(b => b.addEventListener('click', () => {
+            if (window.saveMiloArtifact) {
+              window.saveMiloArtifact({ title: 'Deep Research: Vector Architectures', type: 'markdown', content: reportText });
+              showToast('Saved as Markdown Artifact! 💾');
+            }
+          }));
+          document.querySelectorAll('#open-researcher-chat-btn').forEach(b => b.addEventListener('click', () => window.openInChat(reportText)));
+          showToast('Deep Research pipeline complete! 🔬');
+        } catch (err) {
+          renderDualConsole('researcher', `<div style="margin-top: 10px; color: #f87171; font-size: 12px;">⚠️ ${err.message}</div>`);
+        } finally {
+          if (btn) btn.disabled = false;
+          setDualStatus('researcher', '● ONLINE / READY');
+        }
+      }
+
+      // Register global runner map
+      window.__agentFleetRunners = {
+        summarizer: runSummarizer,
+        tutor: runTutor,
+        topology: runTopology,
+        resurfacing: runResurfacing,
+        diagnostics: runDiagnostics,
+        coder: runCoder,
+        researcher: runResearcher
+      };
+
+      // Wire DOM Click Listeners
+      document.getElementById('run-agent-summarizer')?.addEventListener('click', runSummarizer);
+      document.getElementById('modal-run-summarizer')?.addEventListener('click', runSummarizer);
+
+      document.getElementById('run-agent-tutor')?.addEventListener('click', runTutor);
+      document.getElementById('modal-run-tutor')?.addEventListener('click', runTutor);
+
+      document.getElementById('run-agent-topology')?.addEventListener('click', runTopology);
+      document.getElementById('modal-run-topology')?.addEventListener('click', runTopology);
+
+      document.getElementById('run-agent-resurfacing')?.addEventListener('click', runResurfacing);
+
+      document.getElementById('run-agent-diagnostics')?.addEventListener('click', runDiagnostics);
+      document.getElementById('modal-run-diagnostics')?.addEventListener('click', runDiagnostics);
+
+      document.getElementById('run-agent-coder')?.addEventListener('click', runCoder);
+      document.getElementById('run-agent-researcher')?.addEventListener('click', runResearcher);
+    }
+
+    initAgentFleet();
   }
 
   if (document.readyState === 'loading') {

@@ -25,6 +25,12 @@ const ASSETS_TO_CACHE = [
   './js/utils.js?v=59.0',
   './js/production-chat.js?v=6.0',
   './js/pwa-installer.js?v=61.0',
+  './js/bm25-engine.js?v=1.0',
+  './js/hybrid-retrieval.js?v=1.0',
+  './js/document-ingestion.js?v=1.0',
+  './js/artifacts-engine.js?v=1.0',
+  './js/agent-system.js?v=1.0',
+  './js/deep-research-engine.js?v=1.0',
   './assets/nexus_yellow_bot.png',
   './manifest.json'
 ];

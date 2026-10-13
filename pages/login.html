@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login — Juno AI</title>
+  <title>Login — Milo</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
@@ -426,7 +426,7 @@
   <!-- Worldwide Multilingual Ticker Header Badge -->
   <div class="global-welcome-badge">
     <span class="live-dot"></span>
-    <span id="multilingual-greeting">👋 Welcome Worldwide • Juno AI</span>
+    <span id="multilingual-greeting">👋 Welcome Worldwide • Milo</span>
   </div>
 
   <!-- Centered Master Login Box Wrapper -->
@@ -436,8 +436,8 @@
       <!-- Top Mascot Avatar & Header -->
       <div>
         <div class="mascot-avatar-wrapper">
-          <div class="mascot-avatar-frame" title="Juno AI Companion">
-            <img src="../assets/juno_ai_robot_mascot.png" alt="Juno AI Robot Avatar" class="mascot-avatar-img" />
+          <div class="mascot-avatar-frame" title="Milo Companion">
+            <img src="../assets/juno_ai_robot_mascot.png" alt="Milo Robot Avatar" class="mascot-avatar-img" />
           </div>
           <h1 class="form-title" id="form-heading">Welcome Back</h1>
         </div>
@@ -494,7 +494,7 @@
         </div>
 
         <div class="footer-note">
-          <a href="../index.html">← Back to Juno AI Studio</a>
+          <a href="../index.html">← Back to Milo Studio</a>
         </div>
       </div>
 
@@ -504,7 +504,7 @@
   <script>
     /* Multilingual Greeting Loop for Worldwide Visitors */
     const greetings = [
-      "👋 Welcome Worldwide • Juno AI",
+      "👋 Welcome Worldwide • Milo",
       "🌐 Hola & Bienvenido!",
       "✨ Bonjour & Bienvenue!",
       "Namaste & स्वागतम्! 🙏",
@@ -584,7 +584,7 @@
     function triggerSocialAuth(provider) {
       alert(`🔐 Authenticating via ${provider} Single Sign-On...`);
       localStorage.setItem('second_brain_user_name', 'User');
-      localStorage.setItem('second_brain_user_email', 'user@junoai.io');
+      localStorage.setItem('second_brain_user_email', 'user@miloai.io');
       window.location.href = '../index.html';
     }
 
@@ -594,7 +594,7 @@
       const rawEmail = document.getElementById('input-email').value.trim();
       
       const name = rawName || 'User';
-      const email = rawEmail || 'user@junoai.io';
+      const email = rawEmail || 'user@miloai.io';
       const submitBtn = document.getElementById('submit-btn');
 
       submitBtn.textContent = currentMode === 'login' ? 'Signing in...' : 'Creating Account...';

@@ -6636,6 +6636,38 @@ body[data-theme="gemini-dark"] .chatgpt-hero-title {
 }
 
 /* Dark Theme Adjustments for Chat Bubbles */
+[data-theme="second-brain-navy"] .ai-bubble,
+html[data-theme="second-brain-navy"] .ai-bubble,
+.claude-layout .ai-bubble,
+.claude-layout .assistant-bubble,
+[data-theme="second-brain-navy"] .assistant-bubble {
+  background: rgba(21, 58, 80, 0.65) !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+[data-theme="second-brain-navy"] .ai-bubble *,
+html[data-theme="second-brain-navy"] .ai-bubble *,
+.claude-layout .assistant-bubble *,
+[data-theme="second-brain-navy"] .assistant-bubble * {
+  color: #f1f5f9;
+}
+
+[data-theme="second-brain-navy"] .ai-bubble h1,
+[data-theme="second-brain-navy"] .ai-bubble h2,
+[data-theme="second-brain-navy"] .ai-bubble h3,
+[data-theme="second-brain-navy"] .ai-bubble h4,
+[data-theme="second-brain-navy"] .ai-bubble strong,
+.claude-layout .assistant-bubble h1,
+.claude-layout .assistant-bubble h2,
+.claude-layout .assistant-bubble h3,
+.claude-layout .assistant-bubble h4,
+.claude-layout .assistant-bubble strong {
+  color: #38bdf8 !important;
+}
+
 body[data-theme="gemini-dark"] .ai-bubble {
   background: rgba(24, 24, 27, 0.95) !important;
   border-color: rgba(0, 242, 254, 0.3) !important;
@@ -8669,6 +8701,73 @@ body.focus-preview-mode .claude-main-canvas {
   50% { opacity: 1.0; }
   100% { opacity: 0.85; }
 }
+
+/* Production Chat Message Bubbles (Claude/Onyx Obsidian Style) */
+.chat-message-bubble {
+  max-width: 88%;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 14px;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.chat-message-bubble.user-bubble {
+  align-self: flex-end;
+  background: #2563eb;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+}
+
+.chat-message-bubble.assistant-bubble {
+  align-self: flex-start;
+  background: rgba(15, 23, 42, 0.88);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  color: #f1f5f9;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+}
+
+.chat-message-bubble.assistant-bubble .chat-message-content {
+  color: #f1f5f9;
+}
+
+.chat-message-bubble.assistant-bubble h1,
+.chat-message-bubble.assistant-bubble h2,
+.chat-message-bubble.assistant-bubble h3,
+.chat-message-bubble.assistant-bubble h4 {
+  color: #38bdf8;
+  margin-top: 10px;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.chat-message-bubble.assistant-bubble code {
+  background: rgba(0, 0, 0, 0.45);
+  color: #38bdf8;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Fira Code', monospace;
+  font-size: 13px;
+}
+
+.chat-message-bubble.assistant-bubble pre {
+  background: rgba(2, 6, 23, 0.95);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  border-radius: 8px;
+  padding: 12px;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.chat-message-bubble.assistant-bubble pre code {
+  background: transparent;
+  padding: 0;
+  color: #e2e8f0;
+}
+
 
 
 

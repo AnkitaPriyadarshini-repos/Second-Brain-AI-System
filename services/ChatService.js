@@ -77,7 +77,7 @@
         if (engine && typeof engine.fallbackSynthesize === 'function') {
           const rawHistory = this.getChannelHistory(room) || [];
           const history = rawHistory.map(m => ({
-            role: (m.sender && (m.sender.includes('Gemini') || m.sender.includes('Juno') || m.sender.includes('AI'))) ? 'assistant' : 'user',
+            role: (m.sender && (m.sender.includes('Gemini') || m.sender.includes('Milo') || m.sender.includes('Juno') || m.sender.includes('AI'))) ? 'assistant' : 'user',
             content: m.text || ''
           }));
           const res = engine.fallbackSynthesize(text, selectedModel, '', null, history);

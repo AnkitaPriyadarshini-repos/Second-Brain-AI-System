@@ -117,7 +117,7 @@ window.runInCanvasFromBlock = runInCanvasFromBlock;
       dispatching = true;
       try {
         if (typeof window.handleRAGQuery !== 'function') {
-          throw new Error('Juno chat controller did not load.');
+          throw new Error('Milo chat controller did not load.');
         }
 
         const accepted = await Promise.resolve(window.handleRAGQuery(prompt));
@@ -127,9 +127,9 @@ window.runInCanvasFromBlock = runInCanvasFromBlock;
         }
         return accepted !== false;
       } catch (error) {
-        console.error('[Juno submit guard]', error);
+        console.error('[Milo submit guard]', error);
         if (typeof window.showToast === 'function') {
-          window.showToast('Juno could not start. Your message is still in the composer.', 'error');
+          window.showToast('Milo could not start. Your message is still in the composer.', 'error');
         }
         return false;
       } finally {
@@ -153,7 +153,8 @@ window.runInCanvasFromBlock = runInCanvasFromBlock;
     window.submitRAGQuery = function (event) {
       return dispatch(getInput(), event);
     };
-    window.junoChatReady = () => typeof window.handleRAGQuery === 'function';
+    window.miloChatReady = () => typeof window.handleRAGQuery === 'function';
+    window.junoChatReady = window.miloChatReady;
   }
 
   if (typeof window.handleRAGQuery !== 'function' && document.readyState === 'loading') {

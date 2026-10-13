@@ -73,6 +73,11 @@
             <span>Memory &amp; Knowledge</span>
           </button>
 
+          <button class="sidebar-menu-item" data-view="agents" onclick="window.activateView('agents')" title="Specialized AI Working Agents Fleet">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>
+            <span>Agents</span>
+          </button>
+
           <button class="sidebar-menu-item" data-view="settings" onclick="window.activateView('settings')" title="Preferences & Account Settings">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             <span>Settings</span>
@@ -219,7 +224,7 @@
         </div>
       </div>
       <div class="milo-chat-bar-right">
-        <button type="button" class="milo-clear-chat-btn" onclick="if(window.junoResetChat) window.junoResetChat();" title="Start a fresh conversation with Milo">
+        <button type="button" class="milo-clear-chat-btn" onclick="if(window.miloResetChat) window.miloResetChat(); else if(window.junoResetChat) window.junoResetChat();" title="Start a fresh conversation with Milo">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           <span>New Chat</span>
         </button>
@@ -248,8 +253,10 @@
           <div id="slash-commands-menu" class="slash-commands-menu" style="display: none;">
             <div class="slash-item" onclick="window.selectSlashCommand('/search')"><span class="slash-icon">🔍</span> <strong>/search</strong> — Knowledge Vault &amp; Deep Search</div>
             <div class="slash-item" onclick="window.selectSlashCommand('/code')"><span class="slash-icon">💻</span> <strong>/code</strong> — Modular Code Synthesis</div>
+            <div class="slash-item" onclick="window.selectSlashCommand('/research')"><span class="slash-icon">🔬</span> <strong>/research</strong> — Multi-Angle Deep Research</div>
             <div class="slash-item" onclick="window.selectSlashCommand('/learn')"><span class="slash-icon">🎓</span> <strong>/learn</strong> — Concept Guides &amp; Tutorials</div>
             <div class="slash-item" onclick="window.selectSlashCommand('/write')"><span class="slash-icon">✏️</span> <strong>/write</strong> — Research Summary &amp; Drafts</div>
+            <div class="slash-item" onclick="window.selectSlashCommand('/organize')"><span class="slash-icon">🗂️</span> <strong>/organize</strong> — Vault Clusters &amp; Gap Detection</div>
           </div>
         </div>
 
@@ -767,6 +774,32 @@
             </p>
             <button id="run-agent-diagnostics" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #ffe600, #ffab00); color: #000000; font-weight: 700;">🔍 Run Telemetry Audit</button>
             <div id="agent-console-diagnostics"></div>
+          </div>
+
+          <!-- Agent 6: Coding & Debugging Partner -->
+          <div class="glass-card agent-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="font-size: 15px; font-weight: 700; color: #38bdf8;">💻 Coding &amp; Debugging Partner</h3>
+              <span id="agent-status-coder" class="status-badge online">● ONLINE / READY</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+              Full-Stack Software Architect &amp; Bug Hunter. Synthesizes clean production-grade code grounded in your project patterns.
+            </p>
+            <button id="run-agent-coder" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #0284c7, #38bdf8); color: #ffffff; font-weight: 700;">💻 Run Architecture &amp; Code Review</button>
+            <div id="agent-console-coder"></div>
+          </div>
+
+          <!-- Agent 7: Deep Research Synthesizer -->
+          <div class="glass-card agent-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <h3 style="font-size: 15px; font-weight: 700; color: #a855f7;">🔬 Deep Research Synthesizer</h3>
+              <span id="agent-status-researcher" class="status-badge online">● ONLINE / READY</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
+              Multi-Angle Research Engine. Formulates theoretical, implementation, and edge-case perspectives with citations.
+            </p>
+            <button id="run-agent-researcher" class="btn btn-primary" style="width: 100%; font-size: 12px; background: linear-gradient(135deg, #7e22ce, #c084fc); color: #ffffff; font-weight: 700;">🔬 Run Deep Research Pipeline</button>
+            <div id="agent-console-researcher"></div>
           </div>
 
         </div>
@@ -1505,6 +1538,12 @@
   <script src="js/code-inspector.js?v=58.0"></script>
   <script src="js/adaptive-fusion-visualizer.js?v=1.0"></script>
   <script src="js/adaptive-fusion-engine.js?v=1.0"></script>
+  <script src="js/bm25-engine.js?v=1.0"></script>
+  <script src="js/hybrid-retrieval.js?v=1.0"></script>
+  <script src="js/document-ingestion.js?v=1.0"></script>
+  <script src="js/artifacts-engine.js?v=1.0"></script>
+  <script src="js/agent-system.js?v=1.0"></script>
+  <script src="js/deep-research-engine.js?v=1.0"></script>
   <script src="js/pwa-installer.js?v=61.0"></script>
   <script src="js/nori-companion.js?v=65.0"></script>
   <script src="js/app.js?v=66.0"></script>

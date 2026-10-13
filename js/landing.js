@@ -1,5 +1,5 @@
 /* ==================================================== */
-/* JUNO AI — HANDCRAFTED INTERACTIVE PLAYGROUND & LOGIC */
+/* MILO AI — HANDCRAFTED INTERACTIVE PLAYGROUND & LOGIC */
 /* ==================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -138,7 +138,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
   function executeDemoQuery(queryText) {
     if (!queryText || !output) return;
 
-    output.innerHTML = `<span style="color: var(--accent-amber);">⚡ Querying local vector store (${modelSelect ? modelSelect.value : 'Juno Ultra Flash'})...</span>`;
+    output.innerHTML = `<span style="color: var(--accent-amber);">⚡ Querying local vector store (${modelSelect ? modelSelect.value : 'Milo Ultra Flash'})...</span>`;
 
     const startTime = performance.now();
 

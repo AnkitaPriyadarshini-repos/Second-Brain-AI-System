@@ -20,7 +20,7 @@
 
   function getHistory() {
     try {
-      const history = JSON.parse(localStorage.getItem('juno_chat_history') || '[]');
+      const history = JSON.parse(localStorage.getItem('milo_chat_history') || localStorage.getItem('juno_chat_history') || '[]');
       return Array.isArray(history) ? history.slice(-20) : [];
     } catch (_) {
       return [];
@@ -34,7 +34,9 @@
         { role: 'user', content: prompt, timestamp: Date.now() },
         { role: 'model', content: answer, timestamp: Date.now() }
       );
-      localStorage.setItem('juno_chat_history', JSON.stringify(history.slice(-40)));
+      const serialized = JSON.stringify(history.slice(-40));
+      localStorage.setItem('milo_chat_history', serialized);
+      localStorage.setItem('juno_chat_history', serialized);
     } catch (_) {}
   }
 
@@ -52,6 +54,15 @@
       const notes = Store.getNotes();
       if (!Array.isArray(notes) || !notes.length) {
         return { contextNotes: [], citations: [] };
+      }
+
+      // Use HybridRetrievalEngine (BM25 + TF-IDF Vector + RRF + Metadata Ranking) if present
+      if (typeof HybridRetrievalEngine !== 'undefined') {
+        const hybrid = new HybridRetrievalEngine();
+        const res = hybrid.search(query, notes);
+        if (res && (res.contextNotes.length || res.citations.length)) {
+          return { contextNotes: res.contextNotes, citations: res.citations };
+        }
       }
 
       const queryTokens = [...new Set(tokenize(query).filter((token) => !STOP_WORDS.has(token)))];
@@ -190,13 +201,17 @@
   }
 
   function localFallback(prompt, retrieved) {
-    if (retrieved.contextNotes.length) {
-      const first = retrieved.contextNotes[0];
-      const title = first.title || 'your notes';
-      const excerpt = clean(first.content || first.summary).slice(0, 900);
-      return `I found this in your Second Brain:\n\n**${title}**\n${excerpt}\n\nI couldn't reach the cloud model right now, so I'm showing the grounded source instead of inventing an answer.`;
+    if (retrieved.contextNotes && retrieved.contextNotes.length) {
+      let output = `### 🔒 Grounded in your Second Brain (${retrieved.contextNotes.length} sources found)\n\n`;
+      retrieved.contextNotes.slice(0, 3).forEach((n, i) => {
+        const title = n.title || 'Untitled Note';
+        const excerpt = clean(n.content || n.summary).slice(0, 450);
+        output += `#### ${i + 1}. [${title}]\n${excerpt}\n\n`;
+      });
+      output += `---\n*The remote AI model was unreachable. Milo retrieved your exact grounded knowledge sources directly from your Second Brain vault so you are never blocked.*`;
+      return output;
     }
-    return `I’m here. I couldn’t reach the generation service just now. Your local notes are still available through Search, Vault, and Knowledge Graph.`;
+    return `I am here, but the remote AI service is currently unreachable. Your saved notes are safe and searchable in your Knowledge Vault, Search, and Graph.`;
   }
 
   async function handleRAGQuery(query) {
@@ -222,11 +237,81 @@
         MiloCompanion.setGlobalState('responding', 'Hi! Great to see you.');
         setTimeout(() => MiloCompanion.setGlobalState('idle'), 3000);
       }
-      window.dispatchEvent(new CustomEvent('juno:answer', {
-        detail: { success: true, local: true, latencyMs: Math.round(performance.now() - startedAt) }
-      }));
+      const eventDetail = { success: true, local: true, latencyMs: Math.round(performance.now() - startedAt) };
+      window.dispatchEvent(new CustomEvent('milo:answer', { detail: eventDetail }));
+      window.dispatchEvent(new CustomEvent('juno:answer', { detail: eventDetail }));
       focusComposer();
       return true;
+    }
+
+    // Check for Specialized Agent Execution or Slash Commands (/code, /learn, /study, /write, /research, /organize)
+    const slashMatch = prompt.match(/^\/([a-zA-Z]+)(?:\s+(.*))?$/);
+    if (slashMatch) {
+      const command = slashMatch[1].toLowerCase();
+      const taskPrompt = (slashMatch[2] || '').trim();
+      const agentSystem = (typeof AgentSystem !== 'undefined' && AgentSystem.AgentSystem)
+        ? (window.agentSystem || new AgentSystem.AgentSystem())
+        : null;
+      const researchEngine = (typeof DeepResearchEngine !== 'undefined')
+        ? (window.deepResearchEngine || new DeepResearchEngine())
+        : null;
+
+      let executed = false;
+      let agentResultText = '';
+
+      try {
+        if (command === 'code' && agentSystem) {
+          executed = true;
+          replaceMessage(thinking, '💻 **Coding Partner Active**\n\n*Step 1: Inspecting vault patterns and planning architecture...*');
+          const res = await agentSystem.executeAgent('agent_coder', taskPrompt || 'Write clean, production-grade code architecture.', (step) => {
+            replaceMessage(thinking, `💻 **Coding Partner**\n\n*Step ${step.step}: ${step.name} — ${step.detail}*`);
+          });
+          agentResultText = res.answer;
+        } else if ((command === 'learn' || command === 'study') && agentSystem) {
+          executed = true;
+          replaceMessage(thinking, '🎓 **Study & Concept Explainer Active**\n\n*Step 1: Searching knowledge vault for grounded concepts...*');
+          const res = await agentSystem.executeAgent('agent_study', taskPrompt || 'Explain core technical concepts from my vault.', (step) => {
+            replaceMessage(thinking, `🎓 **Study Explainer**\n\n*Step ${step.step}: ${step.name} — ${step.detail}*`);
+          });
+          agentResultText = res.answer;
+        } else if ((command === 'write' || command === 'summary') && agentSystem) {
+          executed = true;
+          replaceMessage(thinking, '✍️ **Writing & Document Drafter Active**\n\n*Step 1: Distilling executive takeaways and key decisions...*');
+          const res = await agentSystem.executeAgent('agent_writer', taskPrompt || 'Distill executive summary from saved notes.', (step) => {
+            replaceMessage(thinking, `✍️ **Document Drafter**\n\n*Step ${step.step}: ${step.name} — ${step.detail}*`);
+          });
+          agentResultText = res.answer;
+        } else if (command === 'research' && researchEngine) {
+          executed = true;
+          replaceMessage(thinking, '🔬 **Deep Research Engine Active**\n\n*Step 1: Formulating 3-angle research plan...*');
+          const res = await researchEngine.executeResearch(taskPrompt || 'State of the art systems architecture and benchmarks', (prog) => {
+            replaceMessage(thinking, `🔬 **Deep Research Engine**\n\n*${prog.stage}: ${prog.detail || ''}*`);
+          });
+          agentResultText = res.report;
+        } else if (command === 'organize' && agentSystem) {
+          executed = true;
+          replaceMessage(thinking, '🗂️ **Knowledge Organizer Active**\n\n*Step 1: Scanning vault clusters and detecting knowledge gaps...*');
+          const res = await agentSystem.executeAgent('agent_organizer', taskPrompt || 'Scan and organize knowledge vault.', (step) => {
+            replaceMessage(thinking, `🗂️ **Knowledge Organizer**\n\n*Step ${step.step}: ${step.name} — ${step.detail}*`);
+          });
+          agentResultText = res.answer;
+        }
+      } catch (agentErr) {
+        agentResultText = `⚠️ Agent execution error: ${agentErr.message}`;
+      }
+
+      if (executed) {
+        replaceMessage(thinking, agentResultText);
+        saveTurn(prompt, agentResultText);
+        setBusy(false);
+        window.isAIProcessing = false;
+        if (typeof MiloCompanion !== 'undefined') {
+          MiloCompanion.setGlobalState('responding');
+          setTimeout(() => MiloCompanion.setGlobalState('idle'), 3500);
+        }
+        focusComposer();
+        return true;
+      }
     }
 
     const controller = new AbortController();
@@ -266,6 +351,7 @@
         MiloCompanion.setGlobalState('responding');
         setTimeout(() => MiloCompanion.setGlobalState('idle'), 3500);
       }
+      window.dispatchEvent(new CustomEvent('milo:answer', { detail: data }));
       window.dispatchEvent(new CustomEvent('juno:answer', { detail: data }));
       return true;
     } catch (error) {
@@ -276,10 +362,29 @@
         const fallback = localFallback(prompt, retrieved);
         replaceMessage(thinking, fallback);
       } else {
-        const userMsg = isTimeout
-          ? 'Request timed out after 25 seconds. Please try asking again.'
-          : (error?.message || 'The AI service could not complete this request. Please try again.');
-        replaceMessage(thinking, `⚠️ ${userMsg}`);
+        // Resilient On-Device Synthesis Fallback
+        let localAns = '';
+        if (typeof window !== 'undefined' && window.aiEngine && typeof window.aiEngine.fallbackSynthesize === 'function') {
+          try {
+            const fb = window.aiEngine.fallbackSynthesize(prompt, 'gemini-flash', '', null, getHistory());
+            if (fb && fb.text) localAns = fb.text;
+          } catch (_) {}
+        } else if (typeof AIEngine !== 'undefined') {
+          try {
+            const engine = new AIEngine();
+            const fb = engine.fallbackSynthesize(prompt, 'gemini-flash', '', null, getHistory());
+            if (fb && fb.text) localAns = fb.text;
+          } catch (_) {}
+        }
+
+        if (localAns) {
+          replaceMessage(thinking, `${localAns}\n\n---\n*⚡ Synthesized via Milo On-Device Local Engine (Remote cloud service unavailable).*`);
+        } else {
+          const userMsg = isTimeout
+            ? 'Request timed out after 25 seconds. Please try asking again.'
+            : (error?.message || 'The AI service could not complete this request. Please try again.');
+          replaceMessage(thinking, `⚠️ ${userMsg}`);
+        }
       }
       if (typeof window.showToast === 'function') {
         window.showToast(isTimeout ? 'Request timed out.' : 'Cloud AI temporarily unavailable.', 'warning');
@@ -288,9 +393,9 @@
         MiloCompanion.setGlobalState('error', 'I encountered an issue reaching the cloud AI.');
         setTimeout(() => MiloCompanion.setGlobalState('idle'), 4000);
       }
-      window.dispatchEvent(new CustomEvent('juno:answer', {
-        detail: { success: false, fallback: true, error: error?.message || 'Gateway unavailable' }
-      }));
+      const errorDetail = { success: false, fallback: true, error: error?.message || 'Gateway unavailable' };
+      window.dispatchEvent(new CustomEvent('milo:answer', { detail: errorDetail }));
+      window.dispatchEvent(new CustomEvent('juno:answer', { detail: errorDetail }));
       return false;
     } finally {
       clearTimeout(timeoutId);
@@ -485,6 +590,7 @@
     return handleRAGQuery(prompt);
   };
   window.sendMessage = window.submitRAGQuery;
+  window.miloResetChat = createFallbackNewChat;
   window.junoResetChat = createFallbackNewChat;
   window.insertSampleQuery = function (text) {
     const input = document.getElementById('rag-query-input');

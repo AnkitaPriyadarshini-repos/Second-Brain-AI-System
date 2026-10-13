@@ -90,6 +90,7 @@ class AIGatewayService {
       if (clean) return clean;
     }
     const direct = (
+      process.env.MILO_GEMINI_KEY ||
       process.env.JUNO_GEMINI_KEY ||
       process.env.GEMINI_API_KEY ||
       process.env.GOOGLE_API_KEY ||
@@ -100,7 +101,7 @@ class AIGatewayService {
     if (direct) return direct;
     if (process.env && typeof process.env === 'object') {
       for (const [key, value] of Object.entries(process.env)) {
-        if (typeof value === 'string' && /(?:gemini|juno|google).*key/i.test(key)) {
+        if (typeof value === 'string' && /(?:gemini|milo|juno|google).*key/i.test(key)) {
           const cleaned = value.trim().replace(/^["']|["']$/g, '');
           if (cleaned.length > 10) return cleaned;
         }

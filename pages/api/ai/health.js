@@ -1,8 +1,9 @@
-// Minimal public readiness endpoint for the Juno AI gateway in Next.js pages/api.
+// Minimal public readiness endpoint for the Milo AI gateway in Next.js pages/api.
 // Never return environment-variable names, secret lengths, deployment metadata,
 // model configuration, or raw provider error details from a public health route.
 function getApiKey() {
   const direct = (
+    process.env.MILO_GEMINI_KEY ||
     process.env.JUNO_GEMINI_KEY ||
     process.env.GEMINI_API_KEY ||
     process.env.GOOGLE_API_KEY ||
@@ -15,7 +16,7 @@ function getApiKey() {
 
   if (process.env && typeof process.env === 'object') {
     for (const [key, value] of Object.entries(process.env)) {
-      if (typeof value === 'string' && /(?:gemini|juno|google).*key/i.test(key)) {
+      if (typeof value === 'string' && /(?:gemini|milo|juno|google).*key/i.test(key)) {
         const cleaned = value.trim().replace(/^["']|["']$/g, '');
         if (cleaned.length > 10) return cleaned;
       }
@@ -37,7 +38,7 @@ export default function handler(req, res) {
   const configured = Boolean(getApiKey());
   const payload = {
     ok: configured,
-    service: 'juno-ai-gateway',
+    service: 'milo-ai-gateway',
     configured,
     timestamp: new Date().toISOString()
   };

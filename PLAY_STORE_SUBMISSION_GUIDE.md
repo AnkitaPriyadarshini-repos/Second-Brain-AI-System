@@ -23,7 +23,7 @@ Your Android App Bundle (**`.aab`**) and Digital Asset Links (**`assetlinks.json
 - **Short Description** (80 chars max):
   `Zero-friction capture, on-device AI thinking partner & local RAG retrieval.`
 - **Full Description**:
-  `Second Brain AI System (Juno AI) is your personal cognitive assistant featuring grounded local RAG document retrieval, multi-surface voice capture, intelligent note synthesis, and interactive graph topology visualization.`
+  `Second Brain AI System (Milo) is your personal cognitive assistant featuring grounded local RAG document retrieval, multi-surface voice capture, intelligent note synthesis, and interactive graph topology visualization.`
 
 ### 2. Categorization & Contact
 - **Application Category**: `Productivity` / `Tools`
