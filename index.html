@@ -14,19 +14,35 @@
   <meta http-equiv="Expires" content="0">
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 
+  <script>
+    (function() {
+      try {
+        document.documentElement.setAttribute('data-theme', 'onyx');
+        const raw = localStorage.getItem('second_brain_settings');
+        if (raw) {
+          const s = JSON.parse(raw);
+          s.theme = 'onyx';
+          localStorage.setItem('second_brain_settings', JSON.stringify(s));
+        }
+        localStorage.removeItem('theme');
+        localStorage.removeItem('selected_theme');
+      } catch (e) {}
+    })();
+  </script>
+
   <!-- Google Fonts: Inter + Fira Code -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheets & App Manifest -->
-  <link rel="stylesheet" href="css/style.css?v=59.0">
-  <link rel="stylesheet" href="css/nori-companion.css?v=66.0">
-  <link rel="stylesheet" href="css/responsive.css?v=58.0">
-  <link rel="stylesheet" href="css/websocket-chat.css?v=58.0">
-  <link rel="stylesheet" href="css/adaptive-fusion.css?v=1.0">
+  <link rel="stylesheet" href="css/style.css?v=67.0">
+  <link rel="stylesheet" href="css/nori-companion.css?v=67.0">
+  <link rel="stylesheet" href="css/responsive.css?v=67.0">
+  <link rel="stylesheet" href="css/websocket-chat.css?v=67.0">
+  <link rel="stylesheet" href="css/adaptive-fusion.css?v=67.0">
   <link rel="stylesheet" href="css/milo-workspace-studio.css?v=1.0">
-  <link rel="stylesheet" href="css/onyx-theme.css?v=1.0">
+  <link rel="stylesheet" href="css/onyx-theme.css?v=67.0">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FFFFFF">
 </head>
@@ -83,7 +99,7 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
             <span>IT Helpdesk</span>
           </div>
-          <div class="onyx-sidebar-item sidebar-menu-item" data-view="create" onclick="window.activateView('create')" title="Create Studio (Image & Video)">
+          <div class="onyx-sidebar-item sidebar-menu-item" data-view="create" onclick="window.activateView('create')" title="Create Studio (Image & Video)" style="display: none;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             <span>Create Studio</span>
           </div>
@@ -333,8 +349,8 @@
     <div class="nori-reference-composer-wrapper">
       <form id="rag-query-form" class="nori-reference-composer-card" autocomplete="off" onsubmit="window.submitRAGQuery(event); return false;">
         
-        <!-- Shortcut Hint inside composer box -->
-        <div class="nori-shortcut-hint">
+        <!-- Shortcut Hint inside composer box (hidden for Onyx) -->
+        <div class="nori-shortcut-hint" style="display: none;">
           <span>⇧</span> <span>↵</span> <span>to insert a line break</span>
         </div>
 
@@ -2004,7 +2020,7 @@
   <!-- JavaScript Modules -->
   <script src="js/utils.js?v=59.0"></script>
   <script src="js/nlp-engine.js?v=58.0"></script>
-  <script src="js/store.js?v=58.0"></script>
+  <script src="js/store.js?v=67.0"></script>
   <script src="js/rag-engine.js?v=58.0"></script>
   <script src="js/voice-engine.js?v=58.0"></script>
   <script src="js/audio-presets.js?v=58.0"></script>
@@ -2025,9 +2041,9 @@
   <script src="js/create-studio.js?v=1.0"></script>
   <script src="js/diff-coding-agent.js?v=1.0"></script>
   <script src="js/autonomous-agent.js?v=1.0"></script>
-  <script src="js/onyx-interface.js?v=1.0"></script>
+  <script src="js/onyx-interface.js?v=67.0"></script>
   <script src="js/pwa-installer.js?v=61.0"></script>
   <script src="js/nori-companion.js?v=65.0"></script>
-  <script src="js/app.js?v=66.0"></script>
+  <script src="js/app.js?v=67.0"></script>
 </body>
 </html>

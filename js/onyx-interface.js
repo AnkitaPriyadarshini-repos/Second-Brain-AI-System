@@ -464,10 +464,18 @@
       this.bindKeyboardShortcuts();
       this.bindComposerTools();
 
-      // Ensure initial session is loaded
+      // Ensure initial session is loaded with Onyx thread
       const container = document.getElementById('chat-container');
-      if (container && (!container.children.length || container.innerHTML.trim() === '')) {
+      if (container && (!container.children.length || container.innerHTML.trim() === '' || !container.querySelector('.onyx-turn-actions-bar'))) {
         this.loadSession(this.currentSessionId);
+      }
+    }
+
+    toggleTurnThought(turnId) {
+      const body = document.getElementById('body-' + turnId);
+      if (body) {
+        const isHidden = body.style.display === 'none';
+        body.style.display = isHidden ? 'block' : 'none';
       }
     }
 

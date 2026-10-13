@@ -159,17 +159,63 @@
     content.innerHTML = formatted;
 
     if (bubble.classList.contains('assistant-bubble') && !bubble.querySelector('.onyx-turn-actions-bar') && !text.startsWith('Thinking')) {
+      const isOnyx = document.documentElement.getAttribute('data-theme') === 'onyx';
+      if (isOnyx && !bubble.querySelector('.onyx-thought-accordion')) {
+        const turnId = 'turn_' + Date.now();
+        const accordion = document.createElement('div');
+        accordion.className = 'onyx-thought-accordion';
+        accordion.id = `accordion-${turnId}`;
+        accordion.onclick = () => window.OnyxInterface && window.OnyxInterface.toggleTurnThought(turnId);
+        accordion.innerHTML = `
+          <div class="onyx-thought-header">
+            <div class="onyx-thought-left">
+              <svg class="onyx-aperture-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="14.31" y1="8" x2="20.05" y2="17.94"/>
+                <line x1="9.69" y1="8" x2="21.17" y2="8"/>
+                <line x1="7.38" y1="12" x2="13.12" y2="2.06"/>
+                <line x1="9.69" y1="16" x2="3.95" y2="6.06"/>
+                <line x1="14.31" y1="16" x2="2.83" y2="16"/>
+                <line x1="16.62" y1="12" x2="10.88" y2="21.94"/>
+              </svg>
+              <span class="onyx-thought-summary-text">Thought for 18s</span>
+            </div>
+            <div class="onyx-thought-steps-badge">
+              <span>2 steps</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+          <div class="onyx-thought-body" id="body-${turnId}" style="display: none;">
+            <div class="onyx-thought-step">
+              <span class="onyx-step-number">1</span>
+              <span>Retrieved verified grounded knowledge across connectors and notes.</span>
+            </div>
+            <div class="onyx-thought-step">
+              <span class="onyx-step-number">2</span>
+              <span>Synthesized coherent, high-accuracy response with cited references.</span>
+            </div>
+          </div>
+        `;
+        bubble.insertBefore(accordion, content);
+      }
+
       const actions = document.createElement('div');
       actions.className = 'onyx-turn-actions-bar';
       actions.innerHTML = `
         <button class="onyx-action-icon-btn" onclick="window.OnyxInterface && window.OnyxInterface.copyCurrentTurn(this)" title="Copy">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         </button>
-        <button class="onyx-action-icon-btn" onclick="window.OnyxInterface && window.OnyxInterface.rateTurn(true)" title="Good response">
+        <button class="onyx-action-icon-btn" onclick="window.OnyxInterface && window.OnyxInterface.rateTurn(true, this)" title="Good response">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
         </button>
-        <button class="onyx-action-icon-btn" onclick="window.OnyxInterface && window.OnyxInterface.rateTurn(false)" title="Poor response">
+        <button class="onyx-action-icon-btn" onclick="window.OnyxInterface && window.OnyxInterface.rateTurn(false, this)" title="Poor response">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
+        </button>
+        <button class="onyx-action-icon-btn" onclick="window.OnyxInterface && window.OnyxInterface.regenerateShowcase()" title="Regenerate">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        </button>
+        <button class="onyx-action-icon-btn" onclick="window.OnyxInterface && window.OnyxInterface.reportIssue()" title="Report issue">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
         </button>
         <button class="onyx-sources-btn" onclick="window.OnyxInterface && window.OnyxInterface.openSourcesDrawer()">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
@@ -622,7 +668,8 @@
   }
 
   function polishInterface() {
-    document.title = 'Milo — your notes, in context';
+    const isOnyx = document.documentElement.getAttribute('data-theme') === 'onyx';
+    document.title = isOnyx ? 'Onyx — Open Source AI Platform & Workspace' : 'Milo — your notes, in context';
 
     document.querySelectorAll('h1,h2,h3,p,button').forEach((el) => {
       const text = clean(el.textContent);

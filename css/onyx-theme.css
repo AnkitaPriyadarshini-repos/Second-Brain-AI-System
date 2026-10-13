@@ -55,6 +55,13 @@ html[data-theme="onyx"] {
   --topbar-border: #E5E7EB !important;
 }
 
+body,
+.app-layout-wrapper,
+.app-main-canvas,
+.claude-main-canvas,
+.claude-hero-section,
+#view-jarvis,
+[data-theme="onyx"] body,
 html[data-theme="onyx"] body,
 html[data-theme="onyx"] .app-layout-wrapper,
 html[data-theme="onyx"] .app-main-canvas,
@@ -68,10 +75,12 @@ html[data-theme="onyx"] #view-jarvis {
   -webkit-font-smoothing: antialiased;
 }
 
+#gemini-flow-canvas,
 html[data-theme="onyx"] #gemini-flow-canvas {
   display: none !important;
 }
 
+.app-layout-wrapper,
 html[data-theme="onyx"] .app-layout-wrapper {
   background-color: #FFFFFF !important;
   display: flex !important;
@@ -83,6 +92,9 @@ html[data-theme="onyx"] .app-layout-wrapper {
    ONYX LEFT SIDEBAR
    ========================================================================== */
 
+#app-sidebar,
+.claude-sidebar,
+.app-sidebar,
 html[data-theme="onyx"] #app-sidebar,
 html[data-theme="onyx"] .claude-sidebar,
 html[data-theme="onyx"] .app-sidebar {
@@ -888,11 +900,39 @@ html[data-theme="onyx"] #rag-submit-btn:not([disabled]):hover {
 }
 
 /* Hide legacy shortcuts or unwanted text inside onyx composer */
+.nori-shortcut-hint,
+#milo-chat-companion-bar,
+.nori-at-tag-btn,
+button.nori-at-tag-btn,
+.nori-voice-label,
+#voice-trigger-btn .nori-voice-label,
+.claude-ai-bubble .chat-header,
+.ai-bubble .chat-header,
 html[data-theme="onyx"] .nori-shortcut-hint,
 html[data-theme="onyx"] #milo-chat-companion-bar,
 html[data-theme="onyx"] .nori-at-tag-btn,
 html[data-theme="onyx"] button.nori-at-tag-btn {
   display: none !important;
+}
+
+#voice-trigger-btn,
+.onyx-composer-tools-right #voice-trigger-btn {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #6B7280 !important;
+  padding: 6px !important;
+  border-radius: 8px !important;
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+#voice-trigger-btn:hover {
+  color: #111827 !important;
+  background: #F3F4F6 !important;
 }
 
 /* Platform Subtitle Footer */

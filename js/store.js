@@ -392,12 +392,11 @@
       if (savedSettings) {
         try {
           this.settings = { ...this.settings, ...JSON.parse(savedSettings) };
-          if (!this.settings.theme || ['gemini-dark', 'obsidian'].includes(this.settings.theme)) {
-            this.settings.theme = 'gold-glassmorphism';
-            this.saveSettings();
-          }
         } catch (e) { }
       }
+      // Ensure Onyx enterprise theme is always active
+      this.settings.theme = 'onyx';
+      this._setItem(SETTINGS_KEY, JSON.stringify(this.settings));
 
       const savedGoals = this._getItem(GOALS_KEY);
       if (savedGoals) {
@@ -581,6 +580,10 @@
     updateSettings: function (newSettings) {
       this.settings = { ...this.settings, ...newSettings };
       this.saveNotes();
+    },
+
+    saveSettings: function () {
+      this._setItem(SETTINGS_KEY, JSON.stringify(this.settings));
     },
 
     setOffline: function (offlineState) {

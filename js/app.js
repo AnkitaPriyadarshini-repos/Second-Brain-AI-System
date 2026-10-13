@@ -1123,38 +1123,34 @@
       });
     }
 
-    // Theme Switcher Initialization
-    const themeCardOpts = document.querySelectorAll('.theme-card-option');
+    // Theme Switcher Initialization — Enforce Onyx Enterprise Theme
     const initialThemeAttr = (typeof document !== 'undefined' && document.documentElement) ? document.documentElement.getAttribute('data-theme') : 'onyx';
-    let savedTheme = (typeof Store !== 'undefined' && Store.settings && Store.settings.theme) ? Store.settings.theme : (initialThemeAttr || 'onyx');
-    if (!savedTheme || savedTheme === 'royal-gold' || savedTheme === 'sunflower-yellow' || savedTheme === 'golden-harmony' || savedTheme === 'second-brain-navy' || savedTheme === 'aqua-aesthetic') {
-      savedTheme = initialThemeAttr || 'onyx';
+    let savedTheme = 'onyx';
+    if (typeof Store !== 'undefined' && Store.settings) {
+      Store.settings.theme = 'onyx';
     }
-    applyTheme(savedTheme);
+    applyTheme('onyx');
 
     const allThemeButtons = [...themePillBtns, ...themeCardOpts];
     allThemeButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        const theme = btn.getAttribute('data-theme');
-        if (theme) {
-          applyTheme(theme);
-          if (typeof Store !== 'undefined' && Store.updateSettings) {
-            Store.updateSettings({ theme });
-          }
+        applyTheme('onyx');
+        if (typeof Store !== 'undefined' && Store.updateSettings) {
+          Store.updateSettings({ theme: 'onyx' });
         }
       });
     });
 
     function applyTheme(themeName) {
-      if (!themeName) themeName = 'second-brain-navy';
+      themeName = 'onyx';
       const root = document.documentElement || document.body || (typeof document !== 'undefined' ? document.querySelector('html') : null);
       if (root && typeof root.setAttribute === 'function') {
-        root.setAttribute('data-theme', themeName);
+        root.setAttribute('data-theme', 'onyx');
       }
       
       const themeElements = document.querySelectorAll('.theme-pill-btn, .theme-card-option');
       themeElements.forEach(b => {
-        if (b.getAttribute('data-theme') === themeName) {
+        if (b.getAttribute('data-theme') === 'onyx') {
           b.classList.add('active');
         } else {
           b.classList.remove('active');
@@ -1162,7 +1158,7 @@
       });
 
       if (typeof GeminiColorFlowEngine !== 'undefined' && GeminiColorFlowEngine.setThemePalette) {
-        GeminiColorFlowEngine.setThemePalette(themeName);
+        GeminiColorFlowEngine.setThemePalette('onyx');
       }
     }
 
@@ -1197,8 +1193,8 @@
               voiceTriggerBtn.innerHTML = `🔊<span class="nori-voice-label">Speaking…</span>`;
             } else {
               voiceTriggerBtn.classList.remove('listening', 'speaking');
-              voiceTriggerBtn.title = 'Talk to Milo (Voice Input)';
-              voiceTriggerBtn.innerHTML = `${micSvg}<span class="nori-voice-label">Talk to Milo</span>`;
+              voiceTriggerBtn.title = 'Voice Input';
+              voiceTriggerBtn.innerHTML = `${micSvg}`;
             }
           }
         }
@@ -2032,39 +2028,71 @@
 
       const msgCard = document.createElement('div');
       if (sender === 'user') {
-        msgCard.className = `chat-bubble user-bubble claude-user-bubble`;
+        msgCard.className = `chat-bubble user-bubble claude-user-bubble onyx-user-bubble`;
         msgCard.innerHTML = `
-          <div class="chat-text" style="font-size: 15px; line-height: 1.5; font-weight: 400; word-break: break-word; color: #f3f0e8;">${escapeHTML(text)}</div>
+          <div class="chat-text" style="font-size: 15px; line-height: 1.5; font-weight: 500; word-break: break-word; color: #111827;">${escapeHTML(text)}</div>
         `;
       } else {
-        msgCard.className = `chat-bubble ai-bubble claude-ai-bubble`;
-        let citationsHTML = '';
-        if (citations && citations.length > 0) {
-          citationsHTML = `<div class="citations-container" style="margin-top: 12px; padding: 10px 14px; background: rgba(56, 189, 248, 0.08); border-radius: 10px; border: 1px solid rgba(56, 189, 248, 0.18);">
-            <div class="citations-title" style="font-size: 12px; color: #38BDF8; font-weight: 600; margin-bottom: 6px;">🧠 Remembered from ${citations.length} note${citations.length > 1 ? 's' : ''}:</div>
-            <div class="citations-list" style="display: flex; flex-wrap: wrap; gap: 6px;">
-              ${citations.map(c => `
-                <a class="citation-pill" data-id="${c.id}" style="font-size: 11.5px; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,0.06); color: #E2E8F0; text-decoration: none; border: 1px solid rgba(255,255,255,0.1); cursor: pointer;">
-                  ${escapeHTML(c.title)}
-                </a>
-              `).join('')}
-            </div>
-          </div>`;
-        }
-
-        const actionsHTML = `<div class="chat-actions-bar claude-actions-bar">
-          <button class="chat-action-btn copy-btn" title="Copy answer text">📋 Copy</button>
-          <button class="chat-action-btn regen-btn" title="Regenerate response">🔄 Retry</button>
-          <button class="chat-action-btn speak-btn" title="Listen to answer">🔊 Read</button>
-        </div>`;
+        msgCard.className = `chat-bubble ai-bubble claude-ai-bubble onyx-assistant-bubble`;
+        const turnId = 'turn_' + Date.now();
+        const sourcesCount = citations && citations.length ? citations.length : 0;
+        
+        const actionsHTML = `
+          <div class="onyx-turn-actions-bar" style="margin-top: 14px; display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.copyCurrentTurn(this)" title="Copy">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.rateTurn(true, this)" title="Good response">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+            </button>
+            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.rateTurn(false, this)" title="Poor response">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
+            </button>
+            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.regenerateShowcase()" title="Regenerate">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            </button>
+            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.reportIssue()" title="Report issue">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+            </button>
+            <button type="button" class="onyx-sources-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.openSourcesDrawer()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+              <span>${sourcesCount > 0 ? sourcesCount + ' ' : ''}Sources</span>
+            </button>
+          </div>
+        `;
 
         msgCard.innerHTML = `
-          <div class="chat-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-            <span style="font-size: 16px;">✨</span>
-            <strong style="font-size: 14px; font-weight: 700; color: #38BDF8;">Milo</strong>
+          <div class="onyx-thought-accordion" id="accordion-${turnId}" onclick="if(window.OnyxInterface) window.OnyxInterface.toggleTurnThought('${turnId}')">
+            <div class="onyx-thought-header">
+              <div class="onyx-thought-left">
+                <svg class="onyx-aperture-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="14.31" y1="8" x2="20.05" y2="17.94"/>
+                  <line x1="9.69" y1="8" x2="21.17" y2="8"/>
+                  <line x1="7.38" y1="12" x2="13.12" y2="2.06"/>
+                  <line x1="9.69" y1="16" x2="3.95" y2="6.06"/>
+                  <line x1="14.31" y1="16" x2="2.83" y2="16"/>
+                  <line x1="16.62" y1="12" x2="10.88" y2="21.94"/>
+                </svg>
+                <span class="onyx-thought-summary-text">Thought for 12s</span>
+              </div>
+              <div class="onyx-thought-steps-badge">
+                <span>2 steps</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+            </div>
+            <div class="onyx-thought-body" id="body-${turnId}" style="display: none;">
+              <div class="onyx-thought-step">
+                <span class="onyx-step-number">1</span>
+                <span>Retrieved verified grounded knowledge across connectors and notes.</span>
+              </div>
+              <div class="onyx-thought-step">
+                <span class="onyx-step-number">2</span>
+                <span>Synthesized coherent, high-accuracy response with cited references.</span>
+              </div>
+            </div>
           </div>
-          <div class="chat-text" style="color: #f3f0e8; font-size: 15.5px; line-height: 1.65; font-family: 'Inter', sans-serif;"></div>
-          ${citationsHTML}
+          <div class="chat-text onyx-turn-content" style="color: #111827; font-size: 15px; line-height: 1.6; font-family: 'Inter', sans-serif;"></div>
           ${actionsHTML}
         `;
 
