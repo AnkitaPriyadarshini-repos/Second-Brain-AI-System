@@ -18,23 +18,25 @@ export default async function handler(req, res) {
   }
 
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 6000);
-    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: 'What is 2+2?' }] }]
-      }),
-      signal: controller.signal
-    });
-    clearTimeout(timeout);
-    const d = await resp.json();
-    return res.status(resp.status).json({
-      model: 'gemini-flash-latest',
-      status: resp.status,
-      data: d
-    });
+    const modelsToTry = ['gemini-3.1-flash-lite', 'gemini-3.5-flash-lite', 'gemini-pro-latest', 'gemma-4-31b-it'];
+    for (const m of modelsToTry) {
+      const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: 'What is 2+2?' }] }]
+        })
+      });
+      const d = await resp.json();
+      if (resp.status === 200) {
+        return res.status(200).json({
+          workingModel: m,
+          status: 200,
+          answer: d?.candidates?.[0]?.content?.parts?.[0]?.text
+        });
+      }
+    }
+    return res.status(503).json({ error: 'All tested flash-lite models were unavailable' });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
