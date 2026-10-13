@@ -96,7 +96,34 @@ const imageHandler = require('../api/media/image.js');
   console.log('\nSuite 2: Async Video Generation Job Lifecycle');
   const videoHandler = require('../api/media/video.js');
 
+  // Test 2.0: Unconfigured Video Provider returns honest 503 Service Unavailable
+  {
+    const origEnv = process.env.MILO_TEST_VIDEO_PROVIDER;
+    delete process.env.MILO_TEST_VIDEO_PROVIDER;
+    let statusCode = null;
+    let jsonBody = null;
+    const req = {
+      method: 'POST',
+      body: { action: 'create', prompt: 'A futuristic cyber city' },
+      headers: { 'x-forwarded-for': '127.0.0.99' }
+    };
+    const res = {
+      status: (code) => { statusCode = code; return res; },
+      json: (data) => { jsonBody = data; return res; }
+    };
+    await videoHandler(req, res);
+    assert.strictEqual(statusCode, 503, 'Unconfigured video provider must return 503');
+    assert.strictEqual(jsonBody.configured, false);
+    assert.ok(jsonBody.error.includes('unconfigured'));
+    console.log('  ✅ [PASS] Video API returns honest 503 when external video provider is unconfigured');
+    if (origEnv) process.env.MILO_TEST_VIDEO_PROVIDER = origEnv;
+  }
+
+  // Set test mock provider for deterministic contract and authorization tests
+  process.env.MILO_TEST_VIDEO_PROVIDER = 'mock';
+
   let testJobId = null;
+  const ownerHeaders = { 'x-forwarded-for': '127.0.0.4' };
 
   // Test 2.1: Submit new video generation job
   {
@@ -105,7 +132,7 @@ const imageHandler = require('../api/media/image.js');
     const req = {
       method: 'POST',
       body: { action: 'create', prompt: 'Milo robot waving hello in a neon cyber garden', duration: 4, aspectRatio: '16:9' },
-      headers: { 'x-forwarded-for': '127.0.0.4' }
+      headers: ownerHeaders
     };
     const res = {
       status: (code) => { statusCode = code; return res; },
@@ -119,14 +146,14 @@ const imageHandler = require('../api/media/image.js');
     console.log('  ✅ [PASS] Video API registers new generation job with queued status');
   }
 
-  // Test 2.2: Poll video job status
+  // Test 2.2: Poll video job status with owner identity
   {
     let statusCode = 200;
     let jsonBody = null;
     const req = {
       method: 'POST',
       body: { action: 'status', jobId: testJobId },
-      headers: { 'x-forwarded-for': '127.0.0.4' }
+      headers: ownerHeaders
     };
     const res = {
       status: (code) => { statusCode = code; return res; },
@@ -140,14 +167,33 @@ const imageHandler = require('../api/media/image.js');
     console.log('  ✅ [PASS] Video API returns accurate asynchronous job progress on polling');
   }
 
-  // Test 2.3: Cancel video generation job
+  // Test 2.3: Authorization / Ownership Check (Different client cannot access or cancel job)
+  {
+    let statusCode = null;
+    let jsonBody = null;
+    const intruderReq = {
+      method: 'POST',
+      body: { action: 'status', jobId: testJobId },
+      headers: { 'x-forwarded-for': '192.168.1.100' } // Different IP / guest identity
+    };
+    const res = {
+      status: (code) => { statusCode = code; return res; },
+      json: (data) => { jsonBody = data; return res; }
+    };
+    await videoHandler(intruderReq, res);
+    assert.strictEqual(statusCode, 403, 'Intruder request to access private job must return 403 Forbidden');
+    assert.ok(jsonBody.error.includes('Access denied'));
+    console.log('  ✅ [PASS] Video API enforces verified ownership boundaries and prevents IDOR (403)');
+  }
+
+  // Test 2.4: Cancel video generation job
   {
     let statusCode = 200;
     let jsonBody = null;
     const req = {
       method: 'POST',
       body: { action: 'cancel', jobId: testJobId },
-      headers: { 'x-forwarded-for': '127.0.0.4' }
+      headers: ownerHeaders
     };
     const res = {
       status: (code) => { statusCode = code; return res; },
@@ -156,17 +202,17 @@ const imageHandler = require('../api/media/image.js');
     await videoHandler(req, res);
     assert.strictEqual(statusCode, 200);
     assert.strictEqual(jsonBody.status, 'cancelled');
-    console.log('  ✅ [PASS] Video API safely handles explicit job cancellation');
+    console.log('  ✅ [PASS] Video API safely handles explicit job cancellation by owner');
   }
 
-  // Test 2.4: Querying unknown job returns 404
+  // Test 2.5: Querying unknown job returns 404
   {
     let statusCode = null;
     let jsonBody = null;
     const req = {
       method: 'POST',
       body: { action: 'status', jobId: 'non-existent-job-id' },
-      headers: { 'x-forwarded-for': '127.0.0.4' }
+      headers: ownerHeaders
     };
     const res = {
       status: (code) => { statusCode = code; return res; },

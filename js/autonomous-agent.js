@@ -212,7 +212,17 @@
             });
             return { success: true, noteId: newNote.id, title: newNote.title };
           }
-          return { success: true, title: params.title, simulated: true };
+          const memoryNote = {
+            id: `vault_note_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            title: params.title,
+            content: params.content,
+            tags: params.tags || ['#agent-synthesis'],
+            createdAt: new Date().toISOString()
+          };
+          if (context && Array.isArray(context.notes)) {
+            context.notes.unshift(memoryNote);
+          }
+          return { success: true, noteId: memoryNote.id, title: memoryNote.title, persisted: 'session_memory' };
         }
       });
     }

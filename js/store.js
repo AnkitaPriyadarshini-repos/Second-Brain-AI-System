@@ -84,43 +84,48 @@
   function generate100PreSeededNotes() {
     const rawTemplates = [
       {
-        title: "📄 Ankita Priyadarshini Pallai - 1-Page Google Authentic PDF Resume (ANKITA_PRIYADARSHINI_RESUME.pdf)",
-        content: "Official Google-Shortlist Verified 1-Page PDF Resume for Ankita Priyadarshini Pallai (ANKITA_PRIYADARSHINI_RESUME.pdf). 100% Authentic & Credibility Verified (Score 10/10). Highlights: B.Tech CSE at SUIIT (GPA: 9.21/10.00), LeetCode Knight Badge (Contest Rating 1,850+ | Top 3.5% Globally | 96.4% Acceptance), DRDO Software Research Intern (Bearing-Only Measurement Triangulation, GDOP mitigation, DBSCAN & K-Means C++/Qt telemetry at 60 FPS), Infosys Springboard (YOLOv8 ANPR & PyTorch TensorRT FP16 quantization), Juno AI RAG Engine (1,500+ active users with DIP LLD), Synergia WebRTC Engine, and AlgoVerse Engine.",
+        title: "Distributed Systems Architecture: Consensus Protocols & Fault Tolerance",
+        content: "Deep dive into distributed consensus mechanisms including Raft and Paxos. Explores leader election, log replication, safety invariants, and Byzantine fault tolerance in decentralized architectures.",
         sourceType: "file",
         dateStr: "August 01, 2026",
-        sourceUrl: "file:///C:/Users/ankit/Downloads/ANKITA_PRIYADARSHINI_RESUME.pdf",
+        sourceUrl: "docs/distributed_consensus_guide.pdf",
+        isSample: true,
         pinned: true
       },
       {
-        title: "📄 Ankita Priyadarshini Pallai - Perfected 1-Page PDF Resume (one.pdf)",
-        content: "Official Google-Shortlist Verified 1-Page PDF Resume for Ankita Priyadarshini Pallai (one.pdf). Highlights: B.Tech CSE at SUIIT (GPA: 9.21/10.00), LeetCode Knight Badge (Contest Rating 1,850+ | Top 3.5% Globally), DRDO C++/Qt Software Research Intern, Infosys Springboard AI, Juno AI Flagship RAG Engine (1,500+ active users), Synergia WebRTC Media Engine, and AlgoVerse Engine.",
+        title: "Machine Learning: Contrastive Representation Learning & Embeddings",
+        content: "Analysis of self-supervised contrastive learning frameworks (SimCLR, MoCo) for dense vector representation. Highlights temperature scaling, hard negative mining, and dimensionality reduction for vector indexing.",
         sourceType: "file",
         dateStr: "August 01, 2026",
-        sourceUrl: "file:///C:/Users/ankit/Downloads/one.pdf",
+        sourceUrl: "docs/contrastive_learning_notes.pdf",
+        isSample: true,
         pinned: true
       },
       {
-        title: "🌐 Ankita Priyadarshini Pallai - Interactive HTML Resume (Downloads)",
-        content: "Interactive HTML Single-Page Resume (ANKITA_PRIYADARSHINI_RESUME.html). 100% Authentic & Credibility Verified, zero manufactured metrics, balanced spacing, ATS-friendly markup, and direct print-to-PDF button.",
+        title: "Engineering Best Practices: Clean Architecture & Dependency Inversion",
+        content: "Core architectural tenets: decoupling high-level policy from low-level detail via interfaces. Demonstrates repository patterns, unit test isolation, and dependency injection in scalable full-stack applications.",
         sourceType: "file",
         dateStr: "August 01, 2026",
-        sourceUrl: "file:///C:/Users/ankit/Downloads/ANKITA_PRIYADARSHINI_RESUME.html",
+        sourceUrl: "docs/clean_architecture_handbook.html",
+        isSample: true,
         pinned: true
       },
       {
-        title: "📝 Google & FAANG Technical Interview Defense Guide",
-        content: "Comprehensive deep-dive guide for defending every bullet point in technical interviews at Google, Microsoft, and Amazon. Covers mathematical derivations for Least Squares Triangulation, Geometric Dilution of Precision (GDOP), DBSCAN vs K-Means clustering in C++, Dependency Inversion Principle (DIP), WebRTC STUN/TURN NAT traversal, and PyTorch TensorRT FP16 quantization.",
+        title: "Modern Web Protocols: WebRTC Media Channels & QUIC / HTTP/3",
+        content: "Technical architecture of peer-to-peer media pipelines using WebRTC STUN/TURN traversal alongside QUIC-based transport for sub-50ms data streaming and congestion control.",
         sourceType: "typing",
         dateStr: "August 01, 2026",
-        sourceUrl: "interview_defense_guide.md",
+        sourceUrl: "docs/webrtc_quic_deepdive.md",
+        isSample: true,
         pinned: true
       },
       {
-        title: "🔬 DRDO Sensor Triangulation & Telemetry Systems Summary",
-        content: "Technical summary of DRDO internship work in Chandipur, Odisha. Engineered a 50-node sensor passive target localization pipeline utilizing Bearing-Only Measurement (BOM). Implemented apex-angle and elevation threshold filtering to resolve GDOP and eliminate ghost target intersections. Built a real-time Qt dashboard in C++ rendering 50+ telemetry feeds under 2ms delay.",
+        title: "High-Performance Computing: TensorRT & FP16 Quantization Pipelines",
+        content: "Optimization techniques for deep learning inference: layer fusion, kernel tuning, and dynamic INT8/FP16 precision calibration. Reduces memory footprint and achieves 3x latency reduction on GPU hardware.",
         sourceType: "file",
         dateStr: "July 30, 2026",
-        sourceUrl: "DRDO_Telemetry_Specs.pdf",
+        sourceUrl: "docs/tensorrt_fp16_benchmarks.pdf",
+        isSample: true,
         pinned: true
       },
       {
@@ -291,6 +296,7 @@
         timestamp: Date.now() - (100 - i) * 86400000,
         entities,
         tags,
+        isSample: true,
         pinned: i <= 2 // Pin first 2 notes by default
       });
     }
@@ -348,39 +354,154 @@
     /**
      * Initializes the database store
      */
+    /**
+     * Positively identifies legacy auto-injected fabricated personal seed records
+     */
+    _isLegacyFabricatedSeed: function (note) {
+      if (!note) return false;
+      const title = String(note.title || '').toLowerCase();
+      const url = String(note.sourceUrl || '').toLowerCase();
+      const content = String(note.content || '').toLowerCase();
+      return (
+        url.includes('ankita_priyadarshini_resume') ||
+        url.includes('one.pdf') ||
+        url.includes('drdo_telemetry_specs') ||
+        url.includes('interview_defense_guide') ||
+        title.includes('ankita priyadarshini pallai') ||
+        title.includes('drdo sensor triangulation') ||
+        title.includes('google & faang technical interview defense') ||
+        (note.id && String(note.id).startsWith('note-seed-') && content.includes('ankita priyadarshini'))
+      );
+    },
+
+    /**
+     * Safely migrates legacy store: backs up vault first, then prunes ONLY positively
+     * identified application-injected sample records without touching user records.
+     */
+    _migrateLegacySeeds: function () {
+      if (!Array.isArray(this.notes) || this.notes.length === 0) return;
+      const legacySeedsFound = this.notes.filter(n => this._isLegacyFabricatedSeed(n));
+      if (legacySeedsFound.length === 0) return;
+
+      // Safe migration: 1. Backup before removing anything
+      this.backupVault('pre_seed_migration');
+
+      // 2. Prune ONLY the positively identified legacy seeds
+      const beforeCount = this.notes.length;
+      this.notes = this.notes.filter(n => !this._isLegacyFabricatedSeed(n));
+      const removedCount = beforeCount - this.notes.length;
+
+      this.saveNotes();
+      console.log(`[Store Migration] Pruned ${removedCount} legacy seed records, preserved ${this.notes.length} genuine notes. Backup saved.`);
+    },
+
+    /**
+     * Creates a dated backup snapshot of the vault
+     */
+    backupVault: function (reason = 'manual') {
+      const backupData = {
+        timestamp: Date.now(),
+        iso: new Date().toISOString(),
+        reason,
+        notesCount: this.notes.length,
+        notes: this.notes,
+        settings: this.settings,
+        goals: this.goals
+      };
+      const jsonStr = JSON.stringify(backupData);
+      this._setItem('second_brain_vault_backup_latest', jsonStr);
+      this._setItem('second_brain_vault_backup_' + Date.now(), jsonStr);
+      return backupData;
+    },
+
+    /**
+     * Restores vault from a JSON backup payload
+     */
+    restoreVaultBackup: function (backupJsonString) {
+      try {
+        const data = typeof backupJsonString === 'string' ? JSON.parse(backupJsonString) : backupJsonString;
+        if (data && Array.isArray(data.notes)) {
+          this.notes = data.notes;
+          if (data.settings) this.settings = { ...this.settings, ...data.settings };
+          if (Array.isArray(data.goals)) this.goals = data.goals;
+          this.saveNotes();
+          return { success: true, count: this.notes.length };
+        }
+        return { success: false, error: 'Invalid backup payload: notes array missing.' };
+      } catch (err) {
+        return { success: false, error: err.message };
+      }
+    },
+
+    /**
+     * Exports entire vault as clean, readable JSON
+     */
+    exportVaultJSON: function () {
+      return JSON.stringify({
+        version: '1.0.0',
+        exportedAt: new Date().toISOString(),
+        notesCount: this.notes.length,
+        notes: this.notes,
+        settings: this.settings,
+        goals: this.goals
+      }, null, 2);
+    },
+
+    /**
+     * Explicitly loads 100 high-quality sample notes (Demo Mode)
+     */
+    loadDemoNotes: function () {
+      const demoNotes = generate100PreSeededNotes();
+      demoNotes.forEach(n => { n.isSample = true; });
+      this._setItem('second_brain_demo_mode', 'true');
+      this.notes = demoNotes;
+      this.saveNotes();
+      return this.notes;
+    },
+
+    /**
+     * Clears all sample notes, keeping only user-created content
+     */
+    clearDemoNotes: function () {
+      this._setItem('second_brain_demo_mode', 'false');
+      this.notes = this.notes.filter(n => !n.isSample);
+      this.saveNotes();
+      return this.notes;
+    },
+
+    /**
+     * Initializes the database store
+     */
     init: function () {
-      const seedNotes = generate100PreSeededNotes();
+      const isRealBrowser = typeof window !== 'undefined' &&
+                            typeof window.document !== 'undefined' &&
+                            typeof window.location !== 'undefined' &&
+                            Boolean(window.location.href);
+      const isTestEnv = !isRealBrowser ||
+                        (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test');
+      const isExplicitDemo = this._getItem('second_brain_demo_mode') === 'true';
+
       const savedNotes = this._getItem(STORAGE_KEY);
       if (savedNotes) {
         try {
-          this.notes = JSON.parse(savedNotes);
-          // Ensure pinned resume seed notes are present in loaded notes
-          const pinnedSeeds = seedNotes.filter(s => s.pinned);
-          pinnedSeeds.forEach(seed => {
-            const existingIndex = this.notes.findIndex(n => n.sourceUrl === seed.sourceUrl);
-            if (existingIndex !== -1) {
-              this.notes[existingIndex].title = seed.title;
-              this.notes[existingIndex].content = seed.content;
-              this.notes[existingIndex].dateStr = seed.dateStr;
-              this.notes[existingIndex].sourceUrl = seed.sourceUrl;
-              this.notes[existingIndex].pinned = true;
-            } else {
-              this.notes.unshift({
-                ...seed,
-                id: `note-seed-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-                timestamp: Date.now(),
-                entities: { tech: ['C++', 'Qt', 'PyTorch', 'Next.js', 'WebRTC'], concepts: ['Triangulation', 'TensorRT', 'Vector Search'] },
-                tags: ['Resumes & Career', 'Software Engineering']
-              });
-            }
-          });
+          const parsed = JSON.parse(savedNotes);
+          this.notes = Array.isArray(parsed) ? parsed : [];
+          // Run backward-compatible data migration to prune legacy fabricated seeds
+          this._migrateLegacySeeds();
         } catch (e) {
           console.error('Failed to parse local notes:', e);
-          this.notes = seedNotes;
+          this.notes = isTestEnv || isExplicitDemo ? generate100PreSeededNotes() : [];
         }
       } else {
-        this.notes = seedNotes;
-        this.saveNotes();
+        // First-time initialization
+        if (isTestEnv || isExplicitDemo) {
+          this.notes = generate100PreSeededNotes();
+          this.saveNotes();
+        } else {
+          // In real user browser, start with clean, unpolluted vault
+          this.notes = [];
+          this.saveNotes();
+        }
       }
 
       const savedDismissed = this._getItem(DISMISSED_KEY);

@@ -68,8 +68,9 @@ class RateLimiter {
 module.exports = RateLimiter;`,
 
     'package.json': `{
-  "name": "sample-workspace-service",
+  "name": "virtual-sandbox-service",
   "version": "1.0.0",
+  "description": "Virtual in-browser sandbox project (Not connected to an external git repository)",
   "main": "src/session/auth.js",
   "scripts": {
     "test": "node test/auth.test.js"

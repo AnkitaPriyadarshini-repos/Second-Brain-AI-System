@@ -10,22 +10,23 @@
 const https = require('https');
 const http = require('http');
 const { URL } = require('url');
+const authGuard = require('../auth-guard');
 
 const MAX_PROMPT_LENGTH = 1500;
 const rateLimitMap = new Map();
 const RATE_LIMIT_WINDOW_MS = 60000;
 const RATE_LIMIT_MAX = 20;
 
-function checkRateLimit(ip) {
+function checkRateLimit(key) {
   const now = Date.now();
-  const entry = rateLimitMap.get(ip) || { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
+  const entry = rateLimitMap.get(key) || { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
   if (now > entry.resetAt) {
     entry.count = 1;
     entry.resetAt = now + RATE_LIMIT_WINDOW_MS;
   } else {
     entry.count++;
   }
-  rateLimitMap.set(ip, entry);
+  rateLimitMap.set(key, entry);
   return entry.count <= RATE_LIMIT_MAX;
 }
 
@@ -139,8 +140,9 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
 
-  const clientIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '127.0.0.1';
-  if (!checkRateLimit(clientIp)) {
+  const clientIdentity = authGuard.extractClientIdentity(req);
+  const rateLimitKey = `${clientIdentity.id}:${clientIdentity.ip}`;
+  if (!checkRateLimit(rateLimitKey)) {
     return res.status(429).json({ success: false, error: 'Image generation rate limit exceeded. Please wait a minute.' });
   }
 

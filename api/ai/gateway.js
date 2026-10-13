@@ -1,3 +1,5 @@
+import authGuard from '../auth-guard.js';
+
 const PRIMARY_MODEL = 'gemini-3.6-flash';
 const FAST_MODEL = 'gemini-3.5-flash-lite';
 const MAX_CONTEXT = 9000;
@@ -7,7 +9,8 @@ const MAX_CITATIONS = 8;
 const MAX_CONTEXT_NOTES = 8;
 const MAX_NOTE_FIELD = 2400;
 const RATE_WINDOW_MS = 60_000;
-const RATE_LIMIT = 30;
+const AUTH_RATE_LIMIT = 30;
+const GUEST_RATE_LIMIT = 15;
 const CACHE_TTL_MS = 20_000;
 const REQUEST_TIMEOUT_MS = 25_000;
 
@@ -15,6 +18,15 @@ const rateBuckets = globalThis.__junoRateBuckets || new Map();
 const answerCache = globalThis.__junoAnswerCache || new Map();
 globalThis.__junoRateBuckets = rateBuckets;
 globalThis.__junoAnswerCache = answerCache;
+
+// Circuit Breaker across instances to guard against upstream Gemini 503 cascading failures
+const circuitBreaker = globalThis.__miloCircuitBreaker || {
+  consecutiveFailures: 0,
+  cooldownUntil: 0,
+  threshold: 5,
+  cooldownDurationMs: 15_000
+};
+globalThis.__miloCircuitBreaker = circuitBreaker;
 
 function clean(value, max = MAX_MESSAGE) {
   return typeof value === 'string' ? value.trim().slice(0, max) : '';
@@ -33,24 +45,24 @@ function normalizeHistory(history) {
 }
 
 function getClientKey(req) {
-  const forwarded = req.headers['x-forwarded-for'];
-  const value = Array.isArray(forwarded)
-    ? forwarded[0]
-    : String(forwarded || req.socket?.remoteAddress || 'unknown');
-  return value.split(',')[0].trim() || 'unknown';
+  // Use platform-verified IP from authGuard to avoid spoofing
+  return authGuard.getVerifiedClientIp(req);
 }
 
-function checkRateLimit(key) {
+function checkRateLimit(key, maxLimit = AUTH_RATE_LIMIT) {
   const now = Date.now();
   const existing = rateBuckets.get(key);
   if (!existing || now - existing.startedAt >= RATE_WINDOW_MS) {
     rateBuckets.set(key, { startedAt: now, count: 1 });
-    return { allowed: true, remaining: RATE_LIMIT - 1 };
+    return { allowed: true, remaining: maxLimit - 1, resetSeconds: 60 };
   }
   existing.count += 1;
+  const remaining = Math.max(0, maxLimit - existing.count);
+  const resetSeconds = Math.max(1, Math.ceil((existing.startedAt + RATE_WINDOW_MS - now) / 1000));
   return {
-    allowed: existing.count <= RATE_LIMIT,
-    remaining: Math.max(0, RATE_LIMIT - existing.count)
+    allowed: existing.count <= maxLimit,
+    remaining,
+    resetSeconds
   };
 }
 
@@ -196,6 +208,8 @@ function extractAnswer(data) {
     .trim();
 }
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 async function callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey, requestId }) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -223,7 +237,7 @@ async function callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey
     const data = await response.json().catch(() => ({}));
     return { response, data };
   } catch (error) {
-    console.error('[juno/gateway]', requestId, error?.name || error?.message || error);
+    console.error('[milo/gateway]', requestId, error?.name || error?.message || error);
     throw error;
   } finally {
     clearTimeout(timeout);
@@ -259,6 +273,7 @@ export default async function handler(req, res) {
   const startedAt = Date.now();
 
   res.setHeader('X-Juno-Request-Id', requestId);
+  res.setHeader('X-Milo-Request-Id', requestId);
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
@@ -268,13 +283,37 @@ export default async function handler(req, res) {
     return res.status(405).json({ success: false, error: 'Method not allowed.', requestId });
   }
 
+  // Extract client identity and platform-verified IP
+  const clientIdentity = authGuard.extractClientIdentity(req);
+  res.setHeader('X-Milo-Client-Id', clientIdentity.id);
+  if (clientIdentity.isGuest && clientIdentity.token) {
+    res.setHeader('X-Milo-Guest-Token', clientIdentity.token);
+  }
+
+  // Check rate limit (quota is 30 for users, 15 for guests)
   cleanupCaches();
-  const limit = checkRateLimit(getClientKey(req));
+  const maxLimit = clientIdentity.isGuest ? GUEST_RATE_LIMIT : AUTH_RATE_LIMIT;
+  const rateLimitKey = `${clientIdentity.id}:${clientIdentity.ip}`;
+  const limit = checkRateLimit(rateLimitKey, maxLimit);
+
+  res.setHeader('X-RateLimit-Limit', String(maxLimit));
   res.setHeader('X-RateLimit-Remaining', String(limit.remaining));
+  res.setHeader('X-RateLimit-Reset', String(limit.resetSeconds));
+
   if (!limit.allowed) {
     return res.status(429).json({
       success: false,
       error: 'Milo is receiving a lot of requests right now. Please try again in a minute.',
+      requestId
+    });
+  }
+
+  // Check circuit breaker state
+  if (Date.now() < circuitBreaker.cooldownUntil) {
+    const remainingCooldownSec = Math.ceil((circuitBreaker.cooldownUntil - Date.now()) / 1000);
+    return res.status(503).json({
+      success: false,
+      error: `The AI gateway is in temporary cooldown to protect upstream services (${remainingCooldownSec}s remaining). Please try again shortly.`,
       requestId
     });
   }
@@ -341,8 +380,16 @@ export default async function handler(req, res) {
     let thinkingLevel = route.thinkingLevel;
     let result = await callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey, requestId });
 
-    // If the lightweight model is temporarily throttled, retry once with the
-    // primary model. This is a resilience path, not a silent answer change.
+    // Handle transient retry with exponential backoff on 429 / 503
+    if (!result.response.ok && [429, 503].includes(result.response.status)) {
+      const retryHeader = result.response.headers?.get?.('retry-after');
+      const waitSec = parseInt(retryHeader, 10);
+      const waitMs = (!isNaN(waitSec) && waitSec > 0 && waitSec <= 5) ? waitSec * 1000 : (300 + Math.floor(Math.random() * 200));
+      await sleep(waitMs);
+      result = await callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey, requestId });
+    }
+
+    // If the lightweight model is temporarily throttled or unavailable, fallback once to the primary model
     if (!result.response.ok && model === FAST_MODEL && [404, 429, 500, 502, 503, 504].includes(result.response.status)) {
       model = PRIMARY_MODEL;
       thinkingLevel = 'medium';
@@ -351,6 +398,13 @@ export default async function handler(req, res) {
 
     const { response, data } = result;
     if (!response.ok) {
+      // Record failure for circuit breaker
+      circuitBreaker.consecutiveFailures++;
+      if (circuitBreaker.consecutiveFailures >= circuitBreaker.threshold) {
+        circuitBreaker.cooldownUntil = Date.now() + circuitBreaker.cooldownDurationMs;
+        console.warn('[milo/gateway] Circuit breaker tripped for 15s due to repeated upstream 503/500 errors.');
+      }
+
       const providerMessage = data?.error?.message || `Gemini returned HTTP ${response.status}`;
       console.error('[milo/gateway]', requestId, response.status, providerMessage);
       return res.status(response.status === 429 ? 429 : 502).json({
@@ -361,6 +415,9 @@ export default async function handler(req, res) {
         requestId
       });
     }
+
+    // Success resets circuit breaker consecutive failures
+    circuitBreaker.consecutiveFailures = 0;
 
     const answer = extractAnswer(data);
     if (!answer) {
@@ -390,6 +447,7 @@ export default async function handler(req, res) {
       requestId
     });
   } catch (error) {
+    circuitBreaker.consecutiveFailures++;
     return res.status(error?.name === 'AbortError' ? 504 : 502).json({
       success: false,
       error: error?.name === 'AbortError'

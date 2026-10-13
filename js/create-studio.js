@@ -400,35 +400,39 @@
     async renderGallery() {
       if (typeof document === 'undefined') return;
       let items = await this.getGalleryItems();
-      if (!items || items.length === 0) {
-        const demo1 = {
-          id: 'demo_morpho_butterfly',
-          type: 'image',
-          url: 'https://images.unsplash.com/photo-1559253664-ca249d4608c6?w=800&auto=format&fit=crop&q=80',
-          prompt: 'A blue morpho butterfly on a vibrant green leaf, macro lens, photorealistic',
-          provider: 'Pollinations Flux',
-          aspectRatio: '1:1',
-          createdAt: new Date().toISOString()
-        };
-        const demo2 = {
-          id: 'demo_milo_robot',
-          type: 'image',
-          url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
-          prompt: 'Futuristic friendly robot mascot Milo floating in space with neon cyber particles',
-          provider: 'Gemini Imagen 3',
-          aspectRatio: '1:1',
-          createdAt: new Date().toISOString()
-        };
-        await saveMediaItem(demo1);
-        await saveMediaItem(demo2);
-        items = [demo1, demo2];
+      const hasRealItems = items && items.length > 0;
+      
+      // If user has no items yet, provide clearly-labeled sample preview items in UI ONLY (never written to DB)
+      if (!hasRealItems) {
+        items = [
+          {
+            id: 'sample_butterfly',
+            type: 'image',
+            url: 'https://images.unsplash.com/photo-1559253664-ca249d4608c6?w=800&auto=format&fit=crop&q=80',
+            prompt: 'Sample: A blue morpho butterfly on a vibrant green leaf, macro lens',
+            provider: 'Sample Preview',
+            aspectRatio: '1:1',
+            isSample: true,
+            createdAt: new Date().toISOString()
+          },
+          {
+            id: 'sample_robot',
+            type: 'image',
+            url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
+            prompt: 'Sample: Friendly robot mascot Milo floating in space with neon cyber particles',
+            provider: 'Sample Preview',
+            aspectRatio: '1:1',
+            isSample: true,
+            createdAt: new Date().toISOString()
+          }
+        ];
       }
 
       const countBadges = [
         document.getElementById('gallery-count-badge'),
         document.getElementById('side-gallery-count')
       ];
-      countBadges.forEach(b => { if (b) b.textContent = items.length; });
+      countBadges.forEach(b => { if (b) b.textContent = hasRealItems ? items.length : '0'; });
 
       const sideGrid = document.getElementById('studio-side-gallery-grid');
       if (sideGrid) {

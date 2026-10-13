@@ -238,7 +238,7 @@
           content: { type: 'string', description: 'Body content of the note', required: true },
           tags: { type: 'array', description: 'Array of category tags' }
         },
-        execute: async (params) => {
+        execute: async (params, context = {}) => {
           const title = String(params.title || '').trim();
           const content = String(params.content || '').trim();
           if (!title || !content) {
@@ -259,10 +259,23 @@
             };
           }
 
+          // If Store singleton is not attached, save directly to execution context note list
+          const memoryNote = {
+            id: `note_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            title,
+            content,
+            tags: Array.isArray(params.tags) ? params.tags : ['agent-generated'],
+            sourceType: 'agent',
+            createdAt: new Date().toISOString()
+          };
+          if (context && Array.isArray(context.notes)) {
+            context.notes.unshift(memoryNote);
+          }
           return {
             success: true,
-            simulated: true,
-            message: `Note "${title}" prepared for Knowledge Vault.`
+            persisted: 'session_memory',
+            note: memoryNote,
+            message: `Note "${title}" recorded in session Knowledge Vault.`
           };
         }
       });

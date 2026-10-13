@@ -142,6 +142,7 @@
 
       if (collectedSources.length > 0) {
         reportMarkdown = `# 🔬 Deep Research Report: ${cleanTopic}\n\n` +
+          `> ℹ️ **Research Scope**: Grounded Knowledge Vault Synthesis (${collectedSources.length} verified local sources examined). External live web crawling requires configured search provider credentials.\n\n` +
           `*Synthesized by Milo Deep Research Engine · ${collectedSources.length} sources examined · ${durationSeconds}s research duration*\n\n` +
           `---\n\n` +
           `### 🎯 Executive Synthesis\n` +
@@ -160,7 +161,8 @@
           ).join('\n');
       } else {
         reportMarkdown = `# 🔬 Deep Research Report: ${cleanTopic}\n\n` +
-          `*Synthesized by Milo Deep Research Engine · 0 local vault sources matched (General Domain Analysis)*\n\n` +
+          `> ℹ️ **Research Scope**: Conceptual Synthesis (0 local vault sources matched). External web search unconfigured.\n\n` +
+          `*Synthesized by Milo Deep Research Engine · General Domain Analysis*\n\n` +
           `---\n\n` +
           `### 🎯 Executive Synthesis\n` +
           `A multi-angle synthesis of **${cleanTopic}** covers fundamental principles, design patterns, and edge case resolutions.\n\n` +
