@@ -269,7 +269,7 @@
       <section id="view-jarvis" class="view-section active claude-hero-section">
         
     <!-- Central Hero Workspace View (Mascot, Headline, Starter Chips) -->
-    <div id="chat-hero-view" class="chat-hero-view claude-hero-center" style="display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; max-width: 680px; margin: 0 auto; padding: 40px 20px 10px 20px;">
+    <div id="chat-hero-view" class="chat-hero-view claude-hero-center" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; max-width: 680px; margin: 0 auto; padding: 48px 20px 10px 20px;">
       
       <!-- Milo Robot Mascot Icon -->
       <div class="milo-hero-robot-wrap" style="margin-bottom: 18px; display: inline-flex; align-items: center; justify-content: center; width: 68px; height: 68px; border-radius: 20px; background: #F3F4F6; border: 1px solid #E5E7EB; box-shadow: 0 4px 14px rgba(0,0,0,0.06); transition: transform 0.2s ease;">
@@ -293,18 +293,6 @@
         </p>
       </div>
 
-      <!-- Starter Chips -->
-      <div class="tufy-starter-chips-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 6px;">
-        <button type="button" class="tufy-starter-chip" onclick="if(window.OnyxInterface) window.OnyxInterface.loadSession('onyx_use_cases');" style="background: #FFFFFF; border: 1px solid #E5E7EB; color: #374151; padding: 7px 14px; border-radius: 9999px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer;">
-          <span>✨ Milo Use Cases</span>
-        </button>
-        <button type="button" class="tufy-starter-chip" onclick="if(window.insertSampleQuery) window.insertSampleQuery('Enterprise search across tools');" style="background: #FFFFFF; border: 1px solid #E5E7EB; color: #374151; padding: 7px 14px; border-radius: 9999px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer;">
-          <span>🔍 Enterprise Search</span>
-        </button>
-        <button type="button" class="tufy-starter-chip" onclick="if(window.insertSampleQuery) window.insertSampleQuery('Synthesize customer feedback and signals');" style="background: #FFFFFF; border: 1px solid #E5E7EB; color: #374151; padding: 7px 14px; border-radius: 9999px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer;">
-          <span>📊 Customer Intelligence</span>
-        </button>
-      </div>
       <div id="nori-companion-target" style="display: none;"></div>
     </div>
 
@@ -326,7 +314,7 @@
     </div>
 
     <!-- Chat Stream Messages Container -->
-    <div id="chat-container" class="chat-stream"></div>
+    <div id="chat-container" class="chat-stream" style="display: none;"></div>
 
     <!-- Floating Model Selector Pill (Above Composer) -->
     <div class="onyx-model-pill-container">
@@ -427,6 +415,19 @@
           </div>
         </div>
       </form>
+ 
+      <!-- Starter Chips (Options placed comfortably below the chat box) -->
+      <div id="hero-starter-chips" class="tufy-starter-chips-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px; margin-bottom: 6px;">
+        <button type="button" class="tufy-starter-chip" onclick="if(window.OnyxInterface) window.OnyxInterface.loadSession('onyx_use_cases');" style="background: #FFFFFF; border: 1px solid #E5E7EB; color: #374151; padding: 7px 14px; border-radius: 9999px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; font-size: 13px; font-weight: 500;">
+          <span>✨ Milo Use Cases</span>
+        </button>
+        <button type="button" class="tufy-starter-chip" onclick="if(window.insertSampleQuery) window.insertSampleQuery('Enterprise search across tools');" style="background: #FFFFFF; border: 1px solid #E5E7EB; color: #374151; padding: 7px 14px; border-radius: 9999px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; font-size: 13px; font-weight: 500;">
+          <span>🔍 Enterprise Search</span>
+        </button>
+        <button type="button" class="tufy-starter-chip" onclick="if(window.insertSampleQuery) window.insertSampleQuery('Synthesize customer feedback and signals');" style="background: #FFFFFF; border: 1px solid #E5E7EB; color: #374151; padding: 7px 14px; border-radius: 9999px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; font-size: 13px; font-weight: 500;">
+          <span>📊 Customer Intelligence</span>
+        </button>
+      </div>
 
       <!-- Bottom Platform Footer Credit -->
       <div class="onyx-platform-footer">

@@ -1464,6 +1464,11 @@
         heroView.classList.remove('hidden');
         heroView.style.display = 'flex';
       }
+      const chipsEl = document.getElementById('hero-starter-chips');
+      if (chipsEl) {
+        chipsEl.classList.remove('hidden');
+        chipsEl.style.display = 'flex';
+      }
       if (inputEl) {
         inputEl.value = '';
         inputEl.focus();

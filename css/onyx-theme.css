@@ -455,6 +455,22 @@ html[data-theme="onyx"] #chat-container.chat-stream {
   gap: 12px !important;
 }
 
+html[data-theme="onyx"] #chat-container.chat-stream[style*="display: none"],
+html[data-theme="onyx"] #chat-container.chat-stream.hidden {
+  display: none !important;
+  flex: 0 0 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+html[data-theme="onyx"] #chat-hero-view[style*="display: none"],
+html[data-theme="onyx"] #chat-hero-view.hidden,
+html[data-theme="onyx"] #hero-starter-chips[style*="display: none"],
+html[data-theme="onyx"] #hero-starter-chips.hidden {
+  display: none !important;
+}
+
 /* User Message Pill */
 html[data-theme="onyx"] .chat-message-bubble.user-bubble,
 html[data-theme="onyx"] .user-bubble {

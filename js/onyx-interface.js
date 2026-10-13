@@ -606,9 +606,11 @@
 
       const container = document.getElementById('chat-container');
       const hero = document.getElementById('chat-hero-view');
+      const chips = document.getElementById('hero-starter-chips');
       if (!container) return;
 
       if (hero) hero.style.display = 'none';
+      if (chips) chips.style.display = 'none';
       container.style.display = 'flex';
       container.innerHTML = this.renderSessionHTML(s);
 
@@ -798,6 +800,11 @@
       if (hero) {
         hero.classList.remove('hidden');
         hero.style.display = 'flex';
+      }
+      const chips = document.getElementById('hero-starter-chips');
+      if (chips) {
+        chips.classList.remove('hidden');
+        chips.style.display = 'flex';
       }
       if (input) {
         input.value = '';

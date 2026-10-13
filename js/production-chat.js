@@ -203,9 +203,14 @@
     const hero = document.getElementById('chat-hero-view');
     const stream = document.getElementById('chat-container');
     const miloBar = document.getElementById('milo-chat-companion-bar');
+    const chips = document.getElementById('hero-starter-chips');
     if (hero) {
       hero.style.display = 'none';
       hero.classList.add('hidden');
+    }
+    if (chips) {
+      chips.style.display = 'none';
+      chips.classList.add('hidden');
     }
     if (stream) stream.style.display = 'flex';
     if (miloBar) miloBar.style.display = 'flex';
