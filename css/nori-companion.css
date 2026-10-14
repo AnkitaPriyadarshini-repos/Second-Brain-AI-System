@@ -802,45 +802,447 @@ html[data-theme="dark"] .claude-plan-pill {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
+  width: 148px !important;
+  height: 120px !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  animation: miloFloatHover 3.4s ease-in-out infinite, miloAuraPulse 3.4s ease-in-out infinite !important;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease !important;
+  overflow: visible !important;
+  cursor: pointer !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.milo-hero-robot-wrap.mascot-astronaut {
   width: 104px !important;
   height: 104px !important;
   border-radius: 32px !important;
   background: #FFFFFF !important;
   border: 2.5px solid #F3F4F6 !important;
   box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.1) !important;
-  animation: miloFloatHover 3.4s ease-in-out infinite, miloAuraPulse 3.4s ease-in-out infinite !important;
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease !important;
   overflow: hidden !important;
-  cursor: pointer !important;
-  position: relative !important;
-  z-index: 2 !important;
+}
+
+.milo-hero-robot-wrap.mascot-astronaut .milo-hero-robot-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 29px !important;
 }
 
 .milo-hero-robot-wrap:hover {
-  transform: scale(1.1) translateY(-6px) !important;
+  transform: scale(1.08) translateY(-6px) !important;
 }
 
 .milo-hero-robot-wrap:active {
-  transform: scale(0.96) translateY(0px) !important;
+  transform: scale(0.95) translateY(0px) !important;
+}
+
+.robo-gadget-head-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease-out;
+  will-change: transform;
+}
+
+.robo-gadget-ambient-halo {
+  position: absolute;
+  width: 220px;
+  height: 180px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--robo-halo-glow, rgba(37, 99, 235, 0.20)) 0%, var(--robo-halo-subtle, rgba(59, 130, 246, 0.08)) 45%, transparent 72%);
+  pointer-events: none;
+  z-index: 1;
+  filter: blur(14px);
+  animation: roboHaloBreathing 4s ease-in-out infinite alternate;
+}
+
+@keyframes roboHaloBreathing {
+  0% { transform: translate(-50%, -50%) scale(0.92); opacity: 0.65; }
+  100% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.95; }
 }
 
 .milo-hero-robot-img {
   width: 100% !important;
   height: 100% !important;
-  object-fit: cover !important;
-  border-radius: 29px !important;
+  object-fit: contain !important;
   display: block !important;
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.15)) !important;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease !important;
+}
+
+.milo-hero-robot-img.robo-blinking {
+  transform: scaleY(0.12) !important;
 }
 
 .milo-robot-floor-shadow {
-  width: 76px !important;
-  height: 12px !important;
-  background: radial-gradient(ellipse at center, rgba(17, 24, 39, 0.28) 0%, rgba(17, 24, 39, 0) 70%) !important;
+  width: 90px !important;
+  height: 14px !important;
+  background: radial-gradient(ellipse at center, var(--robo-floor-shadow, rgba(17, 24, 39, 0.28)) 0%, rgba(17, 24, 39, 0) 70%) !important;
   border-radius: 50% !important;
-  margin-top: 4px !important;
+  margin-top: 2px !important;
   animation: miloShadowPulse 3.4s ease-in-out infinite !important;
   z-index: 1 !important;
+}
+
+/* ==========================================================
+   ROBO GADGET WELCOME DIALOGUE CARD & ONBOARDING GUIDE
+   ========================================================== */
+.robo-welcome-card {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 20px;
+  padding: 16px 20px 14px 20px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+  margin-bottom: 22px;
+  text-align: left;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+.robo-welcome-card.collapsed {
+  max-height: 48px;
+  padding: 10px 18px;
+  cursor: pointer;
+}
+
+.robo-welcome-card.collapsed .robo-welcome-tagline,
+.robo-welcome-card.collapsed .robo-welcome-actions {
+  display: none !important;
+}
+
+.robo-welcome-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.robo-live-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.robo-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  animation: roboDotPulse 2s infinite ease-in-out;
+}
+
+@keyframes roboDotPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+}
+
+.robo-card-dismiss-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #9CA3AF;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.robo-card-dismiss-btn:hover {
+  color: #111827;
+  background: #F3F4F6;
+}
+
+.robo-welcome-tagline {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #4B5563;
+  margin: 6px 0 12px 0;
+}
+
+.robo-welcome-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 600px) {
+  .robo-welcome-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.robo-action-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 9px 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.robo-action-tile:hover {
+  background: #FFFFFF;
+  border-color: var(--robo-accent, #2563EB);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.robo-action-icon {
+  font-size: 16px;
+}
+
+.robo-action-text strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.robo-action-text span {
+  display: block;
+  font-size: 10.5px;
+  color: #6B7280;
+  line-height: 1.3;
+}
+
+/* ==========================================================
+   ROBO GADGET FLOATING DOCK (Colorways, Audio & Switcher)
+   ========================================================== */
+.robo-gadget-dock {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 9999px;
+  padding: 5px 12px;
+  margin-top: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.robo-color-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.robo-color-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #FFFFFF;
+  outline: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.robo-color-dot:hover {
+  transform: scale(1.2);
+}
+
+.robo-color-dot.active {
+  outline-color: #111827;
+  transform: scale(1.15);
+}
+
+.robo-color-dot[data-color="blue"] { background: #2563EB; }
+.robo-color-dot[data-color="emerald"] { background: #10B981; }
+.robo-color-dot[data-color="sunset"] { background: #F97316; }
+.robo-color-dot[data-color="obsidian"] { background: #374151; }
+.robo-color-dot[data-color="purple"] { background: #8B5CF6; }
+
+.robo-dock-divider {
+  width: 1px;
+  height: 14px;
+  background: #E5E7EB;
+}
+
+.robo-dock-tool-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #6B7280;
+  padding: 3px 5px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.robo-dock-tool-btn:hover {
+  color: #111827;
+  transform: scale(1.12);
+}
+
+.robo-dock-tool-btn.muted {
+  color: #EF4444;
+}
+
+/* Floating Sparkle Particles */
+.robo-sparkles-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 10;
+}
+
+.robo-sparkle-item {
+  position: absolute;
+  font-size: 18px;
+  pointer-events: none;
+  animation: roboSparkleRise 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes roboSparkleRise {
+  0% { transform: translateY(0) scale(0.6); opacity: 1; }
+  100% { transform: translateY(-45px) scale(1.2); opacity: 0; }
+}
+
+/* Quick Tour Modal */
+.robo-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.5);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.robo-modal-backdrop.open {
+  display: flex;
+}
+
+.robo-tour-card {
+  background: #FFFFFF;
+  border-radius: 20px;
+  max-width: 520px;
+  width: 100%;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: roboModalPop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes roboModalPop {
+  0% { transform: scale(0.92); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.robo-tour-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.robo-tour-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.robo-tour-close-btn {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #9CA3AF;
+  line-height: 1;
+}
+
+.robo-tour-close-btn:hover {
+  color: #111827;
+}
+
+.robo-tour-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.robo-tour-step {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.robo-step-number {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #EFF6FF;
+  color: var(--robo-accent, #2563EB);
+  font-weight: 700;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.robo-step-content strong {
+  display: block;
+  font-size: 14px;
+  color: #111827;
+  margin-bottom: 3px;
+}
+
+.robo-step-content p {
+  margin: 0;
+  font-size: 13px;
+  color: #4B5563;
+  line-height: 1.5;
+}
+
+.robo-step-content code {
+  background: #F3F4F6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.robo-tour-footer {
+  display: flex;
+  justify-content: flex-end;
 }
 
 /* Composer Paste Tool Button */
@@ -855,3 +1257,4 @@ html[data-theme="dark"] .claude-plan-pill {
   color: #10B981 !important;
   background: rgba(16, 185, 129, 0.08) !important;
 }
+

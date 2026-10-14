@@ -4131,12 +4131,18 @@
     };
 
     window.cycleMiloMascot = function() {
+      if (window.RoboGadget && typeof window.RoboGadget.cycleMood === 'function') {
+        window.RoboGadget.cycleMood();
+        return;
+      }
       const img = document.getElementById('milo-hero-robot-img');
       if (!img) return;
       const poses = [
-        { src: 'assets/milo_robot_mascot.png', mood: 'Ready to assist' },
-        { src: 'assets/milo_cosmic_orb.png', mood: 'Cosmic Knowledge Illuminator' },
-        { src: 'assets/milo_space_skater.png', mood: 'Space Explorer' }
+        { src: 'assets/robo_gadget_happy.png', mood: 'Ready to assist' },
+        { src: 'assets/robo_gadget_blue.png', mood: 'Curious & Alert' },
+        { src: 'assets/robo_gadget_wink.png', mood: 'Playful Wink' },
+        { src: 'assets/robo_gadget_love.png', mood: 'Loving Second Brain' },
+        { src: 'assets/robo_gadget_thinking.png', mood: 'Neural Scanning' }
       ];
       let curIdx = poses.findIndex(p => img.src.includes(p.src.replace('assets/', '')));
       let nextIdx = (curIdx + 1) % poses.length;

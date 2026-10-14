@@ -1,6 +1,6 @@
 /* Second Brain AI System — Service Worker for Offline PWA Support */
 
-const CACHE_NAME = 'second-brain-cache-v66.0';
+const CACHE_NAME = 'second-brain-cache-v68.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -21,6 +21,7 @@ const ASSETS_TO_CACHE = [
   './js/sound-engine.js',
   './js/ai-agents.js',
   './js/nori-companion.js',
+  './js/robo-gadget.js',
   './js/app.js',
   './js/utils.js?v=59.0',
   './js/production-chat.js?v=6.0',
@@ -35,8 +36,15 @@ const ASSETS_TO_CACHE = [
   './js/diff-coding-agent.js?v=1.0',
   './js/autonomous-agent.js?v=1.0',
   './css/milo-workspace-studio.css?v=1.0',
-  './css/onyx-theme.css?v=67.0',
-  './js/onyx-interface.js?v=67.0',
+  './css/onyx-theme.css?v=68.0',
+  './js/onyx-interface.js?v=68.0',
+  './assets/robo_gadget_happy.png',
+  './assets/robo_gadget_blue.png',
+  './assets/robo_gadget_happy_sunset.png',
+  './assets/robo_gadget_happy_emerald.png',
+  './assets/robo_gadget_happy_obsidian.png',
+  './assets/robo_gadget_happy_purple.png',
+  './assets/milo_robot_mascot.png',
   './assets/nexus_yellow_bot.png',
   './manifest.json'
 ];
