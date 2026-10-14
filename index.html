@@ -36,13 +36,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Stylesheets & App Manifest -->
-  <link rel="stylesheet" href="css/style.css?v=68.0">
-  <link rel="stylesheet" href="css/nori-companion.css?v=68.0">
-  <link rel="stylesheet" href="css/responsive.css?v=68.0">
-  <link rel="stylesheet" href="css/websocket-chat.css?v=68.0">
-  <link rel="stylesheet" href="css/adaptive-fusion.css?v=68.0">
+  <link rel="stylesheet" href="css/style.css?v=69.0">
+  <link rel="stylesheet" href="css/nori-companion.css?v=69.0">
+  <link rel="stylesheet" href="css/responsive.css?v=69.0">
+  <link rel="stylesheet" href="css/websocket-chat.css?v=69.0">
+  <link rel="stylesheet" href="css/adaptive-fusion.css?v=69.0">
   <link rel="stylesheet" href="css/milo-workspace-studio.css?v=1.0">
-  <link rel="stylesheet" href="css/onyx-theme.css?v=68.0">
+  <link rel="stylesheet" href="css/onyx-theme.css?v=69.0">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FFFFFF">
 </head>
@@ -268,88 +268,21 @@
 
       <section id="view-jarvis" class="view-section active claude-hero-section">
         
-    <!-- Central Hero Workspace View (Mascot, Headline, Starter Chips) -->
-    <div id="chat-hero-view" class="chat-hero-view claude-hero-center" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; max-width: 680px; margin: 0 auto; padding: 48px 20px 10px 20px;">
+    <!-- Central Hero Workspace View (Headline, Subtitle) -->
+    <div id="chat-hero-view" class="chat-hero-view claude-hero-center">
       
-      <!-- Milo Cute Robot Mascot & Interactive Robo Gadget -->
-      <div class="milo-hero-robot-container" id="milo-hero-gadget-container">
-        
-        <!-- Welcome Dialogue Card (To welcome new users and introduce powers) -->
-        <div class="robo-welcome-card" id="robo-welcome-card">
-          <div class="robo-welcome-header">
-            <div class="robo-live-status-pill">
-              <span class="robo-status-dot"></span>
-              <span id="robo-greeting-heading">Good afternoon Ankita! 👋 I'm Milo, your AI Brain Companion</span>
-            </div>
-            <button type="button" class="robo-card-dismiss-btn" onclick="window.toggleRoboWelcomeCard()" title="Toggle welcome tips">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
-            </button>
-          </div>
-          <p class="robo-welcome-tagline">
-            Search your private knowledge vault, synthesize deep research, or chat with voice. Click my face to cycle expressions!
-          </p>
-          <div class="robo-welcome-actions">
-            <button type="button" class="robo-action-tile" onclick="window.triggerRoboAction('search')">
-              <span class="robo-action-icon">🔍</span>
-              <div class="robo-action-text"><strong>Vault Search</strong><span>Search notes &amp; docs</span></div>
-            </button>
-            <button type="button" class="robo-action-tile" onclick="window.triggerRoboAction('research')">
-              <span class="robo-action-icon">🔬</span>
-              <div class="robo-action-text"><strong>Deep Research</strong><span>Multi-angle synthesis</span></div>
-            </button>
-            <button type="button" class="robo-action-tile" onclick="window.triggerRoboAction('voice')">
-              <span class="robo-action-icon">🎙️</span>
-              <div class="robo-action-text"><strong>Voice Chat</strong><span>Real-time voice assistant</span></div>
-            </button>
-            <button type="button" class="robo-action-tile" onclick="window.triggerRoboAction('tour')">
-              <span class="robo-action-icon">⚡</span>
-              <div class="robo-action-text"><strong>Quick Tour</strong><span>3-min interactive guide</span></div>
-            </button>
-          </div>
+      <!-- Hidden Mascot Compatibility Stub (Zero visual footprint) -->
+      <div class="milo-hero-robot-container" id="milo-hero-gadget-container" style="display: none !important; width: 0 !important; height: 0 !important; overflow: hidden !important;" aria-hidden="true">
+        <div class="milo-hero-robot-wrap" onclick="window.cycleMiloMascot && window.cycleMiloMascot()">
+          <img id="milo-hero-robot-img" src="assets/milo_robot_mascot.png" alt="" style="display: none !important;">
         </div>
-
-        <!-- 3D Robo Gadget Assembly & Floating Stage -->
-        <div class="milo-hero-robot-wrap mascot-gadget" id="milo-hero-robot-wrap" title="Milo Robo Gadget — Click to interact or cycle mood!" onclick="window.cycleMiloMascot && window.cycleMiloMascot()">
-          <div class="robo-gadget-ambient-halo" id="robo-ambient-halo"></div>
-          
-          <div class="robo-gadget-head-stage" id="robo-gadget-head-stage">
-            <img id="milo-hero-robot-img" src="assets/robo_gadget_happy.png" alt="Milo Cute Robot Mascot" class="milo-hero-robot-img">
-            <div class="robo-sparkles-container" id="robo-sparkles-container" aria-hidden="true"></div>
-          </div>
-          
-          <div class="milo-robot-glow-halo"></div>
-        </div>
-
-        <!-- Ground Contact Shadow -->
-        <div class="milo-robot-floor-shadow" id="milo-robot-floor-shadow"></div>
-
-        <!-- Gadget Colorway Switcher & Sound Bar ("add the colours to the robo as per background needs to fit in") -->
-        <div class="robo-gadget-dock" id="robo-gadget-dock">
-          <div class="robo-color-pills" title="Match Robo Gadget colors to background">
-            <button type="button" class="robo-color-dot active" data-color="blue" title="Onyx Royal Blue (Matches default theme &amp; Pinterest pin)" onclick="window.setRoboColor('blue')"></button>
-            <button type="button" class="robo-color-dot" data-color="emerald" title="Cyber Emerald (Matches green scanline eyes)" onclick="window.setRoboColor('emerald')"></button>
-            <button type="button" class="robo-color-dot" data-color="sunset" title="Warm Sunset (Matches Astronaut suit)" onclick="window.setRoboColor('sunset')"></button>
-            <button type="button" class="robo-color-dot" data-color="obsidian" title="Obsidian Titanium (Minimalist Monochrome)" onclick="window.setRoboColor('obsidian')"></button>
-            <button type="button" class="robo-color-dot" data-color="purple" title="Cosmic Aurora Purple" onclick="window.setRoboColor('purple')"></button>
-          </div>
-
-          <div class="robo-dock-divider"></div>
-
-          <button type="button" class="robo-dock-tool-btn" id="robo-sound-toggle-btn" title="Toggle audio chirps" onclick="window.toggleRoboSound()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-          </button>
-
-          <button type="button" class="robo-dock-tool-btn" id="robo-mascot-toggle-btn" title="Toggle between Robo Gadget and Astronaut Milo" onclick="window.toggleMascotType()">
-            <span style="font-size: 13px;">🚀</span>
-          </button>
-        </div>
-
+        <div class="milo-robot-floor-shadow" style="display: none !important;"></div>
       </div>
 
       <!-- Welcome Headline Section -->
-      <div class="claude-brand-headline-wrapper" style="margin-bottom: 24px;">
-        <h1 class="claude-serif-headline" style="font-size: 28px; font-weight: 700; color: #111827; margin: 0 0 8px 0; letter-spacing: -0.02em; text-shadow: none !important;">How can Milo help you today?</h1>
-        <p class="hero-subtitle-text" style="font-size: 14.5px; line-height: 1.6; color: #4B5563; margin: 0 auto; max-width: 480px; text-shadow: none !important;">
+      <div class="claude-brand-headline-wrapper">
+        <h1 class="claude-serif-headline">How can Milo help you today?</h1>
+        <p class="hero-subtitle-text">
           Search across Slack, Google Drive, email, CRM, tickets, and your personal knowledge base.
         </p>
       </div>
@@ -2127,10 +2060,9 @@
   <script src="js/create-studio.js?v=1.0"></script>
   <script src="js/diff-coding-agent.js?v=1.0"></script>
   <script src="js/autonomous-agent.js?v=1.0"></script>
-  <script src="js/onyx-interface.js?v=68.0"></script>
+  <script src="js/onyx-interface.js?v=69.0"></script>
   <script src="js/pwa-installer.js?v=61.0"></script>
-  <script src="js/nori-companion.js?v=65.0"></script>
-  <script src="js/robo-gadget.js?v=1.0"></script>
-  <script src="js/app.js?v=68.0"></script>
+  <script src="js/nori-companion.js?v=69.0"></script>
+  <script src="js/app.js?v=69.0"></script>
 </body>
 </html>
