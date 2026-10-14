@@ -59,6 +59,14 @@ assert.ok(onyxJS.includes('shareCurrentTurn(btn)'), 'onyx-interface.js must defi
 const prodChatJS = fs.readFileSync(path.join(__dirname, '..', 'js', 'production-chat.js'), 'utf8');
 assert.ok(prodChatJS.includes('window.copyTurnContent'), 'production-chat.js must define window.copyTurnContent');
 assert.ok(prodChatJS.includes('window.shareTurnContent'), 'production-chat.js must define window.shareTurnContent');
-console.log('  ✔ Share session, turn sharing, copy-to-clipboard, and paste-to-clipboard thoroughly wired');
+// 6. Verify Mobile Bottom-Docked Composer & Thumb Ergonomics
+assert.ok(onyxCSS.includes('/* Anchored Mobile Composer (Brought Down to Bottom with Easy Thumb Reach) */'), 'onyx-theme.css must declare anchored mobile composer');
+assert.ok(onyxCSS.includes('order: 1 !important') && onyxCSS.includes('#hero-starter-chips'), 'onyx-theme.css must place starter chips above composer on mobile (order: 1)');
+assert.ok(onyxCSS.includes('order: 2 !important') && onyxCSS.includes('.onyx-model-pill-container'), 'onyx-theme.css must place model pill above input form on mobile (order: 2)');
+assert.ok(onyxCSS.includes('order: 3 !important') && onyxCSS.includes('.nori-reference-composer-card'), 'onyx-theme.css must anchor input composer card at bottom on mobile (order: 3)');
+assert.ok(onyxCSS.includes('flex: 1 1 auto !important') && onyxCSS.includes('#chat-hero-view'), 'onyx-theme.css must flex-grow hero view to push composer to bottom');
+assert.ok(indexHTML.indexOf('onyx-model-pill-container') > indexHTML.indexOf('nori-reference-composer-wrapper'), 'index.html must nest model pill within composer wrapper for cohesive bottom docking');
+console.log('  ✔ Mobile bottom-docked composer, thumb reach order, and hero flex verified');
 
-console.log('✔ PASS: All cute robot mascot, clipboard, share, and voice assertions passed cleanly!');
+console.log('✔ PASS: All cute robot mascot, clipboard, share, voice, and mobile bottom layout assertions passed cleanly!');
+

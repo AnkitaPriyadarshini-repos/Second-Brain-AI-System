@@ -1,6 +1,6 @@
 /* Second Brain AI System — Service Worker for Offline PWA Support */
 
-const CACHE_NAME = 'second-brain-cache-v69.0';
+const CACHE_NAME = 'second-brain-cache-v70.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -35,8 +35,8 @@ const ASSETS_TO_CACHE = [
   './js/diff-coding-agent.js?v=1.0',
   './js/autonomous-agent.js?v=1.0',
   './css/milo-workspace-studio.css?v=1.0',
-  './css/onyx-theme.css?v=69.0',
-  './js/onyx-interface.js?v=69.0',
+  './css/onyx-theme.css?v=70.0',
+  './js/onyx-interface.js?v=70.0',
   './assets/milo_robot_mascot.png',
   './assets/nexus_yellow_bot.png',
   './manifest.json'
