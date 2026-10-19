@@ -1,7 +1,7 @@
 import authGuard from '../auth-guard.js';
 
-const PRIMARY_MODEL = 'gemini-3.1-flash-lite';
-const FAST_MODEL = 'gemini-3.1-flash-lite';
+const PRIMARY_MODEL = 'gemini-2.0-flash';
+const FAST_MODEL = 'gemini-1.5-flash';
 const MAX_CONTEXT = 9000;
 const MAX_HISTORY_ITEMS = 16;
 const MAX_MESSAGE = 12000;
@@ -12,30 +12,36 @@ const RATE_WINDOW_MS = 60_000;
 const AUTH_RATE_LIMIT = 30;
 const GUEST_RATE_LIMIT = 15;
 const CACHE_TTL_MS = 20_000;
-const REQUEST_TIMEOUT_MS = 24_000;
+const PROVIDER_TIMEOUT_MS = 8_500; // Bounded provider call timeout
+const OVERALL_DEADLINE_MS = 24_000; // Strict deadline well within Vercel's 30s maxDuration
 
-// Upstream model registry: maps requested/advertised tiers to active, verified Google Gemini endpoints
+// Upstream model registry: maps requested/advertised tiers to active, verified Google Gemini endpoints.
+// Includes compatibility aliases for gemini-3.6-flash and gemini-3.5-flash-lite.
 const MODEL_REGISTRY = {
-  'gemini-3.1-flash-lite': 'gemini-3.1-flash-lite',
-  'gemini-3.5-flash-lite': 'gemini-3.1-flash-lite',
-  'gemini-flash-latest': 'gemini-3.1-flash-lite',
-  'gemini-2.5-flash': 'gemini-3.1-flash-lite',
-  'gemini-3.6-flash': 'gemini-3.1-flash-lite',
-  'gemini-1.5-flash': 'gemini-3.1-flash-lite',
-  'gemini-1.5-pro': 'gemini-3.1-flash-lite',
-  'default': 'gemini-3.1-flash-lite'
+  'gemini-2.0-flash': 'gemini-2.0-flash',
+  'gemini-1.5-flash': 'gemini-1.5-flash',
+  'gemini-1.5-pro': 'gemini-1.5-pro',
+  'gemini-2.0-flash-lite': 'gemini-2.0-flash-lite',
+  'gemini-flash-latest': 'gemini-2.0-flash',
+  'gemini-2.5-flash': 'gemini-2.0-flash',
+  'gemini-3.6-flash': 'gemini-2.0-flash',
+  'gemini-3.5-flash-lite': 'gemini-1.5-flash',
+  'gemini-3.1-flash-lite': 'gemini-1.5-flash',
+  'default': 'gemini-2.0-flash'
 };
 
 function resolveUpstreamModel(modelName) {
-  if (!modelName || typeof modelName !== 'string') return 'gemini-3.1-flash-lite';
+  if (!modelName || typeof modelName !== 'string') return PRIMARY_MODEL;
   const cleanName = modelName.trim().toLowerCase();
-  return MODEL_REGISTRY[cleanName] || 'gemini-3.1-flash-lite';
+  return MODEL_REGISTRY[cleanName] || PRIMARY_MODEL;
 }
 
 const rateBuckets = globalThis.__junoRateBuckets || new Map();
 const answerCache = globalThis.__junoAnswerCache || new Map();
+const activeInFlightRequests = globalThis.__miloActiveInFlight || new Map();
 globalThis.__junoRateBuckets = rateBuckets;
 globalThis.__junoAnswerCache = answerCache;
+globalThis.__miloActiveInFlight = activeInFlightRequests;
 
 // Circuit Breaker across instances to guard against upstream Gemini 503 cascading failures
 const circuitBreaker = globalThis.__miloCircuitBreaker || {
@@ -228,10 +234,10 @@ function extractAnswer(data) {
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey, requestId }) {
+async function callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey, requestId, timeoutMs = PROVIDER_TIMEOUT_MS }) {
   const resolvedModel = resolveUpstreamModel(model);
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${resolvedModel}:generateContent`, {
@@ -350,12 +356,25 @@ export default async function handler(req, res) {
     return res.status(413).json({ success: false, error: 'That message is too long. Please shorten it.', requestId });
   }
 
+  // Duplicate in-flight submission guard (prevent rapid double-clicks/submits)
+  const inFlightKey = `${clientIdentity.id}:${prompt.slice(0, 80)}`;
+  const existingInFlight = activeInFlightRequests.get(inFlightKey);
+  if (existingInFlight && Date.now() - existingInFlight < 5_000) {
+    return res.status(429).json({
+      success: false,
+      error: 'A request with this message is currently being processed. Please wait a moment.',
+      requestId
+    });
+  }
+  activeInFlightRequests.set(inFlightKey, Date.now());
+
   const route = classifyRequest(prompt, context, history);
   const key = cacheKey(prompt, context, history);
 
   if (key) {
     const cached = answerCache.get(key);
     if (cached && Date.now() - cached.createdAt < CACHE_TTL_MS) {
+      activeInFlightRequests.delete(inFlightKey);
       return res.status(200).json({
         success: true,
         model: cached.model,
@@ -382,29 +401,67 @@ export default async function handler(req, res) {
     history
   });
 
+  const getRemainingBudget = () => OVERALL_DEADLINE_MS - (Date.now() - startedAt);
+
   try {
     let model = clientRequestedModel && MODEL_REGISTRY[clientRequestedModel.toLowerCase()]
-      ? clientRequestedModel
+      ? resolveUpstreamModel(clientRequestedModel)
       : route.model;
     let thinkingLevel = route.thinkingLevel;
-    let result = await callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey, requestId });
+
+    let result = await callGemini({
+      model,
+      systemPrompt,
+      contents,
+      thinkingLevel,
+      apiKey,
+      requestId,
+      timeoutMs: Math.min(PROVIDER_TIMEOUT_MS, Math.max(3000, getRemainingBudget() - 2000))
+    });
 
     // Handle transient retry with exponential backoff on 429 / 503
-    if (!result.response.ok && [429, 503].includes(result.response.status)) {
+    if (!result.response.ok && [429, 503].includes(result.response.status) && getRemainingBudget() > 9000) {
       const retryHeader = result.response.headers?.get?.('retry-after');
       const waitSec = parseInt(retryHeader, 10);
-      const waitMs = (!isNaN(waitSec) && waitSec > 0 && waitSec <= 5) ? waitSec * 1000 : (400 + Math.floor(Math.random() * 300));
+      const waitMs = (!isNaN(waitSec) && waitSec > 0 && waitSec <= 2) ? waitSec * 1000 : (350 + Math.floor(Math.random() * 250));
       await sleep(waitMs);
-      result = await callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey, requestId });
+      result = await callGemini({
+        model,
+        systemPrompt,
+        contents,
+        thinkingLevel,
+        apiKey,
+        requestId,
+        timeoutMs: Math.min(PROVIDER_TIMEOUT_MS, Math.max(3000, getRemainingBudget() - 1500))
+      });
     }
 
-    // If initial model returns 404/400/503 (unsupported or high demand on configured account), fallback to verified production models
-    if (!result.response.ok && [400, 404, 503].includes(result.response.status)) {
-      model = 'gemini-3.1-flash-lite';
-      result = await callGemini({ model, systemPrompt, contents, thinkingLevel: 'low', apiKey, requestId });
-      if (!result.response.ok && [400, 404, 503].includes(result.response.status)) {
-        model = 'gemini-3.5-flash-lite';
-        result = await callGemini({ model, systemPrompt, contents, thinkingLevel: 'low', apiKey, requestId });
+    // Model fallback chain if initial model returns 400/404/429/500/502/503/504
+    if (!result.response.ok && [400, 404, 429, 500, 502, 503, 504].includes(result.response.status) && getRemainingBudget() > 7000) {
+      const fallbackModel = result.resolvedModel === PRIMARY_MODEL ? FAST_MODEL : PRIMARY_MODEL;
+      console.warn(`[milo/gateway] ${requestId}: Primary model ${result.resolvedModel} returned ${result.response.status}. Falling back to ${fallbackModel}`);
+      result = await callGemini({
+        model: fallbackModel,
+        systemPrompt,
+        contents,
+        thinkingLevel: 'low',
+        apiKey,
+        requestId,
+        timeoutMs: Math.min(PROVIDER_TIMEOUT_MS, Math.max(3000, getRemainingBudget() - 1000))
+      });
+
+      // Third tier fallback if still failing and time permits
+      if (!result.response.ok && [400, 404, 500, 502, 503].includes(result.response.status) && getRemainingBudget() > 6000) {
+        const tertiaryModel = 'gemini-2.0-flash-lite';
+        result = await callGemini({
+          model: tertiaryModel,
+          systemPrompt,
+          contents,
+          thinkingLevel: 'low',
+          apiKey,
+          requestId,
+          timeoutMs: Math.min(6000, Math.max(2500, getRemainingBudget() - 800))
+        });
       }
     }
 
@@ -472,5 +529,7 @@ export default async function handler(req, res) {
         : 'Milo could not reach the AI service. Please try again.',
       requestId
     });
+  } finally {
+    activeInFlightRequests.delete(inFlightKey);
   }
 }

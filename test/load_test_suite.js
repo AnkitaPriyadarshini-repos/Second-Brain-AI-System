@@ -29,10 +29,16 @@ const args = process.argv.slice(2).reduce((acc, arg) => {
 
 const MODE = (args.mode || 'A').toUpperCase();
 const CONCURRENCY = parseInt(args.concurrency, 10) || (MODE === 'C' ? 5 : 100);
-const TARGET_URL = args.target || 'http://127.0.0.1:3199';
+const TARGET_URL = (args.target || 'http://127.0.0.1:3199').trim();
 const IS_DRY_RUN = Boolean(args['dry-run'] || args.dryRun);
 const SPEND_CAP = parseFloat(args['spend-cap'] || args.spendCap) || 0.10;
 const CONFIRM_LIVE = Boolean(args['confirm-live'] || args.confirmLive);
+const CONFIRM_PROD = Boolean(args['confirm-production'] || args.confirmProduction);
+
+// Provide a test session secret for local benchmark/load tests if none was set in environment
+if (!process.env.MILO_SESSION_SECRET && !process.env.SESSION_SECRET) {
+  process.env.MILO_SESSION_SECRET = 'milo_load_test_secret_32bytes_random_testing_val!';
+}
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -40,10 +46,42 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 250, keepAliveMsecs: 1000 });
 const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 250, keepAliveMsecs: 1000 });
 
+// Budget & Cost Enforcement for Live Mode C
+const ESTIMATED_COST_PER_AI_CALL = 0.00015; // Conservative Gemini Flash average prompt+response cost
+const MAX_LIVE_PROVIDER_CALLS = parseInt(args['max-provider-calls'] || args.maxProviderCalls, 10) || 10;
+let liveProviderCallsMade = 0;
+let accumulatedEstimatedSpend = 0.0;
+
+function checkSpendBudget() {
+  if (MODE !== 'C') return true;
+  if (accumulatedEstimatedSpend + ESTIMATED_COST_PER_AI_CALL > SPEND_CAP) {
+    console.warn(`🛑 [SPEND CAP REACHED] Bounded test halted because estimated spend ($${accumulatedEstimatedSpend.toFixed(4)}) would exceed spend cap ($${SPEND_CAP.toFixed(4)}).`);
+    return false;
+  }
+  if (liveProviderCallsMade >= MAX_LIVE_PROVIDER_CALLS) {
+    console.warn(`🛑 [CALL LIMIT REACHED] Bounded test halted because provider call limit (${MAX_LIVE_PROVIDER_CALLS}) was reached.`);
+    return false;
+  }
+  return true;
+}
+
+function recordProviderCall() {
+  if (MODE === 'C') {
+    liveProviderCallsMade++;
+    accumulatedEstimatedSpend += ESTIMATED_COST_PER_AI_CALL;
+  }
+}
+
 function makeRequest(urlStr, options = {}, postData = null) {
   return new Promise((resolve, reject) => {
     const t0 = Date.now();
-    const parsed = new URL(urlStr);
+    let parsed;
+    try {
+      parsed = new URL(urlStr);
+    } catch (err) {
+      return reject({ duration: 0, error: new Error(`Malformed URL: ${urlStr}`) });
+    }
+
     const isHttps = parsed.protocol === 'https:';
     const lib = isHttps ? https : http;
     const agent = isHttps ? httpsAgent : httpAgent;
@@ -187,9 +225,19 @@ async function startModeAServer(port) {
 }
 
 async function runLoadTestSuite() {
+  const modeDesc = {
+    'A': 'Mode A: Local In-Process Benchmark with Mock AI Provider (Validates app throughput, route handling, and isolation; NOT proof of upstream provider quota/latency)',
+    'B': 'Mode B: Deployed Staging Environment Workload (Exercises live serverless API routes on staging deployment)',
+    'C': 'Mode C: Strictly Bounded Live Provider Test (Executes live upstream AI calls with enforced budget cap and call ceilings)'
+  }[MODE] || `Mode ${MODE}`;
+
   console.log('====================================================');
   console.log(`⚡ MILO AI WORKSPACE — LOAD & CONCURRENCY TEST SUITE`);
-  console.log(`   Mode: ${MODE} | Virtual Users: ${CONCURRENCY}`);
+  console.log(`   ${modeDesc}`);
+  console.log(`   Virtual Users: ${CONCURRENCY} | Target: ${TARGET_URL}`);
+  if (MODE === 'C') {
+    console.log(`   Budget Cap   : $${SPEND_CAP.toFixed(4)} | Max Provider Calls: ${MAX_LIVE_PROVIDER_CALLS}`);
+  }
   console.log('====================================================\n');
 
   if (IS_DRY_RUN) {
@@ -198,15 +246,37 @@ async function runLoadTestSuite() {
     console.log(`• Concurrency Plan      : ${CONCURRENCY} independent virtual user sessions`);
     console.log(`• Actions per User      : 7 distinct transactions (health, greeting, context, rate-limit burst, video create/poll/cancel)`);
     console.log(`• Total Planned Requests: ${CONCURRENCY * 7}`);
-    console.log(`• Estimated Spend       : $0.00 (Mode ${MODE})`);
+    console.log(`• Estimated Spend       : $${MODE === 'C' ? Math.min(SPEND_CAP, CONCURRENCY * 2 * ESTIMATED_COST_PER_AI_CALL).toFixed(4) : '0.0000'} (Mode ${MODE})`);
+    console.log(`• Spend Cap Enforced    : $${SPEND_CAP.toFixed(4)} (hard ceiling)`);
     console.log('✅ Dry-run completed cleanly without sending network traffic.\n');
     return;
   }
 
-  // Safety Gate for live environments
+  // Safety Gate 1: URL Syntax Validation
+  try {
+    const parsedTarget = new URL(TARGET_URL);
+    if (!['http:', 'https:'].includes(parsedTarget.protocol)) {
+      throw new Error(`Unsupported protocol ${parsedTarget.protocol}`);
+    }
+  } catch (err) {
+    console.error(`🛑 SAFETY GATE: Malformed or invalid target URL: "${TARGET_URL}". Error: ${err.message}`);
+    process.exit(1);
+  }
+
+  // Safety Gate 2: Production Domain Protection
+  if (TARGET_URL.includes('second-brain-ai-system.vercel.app')) {
+    if (!CONFIRM_PROD) {
+      console.error('🛑 SAFETY GATE: Automated load testing against PRODUCTION main domain (second-brain-ai-system.vercel.app) is forbidden by default.');
+      console.error('   Please run load tests against a local server (Mode A) or staging deployment URL (Mode B).');
+      console.error('   If you have explicit authorization to verify production, pass --confirm-production=true.');
+      process.exit(1);
+    }
+  }
+
+  // Safety Gate 3: Live Environment Confirmation
   if ((MODE === 'B' || MODE === 'C') && TARGET_URL.includes('vercel.app')) {
     if (!CONFIRM_LIVE) {
-      console.error('🛑 SAFETY GATE: Live test against production/staging URL requires explicit --confirm-live flag.');
+      console.error('🛑 SAFETY GATE: Live test against deployed URL requires explicit --confirm-live flag.');
       console.error('   Example: node test/load_test_suite.js --mode=B --target=https://... --confirm-live');
       process.exit(1);
     }
@@ -243,7 +313,7 @@ async function runLoadTestSuite() {
 
   // Generate unique virtual user workloads
   const userWorkflows = Array.from({ length: CONCURRENCY }, async (_, idx) => {
-    const userId = `usr_load_${idx + 1}_${Math.random().toString(36).slice(2, 6)}`;
+    const userId = `usr_load_${idx + 1}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
     const sessionToken = generateSessionToken(userId, false);
     const authHeaders = {
       'Authorization': `Bearer ${sessionToken}`,
@@ -259,28 +329,34 @@ async function runLoadTestSuite() {
       const healthRes = await makeRequest(`${baseUrl}/api/ai/health`, { method: 'GET' });
       recordMetric(healthRes);
 
-      // Step 2: Short greeting AI query
-      const greetingRes = await makeRequest(`${baseUrl}/api/ai/gateway`, {
-        method: 'POST',
-        headers: authHeaders
-      }, { prompt: 'Hello Milo, what is your system status?' });
-      recordMetric(greetingRes);
+      // Step 2: Short greeting AI query (subject to budget in Mode C)
+      if (checkSpendBudget()) {
+        recordProviderCall();
+        const greetingRes = await makeRequest(`${baseUrl}/api/ai/gateway`, {
+          method: 'POST',
+          headers: authHeaders
+        }, { prompt: 'Hello Milo, what is your system status?' });
+        recordMetric(greetingRes);
+      }
 
-      // Step 3: Complex query with isolated private context notes
-      const ragRes = await makeRequest(`${baseUrl}/api/ai/gateway`, {
-        method: 'POST',
-        headers: authHeaders
-      }, {
-        prompt: `Query from virtual user ${userId}`,
-        contextNotes: [
-          {
-            id: `note_${userId}_1`,
-            title: `Confidential Architecture Doc for ${userId}`,
-            content: `Private distributed system consensus specs for node cluster ${userId}.`
-          }
-        ]
-      });
-      recordMetric(ragRes);
+      // Step 3: Complex query with isolated private context notes (subject to budget in Mode C)
+      if (checkSpendBudget()) {
+        recordProviderCall();
+        const ragRes = await makeRequest(`${baseUrl}/api/ai/gateway`, {
+          method: 'POST',
+          headers: authHeaders
+        }, {
+          prompt: `Query from virtual user ${userId}`,
+          contextNotes: [
+            {
+              id: `note_${userId}_1`,
+              title: `Confidential Architecture Doc for ${userId}`,
+              content: `Private distributed system consensus specs for node cluster ${userId}.`
+            }
+          ]
+        });
+        recordMetric(ragRes);
+      }
 
       // Step 4: Rapid burst submission to verify rate-limiting behavior
       const burstRes = await makeRequest(`${baseUrl}/api/ai/gateway`, {
@@ -325,7 +401,7 @@ async function runLoadTestSuite() {
             'Content-Type': 'application/json'
           }
         }, { action: 'status', jobId });
-        
+
         totalRequests++;
         latencies.push(intruderRes.duration);
         statusCodes[intruderRes.statusCode] = (statusCodes[intruderRes.statusCode] || 0) + 1;
@@ -366,6 +442,8 @@ async function runLoadTestSuite() {
   const p50 = latencies[Math.floor(latencies.length * 0.50)] || 0;
   const p95 = latencies[Math.floor(latencies.length * 0.95)] || 0;
   const p99 = latencies[Math.floor(latencies.length * 0.99)] || 0;
+  const min = latencies[0] || 0;
+  const max = latencies[latencies.length - 1] || 0;
   const avg = latencies.length > 0 ? (latencies.reduce((a, b) => a + b, 0) / latencies.length).toFixed(1) : 0;
   const rps = ((totalRequests / totalTimeMs) * 1000).toFixed(1);
   const successRate = ((successfulRequests / totalRequests) * 100).toFixed(1);
@@ -373,16 +451,23 @@ async function runLoadTestSuite() {
   console.log('\n====================================================');
   console.log('📊 MEASURED LOAD & READINESS TEST RESULTS');
   console.log('====================================================');
+  console.log(`• Test Mode             : ${modeDesc}`);
   console.log(`• Virtual Users         : ${CONCURRENCY}`);
   console.log(`• Total Requests        : ${totalRequests}`);
   console.log(`• Total Elapsed Time    : ${totalTimeMs} ms`);
   console.log(`• Throughput            : ${rps} req/sec`);
+  console.log(`• Min Latency           : ${min} ms`);
   console.log(`• p50 Latency           : ${p50} ms`);
   console.log(`• p95 Latency           : ${p95} ms`);
   console.log(`• p99 Latency           : ${p99} ms`);
+  console.log(`• Max Latency           : ${max} ms`);
   console.log(`• Average Latency       : ${avg} ms`);
   console.log(`• Success Rate (2xx/3xx): ${successRate}% (${successfulRequests} / ${totalRequests})`);
   console.log(`• Data Isolation Checks : ${isolationPasses} passed, ${isolationFailures} failed`);
+  if (MODE === 'C') {
+    console.log(`• Live Calls Made       : ${liveProviderCallsMade} / ${MAX_LIVE_PROVIDER_CALLS}`);
+    console.log(`• Estimated Spend       : $${accumulatedEstimatedSpend.toFixed(4)} (Spend Cap: $${SPEND_CAP.toFixed(4)})`);
+  }
   console.log('• HTTP Status Distribution:');
   for (const [code, count] of Object.entries(statusCodes)) {
     console.log(`    HTTP ${code} : ${count}`);
@@ -407,3 +492,4 @@ runLoadTestSuite().catch((err) => {
   console.error('Load test runner encountered unhandled error:', err);
   process.exit(1);
 });
+

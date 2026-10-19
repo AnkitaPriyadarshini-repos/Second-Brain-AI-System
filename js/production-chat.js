@@ -13,6 +13,7 @@
 
   let busy = false;
   let wired = false;
+  let activeQueryId = 0;
   const clean = (value) => String(value == null ? '' : value).trim();
   const STOP_WORDS = new Set(
     'a an and are as at be by can could do for from how i if in is it me my of on or please tell that the this to was what when where who why will with you your about saved save note notes'.split(' ')
@@ -246,6 +247,7 @@
     const prompt = clean(query);
     if (!prompt || busy) return false;
 
+    const queryId = ++activeQueryId;
     showChat();
     setBusy(true);
     if (typeof MiloCompanion !== 'undefined') {
@@ -443,7 +445,7 @@
 
       const selectedModel = (window.Store && window.Store.settings && window.Store.settings.selectedModel) ||
                             (window.OnyxInterface && window.OnyxInterface.currentModel) ||
-                            'gemini-2.5-flash';
+                            'gemini-2.0-flash';
 
       const response = await fetch('/api/ai/gateway', {
         method: 'POST',
@@ -464,6 +466,11 @@
       });
 
       const data = await response.json().catch(() => ({}));
+      if (queryId !== activeQueryId) {
+        // Session was switched or reset while request was in flight; discard safely
+        return false;
+      }
+
       if (!response.ok || !data.success || !data.answer) {
         throw new Error(data.error || `AI request failed (HTTP ${response.status}).`);
       }
@@ -482,6 +489,7 @@
       window.dispatchEvent(new CustomEvent('juno:answer', { detail: data }));
       return true;
     } catch (error) {
+      if (queryId !== activeQueryId) return false;
       console.error('[Milo chat]', error);
       const isTimeout = error?.name === 'AbortError';
       const retrieved = retrieveNotes(prompt);
@@ -506,10 +514,12 @@
       window.dispatchEvent(new CustomEvent('juno:answer', { detail: errorDetail }));
       return false;
     } finally {
-      clearTimeout(timeoutId);
-      setBusy(false);
-      window.isAIProcessing = false;
-      focusComposer();
+      if (queryId === activeQueryId) {
+        clearTimeout(timeoutId);
+        setBusy(false);
+        window.isAIProcessing = false;
+        focusComposer();
+      }
     }
   }
 
@@ -530,6 +540,9 @@
   }
 
   function createFallbackNewChat() {
+    activeQueryId++;
+    setBusy(false);
+    window.isAIProcessing = false;
     const container = document.getElementById('chat-container');
     if (container) container.innerHTML = '';
     const hero = document.getElementById('chat-hero-view');

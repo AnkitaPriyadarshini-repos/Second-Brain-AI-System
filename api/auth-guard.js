@@ -3,35 +3,53 @@
  *
  * Implements tamper-proof user and guest identity boundaries:
  * - Cryptographically signed session tokens (HMAC-SHA256)
+ * - Explicitly configured, shared server-side session secret
+ * - Never uses an ephemeral random fallback secret in production that invalidates tokens across serverless instances
+ * - Rejection of legacy predictable fallbacks and tampered/expired tokens
  * - Verifiable guest identities with strict resource quotas
  * - Platform-verified IP extraction (protects against x-forwarded-for spoofing)
  * - Ownership assertion on server-side resources
- * - Per-identity distributed rate limiting with sliding windows
+ * - Fail-closed semantics for protected operations when unconfigured
  */
 
 const crypto = require('crypto');
 
-const configuredSecret = (
-  process.env.MILO_SESSION_SECRET ||
-  process.env.SESSION_SECRET ||
-  process.env.JUNO_SESSION_SECRET ||
-  ''
-).trim();
+// Approved server-side environment variables for session signing
+function getConfiguredSecret() {
+  const secret = (
+    process.env.MILO_SESSION_SECRET ||
+    process.env.SESSION_SECRET ||
+    process.env.JUNO_SESSION_SECRET ||
+    ''
+  ).trim();
 
-// Never use a predictable static fallback in production. If no server secret is configured,
-// generate a secure cryptographic random key in-memory per runtime instance.
-const isSecretConfigured = configuredSecret.length >= 16;
-const EPHEMERAL_RANDOM_SECRET = crypto.randomBytes(32).toString('hex');
-const SESSION_SECRET = isSecretConfigured ? configuredSecret : EPHEMERAL_RANDOM_SECRET;
+  if (secret.length >= 16) {
+    return secret;
+  }
+
+  // In hermetic test runners (NODE_ENV=test), provide a deterministic test secret so tests run cleanly
+  if (process.env.NODE_ENV === 'test' && !process.env.VERCEL) {
+    return 'milo_hermetic_test_session_secret_32bytes_value!';
+  }
+
+  return '';
+}
 
 const LEGACY_KNOWN_FALLBACK = 'milo_production_hardening_secret_fallback_2026';
-
 const GUEST_TTL_MS = 1000 * 60 * 60 * 24; // 24 hours
 const USER_TTL_MS = 1000 * 60 * 60 * 24 * 14; // 14 days
 
 /**
+ * Returns whether an approved server-side session secret is configured.
+ */
+function isSecretConfigured() {
+  const secret = getConfiguredSecret();
+  return typeof secret === 'string' && secret.length >= 16;
+}
+
+/**
  * Platform-verified IP extraction:
- * Prioritizes Vercel / proxy infrastructure headers (x-vercel-ip, x-real-ip)
+ * Prioritizes Vercel / trusted proxy infrastructure headers (x-vercel-ip, x-real-ip)
  * over arbitrary untrusted x-forwarded-for chains.
  */
 function getVerifiedClientIp(req) {
@@ -65,10 +83,14 @@ function getVerifiedClientIp(req) {
 }
 
 /**
- * Sign payload with HMAC-SHA256
+ * Sign payload with HMAC-SHA256 using the configured server secret
  */
 function signString(data) {
-  return crypto.createHmac('sha256', SESSION_SECRET).update(data).digest('hex').slice(0, 32);
+  const secret = getConfiguredSecret();
+  if (!secret) {
+    throw new Error('SERVER_CONFIGURATION_ERROR: MILO_SESSION_SECRET is not configured on this server.');
+  }
+  return crypto.createHmac('sha256', secret).update(data).digest('hex').slice(0, 32);
 }
 
 /**
@@ -76,6 +98,11 @@ function signString(data) {
  * Format: <prefix>_<id>.<timestamp>.<signature>
  */
 function generateSessionToken(id, isGuest = false) {
+  const secret = getConfiguredSecret();
+  if (!secret) {
+    throw new Error('SERVER_CONFIGURATION_ERROR: MILO_SESSION_SECRET is not configured on this server.');
+  }
+
   const prefix = isGuest ? 'guest' : 'usr';
   const cleanId = String(id || crypto.randomBytes(8).toString('hex')).replace(/[^a-zA-Z0-9_-]/g, '');
   const timestamp = Date.now().toString();
@@ -90,6 +117,12 @@ function generateSessionToken(id, isGuest = false) {
 function verifySessionToken(token) {
   if (!token || typeof token !== 'string') return null;
 
+  const secret = getConfiguredSecret();
+  if (!secret) {
+    // Fail closed: cannot verify tokens without configured secret
+    return null;
+  }
+
   const parts = token.split('.');
   if (parts.length !== 3) return null;
 
@@ -102,7 +135,13 @@ function verifySessionToken(token) {
     return null; // Reject legacy predictable token
   }
 
-  const expectedSig = signString(payload);
+  let expectedSig;
+  try {
+    expectedSig = signString(payload);
+  } catch (_) {
+    return null;
+  }
+
   if (signature.length !== expectedSig.length) return null;
 
   // Use timing-safe comparison to prevent side-channel timing attacks
@@ -133,11 +172,11 @@ function verifySessionToken(token) {
 /**
  * Extract verified client identity from HTTP request.
  * If client presents a valid token, verifies and returns it.
- * If client has no token, derives a deterministic signed guest session based on IP.
+ * If client has no token, derives a deterministic guest session based on IP.
  */
 function extractClientIdentity(req) {
   const headers = req?.headers || {};
-  
+
   // 1. Check Authorization: Bearer <token>
   let token = null;
   const authHeader = headers['authorization'];
@@ -163,11 +202,28 @@ function extractClientIdentity(req) {
     }
   }
 
-  // 4. Derive deterministic signed guest identity if unauthenticated
+  // 4. Derive deterministic guest identity if unauthenticated
   const ip = getVerifiedClientIp(req);
-  const guestHash = crypto.createHmac('sha256', SESSION_SECRET).update(`guest_ip:${ip}`).digest('hex').slice(0, 12);
+  const hasConfig = isSecretConfigured();
+
+  // If secret is configured, use HMAC-SHA256 to hash IP into guest ID and sign guest token
+  let guestHash;
+  let guestToken = null;
+
+  if (hasConfig) {
+    try {
+      const secret = getConfiguredSecret();
+      guestHash = crypto.createHmac('sha256', secret).update(`guest_ip:${ip}`).digest('hex').slice(0, 12);
+      guestToken = generateSessionToken(guestHash, true);
+    } catch (_) {
+      guestHash = crypto.createHash('sha256').update(`guest_ip:${ip}`).digest('hex').slice(0, 12);
+    }
+  } else {
+    // Unconfigured secret in production: deterministic hash without signing secret
+    guestHash = crypto.createHash('sha256').update(`guest_ip:${ip}`).digest('hex').slice(0, 12);
+  }
+
   const guestId = `guest_${guestHash}`;
-  const guestToken = generateSessionToken(guestHash, true);
 
   return {
     id: guestId,
@@ -175,7 +231,8 @@ function extractClientIdentity(req) {
     createdAt: Date.now(),
     verified: false, // Guest fallback
     ip,
-    token: guestToken
+    token: guestToken,
+    configured: hasConfig
   };
 }
 
@@ -214,12 +271,14 @@ function checkRateLimit(key, maxRequests = 30, windowMs = 60000) {
   return { allowed, remaining, resetSeconds, count: entry.count };
 }
 
+/**
+ * Enforce authenticated user status. Fails closed if session secret is missing.
+ */
 function assertAuthenticatedUser(clientIdentity) {
-  if (!clientIdentity || !clientIdentity.verified || clientIdentity.isGuest) {
+  if (!isSecretConfigured()) {
     return false;
   }
-  // Fail closed if the production session secret is not configured
-  if (!isSecretConfigured) {
+  if (!clientIdentity || !clientIdentity.verified || clientIdentity.isGuest) {
     return false;
   }
   return true;
@@ -233,5 +292,5 @@ module.exports = {
   assertOwnership,
   assertAuthenticatedUser,
   checkRateLimit,
-  isSecretConfigured: () => isSecretConfigured
+  isSecretConfigured
 };
