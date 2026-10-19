@@ -1,6 +1,6 @@
 import authGuard from '../auth-guard.js';
 
-const PRIMARY_MODEL = 'gemini-3.8-flash';
+const PRIMARY_MODEL = 'gemini-3.5-flash-lite';
 const FAST_MODEL = 'gemini-3.5-flash-lite';
 const MAX_CONTEXT = 9000;
 const MAX_HISTORY_ITEMS = 16;
