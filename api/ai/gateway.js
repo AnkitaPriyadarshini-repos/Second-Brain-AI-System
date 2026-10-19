@@ -420,23 +420,8 @@ export default async function handler(req, res) {
       });
     };
 
-    let result = await callGemini({
-      model,
-      systemPrompt,
-      contents,
-      thinkingLevel,
-      apiKey,
-      requestId,
-      timeoutMs: Math.min(PROVIDER_TIMEOUT_MS, Math.max(3000, getRemainingBudget() - 2000))
-    });
-    recordAttempt(result);
-
-    // Handle transient retry with exponential backoff on 429 / 503
-    if (!result.response.ok && [429, 503].includes(result.response.status) && getRemainingBudget() > 9000) {
-      const retryHeader = result.response.headers?.get?.('retry-after');
-      const waitSec = parseInt(retryHeader, 10);
-      const waitMs = (!isNaN(waitSec) && waitSec > 0 && waitSec <= 2) ? waitSec * 1000 : (350 + Math.floor(Math.random() * 250));
-      await sleep(waitMs);
+    let result = null;
+    try {
       result = await callGemini({
         model,
         systemPrompt,
@@ -444,46 +429,87 @@ export default async function handler(req, res) {
         thinkingLevel,
         apiKey,
         requestId,
-        timeoutMs: Math.min(PROVIDER_TIMEOUT_MS, Math.max(3000, getRemainingBudget() - 1500))
+        timeoutMs: Math.min(6500, Math.max(3000, getRemainingBudget() - 3000))
       });
       recordAttempt(result);
+    } catch (primaryErr) {
+      console.warn(`[milo/gateway] ${requestId}: Primary model ${model} threw ${primaryErr?.name || primaryErr?.message}. Falling back.`);
+      modelAttempts.push({
+        model,
+        status: primaryErr?.name === 'AbortError' ? 504 : 503,
+        message: primaryErr?.name === 'AbortError' ? 'Primary provider timeout' : (primaryErr?.message || 'Provider connection error')
+      });
     }
 
-    // Model fallback chain if initial model returns 400/404/429/500/502/503/504
-    if (!result.response.ok && [400, 404, 429, 500, 502, 503, 504].includes(result.response.status) && getRemainingBudget() > 7000) {
-      const fallbackModel = result.resolvedModel === FAST_MODEL ? PRIMARY_MODEL : FAST_MODEL;
-      console.warn(`[milo/gateway] ${requestId}: Primary model ${result.resolvedModel} returned ${result.response.status}. Falling back to ${fallbackModel}`);
-      result = await callGemini({
-        model: fallbackModel,
-        systemPrompt,
-        contents,
-        thinkingLevel: 'low',
-        apiKey,
-        requestId,
-        timeoutMs: Math.min(PROVIDER_TIMEOUT_MS, Math.max(3000, getRemainingBudget() - 1000))
-      });
-      recordAttempt(result);
-
-      // Third tier fallback if still failing and time permits
-      if (!result.response.ok && [400, 404, 500, 502, 503].includes(result.response.status) && getRemainingBudget() > 6000) {
-        const tertiaryModel = 'gemini-1.5-flash';
+    // Handle transient retry with exponential backoff on 429 / 503
+    if (result && !result.response?.ok && [429, 503].includes(result.response?.status) && getRemainingBudget() > 9000) {
+      const retryHeader = result.response?.headers?.get?.('retry-after');
+      const waitSec = parseInt(retryHeader, 10);
+      const waitMs = (!isNaN(waitSec) && waitSec > 0 && waitSec <= 2) ? waitSec * 1000 : (350 + Math.floor(Math.random() * 250));
+      await sleep(waitMs);
+      try {
         result = await callGemini({
-          model: tertiaryModel,
+          model,
+          systemPrompt,
+          contents,
+          thinkingLevel,
+          apiKey,
+          requestId,
+          timeoutMs: Math.min(PROVIDER_TIMEOUT_MS, Math.max(3000, getRemainingBudget() - 1500))
+        });
+        recordAttempt(result);
+      } catch (_) {
+        // Fall through to fallback chain
+      }
+    }
+
+    // Model fallback chain if initial model returns 400/404/429/500/502/503/504 or threw timeout/error
+    if ((!result || !result.response?.ok) && getRemainingBudget() > 5000) {
+      const fallbackModel = (result?.resolvedModel || model) === FAST_MODEL ? PRIMARY_MODEL : FAST_MODEL;
+      console.warn(`[milo/gateway] ${requestId}: Initial model failed or timed out. Falling back to ${fallbackModel}`);
+      try {
+        result = await callGemini({
+          model: fallbackModel,
           systemPrompt,
           contents,
           thinkingLevel: 'low',
           apiKey,
           requestId,
-          timeoutMs: Math.min(6000, Math.max(2500, getRemainingBudget() - 800))
+          timeoutMs: Math.min(PROVIDER_TIMEOUT_MS, Math.max(3000, getRemainingBudget() - 1000))
         });
         recordAttempt(result);
+      } catch (fallbackErr) {
+        modelAttempts.push({
+          model: fallbackModel,
+          status: fallbackErr?.name === 'AbortError' ? 504 : 503,
+          message: fallbackErr?.name === 'AbortError' ? 'Fallback provider timeout' : (fallbackErr?.message || 'Fallback provider error')
+        });
+      }
+
+      // Third tier fallback if still failing and time permits
+      if ((!result || !result.response?.ok) && getRemainingBudget() > 4000) {
+        const tertiaryModel = 'gemini-1.5-flash';
+        try {
+          result = await callGemini({
+            model: tertiaryModel,
+            systemPrompt,
+            contents,
+            thinkingLevel: 'low',
+            apiKey,
+            requestId,
+            timeoutMs: Math.min(4000, Math.max(2500, getRemainingBudget() - 800))
+          });
+          recordAttempt(result);
+        } catch (_) {}
       }
     }
 
-    const { response, data } = result;
-    if (!response.ok) {
+    if (!result || !result.response?.ok) {
+      const response = result?.response;
+      const data = result?.data;
+      const lastStatus = response?.status || (modelAttempts[modelAttempts.length - 1]?.status) || 502;
       // Record failure for circuit breaker only on upstream 5xx/overload outages
-      if ([500, 502, 503, 504].includes(response.status)) {
+      if ([500, 502, 503, 504].includes(lastStatus)) {
         circuitBreaker.consecutiveFailures++;
         if (circuitBreaker.consecutiveFailures >= circuitBreaker.threshold) {
           circuitBreaker.cooldownUntil = Date.now() + circuitBreaker.cooldownDurationMs;
@@ -491,19 +517,21 @@ export default async function handler(req, res) {
         }
       }
 
-      const providerMessage = data?.error?.message || `Gemini returned HTTP ${response.status}`;
-      console.error('[milo/gateway]', requestId, response.status, providerMessage);
-      return res.status(response.status === 429 ? 429 : 502).json({
+      const providerMessage = data?.error?.message || `Gemini returned HTTP ${lastStatus}`;
+      console.error('[milo/gateway]', requestId, lastStatus, providerMessage);
+      return res.status(lastStatus === 429 ? 429 : 502).json({
         success: false,
-        error: response.status === 429
+        error: lastStatus === 429
           ? 'The AI service is temporarily busy. Please try again in a moment.'
           : 'The AI service could not complete this request. Please try again.',
-        providerStatus: response.status,
+        providerStatus: lastStatus,
         providerMessage: data?.error?.message ? String(data.error.message).replace(/[A-Za-z0-9_-]{35,}/g, '[REDACTED]') : null,
         modelAttempts,
         requestId
       });
     }
+
+    const { response, data } = result;
 
     // Success resets circuit breaker consecutive failures
     circuitBreaker.consecutiveFailures = 0;
