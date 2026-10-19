@@ -1,7 +1,7 @@
 import authGuard from '../auth-guard.js';
 
-const PRIMARY_MODEL = 'gemini-2.0-flash';
-const FAST_MODEL = 'gemini-1.5-flash';
+const PRIMARY_MODEL = 'gemini-2.5-flash';
+const FAST_MODEL = 'gemini-3.5-flash-lite';
 const MAX_CONTEXT = 9000;
 const MAX_HISTORY_ITEMS = 16;
 const MAX_MESSAGE = 12000;
@@ -16,18 +16,18 @@ const PROVIDER_TIMEOUT_MS = 8_500; // Bounded provider call timeout
 const OVERALL_DEADLINE_MS = 24_000; // Strict deadline well within Vercel's 30s maxDuration
 
 // Upstream model registry: maps requested/advertised tiers to active, verified Google Gemini endpoints.
-// Includes compatibility aliases for gemini-3.6-flash and gemini-3.5-flash-lite.
+// Includes compatibility aliases for gemini-3.6-flash, gemini-3.1-flash-lite, and gemini-3.5-flash-lite.
 const MODEL_REGISTRY = {
-  'gemini-2.0-flash': 'gemini-2.0-flash',
-  'gemini-1.5-flash': 'gemini-1.5-flash',
-  'gemini-1.5-pro': 'gemini-1.5-pro',
-  'gemini-2.0-flash-lite': 'gemini-2.0-flash-lite',
-  'gemini-flash-latest': 'gemini-2.0-flash',
-  'gemini-2.5-flash': 'gemini-2.0-flash',
-  'gemini-3.6-flash': 'gemini-2.0-flash',
-  'gemini-3.5-flash-lite': 'gemini-1.5-flash',
-  'gemini-3.1-flash-lite': 'gemini-1.5-flash',
-  'default': 'gemini-2.0-flash'
+  'gemini-3.5-flash-lite': 'gemini-3.5-flash-lite',
+  'gemini-3.1-flash-lite': 'gemini-3.5-flash-lite',
+  'gemini-2.5-flash': 'gemini-2.5-flash',
+  'gemini-2.0-flash': 'gemini-2.5-flash',
+  'gemini-1.5-flash': 'gemini-3.5-flash-lite',
+  'gemini-1.5-pro': 'gemini-2.5-flash',
+  'gemini-2.0-flash-lite': 'gemini-3.5-flash-lite',
+  'gemini-flash-latest': 'gemini-3.5-flash-lite',
+  'gemini-3.6-flash': 'gemini-2.5-flash',
+  'default': 'gemini-3.5-flash-lite'
 };
 
 function resolveUpstreamModel(modelName) {
@@ -408,6 +408,15 @@ export default async function handler(req, res) {
       ? resolveUpstreamModel(clientRequestedModel)
       : route.model;
     let thinkingLevel = route.thinkingLevel;
+    const modelAttempts = [];
+    const recordAttempt = (res) => {
+      if (!res) return;
+      modelAttempts.push({
+        model: res.resolvedModel,
+        status: res.response?.status,
+        message: res.data?.error?.message ? String(res.data.error.message).replace(/[A-Za-z0-9_-]{35,}/g, '[REDACTED]') : null
+      });
+    };
 
     let result = await callGemini({
       model,
@@ -418,6 +427,7 @@ export default async function handler(req, res) {
       requestId,
       timeoutMs: Math.min(PROVIDER_TIMEOUT_MS, Math.max(3000, getRemainingBudget() - 2000))
     });
+    recordAttempt(result);
 
     // Handle transient retry with exponential backoff on 429 / 503
     if (!result.response.ok && [429, 503].includes(result.response.status) && getRemainingBudget() > 9000) {
@@ -434,11 +444,12 @@ export default async function handler(req, res) {
         requestId,
         timeoutMs: Math.min(PROVIDER_TIMEOUT_MS, Math.max(3000, getRemainingBudget() - 1500))
       });
+      recordAttempt(result);
     }
 
     // Model fallback chain if initial model returns 400/404/429/500/502/503/504
     if (!result.response.ok && [400, 404, 429, 500, 502, 503, 504].includes(result.response.status) && getRemainingBudget() > 7000) {
-      const fallbackModel = result.resolvedModel === PRIMARY_MODEL ? FAST_MODEL : PRIMARY_MODEL;
+      const fallbackModel = result.resolvedModel === FAST_MODEL ? PRIMARY_MODEL : FAST_MODEL;
       console.warn(`[milo/gateway] ${requestId}: Primary model ${result.resolvedModel} returned ${result.response.status}. Falling back to ${fallbackModel}`);
       result = await callGemini({
         model: fallbackModel,
@@ -449,10 +460,11 @@ export default async function handler(req, res) {
         requestId,
         timeoutMs: Math.min(PROVIDER_TIMEOUT_MS, Math.max(3000, getRemainingBudget() - 1000))
       });
+      recordAttempt(result);
 
       // Third tier fallback if still failing and time permits
       if (!result.response.ok && [400, 404, 500, 502, 503].includes(result.response.status) && getRemainingBudget() > 6000) {
-        const tertiaryModel = 'gemini-2.0-flash-lite';
+        const tertiaryModel = 'gemini-1.5-flash';
         result = await callGemini({
           model: tertiaryModel,
           systemPrompt,
@@ -462,6 +474,7 @@ export default async function handler(req, res) {
           requestId,
           timeoutMs: Math.min(6000, Math.max(2500, getRemainingBudget() - 800))
         });
+        recordAttempt(result);
       }
     }
 
@@ -485,6 +498,7 @@ export default async function handler(req, res) {
           : 'The AI service could not complete this request. Please try again.',
         providerStatus: response.status,
         providerMessage: data?.error?.message ? String(data.error.message).replace(/[A-Za-z0-9_-]{35,}/g, '[REDACTED]') : null,
+        modelAttempts,
         requestId
       });
     }
