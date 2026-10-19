@@ -7,7 +7,7 @@ const chat = fs.readFileSync(path.join(root, 'js/production-chat.js'), 'utf8');
 const utils = fs.readFileSync(path.join(root, 'js/utils.js'), 'utf8');
 
 const checks = [
-  ['primary Gemini model is current', gateway.includes("gemini-3.6-flash")],
+  ['primary Gemini model is current', gateway.includes("gemini-3.8-flash")],
   ['fast Gemini model is current', gateway.includes("gemini-3.5-flash-lite")],
   ['latest user turn is explicitly sent', gateway.includes("{ role: 'user', parts: [{ text: prompt }] }")],
   ['private context is marked untrusted', gateway.includes('untrusted reference data')],

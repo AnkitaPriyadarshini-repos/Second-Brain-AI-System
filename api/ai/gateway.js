@@ -1,6 +1,6 @@
 import authGuard from '../auth-guard.js';
 
-const PRIMARY_MODEL = 'gemini-2.5-flash';
+const PRIMARY_MODEL = 'gemini-3.8-flash';
 const FAST_MODEL = 'gemini-3.5-flash-lite';
 const MAX_CONTEXT = 9000;
 const MAX_HISTORY_ITEMS = 16;
@@ -16,17 +16,19 @@ const PROVIDER_TIMEOUT_MS = 8_500; // Bounded provider call timeout
 const OVERALL_DEADLINE_MS = 24_000; // Strict deadline well within Vercel's 30s maxDuration
 
 // Upstream model registry: maps requested/advertised tiers to active, verified Google Gemini endpoints.
-// Includes compatibility aliases for gemini-3.6-flash, gemini-3.1-flash-lite, and gemini-3.5-flash-lite.
+// Sets gemini-3.8-flash as primary frontier reasoning model and gemini-3.5-flash-lite as fast tier.
+// Includes compatibility aliases for gemini-3.6-flash, gemini-2.5-flash, and older versions.
 const MODEL_REGISTRY = {
+  'gemini-3.8-flash': 'gemini-3.8-flash',
   'gemini-3.5-flash-lite': 'gemini-3.5-flash-lite',
+  'gemini-3.6-flash': 'gemini-3.6-flash',
   'gemini-3.1-flash-lite': 'gemini-3.5-flash-lite',
-  'gemini-2.5-flash': 'gemini-2.5-flash',
-  'gemini-2.0-flash': 'gemini-2.5-flash',
+  'gemini-2.5-flash': 'gemini-3.8-flash',
+  'gemini-2.0-flash': 'gemini-3.8-flash',
   'gemini-1.5-flash': 'gemini-3.5-flash-lite',
-  'gemini-1.5-pro': 'gemini-2.5-flash',
+  'gemini-1.5-pro': 'gemini-3.8-flash',
   'gemini-2.0-flash-lite': 'gemini-3.5-flash-lite',
   'gemini-flash-latest': 'gemini-3.5-flash-lite',
-  'gemini-3.6-flash': 'gemini-2.5-flash',
   'default': 'gemini-3.5-flash-lite'
 };
 
