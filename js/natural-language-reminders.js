@@ -49,6 +49,7 @@
       const error = new Error(payload.error || 'Reminder request failed (HTTP ' + response.status + ').');
       error.status = response.status;
       error.code = payload.code;
+      error.payload = payload;
       throw error;
     }
     return payload;
@@ -425,9 +426,31 @@
       applyDraft(data.draft, data.persistenceConfigured);
     } catch (error) {
       if (requestId !== state.activeRequestId) return;
-      state.draft = null;
-      byId('reminder-preview-card').style.display = 'none';
-      setNotice(error.message, 'error');
+      if (error.code === 'MULTIPLE_DATE_EXPRESSIONS') {
+        const candidateText = Array.isArray(error.payload && error.payload.candidateExpressions)
+          ? error.payload.candidateExpressions.join(', ')
+          : '';
+        const summaryMsg = error.message + (candidateText ? ' (Found: ' + candidateText + ')' : '');
+        const clarificationDraft = {
+          title: (error.payload && error.payload.title) || text,
+          taskType: (error.payload && error.payload.taskType) || 'general',
+          dateExpression: candidateText || null,
+          schedulingStatus: 'needs_clarification',
+          dateLocal: '',
+          timeLocal: '',
+          timeZone: timeZone,
+          recurrence: null,
+          dueAt: null,
+          message: summaryMsg,
+          dateResolvedBy: 'deterministic_parser'
+        };
+        applyDraft(clarificationDraft, state.persistenceConfigured);
+        setNotice(error.message, 'warning');
+      } else {
+        state.draft = null;
+        byId('reminder-preview-card').style.display = 'none';
+        setNotice(error.message, 'error');
+      }
     } finally {
       if (requestId === state.activeRequestId) {
         button.disabled = false;
@@ -459,7 +482,8 @@
         dateLocal: byId('reminder-date').value,
         timeLocal: byId('reminder-time').value,
         timeZone: byId('reminder-time-zone').value.trim(),
-        recurrence: readRecurrence()
+        recurrence: readRecurrence(),
+        referenceTime: state.draft ? (state.draft.referenceTime || null) : null
       });
       state.reminders.push(data.reminder);
       state.reminders.sort(function (a, b) {

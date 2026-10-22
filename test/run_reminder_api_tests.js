@@ -279,6 +279,102 @@ async function main() {
 
     process.stdout.write('  PASS Suite 5: CRUD and owner isolation verified\n');
 
+    // ----------------------------------------------------
+    // Suite 6: Authoritative Save Gate & Schedule Consistency
+    // ----------------------------------------------------
+    process.stdout.write('Testing Suite 6: Authoritative save gate & schedule consistency...\n');
+
+    // 1. Incomplete time expression ("tomorrow at 7") rejected at save gate
+    const incompleteTimeSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Incomplete time',
+        dateExpression: 'tomorrow at 7', dateLocal: '2035-10-24', timeLocal: '19:00', timeZone: 'Asia/Kolkata'
+      }
+    }), incompleteTimeSave);
+    assert.strictEqual(incompleteTimeSave.statusCode, 422, 'Incomplete time expression must be rejected');
+    assert.strictEqual(incompleteTimeSave.body.code, 'INCOMPLETE_TIME');
+
+    // 2. Schedule field mismatch (expression vs calendar fields) rejected with 422
+    const mismatchSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Mismatch test',
+        dateExpression: 'tomorrow at 7pm', dateLocal: '2035-12-25', timeLocal: '10:00', timeZone: 'Asia/Kolkata',
+        referenceTime: '2035-10-23T10:00:00.000Z'
+      }
+    }), mismatchSave);
+    assert.strictEqual(mismatchSave.statusCode, 422, 'Schedule mismatch must be rejected with 422');
+    assert.strictEqual(mismatchSave.body.code, 'SCHEDULE_FIELD_MISMATCH');
+
+    // 3. Ambiguous numeric date expression rejected at save gate
+    const ambiguousSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Ambiguous test',
+        dateExpression: '03/04/2027', dateLocal: '2027-04-03', timeLocal: '10:00', timeZone: 'Asia/Kolkata'
+      }
+    }), ambiguousSave);
+    assert.strictEqual(ambiguousSave.statusCode, 422);
+    assert.strictEqual(ambiguousSave.body.code, 'AMBIGUOUS_NUMERIC_DATE');
+
+    // 4. Multi-date expression rejected at save gate
+    const multiDateSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Multi date test',
+        dateExpression: 'Pay rent tomorrow and submit report on Friday', dateLocal: '2035-10-24', timeLocal: '10:00', timeZone: 'Asia/Kolkata'
+      }
+    }), multiDateSave);
+    assert.strictEqual(multiDateSave.statusCode, 422);
+    assert.strictEqual(multiDateSave.body.code, 'MULTIPLE_DATES');
+
+    // 5. Valid manual calendar entry with dateExpression: null
+    const validManualSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Valid manual task',
+        dateExpression: null, dateLocal: '2035-11-20', timeLocal: '15:30', timeZone: 'Asia/Kolkata',
+        recurrence: { unit: 'month', interval: 1 }
+      }
+    }), validManualSave);
+    assert.strictEqual(validManualSave.statusCode, 201, 'Valid manual calendar entry must be saved');
+    assert.strictEqual(validManualSave.body.reminder.dateExpression, null);
+    assert.strictEqual(validManualSave.body.reminder.dateLocal, '2035-11-20');
+    assert.strictEqual(validManualSave.body.reminder.timeLocal, '15:30');
+    assert.strictEqual(validManualSave.body.reminder.recurrence.unit, 'month');
+
+    // 6. Invalid manual calendar date rejected with INVALID_DATE
+    const invalidManualDate = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Bad manual date',
+        dateExpression: null, dateLocal: '2035-02-31', timeLocal: '12:00', timeZone: 'Asia/Kolkata'
+      }
+    }), invalidManualDate);
+    assert.strictEqual(invalidManualDate.statusCode, 422);
+    assert.strictEqual(invalidManualDate.body.code, 'INVALID_DATE');
+
+    // 7. Past timed manual calendar entry rejected with TIME_IN_PAST
+    const pastManualTime = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Past manual time',
+        dateExpression: null, dateLocal: '2020-01-01', timeLocal: '12:00', timeZone: 'Asia/Kolkata'
+      }
+    }), pastManualTime);
+    assert.strictEqual(pastManualTime.statusCode, 422);
+    assert.strictEqual(pastManualTime.body.code, 'TIME_IN_PAST');
+
+    process.stdout.write('  PASS Suite 6: Save-gate schedule consistency & manual entries verified\n');
+
     process.stdout.write('\nPASS reminder API: all session security, length gates, CSRF, and isolation tests passed.\n');
   } finally {
     global.fetch = oldFetch;

@@ -578,15 +578,227 @@ async function runBrowserRemindersTests() {
     console.log('  ✅ [PASS] Phase 9: Failed re-resolution cleared stale schedule; manual calendar edit recovery verified');
 
     // ----------------------------------------------------
-    // Phase 10: Console Error Integrity
+    // Phase 10: Real Frontend Asynchronous Race Guard with Controlled Promises
     // ----------------------------------------------------
-    console.log('Phase 10: Console Error Integrity');
+    console.log('Phase 10: Real Frontend Asynchronous Race Guard with Controlled Promises');
+
+    // Install controlled in-browser fetch wrapper
+    await evalPage(`() => {
+      window.__deferredRequests = [];
+      window.__controlledFetch = true;
+      if (!window.__origFetch) {
+        window.__origFetch = window.fetch;
+        window.fetch = function(url, opts) {
+          if (window.__controlledFetch && typeof url === 'string' && url.includes('/api/reminders')) {
+            return new Promise((resolve, reject) => {
+              window.__deferredRequests.push({
+                url: url,
+                opts: opts,
+                body: opts && opts.body ? JSON.parse(opts.body) : {},
+                resolveWithBackend: async () => {
+                  try {
+                    const resp = await window.__origFetch(url, opts);
+                    resolve(resp);
+                  } catch (e) {
+                    reject(e);
+                  }
+                }
+              });
+            });
+          }
+          return window.__origFetch(url, opts);
+        };
+      }
+      return true;
+    }`);
+
+    // Test A vs B re-ordering on preview
+    // 1. Start preview Request A for "Task Alpha next Friday at 4pm"
+    await evalPage(`() => {
+      const input = document.getElementById('reminder-input');
+      const form = document.getElementById('reminder-form');
+      input.value = 'Task Alpha next Friday at 4pm';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    }`);
+
+    // Wait for Request A to enter pending state in browser
+    for (let i = 0; i < 20; i++) {
+      const count = await evalPage(`() => window.__deferredRequests.length`);
+      if (count >= 1) break;
+      await new Promise(r => setTimeout(r, 50));
+    }
+
+    // 2. Start newer Request B for "Task Beta next Monday at 10am" before A completes
+    await evalPage(`() => {
+      const input = document.getElementById('reminder-input');
+      const form = document.getElementById('reminder-form');
+      input.value = 'Task Beta next Monday at 10am';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    }`);
+
+    for (let i = 0; i < 20; i++) {
+      const count = await evalPage(`() => window.__deferredRequests.length`);
+      if (count >= 2) break;
+      await new Promise(r => setTimeout(r, 50));
+    }
+
+    // 3. Return B's response first
+    await evalPage(`async () => {
+      await window.__deferredRequests[1].resolveWithBackend();
+    }`);
+
+    // Wait for UI to reflect B's response
+    let bApplied = false;
+    for (let i = 0; i < 30; i++) {
+      await new Promise(r => setTimeout(r, 100));
+      const title = await evalPage(`() => document.getElementById('reminder-title').value`);
+      const time = await evalPage(`() => document.getElementById('reminder-time').value`);
+      if (title === 'Task Beta' && time === '10:00') {
+        bApplied = true;
+        break;
+      }
+    }
+    assert.strictEqual(bApplied, true, 'Request B (newer) should be applied to the UI');
+
+    // 4. Return A's stale response
+    await evalPage(`async () => {
+      await window.__deferredRequests[0].resolveWithBackend();
+    }`);
+    await new Promise(r => setTimeout(r, 200));
+
+    // 5. Assert that the UI keeps B's title/date/time/timezone and does not overwrite them with A's result
+    const raceResult = await evalPage(`() => {
+      return {
+        title: document.getElementById('reminder-title').value,
+        previewTitle: document.getElementById('reminder-preview-title').textContent,
+        time: document.getElementById('reminder-time').value,
+        date: document.getElementById('reminder-date').value,
+        timeZone: document.getElementById('reminder-time-zone').value,
+        status: document.getElementById('reminder-preview-status').textContent,
+        saveDisabled: document.getElementById('reminder-save-btn').disabled
+      };
+    }`);
+    assert.strictEqual(raceResult.title, 'Task Beta', 'UI must keep newer Request B title');
+    assert.strictEqual(raceResult.previewTitle, 'Task Beta', 'Preview title must keep newer Request B');
+    assert.strictEqual(raceResult.time, '10:00', 'Time must keep newer Request B (10:00), not overwritten by stale A (16:00)');
+    assert.strictEqual(raceResult.status, 'Scheduled');
+
+    // Part B: Stale failure does not invalidate newer valid draft
+    // Clear deferred requests
+    await evalPage(`() => { window.__deferredRequests = []; }`);
+
+    // Start re-resolution Request C (which will fail with ambiguous date)
+    await evalPage(`() => {
+      const exprInput = document.getElementById('reminder-date-expression-input');
+      exprInput.value = '03/04/2027'; // Ambiguous numeric date
+      exprInput.dispatchEvent(new Event('change', { bubbles: true }));
+    }`);
+
+    for (let i = 0; i < 20; i++) {
+      const count = await evalPage(`() => window.__deferredRequests.length`);
+      if (count >= 1) break;
+      await new Promise(r => setTimeout(r, 50));
+    }
+
+    // Start newer Request D (valid "next Wednesday at 3pm")
+    await evalPage(`() => {
+      const exprInput = document.getElementById('reminder-date-expression-input');
+      exprInput.value = 'next Wednesday at 3pm';
+      exprInput.dispatchEvent(new Event('change', { bubbles: true }));
+    }`);
+
+    for (let i = 0; i < 20; i++) {
+      const count = await evalPage(`() => window.__deferredRequests.length`);
+      if (count >= 2) break;
+      await new Promise(r => setTimeout(r, 50));
+    }
+
+    // Return D's response first (success)
+    await evalPage(`async () => {
+      await window.__deferredRequests[1].resolveWithBackend();
+    }`);
+
+    let dApplied = false;
+    for (let i = 0; i < 30; i++) {
+      await new Promise(r => setTimeout(r, 100));
+      const time = await evalPage(`() => document.getElementById('reminder-time').value`);
+      if (time === '15:00') {
+        dApplied = true;
+        break;
+      }
+    }
+    assert.strictEqual(dApplied, true, 'Request D should update time to 15:00');
+
+    // Now return stale Request C (which fails with 422 AMBIGUOUS_NUMERIC_DATE)
+    await evalPage(`async () => {
+      await window.__deferredRequests[0].resolveWithBackend();
+    }`);
+    await new Promise(r => setTimeout(r, 200));
+
+    // Stale failure must NOT invalidate Request D's valid draft!
+    const staleFailureCheck = await evalPage(`() => {
+      return {
+        time: document.getElementById('reminder-time').value,
+        status: document.getElementById('reminder-preview-status').textContent,
+        saveDisabled: document.getElementById('reminder-save-btn').disabled
+      };
+    }`);
+    assert.strictEqual(staleFailureCheck.time, '15:00', 'Stale failure must not clear time from valid Request D');
+    assert.strictEqual(staleFailureCheck.status, 'Scheduled', 'Stale failure must not set status to Needs clarification');
+    console.log('  ✅ [PASS] Phase 10: Real frontend race guard verified: newer responses win; stale late responses and stale failures discarded');
+
+    // Disable controlled fetch wrapper
+    await evalPage(`() => { window.__controlledFetch = false; }`);
+
+    // ----------------------------------------------------
+    // Phase 11: Unresolved Multiple-Date Expressions Clarification UI
+    // ----------------------------------------------------
+    console.log('Phase 11: Unresolved Multiple-Date Expressions Clarification UI');
+    const multiDateUIResult = await evalPage(`async () => {
+      const input = document.getElementById('reminder-input');
+      const form = document.getElementById('reminder-form');
+      input.value = 'Pay rent tomorrow and submit report on Friday';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+
+      for (let i = 0; i < 30; i++) {
+        await new Promise(r => setTimeout(r, 100));
+        const card = document.getElementById('reminder-preview-card');
+        const statusBadge = document.getElementById('reminder-preview-status');
+        if (card && card.style.display !== 'none' && statusBadge && statusBadge.textContent === 'Needs clarification') {
+          return {
+            cardVisible: true,
+            status: statusBadge.textContent,
+            title: document.getElementById('reminder-title').value,
+            summary: document.getElementById('reminder-parse-summary').textContent,
+            saveDisabled: document.getElementById('reminder-save-btn').disabled,
+            dateExpr: document.getElementById('reminder-date-expression-input').value
+          };
+        }
+      }
+      return null;
+    }`);
+
+    assert.ok(multiDateUIResult, 'Preview card must display with Needs clarification for multiple dates');
+    assert.strictEqual(multiDateUIResult.cardVisible, true);
+    assert.strictEqual(multiDateUIResult.status, 'Needs clarification');
+    assert.ok(multiDateUIResult.title.length > 0, 'User title must be preserved for correction');
+    assert.match(multiDateUIResult.summary, /more than one date/i, 'Clarification summary must instruct user to simplify expression');
+    assert.strictEqual(multiDateUIResult.saveDisabled, true, 'Save button must be disabled for unresolved multi-date expressions');
+    console.log('  ✅ [PASS] Phase 11: Multiple-date rejection preserves user title, displays clarification, and gates save');
+
+    // ----------------------------------------------------
+    // Phase 12: Console Error Integrity
+    // ----------------------------------------------------
+    console.log('Phase 12: Console Error Integrity');
     assert.strictEqual(consoleErrors.length, 0, `Unexpected console errors found: ${consoleErrors.join('; ')}`);
-    console.log('  ✅ [PASS] Phase 10: Zero unexpected client console errors detected across all flows');
+    console.log('  ✅ [PASS] Phase 12: Zero unexpected client console errors detected across all flows');
 
     console.log('\n====================================================');
-    console.log('🎉 ALL 10 BROWSER REMINDERS & VIEWS E2E PHASES PASSED');
-    console.log('   Phases executed: 10 | Passed: 10 | Failed: 0 | Skipped: 0');
+    console.log('🎉 ALL 12 BROWSER REMINDERS & VIEWS E2E PHASES PASSED');
+    console.log('   Phases executed: 12 | Passed: 12 | Failed: 0 | Skipped: 0');
     console.log('====================================================\n');
 
     cleanup();

@@ -388,7 +388,7 @@ async function main() {
   assert.strictEqual(clientState.draft.timeLocal, '14:00', 'Request 2 (latest edit) must win the race over delayed Request 1');
   pass('9. Asynchronous race guard ensures latest edit wins and slower previous request is discarded');
 
-  // 10. Fix 3: Reject multiple scheduling expressions in action=parse
+  // 10. Fix 3: Reject multiple scheduling expressions in action=parse with structured clarification details
   total++;
   const multiDateRes = mockRes();
   await handler(mockReq('POST', {
@@ -402,7 +402,11 @@ async function main() {
   assert.strictEqual(multiDateRes.statusCode, 422);
   assert.strictEqual(multiDateRes.body.code, 'MULTIPLE_DATE_EXPRESSIONS');
   assert.match(multiDateRes.body.error, /more than one date/i);
-  pass('10. Multiple date expressions in action=parse return HTTP 422 MULTIPLE_DATE_EXPRESSIONS');
+  assert.ok(multiDateRes.body.title, 'Must preserve input title for user correction');
+  assert.ok(Array.isArray(multiDateRes.body.candidateExpressions), 'Must provide structured candidateExpressions');
+  assert.ok(multiDateRes.body.candidateExpressions.length >= 2, 'Must include found candidate expressions');
+  assert.ok(multiDateRes.body.extraction, 'Must preserve extraction details');
+  pass('10. Multiple date expressions in action=parse return HTTP 422 MULTIPLE_DATE_EXPRESSIONS with preserved title and candidate details');
 
   // 11. Fix 4: Date-only task can be confirmed and saved without inventing clock time
   total++;
@@ -459,6 +463,161 @@ async function main() {
   assert.strictEqual(listOtherRes.statusCode, 200);
   assert.strictEqual(listOtherRes.body.reminders.length, 0, 'New session must have 0 reminders (strict owner isolation)');
   pass('12. Cross-session owner isolation verified: second session sees zero reminders from first session');
+
+  // 13. Authoritative save gate comprehensive consistency & manual override tests
+  total++;
+  const refTimeFixed = '2026-10-23T12:00:00.000Z';
+
+  // 13a. dateExpression: "tomorrow at 7" with otherwise valid future dateLocal and timeLocal must be rejected as unresolved
+  const incompleteTimeSaveRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: 'Morning wake up',
+      taskType: 'personal',
+      dateExpression: 'tomorrow at 7',
+      dateLocal: '2026-10-24',
+      timeLocal: '19:00',
+      timeZone: 'Asia/Kolkata',
+      referenceTime: refTimeFixed
+    }
+  }), incompleteTimeSaveRes);
+  assert.strictEqual(incompleteTimeSaveRes.statusCode, 422, 'Incomplete time expression must be rejected at save gate');
+  assert.strictEqual(incompleteTimeSaveRes.body.code, 'INCOMPLETE_TIME');
+
+  // 13b. dateExpression: "tomorrow at 7pm" paired with calendar fields for a different date/time must be rejected
+  const mismatchScheduleRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: 'Mismatched schedule task',
+      taskType: 'work',
+      dateExpression: 'tomorrow at 7pm',
+      dateLocal: '2028-12-25', // Intentional mismatch
+      timeLocal: '10:00',     // Intentional mismatch
+      timeZone: 'Asia/Kolkata',
+      referenceTime: refTimeFixed
+    }
+  }), mismatchScheduleRes);
+  assert.strictEqual(mismatchScheduleRes.statusCode, 422, 'Mismatched calendar fields must be rejected with 422');
+  assert.strictEqual(mismatchScheduleRes.body.code, 'SCHEDULE_FIELD_MISMATCH');
+
+  // 13c. Ambiguous numeric dates and multi-date expressions must remain rejected at save gate
+  const saveAmbiguousRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: 'Ambiguous test',
+      dateExpression: '03/04/2027',
+      dateLocal: '2027-04-03',
+      timeLocal: '10:00',
+      timeZone: 'Asia/Kolkata'
+    }
+  }), saveAmbiguousRes);
+  assert.strictEqual(saveAmbiguousRes.statusCode, 422);
+  assert.strictEqual(saveAmbiguousRes.body.code, 'AMBIGUOUS_NUMERIC_DATE');
+
+  const saveMultiDateRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: 'Multi date test',
+      dateExpression: 'Pay rent tomorrow and submit report on Friday',
+      dateLocal: '2026-10-24',
+      timeLocal: '10:00',
+      timeZone: 'Asia/Kolkata'
+    }
+  }), saveMultiDateRes);
+  assert.strictEqual(saveMultiDateRes.statusCode, 422);
+  assert.strictEqual(saveMultiDateRes.body.code, 'MULTIPLE_DATES');
+
+  // 13d. A valid consistent natural-language draft can be saved after confirmation
+  const validNlpSaveRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: 'Valid NLP Reminder',
+      taskType: 'work',
+      dateExpression: 'tomorrow at 7pm',
+      dateLocal: '2026-10-24',
+      timeLocal: '19:00',
+      timeZone: 'Asia/Kolkata',
+      referenceTime: refTimeFixed
+    }
+  }), validNlpSaveRes);
+  assert.strictEqual(validNlpSaveRes.statusCode, 201);
+  assert.strictEqual(validNlpSaveRes.body.success, true);
+  assert.strictEqual(validNlpSaveRes.body.reminder.dateLocal, '2026-10-24');
+  assert.strictEqual(validNlpSaveRes.body.reminder.timeLocal, '19:00');
+
+  // 13e. A valid explicit manual calendar entry can be saved with dateExpression: null
+  const validManualSaveRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: 'Manual Calendar Task',
+      taskType: 'health',
+      dateExpression: null, // Explicit manual entry
+      dateLocal: '2028-06-15',
+      timeLocal: '14:30',
+      timeZone: 'Asia/Kolkata',
+      recurrence: { unit: 'week', interval: 2 }
+    }
+  }), validManualSaveRes);
+  assert.strictEqual(validManualSaveRes.statusCode, 201);
+  assert.strictEqual(validManualSaveRes.body.success, true);
+  assert.strictEqual(validManualSaveRes.body.reminder.dateExpression, null);
+  assert.strictEqual(validManualSaveRes.body.reminder.dateLocal, '2028-06-15');
+  assert.strictEqual(validManualSaveRes.body.reminder.timeLocal, '14:30');
+  assert.strictEqual(validManualSaveRes.body.reminder.recurrence.unit, 'week');
+  assert.strictEqual(validManualSaveRes.body.reminder.recurrence.interval, 2);
+
+  // 13f. Invalid manual dates and past timed entries are rejected
+  const invalidManualDateRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: 'Invalid manual date',
+      dateExpression: null,
+      dateLocal: '2028-02-30', // Feb 30 invalid
+      timeLocal: '12:00',
+      timeZone: 'Asia/Kolkata'
+    }
+  }), invalidManualDateRes);
+  assert.strictEqual(invalidManualDateRes.statusCode, 422);
+  assert.strictEqual(invalidManualDateRes.body.code, 'INVALID_DATE');
+
+  const pastManualTimeRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: 'Past timed task',
+      dateExpression: null,
+      dateLocal: '2020-01-01', // Past date
+      timeLocal: '12:00',
+      timeZone: 'Asia/Kolkata'
+    }
+  }), pastManualTimeRes);
+  assert.strictEqual(pastManualTimeRes.statusCode, 422);
+  assert.strictEqual(pastManualTimeRes.body.code, 'TIME_IN_PAST');
+
+  pass('13. Authoritative save gate strictly validates NLP consistency and permits valid manual entries with dateExpression: null');
 
   console.log(`\n====================================================`);
   console.log(`🎉 ALL ${passed}/${total} INTEGRATION TESTS PASSED`);

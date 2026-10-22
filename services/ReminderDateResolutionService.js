@@ -461,7 +461,7 @@ class ReminderDateResolutionService {
       message = 'No date was assumed. Choose a date and time to complete the reminder.';
     }
 
-    return {
+    const resultPayload = {
       ok: true,
       schedulingStatus: schedulingStatus,
       dateExpression: rawExpr,
@@ -476,6 +476,11 @@ class ReminderDateResolutionService {
       dateResolvedBy: 'deterministic_parser',
       requiresConfirmation: true
     };
+    if (schedulingStatus === 'needs_clarification') {
+      resultPayload.code = incompleteTime ? 'INCOMPLETE_TIME' : (recurrenceResult.recurrence && !dateLocal ? 'RECURRENCE_NEEDS_DATE' : 'UNRESOLVED_DATE_EXPRESSION');
+    }
+
+    return resultPayload;
   }
 }
 

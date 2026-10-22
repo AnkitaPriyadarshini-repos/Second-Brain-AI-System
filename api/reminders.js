@@ -198,7 +198,15 @@ async function handler(req, res) {
       // Stage 1: AI Task Extraction (model-backed or deterministic fallback)
       const extracted = await taskExtractionService.extractTask(body.text, { timeZone: timeZone });
       if (!extracted.ok) {
-        return respond(res, 422, { success: false, code: extracted.code, error: extracted.message });
+        return respond(res, 422, {
+          success: false,
+          code: extracted.code,
+          error: extracted.message,
+          title: extracted.title || null,
+          taskType: extracted.taskType || 'general',
+          candidateExpressions: extracted.candidateExpressions || null,
+          extraction: extracted
+        });
       }
 
       // Stage 2: Pure deterministic rule-based date resolution
@@ -306,17 +314,73 @@ async function handler(req, res) {
     let schedulingStatus = 'unscheduled';
 
     // Authoritative date-expression verification: If an un-cleared date expression is submitted,
-    // verify it is not ambiguous or invalid (e.g. AMBIGUOUS_NUMERIC_DATE, MULTIPLE_DATES)
+    // verify it is not ambiguous, incomplete, or unresolved (e.g. AMBIGUOUS_NUMERIC_DATE, MULTIPLE_DATES, INCOMPLETE_TIME)
     if (body.dateExpression && typeof body.dateExpression === 'string' && body.dateExpression.trim()) {
+      const refTime = body.referenceTime ? new Date(body.referenceTime) : new Date();
       const exprRes = dateResolutionService.resolveDateExpression(body.dateExpression.trim(), {
-        referenceTime: new Date(),
+        referenceTime: refTime,
         timeZone: timeZone
       });
-      if (!exprRes.ok) {
+
+      // 1. Reject unresolved, incomplete, or clarification states even if ok is true
+      if (!exprRes.ok || exprRes.schedulingStatus === 'needs_clarification' || exprRes.schedulingStatus === 'unscheduled') {
         return respond(res, 422, {
           success: false,
-          code: exprRes.code,
-          error: 'The date expression "' + body.dateExpression + '" cannot be saved: ' + exprRes.message
+          code: exprRes.code || 'UNRESOLVED_DATE_EXPRESSION',
+          error: 'The date expression "' + body.dateExpression + '" cannot be saved: ' + (exprRes.message || 'Needs clarification.')
+        });
+      }
+
+      // Check submitted schedulingStatus if provided
+      if (body.schedulingStatus && body.schedulingStatus !== exprRes.schedulingStatus) {
+        return respond(res, 422, {
+          success: false,
+          code: 'SCHEDULE_FIELD_MISMATCH',
+          error: `The submitted scheduling status (${body.schedulingStatus}) does not match the resolved status (${exprRes.schedulingStatus}) for "${body.dateExpression}". Submit dateExpression: null for manual calendar overrides.`
+        });
+      }
+
+      // 2. Validate consistency between submitted calendar fields and the resolved expression
+      if (exprRes.schedulingStatus === 'scheduled') {
+        if (dateLocal !== exprRes.dateLocal || timeLocal !== exprRes.timeLocal) {
+          return respond(res, 422, {
+            success: false,
+            code: 'SCHEDULE_FIELD_MISMATCH',
+            error: `The submitted date (${dateLocal || 'none'}) and time (${timeLocal || 'none'}) do not match the resolved schedule from "${body.dateExpression}" (${exprRes.dateLocal} ${exprRes.timeLocal}). Submit dateExpression: null for manual calendar overrides.`
+          });
+        }
+      } else if (exprRes.schedulingStatus === 'date_only') {
+        if (dateLocal !== exprRes.dateLocal || timeLocal !== '') {
+          return respond(res, 422, {
+            success: false,
+            code: 'SCHEDULE_FIELD_MISMATCH',
+            error: `The submitted date (${dateLocal}) and time (${timeLocal || 'none'}) do not match the date-only expression "${body.dateExpression}" (${exprRes.dateLocal}). Submit dateExpression: null for manual calendar overrides.`
+          });
+        }
+      } else if (exprRes.schedulingStatus === 'unscheduled') {
+        if (dateLocal !== '' || timeLocal !== '') {
+          return respond(res, 422, {
+            success: false,
+            code: 'SCHEDULE_FIELD_MISMATCH',
+            error: `The submitted date (${dateLocal}) and time (${timeLocal}) do not match the unscheduled expression "${body.dateExpression}". Submit dateExpression: null for manual calendar overrides.`
+          });
+        }
+      }
+
+      // 3. Validate recurrence consistency
+      if (exprRes.recurrence) {
+        if (!recurrence || recurrence.unit !== exprRes.recurrence.unit || recurrence.interval !== exprRes.recurrence.interval) {
+          return respond(res, 422, {
+            success: false,
+            code: 'RECURRENCE_MISMATCH',
+            error: `The submitted recurrence does not match the recurrence from date expression "${body.dateExpression}".`
+          });
+        }
+      } else if (recurrence) {
+        return respond(res, 422, {
+          success: false,
+          code: 'RECURRENCE_MISMATCH',
+          error: `The submitted recurrence does not match the non-recurring date expression "${body.dateExpression}".`
         });
       }
     }
