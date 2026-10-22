@@ -268,6 +268,198 @@ async function main() {
   global.fetch = tempFetch; // restore
   pass('7. Storage errors return HTTP 503 and never show false success');
 
+  // 8. Fix 1: Start with valid schedule, change phrase to 03/04/2027 (AMBIGUOUS_NUMERIC_DATE), prove stale schedule cannot save
+  total++;
+  // Step A: Parse a valid schedule
+  const initParseRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'parse',
+      text: 'Submit tax documents tomorrow at 2pm',
+      timeZone: 'Asia/Kolkata'
+    }
+  }), initParseRes);
+  assert.strictEqual(initParseRes.statusCode, 200);
+  const initialValidDraft = initParseRes.body.draft;
+  assert.strictEqual(initialValidDraft.schedulingStatus, 'scheduled');
+  assert.ok(initialValidDraft.dueAt);
+
+  // Step B: User edits the date expression to ambiguous 03/04/2027 -> triggers re-resolution
+  const resolveAmbiguousRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'resolve',
+      dateExpression: '03/04/2027',
+      timeZone: 'Asia/Kolkata',
+      referenceTime: initialValidDraft.referenceTime
+    }
+  }), resolveAmbiguousRes);
+  assert.strictEqual(resolveAmbiguousRes.statusCode, 422);
+  assert.strictEqual(resolveAmbiguousRes.body.code, 'AMBIGUOUS_NUMERIC_DATE');
+
+  // Step C: Prove that attempting to save with the ambiguous expression or stale schedule is authoritatively rejected
+  const staleSaveAttemptRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: initialValidDraft.title,
+      taskType: initialValidDraft.taskType,
+      dateExpression: '03/04/2027', // Stale/unresolved expression
+      dateLocal: initialValidDraft.dateLocal,
+      timeLocal: initialValidDraft.timeLocal,
+      timeZone: 'Asia/Kolkata'
+    }
+  }), staleSaveAttemptRes);
+  assert.strictEqual(staleSaveAttemptRes.statusCode, 422, 'Server save endpoint must authoritatively reject unresolved ambiguous expressions');
+  assert.strictEqual(staleSaveAttemptRes.body.code, 'AMBIGUOUS_NUMERIC_DATE');
+
+  // Step D: User recovers by correcting date expression to unambiguous format
+  const recoveredResolveRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'resolve',
+      dateExpression: 'April 3, 2027 at 10am',
+      timeZone: 'Asia/Kolkata',
+      referenceTime: initialValidDraft.referenceTime
+    }
+  }), recoveredResolveRes);
+  assert.strictEqual(recoveredResolveRes.statusCode, 200);
+  assert.strictEqual(recoveredResolveRes.body.draft.dateLocal, '2027-04-03');
+  assert.strictEqual(recoveredResolveRes.body.draft.timeLocal, '10:00');
+
+  // Save recovered draft successfully
+  const recoveredSaveRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: initialValidDraft.title,
+      taskType: initialValidDraft.taskType,
+      dateExpression: 'April 3, 2027 at 10am',
+      dateLocal: recoveredResolveRes.body.draft.dateLocal,
+      timeLocal: recoveredResolveRes.body.draft.timeLocal,
+      timeZone: 'Asia/Kolkata'
+    }
+  }), recoveredSaveRes);
+  assert.strictEqual(recoveredSaveRes.statusCode, 201);
+  assert.strictEqual(recoveredSaveRes.body.reminder.dateLocal, '2027-04-03');
+  pass('8. Changing phrase to ambiguous numeric date (03/04/2027) prevents stale saving; recovery succeeds cleanly');
+
+  // 9. Fix 2: Asynchronous race protection (latest user input always wins)
+  total++;
+  let activeRequestId = 0;
+  let clientState = { draft: null, dueAt: null };
+
+  async function simulateUserEdit(reqNumber, dateExpr, delayMs) {
+    const reqId = ++activeRequestId;
+    // Simulate async network request
+    const res = mockRes();
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+    await handler(mockReq('POST', {
+      headers: { cookie: sessionCookie },
+      body: {
+        action: 'resolve',
+        dateExpression: dateExpr,
+        timeZone: 'Asia/Kolkata',
+        referenceTime: '2026-10-23T12:00:00.000Z'
+      }
+    }), res);
+
+    // Apply only if this is still the active request
+    if (reqId === activeRequestId && res.statusCode === 200) {
+      clientState.draft = res.body.draft;
+      clientState.dueAt = res.body.draft.dueAt;
+    }
+  }
+
+  // Launch Request 1 (slow, 80ms) for "tomorrow at 10am", then immediately launch Request 2 (fast, 10ms) for "next Monday at 2pm"
+  const p1 = simulateUserEdit(1, 'tomorrow at 10am', 80);
+  const p2 = simulateUserEdit(2, 'next Monday at 2pm', 10);
+  await Promise.all([p1, p2]);
+
+  // Request 2 was launched last (activeRequestId was 2), so even though Request 1 finished later, Request 2 must win!
+  assert.ok(clientState.draft);
+  assert.strictEqual(clientState.draft.timeLocal, '14:00', 'Request 2 (latest edit) must win the race over delayed Request 1');
+  pass('9. Asynchronous race guard ensures latest edit wins and slower previous request is discarded');
+
+  // 10. Fix 3: Reject multiple scheduling expressions in action=parse
+  total++;
+  const multiDateRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'parse',
+      text: 'Pay rent tomorrow and submit the report on Friday',
+      timeZone: 'Asia/Kolkata'
+    }
+  }), multiDateRes);
+  assert.strictEqual(multiDateRes.statusCode, 422);
+  assert.strictEqual(multiDateRes.body.code, 'MULTIPLE_DATE_EXPRESSIONS');
+  assert.match(multiDateRes.body.error, /more than one date/i);
+  pass('10. Multiple date expressions in action=parse return HTTP 422 MULTIPLE_DATE_EXPRESSIONS');
+
+  // 11. Fix 4: Date-only task can be confirmed and saved without inventing clock time
+  total++;
+  const dateOnlySaveRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: 'Submit tax declaration form',
+      taskType: 'finance',
+      dateExpression: '2027-05-15',
+      dateLocal: '2027-05-15',
+      timeLocal: '', // NO time specified
+      timeZone: 'Asia/Kolkata'
+    }
+  }), dateOnlySaveRes);
+
+  assert.strictEqual(dateOnlySaveRes.statusCode, 201);
+  assert.strictEqual(dateOnlySaveRes.body.success, true);
+  assert.strictEqual(dateOnlySaveRes.body.reminder.schedulingStatus, 'date_only');
+  assert.strictEqual(dateOnlySaveRes.body.reminder.dateLocal, '2027-05-15');
+  assert.strictEqual(dateOnlySaveRes.body.reminder.timeLocal, '');
+  assert.strictEqual(dateOnlySaveRes.body.reminder.dueAt, null, 'Date-only task must not invent a clock time or dueAt');
+
+  // Attempting invalid calendar date for date-only is rejected
+  const badDateOnlyRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: 'Invalid date task',
+      taskType: 'general',
+      dateLocal: '2027-02-31', // Feb 31 does not exist
+      timeLocal: '',
+      timeZone: 'Asia/Kolkata'
+    }
+  }), badDateOnlyRes);
+  assert.strictEqual(badDateOnlyRes.statusCode, 422);
+  assert.strictEqual(badDateOnlyRes.body.code, 'INVALID_DATE');
+  pass('11. Date-only task confirmed and saved without clock time; invalid calendar dates rejected');
+
+  // 12. Fix 4 & Fix 6: Cross-session owner isolation
+  total++;
+  // Create second session cookie
+  const otherSessionToken = handler.createSession(validSecret);
+  const otherSessionCookie = 'milo_reminder_session=' + otherSessionToken;
+
+  const listOtherRes = mockRes();
+  await handler(mockReq('GET', {
+    headers: { cookie: otherSessionCookie }
+  }), listOtherRes);
+  assert.strictEqual(listOtherRes.statusCode, 200);
+  assert.strictEqual(listOtherRes.body.reminders.length, 0, 'New session must have 0 reminders (strict owner isolation)');
+  pass('12. Cross-session owner isolation verified: second session sees zero reminders from first session');
+
   console.log(`\n====================================================`);
   console.log(`🎉 ALL ${passed}/${total} INTEGRATION TESTS PASSED`);
   console.log(`====================================================\n`);

@@ -158,6 +158,126 @@ async function main() {
     assert.strictEqual(validated.code, 'INVENTED_DATE_EXPRESSION');
   });
 
+  // 10. Fix 3: Reject multiple scheduling expressions in deterministic fallback
+  await testAsync('10. Multiple scheduling expressions in fallback return MULTIPLE_DATE_EXPRESSIONS', async () => {
+    // Example 1: Pay rent tomorrow and submit the report on Friday
+    const res1 = await service.extractTask('Pay rent tomorrow and submit the report on Friday');
+    assert.strictEqual(res1.ok, false);
+    assert.strictEqual(res1.code, 'MULTIPLE_DATE_EXPRESSIONS');
+    assert.strictEqual(res1.schedulingStatus, 'needs_clarification');
+    assert.strictEqual(res1.dateExpression, null);
+    assert.ok(Array.isArray(res1.candidateExpressions));
+    assert.strictEqual(res1.candidateExpressions.length, 2);
+    assert.match(res1.title.toLowerCase(), /pay rent.*report/i, 'Original task text preserved as title for correction');
+
+    // Example 2: Schedule a meeting next Monday and another on Wednesday
+    const res2 = await service.extractTask('Schedule a meeting next Monday and another on Wednesday');
+    assert.strictEqual(res2.ok, false);
+    assert.strictEqual(res2.code, 'MULTIPLE_DATE_EXPRESSIONS');
+    assert.strictEqual(res2.schedulingStatus, 'needs_clarification');
+    assert.strictEqual(res2.dateExpression, null);
+    assert.strictEqual(res2.candidateExpressions.length, 2);
+
+    // Single date phrase must remain valid and scheduled
+    const res3 = await service.extractTask('Schedule a meeting next Monday');
+    assert.strictEqual(res3.ok, true);
+    assert.strictEqual(res3.dateExpression.toLowerCase(), 'next monday');
+  });
+
+  // 11. Fix 3: Title containing numbers or month names that do not indicate scheduling
+  await testAsync('11. Title containing numbers or month names without scheduling does not false-positive', async () => {
+    // "Review issue #404 in the May report" -> "May report" is noun phrase, #404 is not date
+    const res = await service.extractTask('Review issue #404 in the May report');
+    assert.strictEqual(res.ok, true);
+    assert.strictEqual(res.dateExpression, null, 'Must not extract a date');
+    assert.match(res.title.toLowerCase(), /issue #404.*may report/i);
+
+    // "Order 10 boxes of paper for the office"
+    const res2 = await service.extractTask('Order 10 boxes of paper for the office');
+    assert.strictEqual(res2.ok, true);
+    assert.strictEqual(res2.dateExpression, null);
+  });
+
+  // 12. Fix 3 & Fix 5: Equivalent multi-date safety on the model-backed path
+  await testAsync('12. LLM path enforces equivalent MULTIPLE_DATE_EXPRESSIONS safety check', async () => {
+    // Inject mock LLM that would have picked only the first date
+    const mockModelService = new TaskExtractionService({
+      forcedProvider: 'gemini',
+      mockModelCall: async (_text, _provider) => {
+        return {
+          title: 'Pay rent',
+          taskType: 'finance',
+          dateExpression: 'tomorrow' // Model only extracted the first date!
+        };
+      }
+    });
+
+    const res = await mockModelService.extractTask('Pay rent tomorrow and submit the report on Friday');
+    assert.strictEqual(res.ok, false, 'LLM path must NOT silently schedule when multiple dates are in user text');
+    assert.strictEqual(res.code, 'MULTIPLE_DATE_EXPRESSIONS');
+    assert.strictEqual(res.schedulingStatus, 'needs_clarification');
+    assert.strictEqual(res.dateExpression, null);
+  });
+
+  // 13. Fix 5: Mock model provider injection produces deterministic unit tests without live network calls
+  await testAsync('13. Mock model provider injection verifies structured output parsing deterministically', async () => {
+    let mockCalled = false;
+    const mockService = new TaskExtractionService({
+      forcedProvider: 'gemini',
+      mockModelCall: async (text, provider) => {
+        mockCalled = true;
+        assert.strictEqual(provider, 'gemini');
+        assert.match(text, /dentist/i);
+        return {
+          title: 'Visit dentist',
+          taskType: 'health',
+          dateExpression: 'tomorrow at 3pm'
+        };
+      }
+    });
+
+    const res = await mockService.extractTask('Visit dentist tomorrow at 3pm');
+    assert.strictEqual(mockCalled, true);
+    assert.strictEqual(res.ok, true);
+    assert.strictEqual(res.taskType, 'health');
+    assert.strictEqual(res.title, 'Visit dentist');
+    assert.strictEqual(res.dateExpression, 'tomorrow at 3pm');
+  });
+
+  // 14. Fix 5: Explicit configuration and no arbitrary regex scanning of process.env
+  test('14. Gemini API key lookup is explicit and rejects arbitrary environment variables', () => {
+    const keyService = new TaskExtractionService();
+
+    // Explicit constructor option
+    const serviceWithKey = new TaskExtractionService({ geminiApiKey: 'explicit_test_key' });
+    assert.strictEqual(serviceWithKey.getGeminiApiKey(), 'explicit_test_key');
+
+    // Arbitrary env var must NOT be scanned
+    const oldEnv = process.env.MY_ARBITRARY_GEMINI_KEY_XYZ;
+    process.env.MY_ARBITRARY_GEMINI_KEY_XYZ = 'should_not_be_used_1234567890';
+    try {
+      // With clean env, keyService should return empty string if no explicit GEMINI_API_KEY
+      const savedMilo = process.env.MILO_GEMINI_KEY;
+      const savedGemini = process.env.GEMINI_API_KEY;
+      delete process.env.MILO_GEMINI_KEY;
+      delete process.env.GEMINI_API_KEY;
+
+      const discovered = keyService.getGeminiApiKey();
+      assert.strictEqual(discovered, '', 'Heuristic scan of arbitrary env vars must be disabled');
+
+      // Restoring explicit documented var works
+      process.env.GEMINI_API_KEY = 'documented_gemini_key';
+      assert.strictEqual(keyService.getGeminiApiKey(), 'documented_gemini_key');
+
+      // Cleanup
+      if (savedMilo) process.env.MILO_GEMINI_KEY = savedMilo;
+      if (savedGemini) process.env.GEMINI_API_KEY = savedGemini;
+      else delete process.env.GEMINI_API_KEY;
+    } finally {
+      delete process.env.MY_ARBITRARY_GEMINI_KEY_XYZ;
+    }
+  });
+
   console.log(`\n====================================================`);
   console.log(`🎉 ALL ${passed}/${total} TASK EXTRACTION TESTS PASSED`);
   console.log(`====================================================\n`);

@@ -89,13 +89,17 @@ Mounted at `/api/reminders`:
 ---
 
 ## 5. Security & Privacy Controls
-1. **Server-Side Credentials**: Model keys and Upstash credentials reside strictly server-side in environment variables (`process.env`). Never exposed in client bundles.
+1. **Server-Side Credentials**: Model keys and Upstash credentials reside strictly server-side in environment variables (`process.env`). Never exposed in client bundles. API key lookup is restricted to explicit documented variables (`GEMINI_API_KEY`, `MILO_GEMINI_KEY`), preventing heuristic scans of arbitrary environment variables.
 2. **Session HMAC Signatures**: Client ownership is tracked via `milo_reminder_session` cookie signed with HMAC-SHA256 using `MILO_SESSION_SECRET` (enforcing $\ge 32$ chars and decoded bytes).
 3. **Same-Origin Protection**: Write operations (`action=save`, `DELETE`) require verified `Origin` matching the `Host` header.
 4. **Rate Limiting**:
    - Preview rate: 120 requests/min per verified client IP.
    - Write rate: 40 operations/min per session owner.
 5. **No Secret Persistence**: Prompts and raw model outputs are not written to persistent storage.
+6. **Authoritative Save Verification**: The `action=save` server endpoint independently verifies that any provided date expressions are unambiguous (rejecting `AMBIGUOUS_NUMERIC_DATE` and `MULTIPLE_DATE_EXPRESSIONS`), validates calendar dates for date-only entries, verifies future timestamps for scheduled tasks, and enforces explicit user confirmation. Client disabled buttons are never the sole line of defense.
+7. **Asynchronous Race Protection**: Client preview and re-resolution operations utilize a monotonic `activeRequestId` counter. Stale in-flight responses cannot overwrite newer user edits or draft states.
+8. **Stale Schedule Invalidation**: Modifying date expressions or timezones immediately clears DOM date/time fields and invalidates previous schedules, ensuring failed re-resolutions never permit accidental persistence of outdated schedules.
+9. **Multi-Date Rejection**: When input contains multiple scheduling expressions, both deterministic fallback and model-backed paths reject with `MULTIPLE_DATE_EXPRESSIONS` to prevent silently picking only one date.
 
 ---
 
@@ -103,10 +107,13 @@ Mounted at `/api/reminders`:
 
 | Suite | Description | Executed Command | Tests Count | Exit Code | Result |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Task Extraction** | 9 NLP extraction requirements | `node test/run_task_extraction_service_tests.js` | 9 | **0** | **PASS** |
-| **Date Resolution** | 14 calendar & timezone scenarios | `node test/run_reminder_date_resolution_service_tests.js` | 14 | **0** | **PASS** |
-| **Integration** | Pipeline, save gate, unscheduled tasks | `node test/run_task_extraction_integration_tests.js` | 7 | **0** | **PASS** |
-| **Reminder UI Contract** | Elements, router, status pills, resolver | `node test/run_reminder_ui_contract_tests.js` | 20+ assertions | **0** | **PASS** |
-| **Browser Reminders E2E**| 8 real-browser CDP workflow phases | `node test/run_browser_reminders_and_views_e2e.js` | 8 phases | **0** | **PASS** |
+| **Task Extraction** | Multi-date rejection, mock injection, noun-phrase filtering, prompt-injection defense | `node test/run_task_extraction_service_tests.js` | 14 | **0** | **PASS** |
+| **Date Resolution** | 14 calendar & timezone scenarios (DST gaps/overlaps, reference instant, timezones) | `node test/run_reminder_date_resolution_service_tests.js` | 14 | **0** | **PASS** |
+| **Integration** | Pipeline, stale-schedule prevention, async race protection, date-only saving, isolation | `node test/run_task_extraction_integration_tests.js` | 12 | **0** | **PASS** |
+| **Reminder Parser** | Legacy parser backward compatibility & edge cases | `node test/run_reminder_parser_tests.js` | 14 | **0** | **PASS** |
+| **Reminder API** | Session security, CSRF same-origin, storage fail-closed, CRUD isolation | `node test/run_reminder_api_tests.js` | 5 suites | **0** | **PASS** |
+| **Reminder UI Contract** | Elements, router, status pills, resolver, date-phrase inputs | `node test/run_reminder_ui_contract_tests.js` | 20+ assertions | **0** | **PASS** |
+| **Browser Reminders E2E**| Real Headless Chrome CDP: preview, draft editing, phrase edit re-resolution, stale block, manual recovery | `node test/run_browser_reminders_and_views_e2e.js` | 10 phases | **0** | **PASS** |
+| **Reminders Target** | Unified reminder regression target | `npm run test:reminders` | 7 suites | **0** | **PASS** |
 | **Full Regression** | 25 repository test suites | `npm test` | 25 suites | **0** | **PASS** |
 | **Next.js Production Build** | Page compilation & API route bundling | `npx next build` | 2 static, 17 dynamic routes | **0** | **PASS** |

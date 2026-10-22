@@ -305,6 +305,22 @@ async function handler(req, res) {
     let dueAt = null;
     let schedulingStatus = 'unscheduled';
 
+    // Authoritative date-expression verification: If an un-cleared date expression is submitted,
+    // verify it is not ambiguous or invalid (e.g. AMBIGUOUS_NUMERIC_DATE, MULTIPLE_DATES)
+    if (body.dateExpression && typeof body.dateExpression === 'string' && body.dateExpression.trim()) {
+      const exprRes = dateResolutionService.resolveDateExpression(body.dateExpression.trim(), {
+        referenceTime: new Date(),
+        timeZone: timeZone
+      });
+      if (!exprRes.ok) {
+        return respond(res, 422, {
+          success: false,
+          code: exprRes.code,
+          error: 'The date expression "' + body.dateExpression + '" cannot be saved: ' + exprRes.message
+        });
+      }
+    }
+
     if (dateLocal && timeLocal) {
       const resolved = resolveLocalDateTime(dateLocal, timeLocal, timeZone);
       if (!resolved.ok) return respond(res, 422, { success: false, code: resolved.code, error: resolved.message });
@@ -312,6 +328,13 @@ async function handler(req, res) {
       dueAt = resolved.iso;
       schedulingStatus = 'scheduled';
     } else if (dateLocal && !timeLocal) {
+      const dm = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateLocal);
+      if (!dm) return respond(res, 422, { success: false, code: 'INVALID_DATE', error: 'The selected date is not valid.' });
+      const y = Number(dm[1]), m = Number(dm[2]), d = Number(dm[3]);
+      const check = new Date(Date.UTC(y, m - 1, d));
+      if (y < 1970 || y > 9999 || check.getUTCFullYear() !== y || check.getUTCMonth() + 1 !== m || check.getUTCDate() !== d) {
+        return respond(res, 422, { success: false, code: 'INVALID_DATE', error: 'The selected date is not valid.' });
+      }
       schedulingStatus = 'date_only';
     } else if (!dateLocal && !timeLocal) {
       schedulingStatus = 'unscheduled';

@@ -470,15 +470,123 @@ async function runBrowserRemindersTests() {
     await send('Emulation.clearDeviceMetricsOverride');
 
     // ----------------------------------------------------
-    // Phase 8: Console Error Integrity
+    // Phase 8: Date Expression Live Edit & Deterministic Re-resolution
     // ----------------------------------------------------
-    console.log('Phase 8: Console Error Integrity');
+    console.log('Phase 8: Date Expression Live Edit & Deterministic Re-resolution');
+    await evalPage(`() => { window.activateView('reminders'); }`);
+
+    const initialDraftResult = await evalPage(`async () => {
+      const input = document.getElementById('reminder-input');
+      const form = document.getElementById('reminder-form');
+      input.value = 'Draft research grant next Friday at 4pm';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+
+      for (let i = 0; i < 30; i++) {
+        await new Promise(r => setTimeout(r, 100));
+        const card = document.getElementById('reminder-preview-card');
+        const timeInput = document.getElementById('reminder-time');
+        if (card && card.style.display !== 'none' && timeInput && timeInput.value === '16:00') {
+          return {
+            ready: true,
+            expr: document.getElementById('reminder-date-expression-input').value,
+            time: timeInput.value
+          };
+        }
+      }
+      return { ready: false };
+    }`);
+    assert.strictEqual(initialDraftResult.ready, true, 'Draft should be ready with 16:00 time');
+
+    // Live edit the date expression to "next Monday at 10am"
+    const reResolveResult = await evalPage(`async () => {
+      const exprInput = document.getElementById('reminder-date-expression-input');
+      exprInput.value = 'next Monday at 10am';
+      exprInput.dispatchEvent(new Event('change', { bubbles: true }));
+
+      for (let i = 0; i < 30; i++) {
+        await new Promise(r => setTimeout(r, 100));
+        const timeInput = document.getElementById('reminder-time');
+        const notice = document.getElementById('reminder-notice');
+        if (timeInput && timeInput.value === '10:00') {
+          return {
+            updated: true,
+            time: timeInput.value,
+            date: document.getElementById('reminder-date').value,
+            status: document.getElementById('reminder-preview-status').textContent,
+            resolver: document.getElementById('reminder-preview-resolver').textContent
+          };
+        }
+      }
+      return { updated: false };
+    }`);
+    assert.strictEqual(reResolveResult.updated, true, 'Re-resolution should update time to 10:00');
+    assert.strictEqual(reResolveResult.time, '10:00');
+    assert.strictEqual(reResolveResult.status, 'Scheduled');
+    assert.match(reResolveResult.resolver, /deterministic parser/i);
+    console.log('  ✅ [PASS] Phase 8: Live date-expression edit triggered deterministic re-resolution without NLP re-run');
+
+    // ----------------------------------------------------
+    // Phase 9: Failed Date Re-Resolution Clears Schedule & Prevents Stale Persistence
+    // ----------------------------------------------------
+    console.log('Phase 9: Failed Re-resolution Invalidates Old Schedule & Prevents Stale Save');
+    const failedResolutionResult = await evalPage(`async () => {
+      const exprInput = document.getElementById('reminder-date-expression-input');
+      exprInput.value = '03/04/2027'; // Ambiguous numeric date
+      exprInput.dispatchEvent(new Event('change', { bubbles: true }));
+
+      for (let i = 0; i < 30; i++) {
+        await new Promise(r => setTimeout(r, 100));
+        const notice = document.getElementById('reminder-notice');
+        if (notice && notice.style.display !== 'none' && /two different dates/i.test(notice.textContent)) {
+          return {
+            errorNotice: notice.textContent,
+            dateValue: document.getElementById('reminder-date').value,
+            timeValue: document.getElementById('reminder-time').value,
+            statusText: document.getElementById('reminder-preview-status').textContent,
+            saveDisabled: document.getElementById('reminder-save-btn').disabled
+          };
+        }
+      }
+      return null;
+    }`);
+
+    assert.ok(failedResolutionResult, 'Ambiguous date error notice must be shown');
+    assert.strictEqual(failedResolutionResult.dateValue, '', 'Date input must be cleared immediately upon failed resolution');
+    assert.strictEqual(failedResolutionResult.timeValue, '', 'Time input must be cleared immediately upon failed resolution');
+    assert.strictEqual(failedResolutionResult.statusText, 'Needs clarification');
+    assert.strictEqual(failedResolutionResult.saveDisabled, true, 'Save button must be disabled after failed resolution');
+
+    // Test recovery via manual calendar entry
+    const manualRecoveryResult = await evalPage(`() => {
+      const dateInput = document.getElementById('reminder-date');
+      const timeInput = document.getElementById('reminder-time');
+      dateInput.value = '2027-04-03';
+      timeInput.value = '10:00';
+      dateInput.dispatchEvent(new Event('input', { bubbles: true }));
+      timeInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+      return {
+        date: dateInput.value,
+        time: timeInput.value,
+        status: document.getElementById('reminder-preview-status').textContent,
+        resolver: document.getElementById('reminder-preview-resolver').textContent
+      };
+    }`);
+    assert.strictEqual(manualRecoveryResult.status, 'Scheduled');
+    assert.strictEqual(manualRecoveryResult.resolver, 'Manual calendar entry');
+    console.log('  ✅ [PASS] Phase 9: Failed re-resolution cleared stale schedule; manual calendar edit recovery verified');
+
+    // ----------------------------------------------------
+    // Phase 10: Console Error Integrity
+    // ----------------------------------------------------
+    console.log('Phase 10: Console Error Integrity');
     assert.strictEqual(consoleErrors.length, 0, `Unexpected console errors found: ${consoleErrors.join('; ')}`);
-    console.log('  ✅ [PASS] Phase 8: Zero unexpected client console errors detected across all flows');
+    console.log('  ✅ [PASS] Phase 10: Zero unexpected client console errors detected across all flows');
 
     console.log('\n====================================================');
-    console.log('🎉 ALL 8 BROWSER REMINDERS & VIEWS E2E PHASES PASSED');
-    console.log('   Phases executed: 8 | Passed: 8 | Failed: 0 | Skipped: 0');
+    console.log('🎉 ALL 10 BROWSER REMINDERS & VIEWS E2E PHASES PASSED');
+    console.log('   Phases executed: 10 | Passed: 10 | Failed: 0 | Skipped: 0');
     console.log('====================================================\n');
 
     cleanup();
