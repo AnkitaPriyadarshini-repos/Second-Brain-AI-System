@@ -1,6 +1,6 @@
 'use strict';
 const chrono = require('chrono-node');
-const RECURRENCE_RE = /\bevery\s+(?:(\d{1,2})\s+)?(day|week|month|year)s?\b|\b(daily|weekly|monthly|yearly|annually)\b/i;
+const RECURRENCE_RE = /\bevery\s+(?:(\d+)\s+)?(day|week|month|year)s?\b|\b(daily|weekly|monthly|yearly|annually)\b/i;
 const AMBIGUOUS_DATE_RE = /\b(\d{1,2})[/.](\d{1,2})[/.](\d{2,4})\b/;
 const INCOMPLETE_AT_RE = /\b(?:at|around|by)\s+(\d{1,2})(?!\s*(?:am|pm|a\.m\.|p\.m\.|:\d{2}|o'?clock))\b/i;
 const INCOMPLETE_AFTER_DATE_RE = /\b(?:today|tomorrow|tonight|next\s+(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday))\s+(\d{1,2})\b(?!\s*(?:am|pm|:\d{2}))/i;

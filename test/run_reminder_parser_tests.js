@@ -52,7 +52,7 @@ run('daylight-saving overlap is rejected', function () {
 run('invalid calendar dates are rejected', function () {
   const r = resolveLocalDateTime('2026-02-30', '10:00', 'UTC');
   assert.strictEqual(r.ok, false); assert.strictEqual(r.code, 'INVALID_DATE');
-
+});
 run('year boundary rolls to the correct local date and instant', function () {
   const r = parseReminderText('Settle invoice tomorrow at 9am', {
     referenceTime: new Date('2026-12-31T03:00:00Z'), timeZone: 'Asia/Kolkata'
@@ -84,6 +84,4 @@ run('unsupported recurrence intervals are rejected', function () {
   });
   assert.strictEqual(r.ok, false);
   assert.strictEqual(r.code, 'INVALID_RECURRENCE');
-});
-
 });
