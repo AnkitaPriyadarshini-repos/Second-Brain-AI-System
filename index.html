@@ -43,6 +43,7 @@
   <link rel="stylesheet" href="css/adaptive-fusion.css?v=70.0">
   <link rel="stylesheet" href="css/milo-workspace-studio.css?v=1.0">
   <link rel="stylesheet" href="css/onyx-theme.css?v=70.0">
+  <link rel="stylesheet" href="css/natural-language-reminders.css?v=1.0">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FFFFFF">
 </head>
@@ -121,6 +122,14 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
             <span>Sales</span>
           </div>
+        </div>
+
+        <div class="onyx-sidebar-section-title">Organize</div>
+        <div class="onyx-sidebar-items-group">
+          <button type="button" class="onyx-sidebar-item sidebar-menu-item" data-view="reminders" onclick="window.activateView('reminders')" title="Natural-language Reminders">
+            <span aria-hidden="true">⏰</span>
+            <span>Reminders</span>
+          </button>
         </div>
 
         <!-- Section 3: Recents (Chat history list matching screenshot) -->
@@ -225,6 +234,10 @@
         <button class="drawer-nav-item" onclick="window.activateView('goals'); window.toggleMobileDrawer(false);">
           <span class="nav-icon">🎯</span>
           <span>Tasks</span>
+        </button>
+        <button class="drawer-nav-item" onclick="window.activateView('reminders'); window.toggleMobileDrawer(false);">
+          <span class="nav-icon">⏰</span>
+          <span>Reminders</span>
         </button>
         <button class="drawer-nav-item" onclick="window.activateView('settings'); window.toggleMobileDrawer(false);">
           <span class="nav-icon">⚙️</span>
@@ -1420,6 +1433,99 @@
       </div>
     </section>
 
+    <!-- Natural-language reminder prototype. Secure saves require configured Redis storage. -->
+    <section id="view-reminders" class="view-section" aria-label="Natural-language Reminders" style="display: none;">
+      <div class="milo-reminder-view">
+        <header class="milo-reminder-header">
+          <div class="milo-reminder-kicker">Milo · Planning</div>
+          <h1 class="milo-reminder-title">Natural-language reminders</h1>
+          <p class="milo-reminder-subtitle">Write a reminder the way you would say it. Milo extracts a date and time, then lets you review every detail before saving. Notifications are not enabled in this prototype.</p>
+        </header>
+        <div id="reminder-storage-status" class="milo-reminder-storage-status is-unavailable" role="status">Checking secure reminder storage…</div>
+        <div id="reminder-notice" class="milo-reminder-notice" role="status" aria-live="polite" style="display: none;"></div>
+        <div class="milo-reminder-layout">
+          <section class="milo-reminder-panel" aria-labelledby="reminder-create-heading">
+            <h2 id="reminder-create-heading">Create a reminder</h2>
+            <p>Try a natural phrase, or choose a date and time manually after preview.</p>
+            <form id="reminder-form">
+              <div class="milo-reminder-field">
+                <label for="reminder-input">What do you want to remember?</label>
+                <textarea id="reminder-input" maxlength="500" required placeholder="Remind me to revise DBMS tomorrow at 7pm"></textarea>
+              </div>
+              <div class="milo-reminder-examples" aria-label="Example reminder phrases">
+                <button type="button" class="milo-reminder-example" data-reminder-example="Revise DBMS tomorrow at 7pm">Tomorrow at 7pm</button>
+                <button type="button" class="milo-reminder-example" data-reminder-example="Finish the project next Friday">Next Friday</button>
+                <button type="button" class="milo-reminder-example" data-reminder-example="Pay rent every month">Every month</button>
+              </div>
+              <div class="milo-reminder-field">
+                <label for="reminder-time-zone-input">Time zone used while parsing</label>
+                <input id="reminder-time-zone-input" type="text" maxlength="80" autocomplete="off" required>
+              </div>
+              <button id="reminder-preview-btn" class="milo-reminder-primary" type="submit">Preview reminder</button>
+            </form>
+          </section>
+          <section id="reminder-preview-card" class="milo-reminder-panel" aria-labelledby="reminder-preview-heading" style="display: none;">
+            <h2 id="reminder-preview-heading">Review before saving</h2>
+            <p class="milo-reminder-preview-summary" id="reminder-parse-summary">Review the detected title and schedule.</p>
+            <div class="milo-reminder-preview-line">
+              <span class="milo-reminder-preview-label">Task title</span>
+              <span id="reminder-preview-title" class="milo-reminder-preview-value">Add a task title</span>
+            </div>
+            <div class="milo-reminder-preview-line">
+              <span class="milo-reminder-preview-label">Scheduled local time</span>
+              <span id="reminder-preview-when" class="milo-reminder-preview-value">Choose a date and time.</span>
+            </div>
+            <div class="milo-reminder-field">
+              <label for="reminder-title">Edit task title</label>
+              <input id="reminder-title" type="text" maxlength="180" autocomplete="off">
+            </div>
+            <div class="milo-reminder-time-fields">
+              <div class="milo-reminder-field">
+                <label for="reminder-date">Date</label>
+                <input id="reminder-date" type="date" required>
+              </div>
+              <div class="milo-reminder-field">
+                <label for="reminder-time">Time</label>
+                <input id="reminder-time" type="time" required>
+              </div>
+            </div>
+            <div class="milo-reminder-field">
+              <label for="reminder-time-zone">IANA time zone</label>
+              <input id="reminder-time-zone" type="text" maxlength="80" required placeholder="Asia/Kolkata">
+            </div>
+            <div class="milo-reminder-recurrence-fields">
+              <div class="milo-reminder-field">
+                <label for="reminder-recurrence">Repeat</label>
+                <select id="reminder-recurrence">
+                  <option value="none">Does not repeat</option>
+                  <option value="day">Daily</option>
+                  <option value="week">Weekly</option>
+                  <option value="month">Monthly</option>
+                  <option value="year">Yearly</option>
+                </select>
+              </div>
+              <div class="milo-reminder-field">
+                <label for="reminder-recurrence-interval">Every</label>
+                <input id="reminder-recurrence-interval" type="number" min="1" max="99" step="1" value="1" disabled>
+              </div>
+            </div>
+            <div class="milo-reminder-preview-line">
+              <span class="milo-reminder-preview-label">Repeat summary</span>
+              <span id="reminder-preview-repeat" class="milo-reminder-preview-value">Does not repeat</span>
+            </div>
+            <div class="milo-reminder-inline-note">Saving a reminder does not send a notification. Notification delivery has not been implemented.</div>
+            <button id="reminder-save-btn" class="milo-reminder-primary" type="button" disabled>Confirm &amp; save reminder</button>
+          </section>
+        </div>
+        <section class="milo-reminder-saved-panel" aria-labelledby="reminder-saved-heading">
+          <h2 id="reminder-saved-heading">Saved reminders</h2>
+          <p>Your saved reminders are scoped to this browser's signed reminder session. Account-based syncing is not implemented.</p>
+          <div id="reminder-empty-state" class="milo-reminder-empty">No saved reminders are available yet.</div>
+          <div id="reminder-list" class="milo-reminder-list"></div>
+        </section>
+      </div>
+    </section>
+
   </main>
 
   <!-- Slide-out Note Detail Drawer Modal -->
@@ -2064,5 +2170,6 @@
   <script src="js/pwa-installer.js?v=61.0"></script>
   <script src="js/nori-companion.js?v=70.0"></script>
   <script src="js/app.js?v=70.0"></script>
+  <script src="js/natural-language-reminders.js?v=1.0"></script>
 </body>
 </html>
