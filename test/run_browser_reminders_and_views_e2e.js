@@ -662,28 +662,42 @@ async function runBrowserRemindersTests() {
     }
     assert.strictEqual(bApplied, true, 'Request B (newer) should be applied to the UI');
 
+    // Capture the full visible state after newer Request B succeeds and before releasing stale Request A
+    const stateBeforeA = await evalPage(`() => {
+      return {
+        title: document.getElementById('reminder-title').value,
+        previewTitle: document.getElementById('reminder-preview-title').textContent,
+        date: document.getElementById('reminder-date').value,
+        time: document.getElementById('reminder-time').value,
+        timeZone: document.getElementById('reminder-time-zone').value,
+        status: document.getElementById('reminder-preview-status').textContent,
+        saveDisabled: document.getElementById('reminder-save-btn').disabled
+      };
+    }`);
+
     // 4. Return A's stale response
     await evalPage(`async () => {
       await window.__deferredRequests[0].resolveWithBackend();
     }`);
     await new Promise(r => setTimeout(r, 200));
 
-    // 5. Assert that the UI keeps B's title/date/time/timezone and does not overwrite them with A's result
-    const raceResult = await evalPage(`() => {
+    // 5. Assert that the title, preview title, date, time, timezone, status badge, and save-button state are unchanged
+    const stateAfterA = await evalPage(`() => {
       return {
         title: document.getElementById('reminder-title').value,
         previewTitle: document.getElementById('reminder-preview-title').textContent,
-        time: document.getElementById('reminder-time').value,
         date: document.getElementById('reminder-date').value,
+        time: document.getElementById('reminder-time').value,
         timeZone: document.getElementById('reminder-time-zone').value,
         status: document.getElementById('reminder-preview-status').textContent,
         saveDisabled: document.getElementById('reminder-save-btn').disabled
       };
     }`);
-    assert.strictEqual(raceResult.title, 'Task Beta', 'UI must keep newer Request B title');
-    assert.strictEqual(raceResult.previewTitle, 'Task Beta', 'Preview title must keep newer Request B');
-    assert.strictEqual(raceResult.time, '10:00', 'Time must keep newer Request B (10:00), not overwritten by stale A (16:00)');
-    assert.strictEqual(raceResult.status, 'Scheduled');
+    assert.deepStrictEqual(stateAfterA, stateBeforeA, 'UI state (title, previewTitle, date, time, timezone, status, saveDisabled) must remain completely unchanged after releasing stale Request A');
+    assert.strictEqual(stateAfterA.title, 'Task Beta', 'UI must keep newer Request B title');
+    assert.strictEqual(stateAfterA.previewTitle, 'Task Beta', 'Preview title must keep newer Request B');
+    assert.strictEqual(stateAfterA.time, '10:00', 'Time must keep newer Request B (10:00), not overwritten by stale A (16:00)');
+    assert.strictEqual(stateAfterA.status, 'Scheduled');
 
     // Part B: Stale failure does not invalidate newer valid draft
     // Clear deferred requests
@@ -731,6 +745,19 @@ async function runBrowserRemindersTests() {
     }
     assert.strictEqual(dApplied, true, 'Request D should update time to 15:00');
 
+    // Capture the complete valid draft state after successful Request D and before releasing stale failing Request C
+    const stateBeforeC = await evalPage(`() => {
+      return {
+        title: document.getElementById('reminder-title').value,
+        previewTitle: document.getElementById('reminder-preview-title').textContent,
+        date: document.getElementById('reminder-date').value,
+        time: document.getElementById('reminder-time').value,
+        timeZone: document.getElementById('reminder-time-zone').value,
+        status: document.getElementById('reminder-preview-status').textContent,
+        saveDisabled: document.getElementById('reminder-save-btn').disabled
+      };
+    }`);
+
     // Now return stale Request C (which fails with 422 AMBIGUOUS_NUMERIC_DATE)
     await evalPage(`async () => {
       await window.__deferredRequests[0].resolveWithBackend();
@@ -738,15 +765,20 @@ async function runBrowserRemindersTests() {
     await new Promise(r => setTimeout(r, 200));
 
     // Stale failure must NOT invalidate Request D's valid draft!
-    const staleFailureCheck = await evalPage(`() => {
+    const stateAfterC = await evalPage(`() => {
       return {
+        title: document.getElementById('reminder-title').value,
+        previewTitle: document.getElementById('reminder-preview-title').textContent,
+        date: document.getElementById('reminder-date').value,
         time: document.getElementById('reminder-time').value,
+        timeZone: document.getElementById('reminder-time-zone').value,
         status: document.getElementById('reminder-preview-status').textContent,
         saveDisabled: document.getElementById('reminder-save-btn').disabled
       };
     }`);
-    assert.strictEqual(staleFailureCheck.time, '15:00', 'Stale failure must not clear time from valid Request D');
-    assert.strictEqual(staleFailureCheck.status, 'Scheduled', 'Stale failure must not set status to Needs clarification');
+    assert.deepStrictEqual(stateAfterC, stateBeforeC, 'Complete valid draft (title, previewTitle, date, time, timezone, status, saveDisabled) must remain completely unchanged after stale failure Request C');
+    assert.strictEqual(stateAfterC.time, '15:00', 'Stale failure must not clear time from valid Request D');
+    assert.strictEqual(stateAfterC.status, 'Scheduled', 'Stale failure must not set status to Needs clarification');
     console.log('  ✅ [PASS] Phase 10: Real frontend race guard verified: newer responses win; stale late responses and stale failures discarded');
 
     // Disable controlled fetch wrapper
@@ -784,7 +816,8 @@ async function runBrowserRemindersTests() {
     assert.ok(multiDateUIResult, 'Preview card must display with Needs clarification for multiple dates');
     assert.strictEqual(multiDateUIResult.cardVisible, true);
     assert.strictEqual(multiDateUIResult.status, 'Needs clarification');
-    assert.ok(multiDateUIResult.title.length > 0, 'User title must be preserved for correction');
+    assert.strictEqual(multiDateUIResult.title, 'Pay rent and submit report', 'Clean task title must be extracted without candidate date expressions');
+    assert.match(multiDateUIResult.dateExpr, /tomorrow,\s*(?:on\s+)?Friday/i, 'Candidate date expressions must be listed in date expression field');
     assert.match(multiDateUIResult.summary, /more than one date/i, 'Clarification summary must instruct user to simplify expression');
     assert.strictEqual(multiDateUIResult.saveDisabled, true, 'Save button must be disabled for unresolved multi-date expressions');
     console.log('  ✅ [PASS] Phase 11: Multiple-date rejection preserves user title, displays clarification, and gates save');

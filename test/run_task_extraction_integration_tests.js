@@ -112,6 +112,7 @@ async function main() {
       title: draft.title,
       taskType: draft.taskType,
       dateExpression: draft.dateExpression,
+      resolutionToken: draft.resolutionToken,
       dateLocal: draft.dateLocal,
       timeLocal: draft.timeLocal,
       timeZone: draft.timeZone
@@ -193,6 +194,7 @@ async function main() {
       title: editedTitle,
       taskType: draft.taskType,
       dateExpression: draft.dateExpression,
+      resolutionToken: draft.resolutionToken,
       dateLocal: draft.dateLocal,
       timeLocal: draft.timeLocal,
       timeZone: draft.timeZone
@@ -342,6 +344,7 @@ async function main() {
       title: initialValidDraft.title,
       taskType: initialValidDraft.taskType,
       dateExpression: 'April 3, 2027 at 10am',
+      resolutionToken: recoveredResolveRes.body.resolutionToken,
       dateLocal: recoveredResolveRes.body.draft.dateLocal,
       timeLocal: recoveredResolveRes.body.draft.timeLocal,
       timeZone: 'Asia/Kolkata'
@@ -410,6 +413,17 @@ async function main() {
 
   // 11. Fix 4: Date-only task can be confirmed and saved without inventing clock time
   total++;
+  const dateOnlyResolveRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'resolve',
+      dateExpression: '2027-05-15',
+      timeZone: 'Asia/Kolkata'
+    }
+  }), dateOnlyResolveRes);
+  assert.strictEqual(dateOnlyResolveRes.statusCode, 200);
+
   const dateOnlySaveRes = mockRes();
   await handler(mockReq('POST', {
     headers: { cookie: sessionCookie },
@@ -419,6 +433,7 @@ async function main() {
       title: 'Submit tax declaration form',
       taskType: 'finance',
       dateExpression: '2027-05-15',
+      resolutionToken: dateOnlyResolveRes.body.resolutionToken,
       dateLocal: '2027-05-15',
       timeLocal: '', // NO time specified
       timeZone: 'Asia/Kolkata'
@@ -487,6 +502,21 @@ async function main() {
   assert.strictEqual(incompleteTimeSaveRes.statusCode, 422, 'Incomplete time expression must be rejected at save gate');
   assert.strictEqual(incompleteTimeSaveRes.body.code, 'INCOMPLETE_TIME');
 
+  // Obtain trusted resolution token for "tomorrow at 7pm" with fixed test clock
+  const resolveTokenRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    __testReferenceTime: refTimeFixed,
+    body: {
+      action: 'resolve',
+      dateExpression: 'tomorrow at 7pm',
+      timeZone: 'Asia/Kolkata'
+    }
+  }), resolveTokenRes);
+  assert.strictEqual(resolveTokenRes.statusCode, 200);
+  const validToken = resolveTokenRes.body.resolutionToken;
+  assert.ok(validToken, 'Resolution token must be returned for valid date expression');
+
   // 13b. dateExpression: "tomorrow at 7pm" paired with calendar fields for a different date/time must be rejected
   const mismatchScheduleRes = mockRes();
   await handler(mockReq('POST', {
@@ -497,6 +527,7 @@ async function main() {
       title: 'Mismatched schedule task',
       taskType: 'work',
       dateExpression: 'tomorrow at 7pm',
+      resolutionToken: validToken,
       dateLocal: '2028-12-25', // Intentional mismatch
       timeLocal: '10:00',     // Intentional mismatch
       timeZone: 'Asia/Kolkata',
@@ -549,6 +580,7 @@ async function main() {
       title: 'Valid NLP Reminder',
       taskType: 'work',
       dateExpression: 'tomorrow at 7pm',
+      resolutionToken: validToken,
       dateLocal: '2026-10-24',
       timeLocal: '19:00',
       timeZone: 'Asia/Kolkata',
@@ -618,6 +650,158 @@ async function main() {
   assert.strictEqual(pastManualTimeRes.body.code, 'TIME_IN_PAST');
 
   pass('13. Authoritative save gate strictly validates NLP consistency and permits valid manual entries with dateExpression: null');
+
+  // -------------------------------------------------------------------------
+  // 14. Stateless Resolution Verification Trust Boundary Regression Suite
+  // -------------------------------------------------------------------------
+  total++;
+
+  // 14a. Forged-anchor attack: caller submits forged referenceTime in body while attempting to save future date
+  const forgedAnchorSaveRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: 'Forged anchor attack',
+      taskType: 'work',
+      dateExpression: 'tomorrow at 7pm',
+      resolutionToken: validToken,
+      dateLocal: '2030-01-02', // Arbitrary future date
+      timeLocal: '19:00',
+      timeZone: 'Asia/Kolkata',
+      referenceTime: '2030-01-01T10:00:00.000Z' // Forged anchor in body
+    }
+  }), forgedAnchorSaveRes);
+  assert.strictEqual(forgedAnchorSaveRes.statusCode, 422);
+  assert.strictEqual(forgedAnchorSaveRes.body.code, 'SCHEDULE_FIELD_MISMATCH');
+
+  // 14b. Forged anchor attack without token rejected with MISSING_RESOLUTION_TOKEN
+  const forgedAnchorNoTokenRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: 'Forged anchor without token',
+      taskType: 'work',
+      dateExpression: 'tomorrow at 7pm',
+      dateLocal: '2030-01-02',
+      timeLocal: '19:00',
+      timeZone: 'Asia/Kolkata',
+      referenceTime: '2030-01-01T10:00:00.000Z'
+    }
+  }), forgedAnchorNoTokenRes);
+  assert.strictEqual(forgedAnchorNoTokenRes.statusCode, 422);
+  assert.strictEqual(forgedAnchorNoTokenRes.body.code, 'MISSING_RESOLUTION_TOKEN');
+
+  // 14c. Tampered token signature rejected with INVALID_RESOLUTION_TOKEN
+  const tamperedTokenRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: 'Tampered token test',
+      taskType: 'work',
+      dateExpression: 'tomorrow at 7pm',
+      resolutionToken: validToken.slice(0, -6) + '123456',
+      dateLocal: '2026-10-24',
+      timeLocal: '19:00',
+      timeZone: 'Asia/Kolkata'
+    }
+  }), tamperedTokenRes);
+  assert.strictEqual(tamperedTokenRes.statusCode, 422);
+  assert.strictEqual(tamperedTokenRes.body.code, 'INVALID_RESOLUTION_TOKEN');
+
+  // 14d. Expired token rejected with EXPIRED_RESOLUTION_TOKEN
+  const sessionTokenPayload = handler.verifySession(sessionCookie.split('=')[1], validSecret);
+  const expiredToken = handler.createResolutionToken({
+    ownerId: sessionTokenPayload.ownerId,
+    dateExpression: 'tomorrow at 7pm',
+    timeZone: 'Asia/Kolkata',
+    dateLocal: '2026-10-24',
+    timeLocal: '19:00',
+    schedulingStatus: 'scheduled',
+    referenceTime: refTimeFixed
+  }, validSecret, { ttlMs: -10000 });
+
+  const expiredTokenRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: 'Expired token test',
+      taskType: 'work',
+      dateExpression: 'tomorrow at 7pm',
+      resolutionToken: expiredToken,
+      dateLocal: '2026-10-24',
+      timeLocal: '19:00',
+      timeZone: 'Asia/Kolkata'
+    }
+  }), expiredTokenRes);
+  assert.strictEqual(expiredTokenRes.statusCode, 422);
+  assert.strictEqual(expiredTokenRes.body.code, 'EXPIRED_RESOLUTION_TOKEN');
+
+  // 14e. Session owner mismatch rejected with RESOLUTION_OWNER_MISMATCH
+  const wrongOwnerToken = handler.createResolutionToken({
+    ownerId: '11111111-2222-3333-4444-555555555555',
+    dateExpression: 'tomorrow at 7pm',
+    timeZone: 'Asia/Kolkata',
+    dateLocal: '2026-10-24',
+    timeLocal: '19:00',
+    schedulingStatus: 'scheduled',
+    referenceTime: refTimeFixed
+  }, validSecret);
+
+  const wrongOwnerRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'save',
+      confirmed: true,
+      title: 'Wrong owner test',
+      taskType: 'work',
+      dateExpression: 'tomorrow at 7pm',
+      resolutionToken: wrongOwnerToken,
+      dateLocal: '2026-10-24',
+      timeLocal: '19:00',
+      timeZone: 'Asia/Kolkata'
+    }
+  }), wrongOwnerRes);
+  assert.strictEqual(wrongOwnerRes.statusCode, 422);
+  assert.strictEqual(wrongOwnerRes.body.code, 'RESOLUTION_OWNER_MISMATCH');
+
+  // 14f. Multiple-date clarification: title stripped when clean text exists, title null when text is only dates
+  const cleanTitleMultiDate = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'parse',
+      text: 'Pay rent tomorrow and submit report on Friday',
+      timeZone: 'Asia/Kolkata'
+    }
+  }), cleanTitleMultiDate);
+  assert.strictEqual(cleanTitleMultiDate.statusCode, 422);
+  assert.strictEqual(cleanTitleMultiDate.body.code, 'MULTIPLE_DATE_EXPRESSIONS');
+  assert.strictEqual(cleanTitleMultiDate.body.title, 'Pay rent and submit report');
+  assert.deepStrictEqual(cleanTitleMultiDate.body.candidateExpressions, ['tomorrow', 'on Friday']);
+
+  const nullTitleMultiDate = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    body: {
+      action: 'parse',
+      text: 'tomorrow and Friday',
+      timeZone: 'Asia/Kolkata'
+    }
+  }), nullTitleMultiDate);
+  assert.strictEqual(nullTitleMultiDate.statusCode, 422);
+  assert.strictEqual(nullTitleMultiDate.body.code, 'MULTIPLE_DATE_EXPRESSIONS');
+  assert.strictEqual(nullTitleMultiDate.body.title, null, 'Fallback must not claim a clean title when only raw sentence/dates exist');
+
+  pass('14. Stateless resolution token trust boundary verified: forged referenceTime, tampered tokens, expired tokens, owner mismatch, and clean title extraction verified');
 
   console.log(`\n====================================================`);
   console.log(`🎉 ALL ${passed}/${total} INTEGRATION TESTS PASSED`);

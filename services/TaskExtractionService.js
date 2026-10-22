@@ -50,6 +50,49 @@ function cleanTitleText(value) {
 }
 
 /**
+ * Extracts a clean task title from text by stripping candidate date expressions and prepositions.
+ * Returns the cleanly extracted title, or null if no clean task title remains or if it would merely
+ * preserve the entire original sentence.
+ */
+function extractCleanTitleWithoutDates(rawText, validMatches) {
+  if (!rawText || typeof rawText !== 'string') return null;
+  const raw = rawText.trim();
+  if (!raw) return null;
+  if (!validMatches || validMatches.length === 0) {
+    const cleaned = cleanTitleText(raw);
+    return (cleaned && cleaned.toLowerCase() !== raw.toLowerCase()) ? cleaned : null;
+  }
+
+  // Sort matches by index descending to slice from the end without shifting earlier indices
+  const sorted = [...validMatches].sort((a, b) => b.index - a.index);
+  let titleSource = raw;
+  for (const m of sorted) {
+    const idx = m.index;
+    if (idx < 0 || idx >= titleSource.length) continue;
+    const before = titleSource.slice(0, idx);
+    const after = titleSource.slice(idx + m.text.length);
+    const prepMatch = /\s+(?:on|at|by|for|around)\s*$/i.exec(before);
+    if (prepMatch) {
+      titleSource = before.slice(0, prepMatch.index) + ' ' + after;
+    } else {
+      titleSource = before + ' ' + after;
+    }
+  }
+
+  let cleaned = cleanTitleText(titleSource);
+  cleaned = cleaned.replace(/^(?:and|or|then|also|plus)\s+/i, '')
+                   .replace(/\s+(?:and|or|then|also|plus)$/i, '')
+                   .trim();
+
+  // Ensure the fallback path does not claim a clean task title if it has only preserved the entire original sentence,
+  // or if no meaningful task title remains (e.g. only stop words/conjunctions).
+  if (!cleaned || cleaned.toLowerCase() === raw.toLowerCase() || /^(?:and|or|then|also|plus|to|for|at|on|in|by|with)$/i.test(cleaned)) {
+    return null;
+  }
+  return cleaned;
+}
+
+/**
  * Parses user text using chrono and excludes matches falling inside noun-phrase month spans.
  */
 function findValidDateMatches(raw) {
@@ -150,12 +193,13 @@ class TaskExtractionService {
 
     // Multiple distinct scheduling expressions: reject to prevent silently scheduling only one date
     if (validMatches.length > 1) {
-      const title = cleanTitleText(raw) || raw;
+      const cleanTitle = extractCleanTitleWithoutDates(raw, validMatches);
       return {
         ok: false,
         code: 'MULTIPLE_DATE_EXPRESSIONS',
         message: 'I found more than one date or time expression. Please specify a single reminder time or create separate tasks.',
-        title: title,
+        title: cleanTitle,
+        originalText: raw,
         taskType: taskType,
         dateExpression: null,
         candidateExpressions: validMatches.map((m) => m.text),
@@ -312,11 +356,16 @@ class TaskExtractionService {
     // Guard: Equivalent safety check for multiple distinct scheduling expressions in the user text
     const validMatches = findValidDateMatches(userText);
     if (validMatches.length > 1) {
+      let resolvedTitle = title;
+      if (!resolvedTitle || resolvedTitle.toLowerCase() === userText.toLowerCase()) {
+        resolvedTitle = extractCleanTitleWithoutDates(userText, validMatches);
+      }
       return {
         ok: false,
         code: 'MULTIPLE_DATE_EXPRESSIONS',
         message: 'I found more than one date or time expression. Please specify a single reminder time or create separate tasks.',
-        title: title || cleanTitleText(userText),
+        title: resolvedTitle,
+        originalText: userText,
         taskType: taskType,
         dateExpression: null,
         candidateExpressions: validMatches.map((m) => m.text),

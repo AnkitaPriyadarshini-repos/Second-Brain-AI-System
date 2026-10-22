@@ -227,6 +227,9 @@
 
   function applyDraft(draft, persistenceConfigured) {
     state.draft = draft;
+    if (state.draft) {
+      state.draft.resolutionToken = (draft && draft.resolutionToken) || null;
+    }
     state.persistenceConfigured = Boolean(persistenceConfigured);
     state.resolving = false;
     state.manualCalendarEdit = false;
@@ -288,6 +291,7 @@
     state.draft.timeLocal = '';
     state.draft.dueAt = null;
     state.draft.schedulingStatus = 'needs_clarification';
+    state.draft.resolutionToken = null;
 
     if (byId('reminder-preview-date-expression')) {
       byId('reminder-preview-date-expression').textContent = expr || 'None (unscheduled)';
@@ -317,6 +321,7 @@
         state.draft.schedulingStatus = data.draft.schedulingStatus;
         state.draft.needs = data.draft.needs;
         state.draft.message = data.draft.message;
+        state.draft.resolutionToken = (data.draft && data.draft.resolutionToken) || data.resolutionToken || null;
 
         state.scheduleValid = data.draft.schedulingStatus !== 'needs_clarification';
 
@@ -349,6 +354,7 @@
       state.draft.dateLocal = '';
       state.draft.timeLocal = '';
       state.draft.schedulingStatus = 'needs_clarification';
+      state.draft.resolutionToken = null;
       state.draft.message = err.message;
 
       byId('reminder-date').value = '';
@@ -432,7 +438,7 @@
           : '';
         const summaryMsg = error.message + (candidateText ? ' (Found: ' + candidateText + ')' : '');
         const clarificationDraft = {
-          title: (error.payload && error.payload.title) || text,
+          title: (error.payload && error.payload.title != null) ? error.payload.title : '',
           taskType: (error.payload && error.payload.taskType) || 'general',
           dateExpression: candidateText || null,
           schedulingStatus: 'needs_clarification',
@@ -471,6 +477,7 @@
     const taskType = catSelect ? catSelect.value : (state.draft.taskType || 'general');
     const exprInput = byId('reminder-date-expression-input');
     const dateExpression = state.manualCalendarEdit ? null : (exprInput ? exprInput.value.trim() : (state.draft.dateExpression || null));
+    const resolutionToken = state.manualCalendarEdit ? null : (state.draft ? state.draft.resolutionToken : null);
 
     try {
       const data = await apiRequest('POST', {
@@ -479,11 +486,12 @@
         title: byId('reminder-title').value.trim(),
         taskType: taskType,
         dateExpression: dateExpression || null,
+        resolutionToken: resolutionToken || null,
+        schedulingStatus: state.draft ? state.draft.schedulingStatus : null,
         dateLocal: byId('reminder-date').value,
         timeLocal: byId('reminder-time').value,
         timeZone: byId('reminder-time-zone').value.trim(),
-        recurrence: readRecurrence(),
-        referenceTime: state.draft ? (state.draft.referenceTime || null) : null
+        recurrence: readRecurrence()
       });
       state.reminders.push(data.reminder);
       state.reminders.sort(function (a, b) {

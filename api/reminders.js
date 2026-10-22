@@ -57,6 +57,78 @@ function verifySession(token, secret) {
     return { ownerId: payload.ownerId, expiresAt: payload.expiresAt };
   } catch (_) { return null; }
 }
+
+const RESOLUTION_TOKEN_TTL_MS = 20 * 60 * 1000; // 20 minutes
+let customReferenceClock = null;
+
+function setReferenceClock(fn) {
+  customReferenceClock = typeof fn === 'function' ? fn : null;
+}
+
+function getReferenceInstant(req) {
+  if (req && req.__testReferenceTime && (process.env.NODE_ENV === 'test' || !process.env.NODE_ENV || process.env.NODE_ENV === 'development')) {
+    return new Date(req.__testReferenceTime);
+  }
+  if (customReferenceClock && (process.env.NODE_ENV === 'test' || !process.env.NODE_ENV || process.env.NODE_ENV === 'development')) {
+    return new Date(customReferenceClock());
+  }
+  return new Date();
+}
+
+function createResolutionToken(data, secret, options) {
+  if (!secret || typeof secret !== 'string') return null;
+  const issuedAt = (options && options.issuedAt != null) ? options.issuedAt : Date.now();
+  const ttl = (options && options.ttlMs != null) ? options.ttlMs : RESOLUTION_TOKEN_TTL_MS;
+  const expiresAt = (options && options.expiresAt != null) ? options.expiresAt : (issuedAt + ttl);
+
+  const payload = {
+    v: 1,
+    ownerId: data.ownerId,
+    dateExpression: data.dateExpression,
+    timeZone: data.timeZone,
+    dateLocal: data.dateLocal || '',
+    timeLocal: data.timeLocal || '',
+    schedulingStatus: data.schedulingStatus,
+    dueAt: data.dueAt || null,
+    recurrence: data.recurrence || null,
+    referenceTime: data.referenceTime,
+    issuedAt: issuedAt,
+    expiresAt: expiresAt
+  };
+  const encoded = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const signature = signPayload(encoded, secret);
+  return encoded + '.' + signature;
+}
+
+function verifyResolutionToken(token, secret) {
+  if (!token || typeof token !== 'string') {
+    return { ok: false, code: 'MISSING_RESOLUTION_TOKEN', error: 'Resolution token is required.' };
+  }
+  if (!secret) {
+    return { ok: false, code: 'INVALID_RESOLUTION_TOKEN', error: 'Server secret is unconfigured.' };
+  }
+  const parts = token.split('.');
+  if (parts.length !== 2) {
+    return { ok: false, code: 'INVALID_RESOLUTION_TOKEN', error: 'Malformed resolution token.' };
+  }
+  const expectedSig = Buffer.from(signPayload(parts[0], secret));
+  const actualSig = Buffer.from(parts[1]);
+  if (expectedSig.length !== actualSig.length || !crypto.timingSafeEqual(expectedSig, actualSig)) {
+    return { ok: false, code: 'INVALID_RESOLUTION_TOKEN', error: 'Tampered resolution token signature.' };
+  }
+  try {
+    const payload = JSON.parse(Buffer.from(parts[0], 'base64url').toString('utf8'));
+    if (payload.v !== 1 || !payload.ownerId || !payload.dateExpression || !payload.referenceTime) {
+      return { ok: false, code: 'INVALID_RESOLUTION_TOKEN', error: 'Incomplete resolution token payload.' };
+    }
+    if (!Number.isFinite(payload.expiresAt) || payload.expiresAt <= Date.now()) {
+      return { ok: false, code: 'EXPIRED_RESOLUTION_TOKEN', error: 'The resolution token has expired. Please re-resolve the schedule.' };
+    }
+    return { ok: true, payload: payload };
+  } catch (_) {
+    return { ok: false, code: 'INVALID_RESOLUTION_TOKEN', error: 'Malformed resolution token payload.' };
+  }
+}
 function readCookie(req, name) {
   const header = req && req.headers ? req.headers.cookie : '';
   if (typeof header !== 'string') return '';
@@ -192,8 +264,8 @@ async function handler(req, res) {
       const timeZone = typeof body.timeZone === 'string' && body.timeZone.trim() ? body.timeZone.trim() : 'UTC';
       if (!validTimeZone(timeZone)) return respond(res, 422, { success: false, code: 'INVALID_TIME_ZONE', error: 'Choose a valid IANA time zone, such as Asia/Kolkata.' });
 
-      // Explicit reference instant captured at start of resolution request
-      const referenceTime = body.referenceTime ? new Date(body.referenceTime) : new Date();
+      // Server-generated reference instant: do not trust an arbitrary timestamp supplied by the client
+      const referenceTime = getReferenceInstant(req);
 
       // Stage 1: AI Task Extraction (model-backed or deterministic fallback)
       const extracted = await taskExtractionService.extractTask(body.text, { timeZone: timeZone });
@@ -203,6 +275,7 @@ async function handler(req, res) {
           code: extracted.code,
           error: extracted.message,
           title: extracted.title || null,
+          originalText: extracted.originalText || body.text,
           taskType: extracted.taskType || 'general',
           candidateExpressions: extracted.candidateExpressions || null,
           extraction: extracted
@@ -219,12 +292,29 @@ async function handler(req, res) {
         return respond(res, 422, { success: false, code: resolution.code, error: resolution.message });
       }
 
+      let resolutionToken = null;
+      const secret = getSessionSecret();
+      if (session && secret && extracted.dateExpression) {
+        resolutionToken = createResolutionToken({
+          ownerId: session.ownerId,
+          dateExpression: extracted.dateExpression,
+          timeZone: resolution.timeZone,
+          dateLocal: resolution.dateLocal,
+          timeLocal: resolution.timeLocal,
+          schedulingStatus: resolution.schedulingStatus,
+          dueAt: resolution.dueAt,
+          recurrence: resolution.recurrence,
+          referenceTime: resolution.referenceTime
+        }, secret);
+      }
+
       const draft = {
         ok: true,
         title: extracted.title,
         taskType: extracted.taskType,
         taskClassification: extracted.taskType,
         dateExpression: extracted.dateExpression,
+        resolutionToken: resolutionToken,
         schedulingStatus: resolution.schedulingStatus,
         dateLocal: resolution.dateLocal,
         timeLocal: resolution.timeLocal,
@@ -239,7 +329,12 @@ async function handler(req, res) {
         providerUsed: extracted.providerUsed
       };
 
-      return respond(res, 200, { success: true, draft: draft, persistenceConfigured: Boolean(getRedisConfig() && session) });
+      return respond(res, 200, {
+        success: true,
+        draft: draft,
+        resolutionToken: resolutionToken,
+        persistenceConfigured: Boolean(getRedisConfig() && session)
+      });
     }
 
     // -------------------------------------------------------------------------
@@ -253,7 +348,8 @@ async function handler(req, res) {
       const timeZone = typeof body.timeZone === 'string' && body.timeZone.trim() ? body.timeZone.trim() : 'UTC';
       if (!validTimeZone(timeZone)) return respond(res, 422, { success: false, code: 'INVALID_TIME_ZONE', error: 'Choose a valid IANA time zone, such as Asia/Kolkata.' });
 
-      const referenceTime = body.referenceTime ? new Date(body.referenceTime) : new Date();
+      // Server-generated reference instant: do not trust an arbitrary timestamp supplied by the client
+      const referenceTime = getReferenceInstant(req);
       const resolution = dateResolutionService.resolveDateExpression(body.dateExpression || null, {
         referenceTime: referenceTime,
         timeZone: timeZone
@@ -263,10 +359,29 @@ async function handler(req, res) {
         return respond(res, 422, { success: false, code: resolution.code, error: resolution.message });
       }
 
+      let resolutionToken = null;
+      const secret = getSessionSecret();
+      if (session && secret && body.dateExpression && typeof body.dateExpression === 'string' && body.dateExpression.trim()) {
+        resolutionToken = createResolutionToken({
+          ownerId: session.ownerId,
+          dateExpression: body.dateExpression.trim(),
+          timeZone: resolution.timeZone,
+          dateLocal: resolution.dateLocal,
+          timeLocal: resolution.timeLocal,
+          schedulingStatus: resolution.schedulingStatus,
+          dueAt: resolution.dueAt,
+          recurrence: resolution.recurrence,
+          referenceTime: resolution.referenceTime
+        }, secret);
+      }
+
+      resolution.resolutionToken = resolutionToken;
+
       return respond(res, 200, {
         success: true,
         draft: resolution,
         resolution: resolution,
+        resolutionToken: resolutionToken,
         persistenceConfigured: Boolean(getRedisConfig() && session)
       });
     }
@@ -316,13 +431,75 @@ async function handler(req, res) {
     // Authoritative date-expression verification: If an un-cleared date expression is submitted,
     // verify it is not ambiguous, incomplete, or unresolved (e.g. AMBIGUOUS_NUMERIC_DATE, MULTIPLE_DATES, INCOMPLETE_TIME)
     if (body.dateExpression && typeof body.dateExpression === 'string' && body.dateExpression.trim()) {
-      const refTime = body.referenceTime ? new Date(body.referenceTime) : new Date();
-      const exprRes = dateResolutionService.resolveDateExpression(body.dateExpression.trim(), {
-        referenceTime: refTime,
+      const trimmedExpr = body.dateExpression.trim();
+
+      // Inherent expression check: reject ambiguous numeric dates, multi-dates, or incomplete times
+      const preliminaryCheck = dateResolutionService.resolveDateExpression(trimmedExpr, {
+        referenceTime: new Date(),
+        timeZone: timeZone
+      });
+      if (!preliminaryCheck.ok || preliminaryCheck.schedulingStatus === 'needs_clarification' || preliminaryCheck.schedulingStatus === 'unscheduled') {
+        return respond(res, 422, {
+          success: false,
+          code: preliminaryCheck.code || 'UNRESOLVED_DATE_EXPRESSION',
+          error: 'The date expression "' + body.dateExpression + '" cannot be saved: ' + (preliminaryCheck.message || 'Needs clarification.')
+        });
+      }
+
+      // Stateless resolution verification
+      const secret = getSessionSecret();
+      const verifiedToken = verifyResolutionToken(body.resolutionToken, secret);
+      if (!verifiedToken.ok) {
+        return respond(res, 422, {
+          success: false,
+          code: verifiedToken.code,
+          error: verifiedToken.error
+        });
+      }
+
+      const tokenPayload = verifiedToken.payload;
+
+      // 1. Bind session ownership
+      if (tokenPayload.ownerId !== session.ownerId) {
+        return respond(res, 422, {
+          success: false,
+          code: 'RESOLUTION_OWNER_MISMATCH',
+          error: 'Resolution token belongs to a different session owner.'
+        });
+      }
+
+      // 2. Bind date expression and timezone
+      if (tokenPayload.dateExpression !== trimmedExpr) {
+        return respond(res, 422, {
+          success: false,
+          code: 'SCHEDULE_FIELD_MISMATCH',
+          error: `The submitted date expression ("${trimmedExpr}") does not match the token expression ("${tokenPayload.dateExpression}").`
+        });
+      }
+
+      if (tokenPayload.timeZone !== timeZone) {
+        return respond(res, 422, {
+          success: false,
+          code: 'SCHEDULE_FIELD_MISMATCH',
+          error: `The submitted time zone ("${timeZone}") does not match the token time zone ("${tokenPayload.timeZone}").`
+        });
+      }
+
+      // 3. Independently rerun deterministic date resolution using the trusted reference time from the verified token
+      const trustedRefTime = new Date(tokenPayload.referenceTime);
+      if (Number.isNaN(trustedRefTime.getTime())) {
+        return respond(res, 422, {
+          success: false,
+          code: 'INVALID_RESOLUTION_TOKEN',
+          error: 'Invalid reference time in resolution token.'
+        });
+      }
+
+      const exprRes = dateResolutionService.resolveDateExpression(trimmedExpr, {
+        referenceTime: trustedRefTime,
         timeZone: timeZone
       });
 
-      // 1. Reject unresolved, incomplete, or clarification states even if ok is true
       if (!exprRes.ok || exprRes.schedulingStatus === 'needs_clarification' || exprRes.schedulingStatus === 'unscheduled') {
         return respond(res, 422, {
           success: false,
@@ -331,18 +508,28 @@ async function handler(req, res) {
         });
       }
 
-      // Check submitted schedulingStatus if provided
-      if (body.schedulingStatus && body.schedulingStatus !== exprRes.schedulingStatus) {
+      // 4. Verify scheduling status matches across token, resolver, and any submitted status
+      if (tokenPayload.schedulingStatus !== exprRes.schedulingStatus) {
         return respond(res, 422, {
           success: false,
           code: 'SCHEDULE_FIELD_MISMATCH',
-          error: `The submitted scheduling status (${body.schedulingStatus}) does not match the resolved status (${exprRes.schedulingStatus}) for "${body.dateExpression}". Submit dateExpression: null for manual calendar overrides.`
+          error: `The token scheduling status (${tokenPayload.schedulingStatus}) does not match the re-resolved status (${exprRes.schedulingStatus}).`
         });
       }
 
-      // 2. Validate consistency between submitted calendar fields and the resolved expression
+      const submittedStatus = body.schedulingStatus || tokenPayload.schedulingStatus;
+      if (submittedStatus !== exprRes.schedulingStatus) {
+        return respond(res, 422, {
+          success: false,
+          code: 'SCHEDULE_FIELD_MISMATCH',
+          error: `The submitted scheduling status (${submittedStatus}) does not match the resolved status (${exprRes.schedulingStatus}) for "${body.dateExpression}". Submit dateExpression: null for manual calendar overrides.`
+        });
+      }
+
+      // 5. Validate equality of all submitted scheduling fields against the signed resolution
       if (exprRes.schedulingStatus === 'scheduled') {
-        if (dateLocal !== exprRes.dateLocal || timeLocal !== exprRes.timeLocal) {
+        if (dateLocal !== exprRes.dateLocal || timeLocal !== exprRes.timeLocal ||
+            dateLocal !== tokenPayload.dateLocal || timeLocal !== tokenPayload.timeLocal) {
           return respond(res, 422, {
             success: false,
             code: 'SCHEDULE_FIELD_MISMATCH',
@@ -350,7 +537,8 @@ async function handler(req, res) {
           });
         }
       } else if (exprRes.schedulingStatus === 'date_only') {
-        if (dateLocal !== exprRes.dateLocal || timeLocal !== '') {
+        if (dateLocal !== exprRes.dateLocal || timeLocal !== '' ||
+            dateLocal !== tokenPayload.dateLocal || tokenPayload.timeLocal !== '') {
           return respond(res, 422, {
             success: false,
             code: 'SCHEDULE_FIELD_MISMATCH',
@@ -358,7 +546,7 @@ async function handler(req, res) {
           });
         }
       } else if (exprRes.schedulingStatus === 'unscheduled') {
-        if (dateLocal !== '' || timeLocal !== '') {
+        if (dateLocal !== '' || timeLocal !== '' || tokenPayload.dateLocal !== '' || tokenPayload.timeLocal !== '') {
           return respond(res, 422, {
             success: false,
             code: 'SCHEDULE_FIELD_MISMATCH',
@@ -367,9 +555,12 @@ async function handler(req, res) {
         }
       }
 
-      // 3. Validate recurrence consistency
-      if (exprRes.recurrence) {
-        if (!recurrence || recurrence.unit !== exprRes.recurrence.unit || recurrence.interval !== exprRes.recurrence.interval) {
+      // 6. Validate recurrence consistency against both resolved expression and verified token
+      const resolvedRecurrence = exprRes.recurrence || null;
+      const tokenRecurrence = tokenPayload.recurrence || null;
+
+      if (resolvedRecurrence) {
+        if (!recurrence || recurrence.unit !== resolvedRecurrence.unit || recurrence.interval !== resolvedRecurrence.interval) {
           return respond(res, 422, {
             success: false,
             code: 'RECURRENCE_MISMATCH',
@@ -381,6 +572,22 @@ async function handler(req, res) {
           success: false,
           code: 'RECURRENCE_MISMATCH',
           error: `The submitted recurrence does not match the non-recurring date expression "${body.dateExpression}".`
+        });
+      }
+
+      if (tokenRecurrence) {
+        if (!recurrence || recurrence.unit !== tokenRecurrence.unit || recurrence.interval !== tokenRecurrence.interval) {
+          return respond(res, 422, {
+            success: false,
+            code: 'RECURRENCE_MISMATCH',
+            error: `The submitted recurrence does not match the token recurrence for "${body.dateExpression}".`
+          });
+        }
+      } else if (recurrence && !tokenRecurrence) {
+        return respond(res, 422, {
+          success: false,
+          code: 'RECURRENCE_MISMATCH',
+          error: `The submitted recurrence does not match the non-recurring token for "${body.dateExpression}".`
         });
       }
     }
@@ -466,4 +673,9 @@ module.exports.sameOrigin = sameOrigin;
 module.exports.MIN_SECRET_LENGTH = MIN_SECRET_LENGTH;
 module.exports.taskExtractionService = taskExtractionService;
 module.exports.dateResolutionService = dateResolutionService;
+module.exports.createResolutionToken = createResolutionToken;
+module.exports.verifyResolutionToken = verifyResolutionToken;
+module.exports.setReferenceClock = setReferenceClock;
+module.exports.getReferenceInstant = getReferenceInstant;
+module.exports.RESOLUTION_TOKEN_TTL_MS = RESOLUTION_TOKEN_TTL_MS;
 

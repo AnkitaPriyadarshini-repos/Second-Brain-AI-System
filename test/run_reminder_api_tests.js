@@ -297,13 +297,27 @@ async function main() {
     assert.strictEqual(incompleteTimeSave.body.code, 'INCOMPLETE_TIME');
 
     // 2. Schedule field mismatch (expression vs calendar fields) rejected with 422
+    const tokenPreviewRes = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      __testReferenceTime: '2035-10-23T10:00:00.000Z',
+      body: {
+        action: 'resolve',
+        dateExpression: 'tomorrow at 7pm',
+        timeZone: 'Asia/Kolkata'
+      }
+    }), tokenPreviewRes);
+    assert.strictEqual(tokenPreviewRes.statusCode, 200);
+    const validTomorrowToken = tokenPreviewRes.body.resolutionToken;
+    assert.ok(validTomorrowToken);
+
     const mismatchSave = res();
     await handler(req('POST', {
       headers: { cookie: validCookie },
       body: {
         action: 'save', confirmed: true, title: 'Mismatch test',
         dateExpression: 'tomorrow at 7pm', dateLocal: '2035-12-25', timeLocal: '10:00', timeZone: 'Asia/Kolkata',
-        referenceTime: '2035-10-23T10:00:00.000Z'
+        resolutionToken: validTomorrowToken
       }
     }), mismatchSave);
     assert.strictEqual(mismatchSave.statusCode, 422, 'Schedule mismatch must be rejected with 422');
@@ -374,6 +388,297 @@ async function main() {
     assert.strictEqual(pastManualTime.body.code, 'TIME_IN_PAST');
 
     process.stdout.write('  PASS Suite 6: Save-gate schedule consistency & manual entries verified\n');
+
+    // ----------------------------------------------------
+    // Suite 7: Stateless Resolution Verification & Trust Boundary
+    // ----------------------------------------------------
+    process.stdout.write('Testing Suite 7: Stateless resolution verification & trust boundary...\n');
+    const testFixedRef = '2026-10-23T10:00:00.000Z';
+
+    // 1. Normal preview followed by matching save succeeds while signed token is valid
+    const normalPreview = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      __testReferenceTime: testFixedRef,
+      body: {
+        action: 'parse',
+        text: 'Doctor checkup tomorrow at 7pm',
+        timeZone: 'Asia/Kolkata'
+      }
+    }), normalPreview);
+    assert.strictEqual(normalPreview.statusCode, 200);
+    assert.ok(normalPreview.body.draft.resolutionToken, 'Resolution token must be returned in draft');
+    const normalToken = normalPreview.body.draft.resolutionToken;
+
+    const normalSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save',
+        confirmed: true,
+        title: normalPreview.body.draft.title,
+        taskType: normalPreview.body.draft.taskType,
+        dateExpression: normalPreview.body.draft.dateExpression,
+        resolutionToken: normalToken,
+        schedulingStatus: normalPreview.body.draft.schedulingStatus,
+        dateLocal: normalPreview.body.draft.dateLocal,
+        timeLocal: normalPreview.body.draft.timeLocal,
+        timeZone: normalPreview.body.draft.timeZone,
+        recurrence: null
+      }
+    }), normalSave);
+    assert.strictEqual(normalSave.statusCode, 201, 'Matching save with valid token must succeed');
+    assert.strictEqual(normalSave.body.reminder.dateLocal, '2026-10-24');
+    assert.strictEqual(normalSave.body.reminder.timeLocal, '19:00');
+
+    // 2. Forged-anchor scenario: caller attempts to make "tomorrow at 7pm" match arbitrary future date by forging referenceTime
+    // Case A: Attacker passes forged referenceTime in body while using token issued from genuine reference instant
+    const forgedAnchorWithToken = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save',
+        confirmed: true,
+        title: 'Forged anchor attack',
+        taskType: 'work',
+        dateExpression: 'tomorrow at 7pm',
+        dateLocal: '2029-05-15', // Arbitrary future date
+        timeLocal: '19:00',
+        timeZone: 'Asia/Kolkata',
+        referenceTime: '2029-05-14T10:00:00.000Z', // Forged referenceTime
+        resolutionToken: normalToken
+      }
+    }), forgedAnchorWithToken);
+    assert.strictEqual(forgedAnchorWithToken.statusCode, 422);
+    assert.strictEqual(forgedAnchorWithToken.body.code, 'SCHEDULE_FIELD_MISMATCH', 'Forged referenceTime in body must not override server verified anchor');
+
+    // Case B: Attacker passes forged referenceTime without token
+    const forgedAnchorNoToken = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save',
+        confirmed: true,
+        title: 'Forged anchor without token',
+        taskType: 'work',
+        dateExpression: 'tomorrow at 7pm',
+        dateLocal: '2029-05-15',
+        timeLocal: '19:00',
+        timeZone: 'Asia/Kolkata',
+        referenceTime: '2029-05-14T10:00:00.000Z'
+      }
+    }), forgedAnchorNoToken);
+    assert.strictEqual(forgedAnchorNoToken.statusCode, 422);
+    assert.strictEqual(forgedAnchorNoToken.body.code, 'MISSING_RESOLUTION_TOKEN');
+
+    // 3. Tampered token signature is rejected
+    const tamperedResToken = normalToken.slice(0, -6) + 'abcdef';
+    const tamperedSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save',
+        confirmed: true,
+        title: 'Tampered token test',
+        taskType: 'work',
+        dateExpression: normalPreview.body.draft.dateExpression,
+        resolutionToken: tamperedResToken,
+        dateLocal: normalPreview.body.draft.dateLocal,
+        timeLocal: normalPreview.body.draft.timeLocal,
+        timeZone: normalPreview.body.draft.timeZone
+      }
+    }), tamperedSave);
+    assert.strictEqual(tamperedSave.statusCode, 422);
+    assert.strictEqual(tamperedSave.body.code, 'INVALID_RESOLUTION_TOKEN');
+
+    // 4. Expired token is rejected
+    const sessionTokenStr = validCookie.split('=')[1];
+    const sessionObj = handler.verifySession(sessionTokenStr, validSecret);
+    const expiredResToken = handler.createResolutionToken({
+      ownerId: sessionObj.ownerId,
+      dateExpression: 'tomorrow at 7pm',
+      timeZone: 'Asia/Kolkata',
+      dateLocal: '2026-10-24',
+      timeLocal: '19:00',
+      schedulingStatus: 'scheduled',
+      referenceTime: testFixedRef
+    }, validSecret, { ttlMs: -10000 });
+    const expiredSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save',
+        confirmed: true,
+        title: 'Expired token test',
+        taskType: 'work',
+        dateExpression: 'tomorrow at 7pm',
+        resolutionToken: expiredResToken,
+        dateLocal: '2026-10-24',
+        timeLocal: '19:00',
+        timeZone: 'Asia/Kolkata'
+      }
+    }), expiredSave);
+    assert.strictEqual(expiredSave.statusCode, 422);
+    assert.strictEqual(expiredSave.body.code, 'EXPIRED_RESOLUTION_TOKEN');
+
+    // 5. Token session owner mismatch is rejected
+    const otherOwnerToken = handler.createResolutionToken({
+      ownerId: '00000000-0000-0000-0000-000000000099', // Different owner
+      dateExpression: 'tomorrow at 7pm',
+      timeZone: 'Asia/Kolkata',
+      dateLocal: '2026-10-24',
+      timeLocal: '19:00',
+      schedulingStatus: 'scheduled',
+      referenceTime: testFixedRef
+    }, validSecret);
+    const ownerMismatchSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save',
+        confirmed: true,
+        title: 'Owner mismatch test',
+        taskType: 'work',
+        dateExpression: 'tomorrow at 7pm',
+        resolutionToken: otherOwnerToken,
+        dateLocal: '2026-10-24',
+        timeLocal: '19:00',
+        timeZone: 'Asia/Kolkata'
+      }
+    }), ownerMismatchSave);
+    assert.strictEqual(ownerMismatchSave.statusCode, 422);
+    assert.strictEqual(ownerMismatchSave.body.code, 'RESOLUTION_OWNER_MISMATCH');
+
+    // 6. Altered fields (date, time, timezone, scheduling status) rejected
+    const alteredDateSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Altered date',
+        dateExpression: 'tomorrow at 7pm', resolutionToken: normalToken,
+        dateLocal: '2026-10-28', timeLocal: '19:00', timeZone: 'Asia/Kolkata'
+      }
+    }), alteredDateSave);
+    assert.strictEqual(alteredDateSave.statusCode, 422);
+    assert.strictEqual(alteredDateSave.body.code, 'SCHEDULE_FIELD_MISMATCH');
+
+    const alteredTimeSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Altered time',
+        dateExpression: 'tomorrow at 7pm', resolutionToken: normalToken,
+        dateLocal: '2026-10-24', timeLocal: '20:00', timeZone: 'Asia/Kolkata'
+      }
+    }), alteredTimeSave);
+    assert.strictEqual(alteredTimeSave.statusCode, 422);
+    assert.strictEqual(alteredTimeSave.body.code, 'SCHEDULE_FIELD_MISMATCH');
+
+    const alteredZoneSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Altered zone',
+        dateExpression: 'tomorrow at 7pm', resolutionToken: normalToken,
+        dateLocal: '2026-10-24', timeLocal: '19:00', timeZone: 'America/New_York'
+      }
+    }), alteredZoneSave);
+    assert.strictEqual(alteredZoneSave.statusCode, 422);
+    assert.strictEqual(alteredZoneSave.body.code, 'SCHEDULE_FIELD_MISMATCH');
+
+    const alteredStatusSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Altered status',
+        dateExpression: 'tomorrow at 7pm', resolutionToken: normalToken,
+        schedulingStatus: 'date_only',
+        dateLocal: '2026-10-24', timeLocal: '19:00', timeZone: 'Asia/Kolkata'
+      }
+    }), alteredStatusSave);
+    assert.strictEqual(alteredStatusSave.statusCode, 422);
+    assert.strictEqual(alteredStatusSave.body.code, 'SCHEDULE_FIELD_MISMATCH');
+
+    // 7. Recurrence checks: missing or mismatched recurrence cannot bypass consistency
+    const recurringPreview = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      __testReferenceTime: testFixedRef,
+      body: {
+        action: 'resolve',
+        dateExpression: 'every day at 10am',
+        timeZone: 'Asia/Kolkata'
+      }
+    }), recurringPreview);
+    assert.strictEqual(recurringPreview.statusCode, 200);
+    const recurringToken = recurringPreview.body.resolutionToken;
+    assert.ok(recurringToken);
+
+    // Missing recurrence when expression requires recurrence
+    const missingRecurrenceSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Missing recurrence',
+        dateExpression: 'every day at 10am', resolutionToken: recurringToken,
+        dateLocal: recurringPreview.body.draft.dateLocal,
+        timeLocal: recurringPreview.body.draft.timeLocal,
+        timeZone: 'Asia/Kolkata',
+        recurrence: null // Missing recurrence
+      }
+    }), missingRecurrenceSave);
+    assert.strictEqual(missingRecurrenceSave.statusCode, 422);
+    assert.strictEqual(missingRecurrenceSave.body.code, 'RECURRENCE_MISMATCH');
+
+    // Mismatched recurrence rule
+    const mismatchedRecurrenceSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Mismatched recurrence',
+        dateExpression: 'every day at 10am', resolutionToken: recurringToken,
+        dateLocal: recurringPreview.body.draft.dateLocal,
+        timeLocal: recurringPreview.body.draft.timeLocal,
+        timeZone: 'Asia/Kolkata',
+        recurrence: { unit: 'week', interval: 1 } // Expression is day: 1
+      }
+    }), mismatchedRecurrenceSave);
+    assert.strictEqual(mismatchedRecurrenceSave.statusCode, 422);
+    assert.strictEqual(mismatchedRecurrenceSave.body.code, 'RECURRENCE_MISMATCH');
+
+    // Adding recurrence to non-recurring expression rejected
+    const nonRecurringToken = normalToken;
+    const addedRecurrenceSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Added recurrence',
+        dateExpression: 'tomorrow at 7pm', resolutionToken: nonRecurringToken,
+        dateLocal: normalPreview.body.draft.dateLocal,
+        timeLocal: normalPreview.body.draft.timeLocal,
+        timeZone: 'Asia/Kolkata',
+        recurrence: { unit: 'week', interval: 1 }
+      }
+    }), addedRecurrenceSave);
+    assert.strictEqual(addedRecurrenceSave.statusCode, 422);
+    assert.strictEqual(addedRecurrenceSave.body.code, 'RECURRENCE_MISMATCH');
+
+    // 8. Manual calendar override with dateExpression: null works without token
+    const manualCalendarSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Manual override task',
+        dateExpression: null,
+        dateLocal: '2028-11-15', timeLocal: '14:00', timeZone: 'Asia/Kolkata',
+        recurrence: { unit: 'month', interval: 2 }
+      }
+    }), manualCalendarSave);
+    assert.strictEqual(manualCalendarSave.statusCode, 201);
+    assert.strictEqual(manualCalendarSave.body.reminder.dateExpression, null);
+    assert.strictEqual(manualCalendarSave.body.reminder.dateLocal, '2028-11-15');
+
+    process.stdout.write('  PASS Suite 7: Stateless resolution verification & trust boundary verified\n');
 
     process.stdout.write('\nPASS reminder API: all session security, length gates, CSRF, and isolation tests passed.\n');
   } finally {
