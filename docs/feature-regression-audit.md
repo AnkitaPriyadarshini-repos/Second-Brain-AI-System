@@ -3,7 +3,8 @@
 **Date of Audit**: October 22, 2026  
 **Auditor**: Senior Software Architect, Reliability Engineer, Security Reviewer & Release Manager  
 **Candidate Branch**: `feat/natural-language-reminders`  
-**Candidate Target Commit**: `67a0f6499bcc03e192732f8d9463980cc4e4552a` (PR #18)  
+**Candidate Target Commit**: `84df315679fd0d9e02823be9f048f1eda183c4a4` (PR #18)  
+**Initial PR Head Commit**: `67a0f6499bcc03e192732f8d9463980cc4e4552a`  
 **Base / Production Branch**: `main` (`3591b14c10f52fe3bf6aedd5ffe15672e3297d90`)  
 **Production URL**: https://second-brain-ai-system.vercel.app/  
 
@@ -18,7 +19,7 @@ This document establishes the verified feature inventory, baseline test state, a
 
 - **Justification**:
   1. The candidate's core reminder implementation (natural-language parsing via `chrono-node`, timezone resolution, DST gap/overlap prevention, review preview, and fail-closed persistence safeguards) is technically sound, secure, and fully verified.
-  2. All 21 test suites (comprising over 110 automated unit, integration, security, and browser E2E tests) pass cleanly.
+  2. All 22 test suites (comprising over 110 automated unit, integration, security, contract, and real Chrome CDP browser E2E tests) pass cleanly.
   3. A candidate-introduced routing gap was identified and corrected: `/api/reminders` was previously omitted from `server.js` and `pages/api/reminders.js`, causing local Next.js runs and Next.js page compilation to report 404 for reminder API calls. Adding the express mount in `server.js` and the delegate in `pages/api/reminders.js` resolved this defect without side effects.
   4. The candidate preserves all working features without architectural disruption, framework switching, or dependency bloat (`chrono-node` adds 0 sub-dependencies).
   5. The **`CONDITIONAL`** status reflects necessary operational prerequisites before production release:
@@ -34,8 +35,8 @@ This document establishes the verified feature inventory, baseline test state, a
 | Environment | Branch / Ref | Commit SHA | Node.js | Runtime | Storage Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Production** | `main` | `3591b14` | v22.x | Vercel Serverless + Next.js | Postgres SQL Schema / In-Memory |
-| **Candidate PR #18** | `feat/natural-language-reminders` | `67a0f64` | v22.12.0 | Next.js 14.2.35 + Express 4.19.2 | Preview-only (Fail-Closed) |
-| **Audit Worktree** | `feat/natural-language-reminders` | `67a0f64` + targeted routing fix | v22.12.0 | Next.js 14.2.35 + Express 4.19.2 | Preview-only verified |
+| **Candidate PR #18 (Initial)** | `feat/natural-language-reminders` | `67a0f64` | v22.12.0 | Next.js 14.2.35 + Express 4.19.2 | Preview-only (Fail-Closed) |
+| **Candidate PR #18 (Audited & Fixed)** | `feat/natural-language-reminders` | `84df315` | v22.12.0 | Next.js 14.2.35 + Express 4.19.2 | Preview-only (Fail-Closed) |
 
 ### 2.2 Baseline Anomaly Investigation (`test/run_media_coding_agent_tests.js:115`)
 - **Observed Behavior**: Video generation test historically failed at line 115 expecting HTTP 503 but receiving HTTP 202.
