@@ -52,4 +52,38 @@ run('daylight-saving overlap is rejected', function () {
 run('invalid calendar dates are rejected', function () {
   const r = resolveLocalDateTime('2026-02-30', '10:00', 'UTC');
   assert.strictEqual(r.ok, false); assert.strictEqual(r.code, 'INVALID_DATE');
+
+run('year boundary rolls to the correct local date and instant', function () {
+  const r = parseReminderText('Settle invoice tomorrow at 9am', {
+    referenceTime: new Date('2026-12-31T03:00:00Z'), timeZone: 'Asia/Kolkata'
+  });
+  assert.strictEqual(r.ok, true, r.message);
+  assert.strictEqual(r.dateLocal, '2027-01-01');
+  assert.strictEqual(r.timeLocal, '09:00');
+  assert.strictEqual(r.dueAt, '2027-01-01T03:30:00.000Z');
+});
+run('valid leap-day reminder parses correctly', function () {
+  const r = parseReminderText('Call mom on February 29, 2028 at 4pm', {
+    referenceTime: reference, timeZone: 'Asia/Kolkata'
+  });
+  assert.strictEqual(r.ok, true, r.message);
+  assert.strictEqual(r.title.toLowerCase(), 'call mom');
+  assert.strictEqual(r.dateLocal, '2028-02-29');
+  assert.strictEqual(r.timeLocal, '16:00');
+});
+run('past same-day times are rejected', function () {
+  const r = parseReminderText('Breakfast today at 7am', {
+    referenceTime: reference, timeZone: 'Asia/Kolkata'
+  });
+  assert.strictEqual(r.ok, false);
+  assert.strictEqual(r.code, 'TIME_IN_PAST');
+});
+run('unsupported recurrence intervals are rejected', function () {
+  const r = parseReminderText('Review notes every 100 days', {
+    referenceTime: reference, timeZone: 'Asia/Kolkata'
+  });
+  assert.strictEqual(r.ok, false);
+  assert.strictEqual(r.code, 'INVALID_RECURRENCE');
+});
+
 });

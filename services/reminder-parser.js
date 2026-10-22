@@ -86,7 +86,7 @@ function parseRecurrence(text) {
 function cleanTitle(value) {
   let title = String(value || '');
   title = title.replace(/^\s*(?:please\s+)?(?:remind\s+me\s+to|remind\s+me|set\s+(?:a\s+)?reminder(?:\s+to)?|create\s+(?:a\s+)?reminder(?:\s+to)?|schedule(?:\s+a\s+reminder)?(?:\s+to)?|don't\s+forget\s+to|remember\s+to|task\s*:\s*)\s*/i, '');
-  return title.replace(/^[\s,;:–—-]+|[\s,;:–—-]+$/g, '').replace(/\s+/g, ' ').trim();
+  return title.replace(/\s+(?:on|at|by)\s*$/i, ' ').replace(/^[\s,;:–—-]+|[\s,;:–—-]+$/g, '').replace(/\s+/g, ' ').trim();
 }
 
 function parseReminderText(text, options) {

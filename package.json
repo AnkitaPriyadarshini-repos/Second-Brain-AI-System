@@ -24,7 +24,8 @@
     "test:rag": "node test/run_rag_system_tests.js",
     "test:audit": "node test/run_production_audit_tests.js",
     "test:workspace": "node test/run_media_coding_agent_tests.js",
-    "test:load": "node test/load_test_100_users.js"
+    "test:load": "node test/load_test_100_users.js",
+    "test:reminders": "node test/run_reminder_parser_tests.js && node test/run_reminder_api_tests.js"
   },
   "dependencies": {
     "express": "^4.19.2",
