@@ -5,10 +5,28 @@ const authGuard = require('./auth-guard');
 const COOKIE_NAME = 'milo_reminder_session';
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const MAX_TITLE_LENGTH = 180;
+const MIN_SECRET_LENGTH = 32;
+
+function getDecodedSecretByteLength(secret) {
+  if (!secret || typeof secret !== 'string') return 0;
+  if (/^[0-9a-fA-F]{64,}$/.test(secret)) {
+    return Buffer.from(secret, 'hex').length;
+  }
+  if (/^[A-Za-z0-9+/_-]{43,}={0,2}$/.test(secret)) {
+    try {
+      const normalized = secret.replace(/-/g, '+').replace(/_/g, '/');
+      const b = Buffer.from(normalized, 'base64');
+      if (b.length >= 32) return b.length;
+    } catch (_) {}
+  }
+  return Buffer.byteLength(secret, 'utf8');
+}
 
 function getSessionSecret() {
   const secret = String(process.env.MILO_SESSION_SECRET || process.env.SESSION_SECRET || process.env.JUNO_SESSION_SECRET || '').trim();
-  return secret.length >= 16 ? secret : '';
+  if (secret.length < MIN_SECRET_LENGTH) return '';
+  if (getDecodedSecretByteLength(secret) < MIN_SECRET_LENGTH) return '';
+  return secret;
 }
 function signPayload(encoded, secret) {
   return crypto.createHmac('sha256', secret).update(encoded).digest('base64url');
@@ -47,8 +65,12 @@ function issueCookie(req, res, token) {
 function getSession(req, res, createIfMissing) {
   const secret = getSessionSecret();
   if (!secret) return { ok: false, error: 'Secure reminder sessions are not configured on this deployment.' };
-  const existing = verifySession(readCookie(req, COOKIE_NAME), secret);
-  if (existing) return { ok: true, session: existing };
+  const rawCookie = readCookie(req, COOKIE_NAME);
+  if (rawCookie) {
+    const existing = verifySession(rawCookie, secret);
+    if (existing) return { ok: true, session: existing };
+    return { ok: false, error: 'Reminder session is invalid or expired. Refresh the page and try again.' };
+  }
   if (!createIfMissing) return { ok: false, error: 'Reminder session is missing or expired. Refresh the page and try again.' };
   const token = createSession(secret), session = verifySession(token, secret);
   issueCookie(req, res, token);
@@ -194,3 +216,9 @@ async function handler(req, res) {
 }
 module.exports = handler;
 module.exports.default = handler;
+module.exports.getSessionSecret = getSessionSecret;
+module.exports.verifySession = verifySession;
+module.exports.createSession = createSession;
+module.exports.sameOrigin = sameOrigin;
+module.exports.MIN_SECRET_LENGTH = MIN_SECRET_LENGTH;
+

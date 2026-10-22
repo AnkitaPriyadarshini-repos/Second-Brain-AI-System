@@ -9,9 +9,12 @@
  * - Incomplete time & ambiguous date validation feedback in real DOM
  * - Fail-closed storage behavior when Redis is unconfigured
  * - Console error monitoring across all interactions
+ * - Robust cross-platform Chrome/Chromium discovery (CHROME_PATH, CHROME_BIN, standard OS paths)
+ * - Strict non-zero exit when browser cannot run unless explicit ALLOW_BROWSER_E2E_SKIP=1
+ * - Guaranteed cleanup of processes, sockets, servers, and temporary user profiles
  */
 
-const { spawn } = require('child_process');
+const { spawn, spawnSync } = require('child_process');
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
@@ -21,14 +24,113 @@ const WebSocket = require('ws');
 
 const reminderHandler = require('../api/reminders');
 
-const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-const userDataDir = path.join(__dirname, '..', 'scratch', 'cdp_browser_reminders_' + Date.now());
 const cdpPort = 9489;
 const httpPort = 3788;
+const scratchDir = path.join(__dirname, '..', 'scratch');
+const userDataDir = path.join(scratchDir, 'cdp_browser_reminders_' + Date.now());
 
-console.log('====================================================');
-console.log('🌐 MILO REAL BROWSER REMINDERS & VIEWS E2E GATE');
-console.log('====================================================\n');
+let chromeProcess = null;
+let wsConnection = null;
+let httpServer = null;
+let isCleanedUp = false;
+
+function cleanup() {
+  if (isCleanedUp) return;
+  isCleanedUp = true;
+
+  if (wsConnection) {
+    try { wsConnection.close(); } catch (_) {}
+    wsConnection = null;
+  }
+
+  if (chromeProcess) {
+    try {
+      if (process.platform === 'win32' && chromeProcess.pid) {
+        spawnSync('taskkill', ['/pid', String(chromeProcess.pid), '/T', '/F'], { timeout: 3000 });
+      } else {
+        chromeProcess.kill('SIGKILL');
+      }
+    } catch (_) {}
+    chromeProcess = null;
+  }
+
+  if (httpServer) {
+    try { httpServer.close(); } catch (_) {}
+    httpServer = null;
+  }
+
+  if (fs.existsSync(userDataDir)) {
+    try {
+      fs.rmSync(userDataDir, { recursive: true, force: true, maxRetries: 3 });
+    } catch (_) {}
+  }
+}
+
+process.on('SIGINT', () => { cleanup(); process.exit(130); });
+process.on('SIGTERM', () => { cleanup(); process.exit(143); });
+process.on('exit', () => { cleanup(); });
+
+function findChromeExecutable() {
+  // 1. Explicit environment variables take strict precedence
+  const explicitPath = process.env.CHROME_PATH || process.env.CHROME_BIN;
+  if (explicitPath && typeof explicitPath === 'string' && explicitPath.trim()) {
+    const trimmed = explicitPath.trim();
+    if (fs.existsSync(trimmed)) {
+      try {
+        if (fs.statSync(trimmed).isFile()) return trimmed;
+      } catch (_) {}
+    }
+    return null;
+  }
+
+  // 2. Standard platform installation locations
+  const platform = process.platform;
+  const standardPaths = [];
+
+  if (platform === 'win32') {
+    const localAppData = process.env.LOCALAPPDATA || '';
+    const programFiles = process.env.PROGRAMFILES || 'C:\\Program Files';
+    const programFilesX86 = process.env['PROGRAMFILES(X86)'] || 'C:\\Program Files (x86)';
+
+    standardPaths.push(
+      path.join(programFiles, 'Google', 'Chrome', 'Application', 'chrome.exe'),
+      path.join(programFilesX86, 'Google', 'Chrome', 'Application', 'chrome.exe'),
+      path.join(localAppData, 'Google', 'Chrome', 'Application', 'chrome.exe'),
+      'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+      'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+      path.join(programFilesX86, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
+      path.join(programFiles, 'Microsoft', 'Edge', 'Application', 'msedge.exe')
+    );
+  } else if (platform === 'darwin') {
+    standardPaths.push(
+      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      '/Applications/Google Chrome Beta.app/Contents/MacOS/Google Chrome Beta',
+      '/Applications/Chromium.app/Contents/MacOS/Chromium',
+      '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge'
+    );
+  } else {
+    standardPaths.push(
+      '/usr/bin/google-chrome',
+      '/usr/bin/google-chrome-stable',
+      '/usr/bin/chromium',
+      '/usr/bin/chromium-browser',
+      '/snap/bin/chromium',
+      '/usr/bin/microsoft-edge-stable'
+    );
+  }
+
+  for (const candidate of standardPaths) {
+    if (candidate && fs.existsSync(candidate)) {
+      try {
+        if (fs.statSync(candidate).isFile()) {
+          return candidate;
+        }
+      } catch (_) {}
+    }
+  }
+
+  return null;
+}
 
 function waitForHttp(port, maxAttempts = 30) {
   return new Promise(async (resolve, reject) => {
@@ -53,6 +155,32 @@ function waitForHttp(port, maxAttempts = 30) {
 }
 
 async function runBrowserRemindersTests() {
+  console.log('====================================================');
+  console.log('🌐 MILO REAL BROWSER REMINDERS & VIEWS E2E GATE');
+  console.log('====================================================\n');
+
+  const chromePath = findChromeExecutable();
+
+  if (!chromePath) {
+    if (process.env.ALLOW_BROWSER_E2E_SKIP === '1') {
+      console.warn('⚠️ [SKIP] Browser E2E skipped: No Chrome/Chromium executable discovered and ALLOW_BROWSER_E2E_SKIP=1 is set.');
+      cleanup();
+      process.exit(0);
+    }
+    console.error('❌ [FATAL] Browser E2E failed: No viable Chrome/Chromium executable discovered.');
+    console.error('   Please set CHROME_PATH or install Google Chrome.');
+    console.error('   To permit skipping explicitly in headless environments without a browser, set ALLOW_BROWSER_E2E_SKIP=1.');
+    cleanup();
+    process.exit(1);
+  }
+
+  console.log(`Discovered functional browser executable: ${chromePath}`);
+
+  // Create scratch dir if needed
+  if (!fs.existsSync(scratchDir)) {
+    fs.mkdirSync(scratchDir, { recursive: true });
+  }
+
   const app = express();
   app.use(express.json());
 
@@ -61,23 +189,17 @@ async function runBrowserRemindersTests() {
     return reminderHandler(req, res);
   });
 
-  // Health and fallback endpoints
+  // Health endpoint
   app.get('/api/ai/health', (req, res) => {
     res.json({ ok: true, service: 'milo-ai-gateway', timestamp: new Date().toISOString() });
   });
 
   app.use(express.static(path.join(__dirname, '..')));
 
-  const server = app.listen(httpPort);
+  httpServer = app.listen(httpPort);
   console.log(`Local test webserver listening on http://127.0.0.1:${httpPort}`);
 
-  if (!fs.existsSync(chromePath)) {
-    console.warn(`[SKIP] Chrome executable not found at ${chromePath}.`);
-    server.close();
-    return;
-  }
-
-  const chromeProcess = spawn(chromePath, [
+  chromeProcess = spawn(chromePath, [
     `--remote-debugging-port=${cdpPort}`,
     `--user-data-dir=${userDataDir}`,
     '--headless=new',
@@ -90,8 +212,11 @@ async function runBrowserRemindersTests() {
   try {
     const targets = await waitForHttp(cdpPort);
     const pageTarget = targets.find(t => t.type === 'page') || targets[0];
-    const ws = new WebSocket(pageTarget.webSocketDebuggerUrl);
-    await new Promise(r => ws.on('open', r));
+    wsConnection = new WebSocket(pageTarget.webSocketDebuggerUrl);
+    await new Promise((resolve, reject) => {
+      wsConnection.on('open', resolve);
+      wsConnection.on('error', reject);
+    });
 
     let msgId = 1;
     function send(method, params = {}) {
@@ -100,18 +225,18 @@ async function runBrowserRemindersTests() {
         const handler = (data) => {
           const msg = JSON.parse(data.toString());
           if (msg.id === id) {
-            ws.off('message', handler);
+            wsConnection.off('message', handler);
             if (msg.error) reject(msg.error);
             else resolve(msg.result);
           }
         };
-        ws.on('message', handler);
-        ws.send(JSON.stringify({ id, method, params }));
+        wsConnection.on('message', handler);
+        wsConnection.send(JSON.stringify({ id, method, params }));
       });
     }
 
     const consoleErrors = [];
-    ws.on('message', (data) => {
+    wsConnection.on('message', (data) => {
       try {
         const msg = JSON.parse(data.toString());
         if (msg.method === 'Runtime.consoleAPICalled' && msg.params.type === 'error') {
@@ -129,7 +254,6 @@ async function runBrowserRemindersTests() {
 
     console.log(`Navigating to http://127.0.0.1:${httpPort}/index.html...`);
     await send('Page.navigate', { url: `http://127.0.0.1:${httpPort}/index.html` });
-    await new Promise(r => setTimeout(r, 2500));
 
     async function evalPage(fnStr) {
       const res = await send('Runtime.evaluate', {
@@ -144,10 +268,24 @@ async function runBrowserRemindersTests() {
       return res.result?.value;
     }
 
+    // Deterministic readiness check: wait until document is ready and window.activateView is available
+    let pageReady = false;
+    for (let i = 0; i < 60; i++) {
+      try {
+        const isReady = await evalPage(`() => document.readyState === 'complete' && typeof window.activateView === 'function' && !!document.getElementById('view-jarvis')`);
+        if (isReady) {
+          pageReady = true;
+          break;
+        }
+      } catch (_) {}
+      await new Promise(r => setTimeout(r, 100));
+    }
+    assert.strictEqual(pageReady, true, 'Page failed to reach interactive state within readiness timeout');
+
     // ----------------------------------------------------
-    // Test 1: Navigation across core screens
+    // Phase 1: Navigation across core screens
     // ----------------------------------------------------
-    console.log('Test 1: Core Screen Navigation');
+    console.log('Phase 1: Core Screen Navigation');
     const viewsToTest = [
       { view: 'vault', id: 'view-vault' },
       { view: 'goals', id: 'view-goals' },
@@ -165,12 +303,12 @@ async function runBrowserRemindersTests() {
       }`);
       assert.strictEqual(activeId, item.id, `Navigating to ${item.view} must activate ${item.id}`);
     }
-    console.log('  ✅ [PASS] Successfully navigated across core application views');
+    console.log('  ✅ [PASS] Phase 1: Successfully navigated across 6 core application views');
 
     // ----------------------------------------------------
-    // Test 2: Repeated Navigation back and forth
+    // Phase 2: Repeated Navigation back and forth
     // ----------------------------------------------------
-    console.log('Test 2: Repeated Navigation Between Chat, Vault, and Reminders');
+    console.log('Phase 2: Repeated Navigation Between Chat, Vault, and Reminders');
     for (let i = 0; i < 3; i++) {
       await evalPage(`() => { window.activateView('reminders'); }`);
       const remActive = await evalPage(`() => document.getElementById('view-reminders').classList.contains('active')`);
@@ -180,12 +318,12 @@ async function runBrowserRemindersTests() {
       const jarvisActive = await evalPage(`() => document.getElementById('view-jarvis').classList.contains('active')`);
       assert.strictEqual(jarvisActive, true);
     }
-    console.log('  ✅ [PASS] Repeated navigation between views maintained stable DOM state');
+    console.log('  ✅ [PASS] Phase 2: Repeated navigation between views maintained stable DOM state across 3 cycles');
 
     // ----------------------------------------------------
-    // Test 3: Reminder Prototype Preview & Live Draft Editing
+    // Phase 3: Reminder Prototype Preview & Live Draft Editing
     // ----------------------------------------------------
-    console.log('Test 3: Natural Language Reminder Preview Flow');
+    console.log('Phase 3: Natural Language Reminder Preview Flow & Storage-Gated Save Button');
     await evalPage(`() => { window.activateView('reminders'); }`);
 
     const previewResult = await evalPage(`async () => {
@@ -197,7 +335,6 @@ async function runBrowserRemindersTests() {
       const submitEvent = new Event('submit', { cancelable: true, bubbles: true });
       form.dispatchEvent(submitEvent);
 
-      // Wait for async preview response
       for (let i = 0; i < 30; i++) {
         await new Promise(r => setTimeout(r, 100));
         const card = document.getElementById('reminder-preview-card');
@@ -220,12 +357,12 @@ async function runBrowserRemindersTests() {
     assert.strictEqual(previewResult.title.toLowerCase(), 'submit final report');
     assert.strictEqual(previewResult.timeInput, '19:00');
     assert.strictEqual(previewResult.saveDisabled, true, 'Save must be disabled when storage is unconfigured');
-    console.log('  ✅ [PASS] Natural language phrase correctly parsed, previewed, and gated');
+    console.log('  ✅ [PASS] Phase 3: Natural language phrase correctly parsed, previewed, and save button safely gated');
 
     // ----------------------------------------------------
-    // Test 4: Live Editing of Draft Title
+    // Phase 4: Live Editing of Draft Title
     // ----------------------------------------------------
-    console.log('Test 4: Live Editing of Preview Draft');
+    console.log('Phase 4: Live Editing of Preview Draft');
     const liveEditResult = await evalPage(`() => {
       const titleInput = document.getElementById('reminder-title');
       titleInput.value = 'submit final audited report';
@@ -233,12 +370,12 @@ async function runBrowserRemindersTests() {
       return document.getElementById('reminder-preview-title').textContent;
     }`);
     assert.strictEqual(liveEditResult, 'submit final audited report');
-    console.log('  ✅ [PASS] Live draft title updates reflected instantaneously in review card');
+    console.log('  ✅ [PASS] Phase 4: Live draft title updates reflected instantaneously in review card');
 
     // ----------------------------------------------------
-    // Test 5: Incomplete Time Requires User Input
+    // Phase 5: Incomplete Time Requires User Input
     // ----------------------------------------------------
-    console.log('Test 5: Incomplete Time Rejection & Clarification Prompt');
+    console.log('Phase 5: Incomplete Time Rejection & Clarification Prompt');
     const incompleteResult = await evalPage(`async () => {
       const input = document.getElementById('reminder-input');
       const form = document.getElementById('reminder-form');
@@ -267,12 +404,12 @@ async function runBrowserRemindersTests() {
     assert.ok(incompleteResult, 'Clarification summary must appear');
     assert.strictEqual(incompleteResult.timeValue, '', 'Time must not be assumed');
     assert.match(incompleteResult.summaryText, /AM\/PM|24-hour/i, 'Summary must instruct user to specify AM/PM or 24-hour');
-    console.log('  ✅ [PASS] Bare hour expression ("at 7") safely refused to invent a default time');
+    console.log('  ✅ [PASS] Phase 5: Bare hour expression ("at 7") safely refused to invent a default time');
 
     // ----------------------------------------------------
-    // Test 6: Ambiguous Numeric Date Rejection
+    // Phase 6: Ambiguous Numeric Date Rejection
     // ----------------------------------------------------
-    console.log('Test 6: Ambiguous Numeric Date Rejection');
+    console.log('Phase 6: Ambiguous Numeric Date Rejection');
     const ambiguousResult = await evalPage(`async () => {
       const input = document.getElementById('reminder-input');
       const form = document.getElementById('reminder-form');
@@ -294,12 +431,12 @@ async function runBrowserRemindersTests() {
     }`);
     assert.ok(ambiguousResult, 'Ambiguous date error notice must appear');
     assert.match(ambiguousResult, /two different dates|month name|YYYY-MM-DD/i);
-    console.log('  ✅ [PASS] Ambiguous date ("03/04/2027") safely rejected with clear guidance');
+    console.log('  ✅ [PASS] Phase 6: Ambiguous date ("03/04/2027") safely rejected with clear guidance');
 
     // ----------------------------------------------------
-    // Test 7: Mobile Viewport & Drawer Navigation
+    // Phase 7: Mobile Viewport & Drawer Navigation
     // ----------------------------------------------------
-    console.log('Test 7: Mobile Viewport & Drawer Navigation');
+    console.log('Phase 7: Mobile Viewport & Drawer Navigation');
     await send('Emulation.setDeviceMetricsOverride', {
       width: 375,
       height: 812,
@@ -327,30 +464,28 @@ async function runBrowserRemindersTests() {
     }`);
     assert.strictEqual(mobileNavResult.remindersActive, true);
     assert.strictEqual(mobileNavResult.drawerClosed, true);
-    console.log('  ✅ [PASS] Mobile drawer toggle and mobile view switching verified cleanly');
+    console.log('  ✅ [PASS] Phase 7: Mobile drawer toggle and mobile view switching verified cleanly');
 
     // Reset device metrics
     await send('Emulation.clearDeviceMetricsOverride');
 
     // ----------------------------------------------------
-    // Test 8: Console Error Integrity
+    // Phase 8: Console Error Integrity
     // ----------------------------------------------------
-    console.log('Test 8: Console Error Integrity');
+    console.log('Phase 8: Console Error Integrity');
     assert.strictEqual(consoleErrors.length, 0, `Unexpected console errors found: ${consoleErrors.join('; ')}`);
-    console.log('  ✅ [PASS] Zero unexpected client console errors detected across all flows');
+    console.log('  ✅ [PASS] Phase 8: Zero unexpected client console errors detected across all flows');
 
     console.log('\n====================================================');
-    console.log('🎉 ALL BROWSER REMINDERS & VIEWS E2E TESTS PASSED');
-    console.log('====================================================');
+    console.log('🎉 ALL 8 BROWSER REMINDERS & VIEWS E2E PHASES PASSED');
+    console.log('   Phases executed: 8 | Passed: 8 | Failed: 0 | Skipped: 0');
+    console.log('====================================================\n');
 
-    ws.close();
-    chromeProcess.kill();
-    server.close();
+    cleanup();
     process.exit(0);
   } catch (err) {
     console.error('❌ E2E Browser Test Failed:', err);
-    if (chromeProcess) chromeProcess.kill();
-    if (server) server.close();
+    cleanup();
     process.exit(1);
   }
 }
