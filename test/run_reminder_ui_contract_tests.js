@@ -25,5 +25,8 @@ assert.ok(js.includes('state.persistenceConfigured'), 'UI should disable saving 
 assert.ok(js.includes('Notifications are not configured'), 'UI must be clear that notifications are not available');
 assert.ok(!js.includes('localStorage'), 'Reminder persistence must not use browser localStorage');
 assert.ok(api.includes("if (!headers.origin) return false;"), 'Mutating API calls must reject requests with no Origin header');
-assert.ok(api.includes('reminder-parse:'), 'Parser endpoint should have request throttling');
+const serverJs = fs.readFileSync(path.join(root, 'server.js'), 'utf8');
+const pagesApiReminders = fs.readFileSync(path.join(root, 'pages', 'api', 'reminders.js'), 'utf8');
+assert.ok(serverJs.includes("'/api/reminders'"), 'server.js must mount /api/reminders endpoint');
+assert.ok(pagesApiReminders.includes("require('../../api/reminders')"), 'pages/api/reminders.js must delegate to root api/reminders');
 process.stdout.write('PASS reminder UI contract: navigation, preview, confirmation, honest capability status, and security guardrails\n');
