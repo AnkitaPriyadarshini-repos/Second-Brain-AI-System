@@ -37,9 +37,9 @@ async function main() {
 
   try {
     // ----------------------------------------------------
-    // Suite 1: Session Secret Minimum Length & Entropy Gate
+    // Suite 1: Session Secret Minimum Length & Decoded-Byte Gate
     // ----------------------------------------------------
-    process.stdout.write('Testing Suite 1: Session Secret Minimum Length & Entropy Gate...\n');
+    process.stdout.write('Testing Suite 1: Session Secret Minimum Length & Decoded-Byte Gate...\n');
 
     // Missing secret
     delete process.env.MILO_SESSION_SECRET;
@@ -54,22 +54,24 @@ async function main() {
     process.env.MILO_SESSION_SECRET = 'a'.repeat(31);
     assert.strictEqual(handler.getSessionSecret(), '', '31-character secret must be rejected');
 
-    // Secret at accepted minimum: exactly 32 characters / 32 bytes
+    // Secret at accepted minimum: exactly 32 characters / 32 bytes.
+    // Demonstrates that length/byte boundaries are enforced, but code cannot prove cryptographic entropy;
+    // operational security depends on provisioning a cryptographically random secret via openssl rand -hex 32.
     const minSecret = 'a'.repeat(32);
     process.env.MILO_SESSION_SECRET = minSecret;
-    assert.strictEqual(handler.getSessionSecret(), minSecret, 'Exactly 32-character / 32-byte secret must be accepted');
+    assert.strictEqual(handler.getSessionSecret(), minSecret, 'Exactly 32-character / 32-byte secret must be accepted (demonstrates length/byte enforcement vs entropy)');
 
-    // High-entropy hex secret: 64 characters representing 32 raw bytes
+    // Cryptographically random hex secret: 64 characters representing 32 raw bytes (e.g. openssl rand -hex 32)
     const hexSecret = crypto.randomBytes(32).toString('hex');
     process.env.MILO_SESSION_SECRET = hexSecret;
     assert.strictEqual(handler.getSessionSecret(), hexSecret, '64-hex-character (32-byte) secret must be accepted');
 
-    // High-entropy base64 secret: 44 characters representing 32 raw bytes
+    // Cryptographically random base64 secret: 44 characters representing 32 raw bytes (e.g. openssl rand -base64 32)
     const b64Secret = crypto.randomBytes(32).toString('base64');
     process.env.MILO_SESSION_SECRET = b64Secret;
     assert.strictEqual(handler.getSessionSecret(), b64Secret, '44-base64-character (32-byte) secret must be accepted');
 
-    process.stdout.write('  PASS Suite 1: Secret length & entropy validation verified\n');
+    process.stdout.write('  PASS Suite 1: Secret length & byte size validation verified\n');
 
     // ----------------------------------------------------
     // Suite 2: Preview Parsing Without Storage vs Save Gating

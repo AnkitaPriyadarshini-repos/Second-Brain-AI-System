@@ -7,6 +7,7 @@ const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const MAX_TITLE_LENGTH = 180;
 const MIN_SECRET_LENGTH = 32;
 
+// Enforces minimum decoded-byte length (>= 32 bytes for hex, base64, or raw UTF-8).
 function getDecodedSecretByteLength(secret) {
   if (!secret || typeof secret !== 'string') return 0;
   if (/^[0-9a-fA-F]{64,}$/.test(secret)) {
@@ -22,6 +23,10 @@ function getDecodedSecretByteLength(secret) {
   return Buffer.byteLength(secret, 'utf8');
 }
 
+// Enforces a minimum character length (32 chars) and decoded-byte length (32 bytes).
+// Note: Length and byte-size checks alone cannot prove cryptographic entropy (e.g. 'a'.repeat(32) passes).
+// Operational security depends on provisioning a cryptographically random secret generated via
+// 'openssl rand -hex 32' or an equivalent secure method.
 function getSessionSecret() {
   const secret = String(process.env.MILO_SESSION_SECRET || process.env.SESSION_SECRET || process.env.JUNO_SESSION_SECRET || '').trim();
   if (secret.length < MIN_SECRET_LENGTH) return '';
