@@ -72,6 +72,27 @@ async function main() {
       timeLocal: '19:00', timeZone: 'Asia/Kolkata'
     }}), unconfirmed);
     assert.strictEqual(unconfirmed.statusCode, 400);
+    // Preview must remain usable without secret/storage configuration; saves must fail closed.
+    delete process.env.MILO_SESSION_SECRET;
+    delete process.env.UPSTASH_REDIS_REST_URL;
+    delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    const previewOnly = res();
+    await handler(req('POST', {
+      body: { action: 'parse', text: 'Submit the assignment tomorrow at 6pm', timeZone: 'Asia/Kolkata' }
+    }), previewOnly);
+    assert.strictEqual(previewOnly.statusCode, 200);
+    assert.strictEqual(previewOnly.body.success, true);
+    assert.strictEqual(previewOnly.body.persistenceConfigured, false);
+
+    const blockedSave = res();
+    await handler(req('POST', {
+      body: {
+        action: 'save', confirmed: true, title: 'Submit the assignment',
+        dateLocal: '2035-10-23', timeLocal: '18:00', timeZone: 'Asia/Kolkata'
+      }
+    }), blockedSave);
+    assert.strictEqual(blockedSave.statusCode, 503);
+    assert.ok(/not configured/i.test(blockedSave.body.error));
     process.stdout.write('PASS reminder API: save, list, confirmation gate, and owner isolation\n');
   } finally {
     global.fetch = oldFetch;
