@@ -1,0 +1,29 @@
+'use strict';
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+
+const root = path.join(__dirname, '..');
+const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const css = fs.readFileSync(path.join(root, 'css', 'natural-language-reminders.css'), 'utf8');
+const js = fs.readFileSync(path.join(root, 'js', 'natural-language-reminders.js'), 'utf8');
+const api = fs.readFileSync(path.join(root, 'api', 'reminders.js'), 'utf8');
+
+assert.ok(html.includes('id="view-reminders"'), 'Reminders view should exist');
+assert.ok(html.includes('data-view="reminders"'), 'Desktop navigation should include Reminders');
+assert.ok(html.includes("window.activateView('reminders')"), 'Reminders navigation should use the existing view router');
+assert.ok(html.includes('id="reminder-form"'), 'Natural-language input form should exist');
+assert.ok(html.includes('id="reminder-preview-card"'), 'Editable review preview should exist');
+assert.ok(html.includes('id="reminder-save-btn"'), 'Save confirmation button should exist');
+assert.ok(html.includes('id="reminder-date"') && html.includes('id="reminder-time"'), 'Manual date/time fields should exist');
+assert.ok(html.includes('css/natural-language-reminders.css'), 'Reminder stylesheet should be loaded');
+assert.ok(html.includes('js/natural-language-reminders.js'), 'Reminder controller should be loaded');
+assert.ok(css.includes('@media (max-width: 820px)'), 'Reminder screen should have a mobile layout');
+assert.ok(js.includes("action: 'parse'"), 'UI should request a parser draft');
+assert.ok(js.includes("action: 'save'") && js.includes('confirmed: true'), 'UI should require an explicit confirmation save action');
+assert.ok(js.includes('state.persistenceConfigured'), 'UI should disable saving when durable storage is unavailable');
+assert.ok(js.includes('Notifications are not configured'), 'UI must be clear that notifications are not available');
+assert.ok(!js.includes('localStorage'), 'Reminder persistence must not use browser localStorage');
+assert.ok(api.includes("if (!headers.origin) return false;"), 'Mutating API calls must reject requests with no Origin header');
+assert.ok(api.includes('reminder-parse:'), 'Parser endpoint should have request throttling');
+process.stdout.write('PASS reminder UI contract: navigation, preview, confirmation, honest capability status, and security guardrails\n');

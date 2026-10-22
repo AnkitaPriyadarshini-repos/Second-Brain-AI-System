@@ -63,19 +63,26 @@ function getRedisConfig() {
 async function redisCommand(command) {
   const config = getRedisConfig();
   if (!config) throw new Error('REMINDER_STORE_NOT_CONFIGURED');
-  const response = await fetch(config.url, {
-    method: 'POST',
-    headers: { Authorization: 'Bearer ' + config.token, 'Content-Type': 'application/json' },
-    body: JSON.stringify(command),
-    cache: 'no-store'
-  });
-  const payload = await response.json().catch(function () { return {}; });
-  if (!response.ok || payload.error) throw new Error('REMINDER_STORE_REQUEST_FAILED');
-  return payload.result;
+  const controller = new AbortController();
+  const timeout = setTimeout(function () { controller.abort(); }, 4500);
+  try {
+    const response = await fetch(config.url, {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + config.token, 'Content-Type': 'application/json' },
+      body: JSON.stringify(command),
+      cache: 'no-store',
+      signal: controller.signal
+    });
+    const payload = await response.json().catch(function () { return {}; });
+    if (!response.ok || payload.error) throw new Error('REMINDER_STORE_REQUEST_FAILED');
+    return payload.result;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 function sameOrigin(req) {
   const headers = req.headers || {};
-  if (!headers.origin) return String(headers['sec-fetch-site'] || '').toLowerCase() !== 'cross-site';
+  if (!headers.origin) return false;
   const host = headers['x-forwarded-host'] || headers.host || '';
   if (!host) return false;
   try { return new URL(headers.origin).host.toLowerCase() === String(host).split(',')[0].trim().toLowerCase(); }
@@ -123,6 +130,9 @@ async function handler(req, res) {
   if (req.method === 'POST') {
     const body = req.body && typeof req.body === 'object' ? req.body : {};
     if (body.action === 'parse') {
+      const clientIp = authGuard.getVerifiedClientIp(req);
+      const parseRate = authGuard.checkRateLimit('reminder-parse:' + clientIp, 120, 60000);
+      if (!parseRate.allowed) return respond(res, 429, { success: false, error: 'Too many reminder previews. Please try again shortly.' });
       const draft = parseReminderText(body.text, { timeZone: body.timeZone || 'UTC', referenceTime: new Date() });
       if (!draft.ok) return respond(res, 422, { success: false, code: draft.code, error: draft.message });
       return respond(res, 200, { success: true, draft: draft, persistenceConfigured: Boolean(getRedisConfig() && session) });

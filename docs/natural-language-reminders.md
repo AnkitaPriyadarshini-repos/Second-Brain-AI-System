@@ -27,3 +27,6 @@ A successful save is a saved reminder, not a scheduled notification. No schedule
 
 ## Checks
 Run node test/run_reminder_parser_tests.js, node test/run_reminder_api_tests.js, and npm test.
+
+### Additional protection
+Parser previews are rate-limited at 120 requests per minute per verified client IP as an instance-level abuse guard. Durable writes are rate-limited per signed reminder owner. These in-memory rate counters are per serverless instance, not global counters.
