@@ -1,7 +1,12 @@
 'use strict';
 const crypto = require('crypto');
 const { parseReminderText, resolveLocalDateTime, validTimeZone } = require('../services/reminder-parser');
+const ReminderDateResolutionService = require('../services/ReminderDateResolutionService');
+const TaskExtractionService = require('../services/TaskExtractionService');
 const authGuard = require('./auth-guard');
+
+const taskExtractionService = new TaskExtractionService();
+const dateResolutionService = new ReminderDateResolutionService();
 const COOKIE_NAME = 'milo_reminder_session';
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const MAX_TITLE_LENGTH = 180;
@@ -130,9 +135,19 @@ function validRecurrence(value) {
 function safeReminder(value, ownerId) {
   if (!value || typeof value !== 'object' || value.ownerId !== ownerId) return null;
   return {
-    id: value.id, title: value.title, dateLocal: value.dateLocal, timeLocal: value.timeLocal,
-    timeZone: value.timeZone, dueAt: value.dueAt, recurrence: value.recurrence || null,
-    status: 'saved', notificationStatus: 'not-configured', createdAt: value.createdAt
+    id: value.id,
+    title: value.title,
+    taskType: value.taskType || 'general',
+    dateExpression: value.dateExpression || null,
+    schedulingStatus: value.schedulingStatus || (value.dueAt ? 'scheduled' : 'unscheduled'),
+    dateLocal: value.dateLocal,
+    timeLocal: value.timeLocal,
+    timeZone: value.timeZone,
+    dueAt: value.dueAt,
+    recurrence: value.recurrence || null,
+    status: 'saved',
+    notificationStatus: 'not-configured',
+    createdAt: value.createdAt
   };
 }
 async function listReminders(session) {
@@ -142,7 +157,12 @@ async function listReminders(session) {
   for (let i = 0; i + 1 < result.length; i += 2) {
     try { const safe = safeReminder(JSON.parse(result[i + 1]), session.ownerId); if (safe) reminders.push(safe); } catch (_) {}
   }
-  return reminders.sort(function (a, b) { return String(a.dueAt).localeCompare(String(b.dueAt)); });
+  return reminders.sort(function (a, b) {
+    if (!a.dueAt && !b.dueAt) return String(a.createdAt).localeCompare(String(b.createdAt));
+    if (!a.dueAt) return 1;
+    if (!b.dueAt) return -1;
+    return String(a.dueAt).localeCompare(String(b.dueAt));
+  });
 }
 
 async function handler(req, res) {
@@ -156,15 +176,116 @@ async function handler(req, res) {
 
   if (req.method === 'POST') {
     const body = req.body && typeof req.body === 'object' ? req.body : {};
+
+    // -------------------------------------------------------------------------
+    // Action 1: Parse (Model Task Extraction -> Deterministic Date Resolution)
+    // -------------------------------------------------------------------------
     if (body.action === 'parse') {
       const clientIp = authGuard.getVerifiedClientIp(req);
       const parseRate = authGuard.checkRateLimit('reminder-parse:' + clientIp, 120, 60000);
       if (!parseRate.allowed) return respond(res, 429, { success: false, error: 'Too many reminder previews. Please try again shortly.' });
-      const draft = parseReminderText(body.text, { timeZone: body.timeZone || 'UTC', referenceTime: new Date() });
-      if (!draft.ok) return respond(res, 422, { success: false, code: draft.code, error: draft.message });
+
+      const text = typeof body.text === 'string' ? body.text.trim() : '';
+      if (!text) return respond(res, 422, { success: false, code: 'EMPTY_TEXT', error: 'Enter what you want to be reminded about.' });
+      if (text.length > 500) return respond(res, 422, { success: false, code: 'TEXT_TOO_LONG', error: 'Keep reminder text under 500 characters.' });
+
+      const timeZone = typeof body.timeZone === 'string' && body.timeZone.trim() ? body.timeZone.trim() : 'UTC';
+      if (!validTimeZone(timeZone)) return respond(res, 422, { success: false, code: 'INVALID_TIME_ZONE', error: 'Choose a valid IANA time zone, such as Asia/Kolkata.' });
+
+      // Explicit reference instant captured at start of resolution request
+      const referenceTime = body.referenceTime ? new Date(body.referenceTime) : new Date();
+
+      // Stage 1: AI Task Extraction (model-backed or deterministic fallback)
+      const extracted = await taskExtractionService.extractTask(body.text, { timeZone: timeZone });
+      if (!extracted.ok) {
+        return respond(res, 422, { success: false, code: extracted.code, error: extracted.message });
+      }
+
+      // Stage 2: Pure deterministic rule-based date resolution
+      const resolution = dateResolutionService.resolveDateExpression(extracted.dateExpression, {
+        referenceTime: referenceTime,
+        timeZone: timeZone
+      });
+
+      if (!resolution.ok) {
+        return respond(res, 422, { success: false, code: resolution.code, error: resolution.message });
+      }
+
+      const draft = {
+        ok: true,
+        title: extracted.title,
+        taskType: extracted.taskType,
+        taskClassification: extracted.taskType,
+        dateExpression: extracted.dateExpression,
+        schedulingStatus: resolution.schedulingStatus,
+        dateLocal: resolution.dateLocal,
+        timeLocal: resolution.timeLocal,
+        timeZone: resolution.timeZone,
+        dueAt: resolution.dueAt,
+        recurrence: resolution.recurrence,
+        needs: resolution.needs,
+        message: resolution.message,
+        referenceTime: resolution.referenceTime,
+        dateResolvedBy: 'deterministic_parser',
+        requiresConfirmation: true,
+        providerUsed: extracted.providerUsed
+      };
+
       return respond(res, 200, { success: true, draft: draft, persistenceConfigured: Boolean(getRedisConfig() && session) });
     }
-    if (body.action !== 'save') return respond(res, 400, { success: false, error: 'Use action=parse or action=save.' });
+
+    // -------------------------------------------------------------------------
+    // Action 2: Resolve (Deterministic Re-resolution only, without re-extracting)
+    // -------------------------------------------------------------------------
+    if (body.action === 'resolve') {
+      const clientIp = authGuard.getVerifiedClientIp(req);
+      const parseRate = authGuard.checkRateLimit('reminder-parse:' + clientIp, 120, 60000);
+      if (!parseRate.allowed) return respond(res, 429, { success: false, error: 'Too many reminder previews. Please try again shortly.' });
+
+      const timeZone = typeof body.timeZone === 'string' && body.timeZone.trim() ? body.timeZone.trim() : 'UTC';
+      if (!validTimeZone(timeZone)) return respond(res, 422, { success: false, code: 'INVALID_TIME_ZONE', error: 'Choose a valid IANA time zone, such as Asia/Kolkata.' });
+
+      const referenceTime = body.referenceTime ? new Date(body.referenceTime) : new Date();
+      const resolution = dateResolutionService.resolveDateExpression(body.dateExpression || null, {
+        referenceTime: referenceTime,
+        timeZone: timeZone
+      });
+
+      if (!resolution.ok) {
+        return respond(res, 422, { success: false, code: resolution.code, error: resolution.message });
+      }
+
+      return respond(res, 200, {
+        success: true,
+        draft: resolution,
+        resolution: resolution,
+        persistenceConfigured: Boolean(getRedisConfig() && session)
+      });
+    }
+
+    // -------------------------------------------------------------------------
+    // Action 3: Extract (Model Extraction only)
+    // -------------------------------------------------------------------------
+    if (body.action === 'extract') {
+      const clientIp = authGuard.getVerifiedClientIp(req);
+      const parseRate = authGuard.checkRateLimit('reminder-parse:' + clientIp, 120, 60000);
+      if (!parseRate.allowed) return respond(res, 429, { success: false, error: 'Too many reminder previews. Please try again shortly.' });
+
+      const text = typeof body.text === 'string' ? body.text.trim() : '';
+      if (!text) return respond(res, 422, { success: false, code: 'EMPTY_TEXT', error: 'Enter what you want to be reminded about.' });
+      if (text.length > 500) return respond(res, 422, { success: false, code: 'TEXT_TOO_LONG', error: 'Keep reminder text under 500 characters.' });
+
+      const extracted = await taskExtractionService.extractTask(text);
+      if (!extracted.ok) {
+        return respond(res, 422, { success: false, code: extracted.code, error: extracted.message });
+      }
+      return respond(res, 200, { success: true, extraction: extracted });
+    }
+
+    // -------------------------------------------------------------------------
+    // Action 4: Save (Persistent Write with Explicit Confirmation)
+    // -------------------------------------------------------------------------
+    if (body.action !== 'save') return respond(res, 400, { success: false, error: 'Use action=parse, action=resolve, action=extract, or action=save.' });
     if (!sameOrigin(req)) return respond(res, 403, { success: false, error: 'Cross-origin reminder writes are not allowed.' });
     if (!session) return respond(res, 503, { success: false, error: sessionResult.error || 'Secure reminder session is unavailable.' });
     if (!getRedisConfig()) return respond(res, 503, { success: false, code: 'REMINDER_STORE_NOT_CONFIGURED', error: 'Secure reminder storage is not configured. Nothing was saved.' });
@@ -180,14 +301,44 @@ async function handler(req, res) {
     if (!title || title.length > MAX_TITLE_LENGTH) return respond(res, 400, { success: false, error: 'Enter a reminder title of 1–180 characters.' });
     if (!validTimeZone(timeZone)) return respond(res, 400, { success: false, error: 'Choose a valid time zone.' });
     if (recurrence === undefined) return respond(res, 400, { success: false, error: 'The recurrence rule is invalid.' });
-    const resolved = resolveLocalDateTime(dateLocal, timeLocal, timeZone);
-    if (!resolved.ok) return respond(res, 422, { success: false, code: resolved.code, error: resolved.message });
-    if (resolved.epochMs <= Date.now()) return respond(res, 422, { success: false, code: 'TIME_IN_PAST', error: 'Choose a future date and time.' });
+
+    let dueAt = null;
+    let schedulingStatus = 'unscheduled';
+
+    if (dateLocal && timeLocal) {
+      const resolved = resolveLocalDateTime(dateLocal, timeLocal, timeZone);
+      if (!resolved.ok) return respond(res, 422, { success: false, code: resolved.code, error: resolved.message });
+      if (resolved.epochMs <= Date.now()) return respond(res, 422, { success: false, code: 'TIME_IN_PAST', error: 'Choose a future date and time.' });
+      dueAt = resolved.iso;
+      schedulingStatus = 'scheduled';
+    } else if (dateLocal && !timeLocal) {
+      schedulingStatus = 'date_only';
+    } else if (!dateLocal && !timeLocal) {
+      schedulingStatus = 'unscheduled';
+    } else {
+      return respond(res, 422, { success: false, code: 'INCOMPLETE_DATE_TIME', error: 'Choose a date for the scheduled time.' });
+    }
+
+    const taskType = typeof body.taskType === 'string' && ['academic', 'work', 'personal', 'health', 'finance', 'general'].includes(body.taskType.toLowerCase())
+      ? body.taskType.toLowerCase()
+      : 'general';
+    const dateExpression = typeof body.dateExpression === 'string' ? body.dateExpression.slice(0, 200) : null;
 
     const item = {
-      id: 'rem_' + crypto.randomUUID(), ownerId: session.ownerId, title: title, dateLocal: dateLocal,
-      timeLocal: timeLocal, timeZone: timeZone, dueAt: resolved.iso, recurrence: recurrence,
-      status: 'saved', notificationStatus: 'not-configured', createdAt: new Date().toISOString()
+      id: 'rem_' + crypto.randomUUID(),
+      ownerId: session.ownerId,
+      title: title,
+      taskType: taskType,
+      dateExpression: dateExpression,
+      schedulingStatus: schedulingStatus,
+      dateLocal: dateLocal,
+      timeLocal: timeLocal,
+      timeZone: timeZone,
+      dueAt: dueAt,
+      recurrence: recurrence,
+      status: 'saved',
+      notificationStatus: 'not-configured',
+      createdAt: new Date().toISOString()
     };
     try {
       await redisCommand(['HSET', ownerKey(session.ownerId), item.id, JSON.stringify(item)]);
@@ -226,4 +377,6 @@ module.exports.verifySession = verifySession;
 module.exports.createSession = createSession;
 module.exports.sameOrigin = sameOrigin;
 module.exports.MIN_SECRET_LENGTH = MIN_SECRET_LENGTH;
+module.exports.taskExtractionService = taskExtractionService;
+module.exports.dateResolutionService = dateResolutionService;
 

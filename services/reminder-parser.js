@@ -154,4 +154,17 @@ function parseReminderText(text, options) {
     needs: needs, message: message, referenceTime: referenceDate.toISOString()
   };
 }
-module.exports = { parseReminderText: parseReminderText, resolveLocalDateTime: resolveLocalDateTime, validTimeZone: validTimeZone };
+
+const ReminderDateResolutionService = require('./ReminderDateResolutionService');
+const defaultResolver = new ReminderDateResolutionService();
+function resolveDateExpression(dateExpression, options) {
+  return defaultResolver.resolveDateExpression(dateExpression, options);
+}
+
+module.exports = {
+  parseReminderText: parseReminderText,
+  resolveLocalDateTime: resolveLocalDateTime,
+  validTimeZone: validTimeZone,
+  resolveDateExpression: resolveDateExpression,
+  ReminderDateResolutionService: ReminderDateResolutionService
+};

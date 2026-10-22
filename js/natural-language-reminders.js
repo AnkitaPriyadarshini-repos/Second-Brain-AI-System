@@ -123,41 +123,103 @@
     return { unit: unit, interval: Number(byId('reminder-recurrence-interval').value || 1) };
   }
 
+  function capitalize(str) {
+    if (!str || typeof str !== 'string') return '';
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
   function validateDraft() {
     const title = byId('reminder-title').value.trim();
     const date = byId('reminder-date').value;
     const time = byId('reminder-time').value;
     const zone = byId('reminder-time-zone').value.trim();
+    const catSelect = byId('reminder-category');
+    const category = catSelect ? catSelect.value : 'general';
+
     let validZone = false;
     try { new Intl.DateTimeFormat('en-US', { timeZone: zone }).format(new Date()); validZone = true; }
     catch (_) {}
     const repeat = readRecurrence();
     const interval = Number(byId('reminder-recurrence-interval').value);
-    const valid = Boolean(state.draft && title && title.length <= 180 &&
-      /^\d{4}-\d{2}-\d{2}$/.test(date) && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(time) &&
-      validZone && (!repeat || (Number.isInteger(interval) && interval >= 1 && interval <= 99)));
+
+    // Update title and classification previews immediately without re-parsing
+    byId('reminder-preview-title').textContent = title || 'Add a task title';
+    const catPreview = byId('reminder-preview-category');
+    if (catPreview) catPreview.textContent = capitalize(category);
+
+    // Compute and display scheduling status
+    let statusText = 'Unscheduled';
+    let statusClass = 'status-unscheduled';
+    let whenText = 'Unscheduled draft (no date/time)';
+
+    if (date && time && validZone) {
+      statusText = 'Scheduled';
+      statusClass = 'status-scheduled';
+      whenText = date + ' · ' + time + ' · ' + zone;
+    } else if (date && !time) {
+      statusText = 'Date only (choose time)';
+      statusClass = 'status-date-only';
+      whenText = date + ' · (No time set) · ' + zone;
+    } else if (!date && !time) {
+      statusText = 'Unscheduled draft';
+      statusClass = 'status-unscheduled';
+      whenText = 'Unscheduled draft (no date/time set)';
+    } else {
+      statusText = 'Needs clarification';
+      statusClass = 'status-needs-clarification';
+      whenText = 'Choose both a date and a time to complete the preview.';
+    }
+
+    const statusBadge = byId('reminder-preview-status');
+    if (statusBadge) {
+      statusBadge.textContent = statusText;
+      statusBadge.className = 'milo-reminder-preview-value milo-reminder-status-pill ' + statusClass;
+    }
+
+    byId('reminder-preview-when').textContent = whenText;
+    byId('reminder-preview-repeat').textContent = recurrenceLabel(repeat);
+
+    const valid = Boolean(
+      state.draft && title && title.length <= 180 && validZone &&
+      ((!date && !time) || (date && time && /^\d{4}-\d{2}-\d{2}$/.test(date) && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(time))) &&
+      (!repeat || (Number.isInteger(interval) && interval >= 1 && interval <= 99))
+    );
+
     const save = byId('reminder-save-btn');
     if (save) save.disabled = !valid || !state.persistenceConfigured || state.loading;
     byId('reminder-recurrence-interval').disabled = byId('reminder-recurrence').value === 'none';
-
-    byId('reminder-preview-title').textContent = title || 'Add a task title';
-    byId('reminder-preview-when').textContent = date && time && validZone
-      ? date + ' · ' + time + ' · ' + zone
-      : 'Choose both a date and a time to complete the preview.';
-    byId('reminder-preview-repeat').textContent = recurrenceLabel(repeat);
   }
 
   function applyDraft(draft, persistenceConfigured) {
     state.draft = draft;
     state.persistenceConfigured = Boolean(persistenceConfigured);
     byId('reminder-preview-card').style.display = 'block';
+
     byId('reminder-title').value = draft.title || '';
+    if (byId('reminder-category')) {
+      byId('reminder-category').value = draft.taskType || draft.taskClassification || 'general';
+    }
+    if (byId('reminder-date-expression-input')) {
+      byId('reminder-date-expression-input').value = draft.dateExpression || '';
+    }
+    if (byId('reminder-preview-date-expression')) {
+      byId('reminder-preview-date-expression').textContent = draft.dateExpression || 'None (unscheduled)';
+    }
+
     byId('reminder-date').value = draft.dateLocal || '';
     byId('reminder-time').value = draft.timeLocal || '';
     byId('reminder-time-zone').value = draft.timeZone || defaultTimeZone();
     byId('reminder-recurrence').value = draft.recurrence ? draft.recurrence.unit : 'none';
     byId('reminder-recurrence-interval').value = draft.recurrence ? draft.recurrence.interval : 1;
     byId('reminder-parse-summary').textContent = draft.message || 'Review and edit the details before saving.';
+
+    const resolverLine = byId('reminder-preview-resolver');
+    if (resolverLine) {
+      const resolverName = draft.dateResolvedBy === 'deterministic_parser' ? 'Deterministic parser' : 'Rule-based parser';
+      const refFormatted = draft.referenceTime ? ' · Ref: ' + draft.referenceTime.slice(0, 19).replace('T', ' ') + 'Z' : '';
+      resolverLine.textContent = resolverName + refFormatted;
+    }
+
     if (!state.persistenceConfigured) {
       setStorageStatus('Preview only: secure reminder storage is not configured. Nothing can be saved yet.', false);
       setNotice('The date preview is ready. Complete any missing fields. Saving stays disabled until secure storage is configured.', 'warning');
@@ -166,6 +228,48 @@
       setNotice(draft.message || 'Review the details before saving.', 'info');
     }
     validateDraft();
+  }
+
+  async function reResolveSchedule() {
+    if (!state.draft) return;
+    const dateExprInput = byId('reminder-date-expression-input');
+    const expr = dateExprInput ? dateExprInput.value.trim() : '';
+    const zone = byId('reminder-time-zone').value.trim() || defaultTimeZone();
+    const refTime = state.draft.referenceTime || new Date().toISOString();
+
+    setNotice('Re-resolving schedule for ' + zone + '…', 'info');
+    try {
+      const data = await apiRequest('POST', {
+        action: 'resolve',
+        dateExpression: expr || null,
+        timeZone: zone,
+        referenceTime: refTime
+      });
+      if (data.draft) {
+        state.draft.dateExpression = data.draft.dateExpression;
+        state.draft.dateLocal = data.draft.dateLocal;
+        state.draft.timeLocal = data.draft.timeLocal;
+        state.draft.dueAt = data.draft.dueAt;
+        state.draft.schedulingStatus = data.draft.schedulingStatus;
+        state.draft.needs = data.draft.needs;
+        state.draft.message = data.draft.message;
+
+        byId('reminder-date').value = data.draft.dateLocal || '';
+        byId('reminder-time').value = data.draft.timeLocal || '';
+        if (byId('reminder-preview-date-expression')) {
+          byId('reminder-preview-date-expression').textContent = data.draft.dateExpression || 'None (unscheduled)';
+        }
+        byId('reminder-parse-summary').textContent = data.draft.message || 'Review and edit the details before saving.';
+        if (data.draft.recurrence) {
+          byId('reminder-recurrence').value = data.draft.recurrence.unit;
+          byId('reminder-recurrence-interval').value = data.draft.recurrence.interval;
+        }
+        setNotice(data.draft.message || 'Schedule updated.', 'info');
+        validateDraft();
+      }
+    } catch (err) {
+      setNotice(err.message, 'error');
+    }
   }
 
   async function loadSavedReminders() {
@@ -189,6 +293,8 @@
     if (state.draft) validateDraft();
   }
 
+  let activePreviewRequestId = 0;
+
   async function previewReminder(event) {
     event.preventDefault();
     const text = byId('reminder-input').value.trim();
@@ -198,16 +304,23 @@
     button.textContent = 'Parsing…';
     setNotice('Resolving the date and time for ' + timeZone + '…', 'info');
 
+    const requestId = ++activePreviewRequestId;
+
     try {
       const data = await apiRequest('POST', { action: 'parse', text: text, timeZone: timeZone });
+      // Protect against stale asynchronous responses overwriting newer user requests
+      if (requestId !== activePreviewRequestId) return;
       applyDraft(data.draft, data.persistenceConfigured);
     } catch (error) {
+      if (requestId !== activePreviewRequestId) return;
       state.draft = null;
       byId('reminder-preview-card').style.display = 'none';
       setNotice(error.message, 'error');
     } finally {
-      button.disabled = false;
-      button.textContent = 'Preview reminder';
+      if (requestId === activePreviewRequestId) {
+        button.disabled = false;
+        button.textContent = 'Preview reminder';
+      }
     }
   }
 
@@ -218,18 +331,31 @@
     validateDraft();
     button.textContent = 'Saving…';
     setNotice('Saving confirmed reminder…', 'info');
+
+    const catSelect = byId('reminder-category');
+    const taskType = catSelect ? catSelect.value : (state.draft.taskType || 'general');
+    const exprInput = byId('reminder-date-expression-input');
+    const dateExpression = exprInput ? exprInput.value.trim() : (state.draft.dateExpression || null);
+
     try {
       const data = await apiRequest('POST', {
         action: 'save',
         confirmed: true,
         title: byId('reminder-title').value.trim(),
+        taskType: taskType,
+        dateExpression: dateExpression || null,
         dateLocal: byId('reminder-date').value,
         timeLocal: byId('reminder-time').value,
         timeZone: byId('reminder-time-zone').value.trim(),
         recurrence: readRecurrence()
       });
       state.reminders.push(data.reminder);
-      state.reminders.sort(function (a, b) { return String(a.dueAt).localeCompare(String(b.dueAt)); });
+      state.reminders.sort(function (a, b) {
+        if (!a.dueAt && !b.dueAt) return String(a.createdAt).localeCompare(String(b.createdAt));
+        if (!a.dueAt) return 1;
+        if (!b.dueAt) return -1;
+        return String(a.dueAt).localeCompare(String(b.dueAt));
+      });
       renderSavedReminders();
       setNotice('Reminder saved. Notifications are not configured, so Milo will not send an alert.', 'success');
       state.draft = null;
@@ -251,11 +377,30 @@
     byId('reminder-form').addEventListener('submit', previewReminder);
     byId('reminder-save-btn').addEventListener('click', saveReminder);
 
-    ['reminder-title', 'reminder-date', 'reminder-time', 'reminder-time-zone',
-      'reminder-recurrence', 'reminder-recurrence-interval'].forEach(function (id) {
-      byId(id).addEventListener('input', validateDraft);
-      byId(id).addEventListener('change', validateDraft);
+    // Title editing is separated: input/change events only update the client review card instantaneously
+    byId('reminder-title').addEventListener('input', validateDraft);
+    byId('reminder-title').addEventListener('change', validateDraft);
+
+    // Classification changes update the preview badge instantaneously
+    if (byId('reminder-category')) {
+      byId('reminder-category').addEventListener('change', validateDraft);
+    }
+
+    // Date phrase edits and time-zone edits trigger deterministic schedule re-resolution
+    if (byId('reminder-date-expression-input')) {
+      byId('reminder-date-expression-input').addEventListener('change', reResolveSchedule);
+    }
+    byId('reminder-time-zone').addEventListener('change', reResolveSchedule);
+
+    // Direct calendar edits validate draft without re-running NLP
+    ['reminder-date', 'reminder-time', 'reminder-recurrence', 'reminder-recurrence-interval'].forEach(function (id) {
+      const el = byId(id);
+      if (el) {
+        el.addEventListener('input', validateDraft);
+        el.addEventListener('change', validateDraft);
+      }
     });
+
     document.querySelectorAll('[data-reminder-example]').forEach(function (button) {
       button.addEventListener('click', function () {
         byId('reminder-input').value = button.getAttribute('data-reminder-example') || '';

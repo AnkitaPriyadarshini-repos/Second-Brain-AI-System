@@ -1472,6 +1472,18 @@
               <span id="reminder-preview-title" class="milo-reminder-preview-value">Add a task title</span>
             </div>
             <div class="milo-reminder-preview-line">
+              <span class="milo-reminder-preview-label">Classification</span>
+              <span id="reminder-preview-category" class="milo-reminder-preview-value">General</span>
+            </div>
+            <div class="milo-reminder-preview-line">
+              <span class="milo-reminder-preview-label">Scheduling status</span>
+              <span id="reminder-preview-status" class="milo-reminder-preview-value milo-reminder-status-pill">Scheduled</span>
+            </div>
+            <div class="milo-reminder-preview-line">
+              <span class="milo-reminder-preview-label">Extracted date phrase</span>
+              <span id="reminder-preview-date-expression" class="milo-reminder-preview-value">None</span>
+            </div>
+            <div class="milo-reminder-preview-line">
               <span class="milo-reminder-preview-label">Scheduled local time</span>
               <span id="reminder-preview-when" class="milo-reminder-preview-value">Choose a date and time.</span>
             </div>
@@ -1479,14 +1491,29 @@
               <label for="reminder-title">Edit task title</label>
               <input id="reminder-title" type="text" maxlength="180" autocomplete="off">
             </div>
+            <div class="milo-reminder-field">
+              <label for="reminder-category">Task classification</label>
+              <select id="reminder-category">
+                <option value="general">General</option>
+                <option value="academic">Academic</option>
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="health">Health</option>
+                <option value="finance">Finance</option>
+              </select>
+            </div>
+            <div class="milo-reminder-field">
+              <label for="reminder-date-expression-input">Date phrase (edit to re-resolve schedule)</label>
+              <input id="reminder-date-expression-input" type="text" maxlength="200" placeholder="e.g. tomorrow at 7pm, next Friday, every month">
+            </div>
             <div class="milo-reminder-time-fields">
               <div class="milo-reminder-field">
                 <label for="reminder-date">Date</label>
-                <input id="reminder-date" type="date" required>
+                <input id="reminder-date" type="date">
               </div>
               <div class="milo-reminder-field">
                 <label for="reminder-time">Time</label>
-                <input id="reminder-time" type="time" required>
+                <input id="reminder-time" type="time">
               </div>
             </div>
             <div class="milo-reminder-field">
@@ -1512,6 +1539,10 @@
             <div class="milo-reminder-preview-line">
               <span class="milo-reminder-preview-label">Repeat summary</span>
               <span id="reminder-preview-repeat" class="milo-reminder-preview-value">Does not repeat</span>
+            </div>
+            <div class="milo-reminder-preview-line" id="reminder-resolver-audit-line">
+              <span class="milo-reminder-preview-label">Resolved by</span>
+              <span id="reminder-preview-resolver" class="milo-reminder-preview-value" style="font-size: 12px; font-weight: normal; color: var(--onyx-text-secondary, #4b5563);">Deterministic parser · explicit reference instant</span>
             </div>
             <div class="milo-reminder-inline-note">Saving a reminder does not send a notification. Notification delivery has not been implemented.</div>
             <button id="reminder-save-btn" class="milo-reminder-primary" type="button" disabled>Confirm &amp; save reminder</button>

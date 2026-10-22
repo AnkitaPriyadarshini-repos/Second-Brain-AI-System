@@ -35,7 +35,11 @@
 .milo-reminder-saved-copy { min-width: 0; }
 .milo-reminder-saved-copy h3 { margin: 0 0 6px; font-size: 14px; overflow-wrap: anywhere; }
 .milo-reminder-saved-copy p { margin: 4px 0; font-size: 12px; overflow-wrap: anywhere; }
-.milo-reminder-status-pill { display: inline-flex; border: 1px solid var(--onyx-border-subtle, #e5e7eb); border-radius: 999px; padding: 4px 8px; margin-top: 6px; font-size: 10px; color: var(--onyx-text-secondary, #4b5563); }
+.milo-reminder-status-pill { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--onyx-border-subtle, #e5e7eb); border-radius: 999px; padding: 4px 9px; margin-top: 6px; font-size: 11px; font-weight: 600; color: var(--onyx-text-secondary, #4b5563); }
+.milo-reminder-status-pill.status-scheduled { border-color: #a7d7b5; background: #f0fdf4; color: #166534; }
+.milo-reminder-status-pill.status-date-only { border-color: #99f6e4; background: #f0fdfa; color: #0f766e; }
+.milo-reminder-status-pill.status-unscheduled { border-color: #cbd5e1; background: #f8fafc; color: #475569; }
+.milo-reminder-status-pill.status-needs-clarification { border-color: #fcd34d; background: #fffbeb; color: #92400e; }
 .milo-reminder-delete { border: 1px solid var(--onyx-border-subtle, #e5e7eb); border-radius: 8px; padding: 7px 10px; background: transparent; color: var(--onyx-text-secondary, #4b5563); cursor: pointer; font: inherit; font-size: 12px; }
 .milo-reminder-delete:hover { border-color: #dc2626; color: #b91c1c; }
 .milo-reminder-empty { padding: 20px 10px; text-align: center; font-size: 13px; color: var(--onyx-text-muted, #6b7280); }
