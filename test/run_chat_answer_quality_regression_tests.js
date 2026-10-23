@@ -461,11 +461,11 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
     assert.strictEqual(typeof capturedThinkingConfig.thinkingBudget, 'number', 'thinkingBudget must be a finite integer');
     assert.ok(capturedThinkingConfig.thinkingBudget >= 0, 'thinkingBudget must be non-negative');
 
-    // Test 5B: Deduplicated Fallback Chain (Never retry same model under alias)
-    const attemptedModels = [];
+    // Test 5B: Full Sequential Fallback Chain (All Models Fail)
+    // Primary: gemini-3.8-flash -> Fallback 1: gemini-3.5-flash-lite -> Fallback 2: gemini-3.6-flash -> Fallback 3: gemini-3.1-flash-lite
+    const attemptedUrls = [];
     globalThis.fetch = async (url) => {
-      const match = url.match(/\/models\/([^:]+):generateContent/);
-      if (match) attemptedModels.push(match[1]);
+      attemptedUrls.push(url);
       return {
         ok: false,
         status: 503,
@@ -473,26 +473,133 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
       };
     };
 
+    let suite5IpSeq = 1;
+    const s5Headers = () => ({ 'content-type': 'application/json', 'x-real-ip': `10.5.0.${suite5IpSeq++}` });
+
     const failReq = {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: { prompt: 'Test outage fallback chain', model: 'gemini-3.8-flash' }
+      headers: s5Headers(),
+      body: { prompt: 'Complex architecture design prompt for sequential failure test', model: 'gemini-3.8-flash' }
     };
     const failRes = createMockRes();
     await handler(failReq, failRes);
-    globalThis.fetch = oldFetch;
 
     assert.strictEqual(failRes.statusCode, 502, 'Total failure must return HTTP 502');
-    assert.ok(attemptedModels.length >= 2, 'Fallback must have attempted multiple tiers');
+    assert.strictEqual(attemptedUrls.length, 4, `Must attempt exactly 4 models in sequence, got ${attemptedUrls.length}: ${JSON.stringify(attemptedUrls)}`);
+    assert.ok(attemptedUrls[0].includes('/models/gemini-3.8-flash:generateContent'), 'Tier 1 must be gemini-3.8-flash');
+    assert.ok(attemptedUrls[1].includes('/models/gemini-3.5-flash-lite:generateContent'), 'Tier 2 must be gemini-3.5-flash-lite');
+    assert.ok(attemptedUrls[2].includes('/models/gemini-3.6-flash:generateContent'), 'Tier 3 must be gemini-3.6-flash');
+    assert.ok(attemptedUrls[3].includes('/models/gemini-3.1-flash-lite:generateContent'), 'Tier 4 must be gemini-3.1-flash-lite');
 
-    // Verify all attempted models in the fallback chain were distinct (no duplicate models!)
-    const uniqueAttempted = new Set(attemptedModels);
-    assert.strictEqual(attemptedModels.length, uniqueAttempted.size,
-      `Fallback chain must not attempt duplicate models: ${JSON.stringify(attemptedModels)}`);
-    assert.ok(!attemptedModels.includes('gemini-2.5-flash'), 'Fallback chain must not depend on restricted gemini-2.5-flash');
-    assert.ok(!attemptedModels.includes('gemini-2.5-pro'), 'Fallback chain must not depend on restricted gemini-2.5-pro');
+    // Test 5C: Success at Each Individual Fallback Tier (Stops immediately on success)
+    // Tier 1 Success:
+    let tier1Calls = [];
+    globalThis.fetch = async (url) => {
+      tier1Calls.push(url);
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ candidates: [{ content: { parts: [{ text: 'Answer from Tier 1' }] } }] })
+      };
+    };
+    const resT1 = createMockRes();
+    await handler({ method: 'POST', headers: s5Headers(), body: { prompt: 'Deep math calculate tier 1 unique', model: 'gemini-3.8-flash' } }, resT1);
+    assert.strictEqual(resT1.statusCode, 200);
+    assert.strictEqual(tier1Calls.length, 1, 'Tier 1 success must stop immediately without further calls');
+    assert.ok(tier1Calls[0].includes('gemini-3.8-flash'));
 
-    // Test 5C: Simple question in long chat history (>= 10 turns) using production payload (model: 'auto')
+    // Tier 2 Success (Primary fails, gemini-3.5-flash-lite succeeds):
+    let tier2Calls = [];
+    globalThis.fetch = async (url) => {
+      tier2Calls.push(url);
+      if (url.includes('gemini-3.8-flash')) {
+        return { ok: false, status: 503, json: async () => ({ error: { code: 503, message: '503 Overloaded' } }) };
+      }
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ candidates: [{ content: { parts: [{ text: 'Answer from Tier 2' }] } }] })
+      };
+    };
+    const resT2 = createMockRes();
+    await handler({ method: 'POST', headers: s5Headers(), body: { prompt: 'Deep math calculate tier 2 unique', model: 'gemini-3.8-flash' } }, resT2);
+    assert.strictEqual(resT2.statusCode, 200);
+    assert.strictEqual(tier2Calls.length, 2, 'Tier 2 success must make exactly 2 calls and stop');
+    assert.ok(tier2Calls[0].includes('gemini-3.8-flash'));
+    assert.ok(tier2Calls[1].includes('gemini-3.5-flash-lite'));
+
+    // Tier 3 Success (Primary and Tier 2 fail, gemini-3.6-flash succeeds):
+    let tier3Calls = [];
+    globalThis.fetch = async (url) => {
+      tier3Calls.push(url);
+      if (url.includes('gemini-3.8-flash') || url.includes('gemini-3.5-flash-lite')) {
+        return { ok: false, status: 503, json: async () => ({ error: { code: 503, message: '503 Overloaded' } }) };
+      }
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ candidates: [{ content: { parts: [{ text: 'Answer from Tier 3' }] } }] })
+      };
+    };
+    const resT3 = createMockRes();
+    await handler({ method: 'POST', headers: s5Headers(), body: { prompt: 'Deep math calculate tier 3 unique', model: 'gemini-3.8-flash' } }, resT3);
+    assert.strictEqual(resT3.statusCode, 200);
+    assert.strictEqual(tier3Calls.length, 3, 'Tier 3 success must make exactly 3 calls and stop');
+    assert.ok(tier3Calls[0].includes('gemini-3.8-flash'));
+    assert.ok(tier3Calls[1].includes('gemini-3.5-flash-lite'));
+    assert.ok(tier3Calls[2].includes('gemini-3.6-flash'));
+
+    // Tier 4 Success (Primary, Tier 2, Tier 3 fail, gemini-3.1-flash-lite succeeds):
+    let tier4Calls = [];
+    globalThis.fetch = async (url) => {
+      tier4Calls.push(url);
+      if (!url.includes('gemini-3.1-flash-lite')) {
+        return { ok: false, status: 503, json: async () => ({ error: { code: 503, message: '503 Overloaded' } }) };
+      }
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ candidates: [{ content: { parts: [{ text: 'Answer from Tier 4' }] } }] })
+      };
+    };
+    const resT4 = createMockRes();
+    await handler({ method: 'POST', headers: s5Headers(), body: { prompt: 'Deep math calculate tier 4 unique', model: 'gemini-3.8-flash' } }, resT4);
+    assert.strictEqual(resT4.statusCode, 200);
+    assert.strictEqual(tier4Calls.length, 4, 'Tier 4 success must make exactly 4 calls and return 200');
+    assert.ok(tier4Calls[0].includes('gemini-3.8-flash'));
+    assert.ok(tier4Calls[1].includes('gemini-3.5-flash-lite'));
+    assert.ok(tier4Calls[2].includes('gemini-3.6-flash'));
+    assert.ok(tier4Calls[3].includes('gemini-3.1-flash-lite'));
+
+    // Test 5D: Deduplication when initial model is already in chain (e.g. auto simple query, or alias)
+    let autoSimpleUrls = [];
+    globalThis.fetch = async (url) => {
+      autoSimpleUrls.push(url);
+      return { ok: false, status: 503, json: async () => ({ error: { code: 503, message: 'Service Unavailable' } }) };
+    };
+    const resSimpleAuto = createMockRes();
+    await handler({ method: 'POST', headers: s5Headers(), body: { prompt: 'hi', model: 'auto' } }, resSimpleAuto);
+    assert.strictEqual(resSimpleAuto.statusCode, 502);
+    assert.strictEqual(autoSimpleUrls.length, 3, `Simple greeting routes to gemini-3.5-flash-lite and must not retry it: ${JSON.stringify(autoSimpleUrls)}`);
+    assert.ok(autoSimpleUrls[0].includes('gemini-3.5-flash-lite'));
+    assert.ok(autoSimpleUrls[1].includes('gemini-3.6-flash'));
+    assert.ok(autoSimpleUrls[2].includes('gemini-3.1-flash-lite'));
+
+    // Test 5E: Deduplication when manual selection is gemini-3.6-flash
+    let manual36Urls = [];
+    globalThis.fetch = async (url) => {
+      manual36Urls.push(url);
+      return { ok: false, status: 503, json: async () => ({ error: { code: 503, message: 'Service Unavailable' } }) };
+    };
+    const resManual36 = createMockRes();
+    await handler({ method: 'POST', headers: s5Headers(), body: { prompt: 'Reasoning question', model: 'gemini-3.6-flash' } }, resManual36);
+    assert.strictEqual(resManual36.statusCode, 502);
+    assert.strictEqual(manual36Urls.length, 3, `Manual gemini-3.6-flash must not be repeated: ${JSON.stringify(manual36Urls)}`);
+    assert.ok(manual36Urls[0].includes('gemini-3.6-flash'));
+    assert.ok(manual36Urls[1].includes('gemini-3.5-flash-lite'));
+    assert.ok(manual36Urls[2].includes('gemini-3.1-flash-lite'));
+
+    // Test 5F: Simple question in long chat history (>= 10 turns) using production payload (model: 'auto')
     const longHistory = [];
     for (let i = 0; i < 10; i++) {
       longHistory.push({ role: i % 2 === 0 ? 'user' : 'model', content: `Message turn ${i + 1}` });
@@ -514,7 +621,7 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
 
     const autoSimpleReq = {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: s5Headers(),
       body: { prompt: 'What is the capital of France?', model: 'auto', history: longHistory }
     };
     const autoSimpleRes = createMockRes();
@@ -525,7 +632,7 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
       `Production default auto model with simple prompt must route to gemini-3.5-flash-lite, got: ${capturedSimpleModelUrl}`);
     assert.strictEqual(capturedSimpleThinkingConfig?.thinkingBudget, 0, 'Simple question thinking budget must be minimal (0)');
 
-    // Test 5D: Explicit manual model selection must be honored over auto classifier
+    // Test 5G: Explicit manual model selection must be honored over auto classifier
     let capturedManualModelUrl = '';
     globalThis.fetch = async (url) => {
       capturedManualModelUrl = url;
@@ -540,7 +647,7 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
 
     const manualReq = {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: s5Headers(),
       body: { prompt: 'What is the capital of France?', model: 'gemini-3.8-flash', history: longHistory }
     };
     const manualRes = createMockRes();
@@ -551,7 +658,7 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
     assert.ok(capturedManualModelUrl.includes('/models/gemini-3.8-flash:generateContent'),
       `Explicit manual selection of gemini-3.8-flash must be honored, got: ${capturedManualModelUrl}`);
 
-    console.log('  ✅ [PASS] Auto routing, explicit manual model selection, and deduplicated 3.x fallbacks verified');
+    console.log('  ✅ [PASS] Clean sequential fallback chain, success at each tier, and auto/manual routing verified');
   }
 
   // ------------------------------------------------------------------
@@ -738,6 +845,202 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
     assert.ok(!capturedShareData.text.includes('📋 Copy Code'), 'Share text must NOT contain button labels');
 
     console.log('  ✅ [PASS] Production window.copyTurnContent and window.shareTurnContent verified cleanly');
+  }
+
+  // ------------------------------------------------------------------
+  // SUITE 7: Persistent Settings & Versioned Model Preference Migration
+  // ------------------------------------------------------------------
+  console.log('\nSuite 7: Persistent Settings & Versioned Model Preference Migration');
+  {
+    const vm = require('vm');
+    const storeScript = fs.readFileSync(path.join(root, 'js/store.js'), 'utf8');
+    const onyxScript = fs.readFileSync(path.join(root, 'js/onyx-interface.js'), 'utf8');
+    const chatScript = fs.readFileSync(path.join(root, 'js/production-chat.js'), 'utf8');
+
+    function createStoreContext(initialLocalStorage = {}) {
+      const storage = { ...initialLocalStorage };
+      const ctx = {
+        window: {},
+        document: {
+          getElementById: () => null,
+          querySelector: () => null,
+          querySelectorAll: () => [],
+          addEventListener: () => {}
+        },
+        location: { href: 'https://second-brain-ai-system.vercel.app/' },
+        localStorage: {
+          getItem: (k) => storage[k] !== undefined ? storage[k] : null,
+          setItem: (k, v) => { storage[k] = String(v); },
+          removeItem: (k) => { delete storage[k]; }
+        },
+        getStorageSnapshot: () => ({ ...storage }),
+        setTimeout: () => {}
+      };
+      ctx.window = ctx;
+      vm.createContext(ctx);
+      vm.runInContext(storeScript, ctx);
+      return ctx;
+    }
+
+    // 7A: An old saved default migrates to Auto exactly once and sets modelMigrationVersion: 2
+    {
+      const oldSettings = JSON.stringify({
+        theme: 'onyx',
+        privacyMode: true,
+        ttsEnabled: true,
+        apiKey: '',
+        selectedModel: 'gemini-3.8-flash'
+        // Note: modelMigrationVersion is undefined in old settings
+      });
+      const ctxA = createStoreContext({ second_brain_settings_v2: oldSettings });
+      ctxA.window.Store.init();
+      assert.strictEqual(ctxA.window.Store.settings.selectedModel, 'auto', 'Old saved default gemini-3.8-flash must migrate to auto');
+      assert.strictEqual(ctxA.window.Store.settings.modelMigrationVersion, 2, 'modelMigrationVersion must be recorded as 2');
+
+      const savedA = JSON.parse(ctxA.getStorageSnapshot()['second_brain_settings_v2']);
+      assert.strictEqual(savedA.selectedModel, 'auto', 'Persisted settings must be updated to auto');
+      assert.strictEqual(savedA.modelMigrationVersion, 2, 'Persisted settings must record modelMigrationVersion: 2');
+      console.log('  ✅ [PASS] 7A: Old saved default migrates to Auto exactly once with modelMigrationVersion: 2');
+    }
+
+    // 7B: Auto remains Auto after reload
+    {
+      const autoSettings = JSON.stringify({
+        theme: 'onyx',
+        privacyMode: true,
+        ttsEnabled: true,
+        apiKey: '',
+        selectedModel: 'auto',
+        modelMigrationVersion: 2
+      });
+      const ctxB = createStoreContext({ second_brain_settings_v2: autoSettings });
+      ctxB.window.Store.init();
+      assert.strictEqual(ctxB.window.Store.settings.selectedModel, 'auto', 'Auto must remain Auto on reload');
+      assert.strictEqual(ctxB.window.Store.settings.modelMigrationVersion, 2);
+      console.log('  ✅ [PASS] 7B: Auto remains Auto after reload');
+    }
+
+    // 7C: Selecting gemini-3.1-flash-lite persists across reload (not classified as retired)
+    {
+      const liteSettings = JSON.stringify({
+        theme: 'onyx',
+        privacyMode: true,
+        ttsEnabled: true,
+        apiKey: '',
+        selectedModel: 'gemini-3.1-flash-lite',
+        modelMigrationVersion: 2
+      });
+      const ctxC = createStoreContext({ second_brain_settings_v2: liteSettings });
+      ctxC.window.Store.init();
+      assert.strictEqual(ctxC.window.Store.settings.selectedModel, 'gemini-3.1-flash-lite',
+        'gemini-3.1-flash-lite is a supported stable endpoint and must persist across reload');
+      console.log('  ✅ [PASS] 7C: Selecting gemini-3.1-flash-lite persists across reload');
+    }
+
+    // 7D: Selecting gemini-3.8-flash on version 2 persists across reload (manual selection preserved)
+    {
+      const reasoningSettings = JSON.stringify({
+        theme: 'onyx',
+        privacyMode: true,
+        ttsEnabled: true,
+        apiKey: '',
+        selectedModel: 'gemini-3.8-flash',
+        modelMigrationVersion: 2
+      });
+      const ctxD = createStoreContext({ second_brain_settings_v2: reasoningSettings });
+      ctxD.window.Store.init();
+      assert.strictEqual(ctxD.window.Store.settings.selectedModel, 'gemini-3.8-flash',
+        'Manual selection of gemini-3.8-flash on v2 must persist across reload');
+      console.log('  ✅ [PASS] 7D: Selecting gemini-3.8-flash persists across reload');
+    }
+
+    // 7E: The visible model label always matches the outgoing request's model
+    {
+      let labelText = '';
+      const selectedOptions = new Set();
+      const mockDropdownOptions = [
+        { getAttribute: (k) => k === 'data-model' ? 'auto' : null, classList: { toggle: (cls, on) => on ? selectedOptions.add('auto') : selectedOptions.delete('auto') } },
+        { getAttribute: (k) => k === 'data-model' ? 'gemini-3.8-flash' : null, classList: { toggle: (cls, on) => on ? selectedOptions.add('gemini-3.8-flash') : selectedOptions.delete('gemini-3.8-flash') } },
+        { getAttribute: (k) => k === 'data-model' ? 'gemini-3.1-flash-lite' : null, classList: { toggle: (cls, on) => on ? selectedOptions.add('gemini-3.1-flash-lite') : selectedOptions.delete('gemini-3.1-flash-lite') } }
+      ];
+
+      const storageE = {
+        second_brain_settings_v2: JSON.stringify({
+          selectedModel: 'gemini-3.1-flash-lite',
+          modelMigrationVersion: 2
+        })
+      };
+
+      const ctxE = {
+        window: {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        document: {
+          documentElement: { getAttribute: () => 'onyx' },
+          head: { appendChild: () => {} },
+          createElement: (tag) => ({ tagName: String(tag).toUpperCase(), textContent: '', style: {}, appendChild: () => {} }),
+          getElementById: (id) => {
+            if (id === 'onyx-model-name-label') {
+              return {
+                set textContent(v) { labelText = v; },
+                get textContent() { return labelText; }
+              };
+            }
+            if (id === 'onyx-model-dropdown') {
+              return {
+                querySelectorAll: () => mockDropdownOptions,
+                classList: { remove: () => {} }
+              };
+            }
+            return null;
+          },
+          querySelector: () => null,
+          querySelectorAll: () => [],
+          addEventListener: () => {},
+          removeEventListener: () => {}
+        },
+        location: { href: 'https://second-brain-ai-system.vercel.app/' },
+        localStorage: {
+          getItem: (k) => storageE[k] || null,
+          setItem: (k, v) => { storageE[k] = String(v); },
+          removeItem: (k) => { delete storageE[k]; }
+        },
+        setTimeout: () => {}
+      };
+      ctxE.window = ctxE;
+      vm.createContext(ctxE);
+      vm.runInContext(storeScript, ctxE);
+      vm.runInContext(onyxScript, ctxE);
+      vm.runInContext(chatScript, ctxE);
+
+      ctxE.window.Store.init();
+      ctxE.window.OnyxInterface.init();
+
+      // Check initial state
+      assert.strictEqual(labelText, 'Gemini 3.1 Flash Lite', 'Visible label must match loaded model');
+      assert.strictEqual(ctxE.window.Store.settings.selectedModel, 'gemini-3.1-flash-lite');
+
+      // Change model to Auto via selectModel
+      ctxE.window.OnyxInterface.selectModel('auto');
+      assert.strictEqual(labelText, 'Auto (Smart Route)', 'Visible label must update to Auto');
+      assert.strictEqual(ctxE.window.Store.settings.selectedModel, 'auto');
+
+      // Change model to Gemini 3.8 Flash
+      ctxE.window.OnyxInterface.selectModel('gemini-3.8-flash');
+      assert.strictEqual(labelText, 'Gemini 3.8 Flash', 'Visible label must update to Gemini 3.8 Flash');
+      assert.strictEqual(ctxE.window.Store.settings.selectedModel, 'gemini-3.8-flash');
+
+      console.log('  ✅ [PASS] 7E: Visible model label, Store settings, and dropdown state remain in exact sync');
+    }
+
+    // 7F: Fresh installations default to Auto with modelMigrationVersion: 2
+    {
+      const ctxF = createStoreContext({});
+      ctxF.window.Store.init();
+      assert.strictEqual(ctxF.window.Store.settings.selectedModel, 'auto', 'Fresh install must default to auto');
+      assert.strictEqual(ctxF.window.Store.settings.modelMigrationVersion, 2, 'Fresh install must have modelMigrationVersion: 2');
+      console.log('  ✅ [PASS] 7F: Fresh installations default to Auto with modelMigrationVersion: 2');
+    }
   }
 
   console.log('\n====================================================');

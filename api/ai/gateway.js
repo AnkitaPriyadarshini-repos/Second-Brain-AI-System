@@ -649,56 +649,59 @@ export default async function handler(req, res) {
       } catch (_) {}
     }
 
-    // Model fallback chain: ALWAYS resolve model ID and never attempt the same resolved model twice.
-    // Uses generally available 3.x endpoints without restricted 2.5 dependencies.
-    if ((!result || !result.response?.ok) && getRemainingBudget() > 5000) {
-      const fallbackCandidates = [FAST_MODEL, BALANCED_MODEL, 'gemini-3.1-flash-lite'];
-      const nextCandidate = fallbackCandidates.find((cand) => !attemptedResolvedModels.has(resolveUpstreamModel(cand)));
+    // Sequential fallback chain:
+    // Order:
+    // 1. Initial model (automatic chosen by classifyRequest(), or explicit manual selection).
+    // 2. gemini-3.5-flash-lite
+    // 3. gemini-3.6-flash
+    // 4. gemini-3.1-flash-lite
+    //
+    // Invariants:
+    // - Skip initial model if it appears again in the chain.
+    // - Resolve aliases before checking uniqueness.
+    // - Never send requests to restricted or retired model IDs.
+    // - Attempt each remaining model at most once, stop on success.
+    // - Respect the overall deadline and remaining provider-call budget.
+    const fallbackChain = [
+      'gemini-3.5-flash-lite',
+      'gemini-3.6-flash',
+      'gemini-3.1-flash-lite'
+    ];
 
-      if (nextCandidate) {
-        const resolvedFallback = resolveUpstreamModel(nextCandidate);
-        attemptedResolvedModels.add(resolvedFallback);
-        console.warn(`[milo/gateway] ${requestId}: Initial model ${resolvedInitial} failed or timed out. Falling back to ${resolvedFallback}`);
-        try {
-          result = await callGemini({
-            model: resolvedFallback,
-            systemPrompt,
-            contents,
-            thinkingLevel: 'low',
-            apiKey,
-            requestId,
-            timeoutMs: Math.min(PROVIDER_TIMEOUT_MS, Math.max(3000, getRemainingBudget() - 1000))
-          });
-          recordAttempt(result);
-        } catch (fallbackErr) {
-          modelAttempts.push({
-            model: resolvedFallback,
-            status: fallbackErr?.name === 'AbortError' ? 504 : 503,
-            message: fallbackErr?.name === 'AbortError' ? 'Fallback provider timeout' : (fallbackErr?.message || 'Fallback provider error')
-          });
-        }
+    for (const candidate of fallbackChain) {
+      if (result && result.response?.ok) break;
+
+      const remainingBudget = getRemainingBudget();
+      if (remainingBudget < 2000) {
+        console.warn(`[milo/gateway] ${requestId}: Insufficient budget remaining (${remainingBudget}ms) for further fallbacks.`);
+        break;
       }
 
-      // Third tier fallback if still failing and time permits
-      if ((!result || !result.response?.ok) && getRemainingBudget() > 3500) {
-        const tertiaryCandidates = ['gemini-2.5-flash', FAST_MODEL];
-        const tertiaryModel = tertiaryCandidates.find((cand) => !attemptedResolvedModels.has(resolveUpstreamModel(cand)));
-        if (tertiaryModel) {
-          const resolvedTertiary = resolveUpstreamModel(tertiaryModel);
-          attemptedResolvedModels.add(resolvedTertiary);
-          try {
-            result = await callGemini({
-              model: resolvedTertiary,
-              systemPrompt,
-              contents,
-              thinkingLevel: 'minimal',
-              apiKey,
-              requestId,
-              timeoutMs: Math.min(3500, Math.max(2000, getRemainingBudget() - 500))
-            });
-            recordAttempt(result);
-          } catch (_) {}
-        }
+      const resolvedFallback = resolveUpstreamModel(candidate);
+      if (attemptedResolvedModels.has(resolvedFallback)) {
+        continue;
+      }
+      attemptedResolvedModels.add(resolvedFallback);
+
+      console.warn(`[milo/gateway] ${requestId}: Previous model failed or timed out. Falling back to ${resolvedFallback} (budget remaining: ${remainingBudget}ms)`);
+      try {
+        const timeoutMs = Math.min(PROVIDER_TIMEOUT_MS, Math.max(2000, remainingBudget - 800));
+        result = await callGemini({
+          model: resolvedFallback,
+          systemPrompt,
+          contents,
+          thinkingLevel: resolvedFallback === 'gemini-3.6-flash' ? 'low' : 'minimal',
+          apiKey,
+          requestId,
+          timeoutMs
+        });
+        recordAttempt(result);
+      } catch (fallbackErr) {
+        modelAttempts.push({
+          model: resolvedFallback,
+          status: fallbackErr?.name === 'AbortError' ? 504 : 503,
+          message: fallbackErr?.name === 'AbortError' ? 'Fallback provider timeout' : (fallbackErr?.message || 'Fallback provider error')
+        });
       }
     }
 
