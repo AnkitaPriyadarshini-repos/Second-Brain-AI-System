@@ -19,6 +19,14 @@ const OVERALL_DEADLINE_MS = 24_000; // Strict deadline well within Vercel's 30s 
 // PRIMARY_MODEL (gemini-3.8-flash) represents the frontier reasoning tier.
 // FAST_MODEL (gemini-3.5-flash-lite) represents the ultra-low-latency fast tier.
 // gemini-3.1-flash-lite maps directly to its upstream model without silent redirection.
+const RETIRED_MODEL_MIGRATIONS = {
+  'gemini-2.0-flash': 'gemini-3.5-flash-lite',
+  'gemini-2.0-flash-exp': 'gemini-3.5-flash-lite',
+  'gemini-1.5-flash': 'gemini-2.5-flash',
+  'gemini-1.5-pro': 'gemini-2.5-pro',
+  'gemini-1.0-pro': 'gemini-2.5-flash'
+};
+
 const MODEL_REGISTRY = {
   'gemini-3.8-flash': 'gemini-3.8-flash',
   'gemini-3.5-flash-lite': 'gemini-3.5-flash-lite',
@@ -26,9 +34,6 @@ const MODEL_REGISTRY = {
   'gemini-3.1-flash-lite': 'gemini-3.1-flash-lite',
   'gemini-2.5-flash': 'gemini-2.5-flash',
   'gemini-2.5-pro': 'gemini-2.5-pro',
-  'gemini-2.0-flash': 'gemini-2.0-flash',
-  'gemini-1.5-flash': 'gemini-1.5-flash',
-  'gemini-1.5-pro': 'gemini-1.5-pro',
   'gemini-flash-latest': 'gemini-3.5-flash-lite',
   'default': PRIMARY_MODEL
 };
@@ -36,6 +41,9 @@ const MODEL_REGISTRY = {
 function resolveUpstreamModel(modelName) {
   if (!modelName || typeof modelName !== 'string') return PRIMARY_MODEL;
   const cleanName = modelName.trim().toLowerCase();
+  if (RETIRED_MODEL_MIGRATIONS[cleanName]) {
+    return RETIRED_MODEL_MIGRATIONS[cleanName];
+  }
   return MODEL_REGISTRY[cleanName] || PRIMARY_MODEL;
 }
 
@@ -115,13 +123,14 @@ function classifyRequest(prompt, context, history) {
 
   const coding = /\b(code|coding|debug|bug|error|javascript|typescript|python|java|cpp|c\+\+|react|api|sql|algorithm|function|class|regex)\b/i.test(text);
   const reasoning = /\b(analy[sz]e|architecture|design|compare|derive|prove|calculate|mathemat|security|optimi[sz]e|trade[- ]?off|strategy|plan|research|why does|step by step)\b/i.test(text);
-  const long = prompt.length > 2200 || context.length > 5000 || history.length >= 8;
-  const complex = coding || reasoning || long;
+  const longPrompt = prompt.length > 2200;
+  const heavyContext = context.length > 5000;
+  const complex = coding || reasoning || longPrompt || heavyContext;
 
   return {
     intent: coding ? 'coding' : reasoning ? 'reasoning' : 'general',
     model: complex ? PRIMARY_MODEL : FAST_MODEL,
-    thinkingLevel: complex ? 'medium' : 'low'
+    thinkingLevel: complex ? 'medium' : 'minimal'
   };
 }
 
@@ -206,6 +215,42 @@ function contextNotesToText(notes) {
     ].filter(Boolean).join('\n');
   });
   return sanitizeContext(blocks.join('\n\n---\n\n'));
+}
+
+function isExplicitVaultQuery(prompt) {
+  if (!prompt) return false;
+  return /\b(saved|notes?|vault|second brain|remember|my note|what did i save|search my)\b/i.test(prompt);
+}
+
+function filterRelevantLegacyContext(prompt, legacyContext) {
+  if (!prompt || !legacyContext) return '';
+  if (isExplicitVaultQuery(prompt)) return sanitizeContext(legacyContext);
+
+  const stopWords = new Set([
+    'what', 'did', 'i', 'save', 'about', 'notes', 'note', 'on', 'find', 'show', 'retrieve',
+    'the', 'is', 'a', 'an', 'in', 'to', 'for', 'with', 'tell', 'me', 'my', 'how', 'do',
+    'can', 'are', 'was', 'were', 'explain'
+  ]);
+  const promptTerms = prompt.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter((t) => t.length > 1 && !stopWords.has(t));
+  if (!promptTerms.length) return '';
+
+  const cleanContext = legacyContext.toLowerCase();
+  let matchedTerms = 0;
+  for (const term of promptTerms) {
+    if (new RegExp('\\b' + term + '\\b', 'i').test(cleanContext)) {
+      matchedTerms++;
+    }
+  }
+
+  const matchRatio = matchedTerms / promptTerms.length;
+  if (promptTerms.length >= 2 && matchRatio < 0.5) {
+    return '';
+  }
+  if (matchedTerms === 0) {
+    return '';
+  }
+
+  return sanitizeContext(legacyContext);
 }
 
 function sanitizeCitations(citations) {
@@ -392,8 +437,15 @@ export default async function handler(req, res) {
   // Authenticate and filter context notes against the query to prevent citation leakage
   const rawContextNotes = sanitizeContextNotes(body.contextNotes);
   const relevantContextNotes = filterRelevantNotes(prompt, rawContextNotes);
-  const legacyContext = sanitizeContext(body.context);
-  const context = contextNotesToText(relevantContextNotes) || legacyContext;
+  const rawLegacyContext = sanitizeContext(body.context);
+
+  // If structured notes were provided, do NOT fall back to legacy context if all notes were filtered out as irrelevant
+  let context = '';
+  if (rawContextNotes.length > 0) {
+    context = contextNotesToText(relevantContextNotes);
+  } else if (rawLegacyContext) {
+    context = filterRelevantLegacyContext(prompt, rawLegacyContext);
+  }
 
   // Filter citations to only those notes that actually matched the prompt
   const relevantNoteIds = new Set(relevantContextNotes.map((n) => n.id));
@@ -515,7 +567,7 @@ export default async function handler(req, res) {
 
     // Model fallback chain: ALWAYS resolve model ID and never attempt the same resolved model twice
     if ((!result || !result.response?.ok) && getRemainingBudget() > 5000) {
-      const fallbackCandidates = [FAST_MODEL, PRIMARY_MODEL, 'gemini-2.5-flash', 'gemini-1.5-flash'];
+      const fallbackCandidates = [FAST_MODEL, 'gemini-2.5-flash'];
       const nextCandidate = fallbackCandidates.find((cand) => !attemptedResolvedModels.has(resolveUpstreamModel(cand)));
 
       if (nextCandidate) {
@@ -544,7 +596,7 @@ export default async function handler(req, res) {
 
       // Third tier fallback if still failing and time permits
       if ((!result || !result.response?.ok) && getRemainingBudget() > 3500) {
-        const tertiaryCandidates = ['gemini-2.5-flash', 'gemini-1.5-flash', FAST_MODEL];
+        const tertiaryCandidates = ['gemini-2.5-flash', FAST_MODEL];
         const tertiaryModel = tertiaryCandidates.find((cand) => !attemptedResolvedModels.has(resolveUpstreamModel(cand)));
         if (tertiaryModel) {
           const resolvedTertiary = resolveUpstreamModel(tertiaryModel);

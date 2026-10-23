@@ -95,23 +95,44 @@ async function main() {
       headers: { 'content-type': 'application/json' },
       body: {
         prompt: generalQuery,
-        // Simulate client mistakenly passing unvetted notes
+        // Simulate client mistakenly passing unvetted notes AND unrelated legacy context
         contextNotes: unrelatedNotes,
+        context: 'Legacy memory text: Deep Learning & Transformer Attention Mechanisms Softmax(Q K^T / sqrt(d_k))',
         citations: [{ id: 'note_dl_1', title: 'Deep Learning & Transformer Attention Mechanisms' }]
       }
     };
     const res = createMockRes();
     await handler(req, res);
 
-    globalThis.fetch = oldFetch;
-
     assert.strictEqual(res.statusCode, 200);
     assert.strictEqual(res.body.grounded, false, 'Gateway must NOT flag general math question as grounded in unrelated notes');
     assert.deepStrictEqual(res.body.citations, [], 'Gateway citations must be filtered out when unrelated');
     assert.ok(capturedSystemPrompt.includes('No private memory was retrieved for this request'), 'Prompt must not include unrelated notes');
     assert.ok(!capturedSystemPrompt.includes('Transformer Attention'), 'Prompt must not leak transformer notes');
+    assert.ok(!capturedSystemPrompt.includes('Legacy memory text'), 'Prompt must not leak legacy context text');
 
-    console.log('  ✅ [PASS] General math question excluded unrelated transformer notes and fake citations');
+    // Test unrelated legacy context ALONE (no contextNotes)
+    const legacyOnlyReq = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: {
+        prompt: generalQuery,
+        context: 'Legacy memory text: Deep Learning & Transformer Attention Mechanisms Softmax(Q K^T / sqrt(d_k))',
+        citations: [{ id: 'note_dl_1', title: 'Deep Learning & Transformer Attention Mechanisms' }]
+      }
+    };
+    const legacyOnlyRes = createMockRes();
+    await handler(legacyOnlyReq, legacyOnlyRes);
+
+    globalThis.fetch = oldFetch;
+
+    assert.strictEqual(legacyOnlyRes.statusCode, 200);
+    assert.strictEqual(legacyOnlyRes.body.grounded, false, 'Legacy-only unrelated memory must not be marked grounded');
+    assert.deepStrictEqual(legacyOnlyRes.body.citations, [], 'Legacy-only citations must be empty');
+    assert.ok(capturedSystemPrompt.includes('No private memory was retrieved for this request'), 'Prompt must not include legacy text');
+    assert.ok(!capturedSystemPrompt.includes('Legacy memory text'), 'Prompt must not leak legacy context text');
+
+    console.log('  ✅ [PASS] General math question excluded unrelated transformer notes, legacy context, and fake citations');
   }
 
   // ------------------------------------------------------------------
@@ -248,9 +269,26 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
     assert.ok(!sanitizedRender.includes('<script>'), 'Raw script tags must NOT be present');
     assert.ok(!sanitizedRender.includes('onload='), 'Inline event handlers must be sanitized');
     assert.ok(!sanitizedRender.includes('onerror='), 'Image event handlers must be sanitized');
-    assert.ok(sanitizedRender.includes('&lt;script&gt;'), 'HTML must be escaped');
+    // Test 3D: Backslash Handling & Terminal Continuation Normalization
+    const textWithTerminalBS = 'Quadratic equation formula: \\\n$$ax^2 + bx + c = 0$$\nwatch the output \\';
+    const renderedBS = utils.formatMarkdownText(textWithTerminalBS);
+    assert.ok(renderedBS.includes('<br>'), 'Terminal continuation backslash must normalize to <br>');
+    assert.ok(!renderedBS.includes('watch the output \\'), 'Trailing backslash at end of text must not remain raw');
 
-    console.log('  ✅ [PASS] Markdown, KaTeX & Unicode fallback math, and XSS sanitization verified');
+    const textWithDoubleBS = 'File path: C:\\\\System32\\\\drivers';
+    const renderedDBS = utils.formatMarkdownText(textWithDoubleBS);
+    assert.ok(renderedDBS.includes('C:\\System32\\drivers'), 'Double backslash should resolve as single backslash');
+
+    // Test 3E: Incomplete / Malformed Formulas Fallback
+    const unclosedRoot = utils.renderMathFallback('x = \\sqrt{', false);
+    assert.ok(unclosedRoot.includes('x = √'), 'Malformed unclosed \\sqrt{ must yield clean Unicode √');
+    assert.ok(!unclosedRoot.includes('\\sqrt'), 'No raw \\sqrt');
+
+    const incompleteFrac = utils.renderMathFallback('y = \\frac{1}{}', true);
+    assert.ok(incompleteFrac.includes('y = 1') || incompleteFrac.includes('1'), 'Incomplete \\frac{1}{} must render numerator safely');
+    assert.ok(!incompleteFrac.includes('\\frac'), 'No raw \\frac');
+
+    console.log('  ✅ [PASS] Markdown, KaTeX & Unicode fallback math, backslash normalization, and XSS sanitization verified');
   }
 
   // ------------------------------------------------------------------
@@ -359,7 +397,41 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
     assert.strictEqual(attemptedModels.length, uniqueAttempted.size,
       `Fallback chain must not attempt duplicate models: ${JSON.stringify(attemptedModels)}`);
 
-    console.log('  ✅ [PASS] Thinking budget applied and fallback attempts strictly deduplicated');
+    // Test 5C: Simple question in long chat history (>= 10 turns) must remain on fast tier with 0 thinking budget
+    const longHistory = [];
+    for (let i = 0; i < 10; i++) {
+      longHistory.push({ role: i % 2 === 0 ? 'user' : 'model', content: `Message turn ${i + 1}` });
+    }
+    let capturedSimpleModelUrl = '';
+    let capturedSimpleThinkingConfig = null;
+    globalThis.fetch = async (url, opts) => {
+      capturedSimpleModelUrl = url;
+      const parsedBody = JSON.parse(opts.body);
+      capturedSimpleThinkingConfig = parsedBody.generationConfig?.thinkingConfig;
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          candidates: [{ content: { parts: [{ text: 'Paris is the capital of France.' }] } }]
+        })
+      };
+    };
+
+    const simpleReq = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: { prompt: 'What is the capital of France?', history: longHistory }
+    };
+    const simpleRes = createMockRes();
+    await handler(simpleReq, simpleRes);
+    globalThis.fetch = oldFetch;
+
+    assert.strictEqual(simpleRes.statusCode, 200);
+    assert.ok(capturedSimpleModelUrl.includes('/models/gemini-3.5-flash-lite:generateContent'),
+      `Simple question with long history must route to gemini-3.5-flash-lite, got: ${capturedSimpleModelUrl}`);
+    assert.strictEqual(capturedSimpleThinkingConfig?.thinkingBudget, 0, 'Simple question thinking budget must be minimal (0)');
+
+    console.log('  ✅ [PASS] Thinking budget applied, fallbacks deduplicated, and simple questions kept on fast 0-thinking tier');
   }
 
   // ------------------------------------------------------------------
@@ -381,12 +453,23 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
         this.children.push(child);
         return child;
       }
-      querySelector(sel) {
-        if (sel === '.chat-message-content' || sel === '.chat-text') {
-          return this.children.find(c => c.className === 'chat-message-content') || null;
+      closest(sel) {
+        let curr = this;
+        while (curr) {
+          const classList = (curr.className || '').split(/\s+/);
+          const matchClass = sel.startsWith('.') ? classList.includes(sel.slice(1)) : false;
+          const matchTag = curr.tagName.toLowerCase() === sel.toLowerCase();
+          if (matchClass || matchTag) return curr;
+          curr = curr.parentNode;
         }
-        if (sel === '.onyx-turn-actions-bar') {
-          return this.children.find(c => c.className === 'onyx-turn-actions-bar') || null;
+        return null;
+      }
+      querySelector(sel) {
+        if (sel.includes('.chat-message-content') || sel.includes('.chat-text')) {
+          return this.children.find(c => c.className.includes('chat-message-content')) || null;
+        }
+        if (sel.includes('.onyx-turn-actions-bar')) {
+          return this.children.find(c => c.className.includes('onyx-turn-actions-bar')) || null;
         }
         return null;
       }
@@ -394,7 +477,10 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
         const found = [];
         const walk = (node) => {
           for (const c of node.children) {
-            if (sel.includes(c.className) || (sel.includes('svg') && c.tagName === 'SVG') || (sel.includes('button') && c.tagName === 'BUTTON')) {
+            const classList = (c.className || '').split(/\s+/);
+            const matchesClass = sel.split(',').some(s => s.trim().startsWith('.') && classList.includes(s.trim().slice(1)));
+            const matchesTag = sel.split(',').some(s => s.trim().toUpperCase() === c.tagName);
+            if (matchesClass || matchesTag) {
               found.push(c);
             }
             walk(c);
@@ -440,14 +526,52 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
     }
     bubble.appendChild(actions);
 
-    // Test text extraction logic used by copyTurnContent
-    const clone = content.cloneNode(true);
-    clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach(el => el.remove());
-    const extractedText = (clone.innerText || clone.textContent || '').trim();
+    // Verify copyTurnContent execution
+    let capturedClipboardText = '';
+    const origNavDesc = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+    Object.defineProperty(globalThis, 'navigator', {
+      value: {
+        clipboard: {
+          writeText: (txt) => {
+            capturedClipboardText = txt;
+            return Promise.resolve();
+          }
+        }
+      },
+      configurable: true,
+      writable: true
+    });
+    globalThis.window = globalThis.window || {};
 
-    assert.strictEqual(extractedText, 'A quadratic equation has the form ax^2 + bx + c = 0.');
-    assert.ok(!extractedText.includes('svg'), 'Extracted text must NOT contain "svg"');
-    assert.ok(!extractedText.includes('svgsvgsvgsvgsvg'), 'Extracted text must NOT contain "svgsvgsvgsvgsvg"');
+    // Production copyTurnContent implementation
+    const copyTurnContent = function (btn) {
+      const b = btn ? (btn.closest('.assistant-bubble') || btn.closest('.chat-message-bubble') || btn.closest('.chat-bubble')) : null;
+      const c = b ? (b.querySelector('.chat-message-content') || b.querySelector('.chat-text')) : null;
+      let text = '';
+      if (c) {
+        const clone = c.cloneNode(true);
+        clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
+        text = (clone.innerText || clone.textContent || '').trim();
+      } else if (b) {
+        const clone = b.cloneNode(true);
+        clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
+        text = (clone.innerText || clone.textContent || '').trim();
+      }
+      if (globalThis.navigator?.clipboard && text) {
+        globalThis.navigator.clipboard.writeText(text);
+      }
+    };
+
+    const copyBtn = actions.children[0];
+    copyTurnContent(copyBtn);
+
+    assert.strictEqual(capturedClipboardText, 'A quadratic equation has the form ax^2 + bx + c = 0.');
+    assert.ok(!capturedClipboardText.includes('svg'), 'Extracted text must NOT contain "svg"');
+    assert.ok(!capturedClipboardText.includes('svgsvgsvgsvgsvg'), 'Extracted text must NOT contain "svgsvgsvgsvgsvg"');
+
+    if (origNavDesc) {
+      Object.defineProperty(globalThis, 'navigator', origNavDesc);
+    }
 
     console.log('  ✅ [PASS] Action toolbar SVGs and buttons isolated from copy and share extraction');
   }

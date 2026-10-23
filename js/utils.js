@@ -72,19 +72,34 @@ function renderMathFallback(latex, isDisplay) {
   }
 
   // 3. Square roots: \sqrt[n]{x} and \sqrt{x}
-  text = text.replace(/\\sqrt\[([^\]]+)\]\{([^}]+)\}/g, '^($1)√($2)');
-  text = text.replace(/\\sqrt\{([^}]+)\}/g, (m, inner) => '√(' + inner.trim() + ')');
+  text = text.replace(/\\sqrt\[([^\]]+)\]\{([^}]*)\}/g, '^($1)√($2)');
+  text = text.replace(/\\sqrt\{([^}]*)\}/g, (m, inner) => inner.trim() ? '√(' + inner.trim() + ')' : '√');
+  text = text.replace(/\\sqrt(?![a-zA-Z])/g, '√');
 
   // 4. Fractions \frac{num}{den}
-  while (/\\frac\{([^{}]+)\}\{([^{}]+)\}/.test(text)) {
-    text = text.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, (m, n, d) => {
+  while (/\\frac\{([^{}]*)\}\{([^{}]*)\}/.test(text)) {
+    text = text.replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g, (m, n, d) => {
       n = n.trim();
       d = d.trim();
+      if (!n && !d) return '';
+      if (!d) return n;
       const wrapN = /[\s+\-*/=±]/.test(n) ? `(${n})` : n;
       const wrapD = /[\s+\-*/=±]/.test(d) ? `(${d})` : d;
+      if (!n) return `1 / ${wrapD}`;
       return `${wrapN} / ${wrapD}`;
     });
   }
+  // Handle incomplete fractions like \frac{num}{ or \frac{num}
+  text = text.replace(/\\frac\{([^{}]+)\}(?:\{([^{}]*))?/g, (m, n, d) => {
+    n = (n || '').trim();
+    d = (d || '').trim();
+    if (!n && !d) return '';
+    if (!d) return n;
+    const wrapN = /[\s+\-*/=±]/.test(n) ? `(${n})` : n;
+    const wrapD = /[\s+\-*/=±]/.test(d) ? `(${d})` : d;
+    return `${wrapN} / ${wrapD}`;
+  });
+  text = text.replace(/\\frac(?![a-zA-Z])/g, '');
 
   // 5. Superscripts and Subscripts
   const supers = {
@@ -114,8 +129,8 @@ function renderMathFallback(latex, isDisplay) {
   text = text.replace(/\\right([)\]{}]|\|)/g, '$1');
   text = text.replace(/[{}]/g, '');
   text = text.replace(/\\([a-zA-Z]+)/g, '$1');
-  text = text.replace(/\\$/g, '');
   text = text.replace(/\\\\/g, '\n');
+  text = text.replace(/\\/g, '');
   text = text.replace(/\s+/g, ' ').trim();
 
   const safeLabel = escapeHTML(text);
@@ -150,7 +165,7 @@ function renderMath(latex, isDisplay) {
       return katexLib.renderToString(cleanLatex, {
         displayMode: Boolean(isDisplay),
         output: 'html',
-        throwOnError: false,
+        throwOnError: true,
         strict: false
       });
     } catch (_) {
@@ -263,6 +278,11 @@ function formatMarkdownText(mdText) {
     }).join('');
     return `\n<ul class="md-ul">${items}</ul>\n`;
   });
+
+  // 13b. Normalize trailing terminal continuation backslashes (\) to <br> without stripping LaTeX/code backslashes
+  html = html.replace(/\\\\/g, '@@ESCAPED_BS@@');
+  html = html.replace(/(^|[^\\])\\\s*(\n|$)/g, '$1<br>');
+  html = html.replace(/@@ESCAPED_BS@@/g, '\\');
 
   // 14. Paragraphs and line breaks
   html = html.replace(/\n\n+/g, '<br><br>');

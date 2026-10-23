@@ -311,7 +311,8 @@
       theme: 'onyx',
       privacyMode: true, // Default privacy mode on-device as requested in PDF page 7
       ttsEnabled: true,
-      apiKey: ''
+      apiKey: '',
+      selectedModel: 'gemini-3.8-flash'
     },
     isOffline: false,
     offlineQueue: [],
@@ -514,6 +515,11 @@
         try {
           this.settings = { ...this.settings, ...JSON.parse(savedSettings) };
         } catch (e) { }
+      }
+      // Migrate retired/unsupported models in persisted settings to currently supported models
+      const retiredModels = new Set(['gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-1.0-pro']);
+      if (this.settings.selectedModel && retiredModels.has(this.settings.selectedModel.toLowerCase())) {
+        this.settings.selectedModel = 'gemini-3.8-flash';
       }
       // Ensure Onyx enterprise theme is always active
       this.settings.theme = 'onyx';

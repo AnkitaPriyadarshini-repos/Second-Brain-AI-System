@@ -453,9 +453,16 @@
         replaceMessage(thinking, 'Generating response with Milo AI…');
       }
 
-      const selectedModel = (window.Store && window.Store.settings && window.Store.settings.selectedModel) ||
+      let selectedModel = (window.Store && window.Store.settings && window.Store.settings.selectedModel) ||
                             (window.OnyxInterface && window.OnyxInterface.currentModel) ||
-                            'gemini-2.0-flash';
+                            'gemini-3.8-flash';
+      const retiredModels = new Set(['gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-1.0-pro']);
+      if (retiredModels.has(String(selectedModel).toLowerCase())) {
+        selectedModel = 'gemini-3.8-flash';
+        if (window.Store && window.Store.settings) {
+          window.Store.settings.selectedModel = 'gemini-3.8-flash';
+        }
+      }
 
       const response = await fetch('/api/ai/gateway', {
         method: 'POST',
