@@ -17,7 +17,7 @@ function mockRes() {
 
 function mockReq(method, options) {
   options = options || {};
-  return {
+  const r = {
     method: method,
     headers: Object.assign({
       host: 'localhost:3000',
@@ -27,6 +27,8 @@ function mockReq(method, options) {
     body: options.body || {},
     query: options.query || {}
   };
+  if (options.__testReferenceTime) r.__testReferenceTime = options.__testReferenceTime;
+  return r;
 }
 
 function cookieOf(response) {
@@ -482,6 +484,7 @@ async function main() {
   // 13. Authoritative save gate comprehensive consistency & manual override tests
   total++;
   const refTimeFixed = '2026-10-23T12:00:00.000Z';
+  handler.setReferenceClock(() => refTimeFixed);
 
   // 13a. dateExpression: "tomorrow at 7" with otherwise valid future dateLocal and timeLocal must be rejected as unresolved
   const incompleteTimeSaveRes = mockRes();
@@ -802,13 +805,119 @@ async function main() {
   assert.strictEqual(nullTitleMultiDate.body.title, null, 'Fallback must not claim a clean title when only raw sentence/dates exist');
 
   pass('14. Stateless resolution token trust boundary verified: forged referenceTime, tampered tokens, expired tokens, owner mismatch, and clean title extraction verified');
+  handler.setReferenceClock(null);
+
+  // 15. Timestamp contract & temporal invariants:
+  // - Signed dueAt disagreement rejected
+  // - Future-issued token rejected
+  // - Clarification expressions (e.g. recurrence without date) never issue resolutionToken
+  // - Date boundary crossing resolves with signed reference instant
+  total++;
+  const contractTestRef = '2026-10-23T23:55:00.000Z';
+  const contractEpoch = new Date(contractTestRef).getTime();
+
+  // A. Clarification expression in parse never issues token
+  const noTokenClarificationRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    __testReferenceTime: contractTestRef,
+    body: { action: 'parse', text: 'Water plants every week', timeZone: 'UTC' }
+  }), noTokenClarificationRes);
+  assert.strictEqual(noTokenClarificationRes.statusCode, 200);
+  assert.strictEqual(noTokenClarificationRes.body.draft.schedulingStatus, 'needs_clarification');
+  assert.strictEqual(noTokenClarificationRes.body.draft.resolutionToken, null);
+
+  // B. Valid scheduled preview at 23:55 UTC
+  const validContractParse = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    __testReferenceTime: contractTestRef,
+    body: { action: 'parse', text: 'Team review tomorrow at 9am', timeZone: 'UTC' }
+  }), validContractParse);
+  assert.strictEqual(validContractParse.statusCode, 200);
+  const contractToken = validContractParse.body.draft.resolutionToken;
+  assert.ok(contractToken);
+  assert.strictEqual(validContractParse.body.draft.dateLocal, '2026-10-24');
+  assert.strictEqual(validContractParse.body.draft.timeLocal, '09:00');
+  assert.strictEqual(validContractParse.body.draft.dueAt, '2026-10-24T09:00:00.000Z');
+
+  // C. Disagreeing dueAt in signed token is rejected at save gate
+  const sessionData = handler.verifySession(sessionCookie.split('=')[1], validSecret);
+  const disagreeToken = handler.createResolutionToken({
+    ownerId: sessionData.ownerId,
+    dateExpression: 'tomorrow at 9am',
+    timeZone: 'UTC',
+    dateLocal: '2026-10-24',
+    timeLocal: '09:00',
+    schedulingStatus: 'scheduled',
+    dueAt: '2026-10-25T09:00:00.000Z', // Mismatched dueAt
+    referenceTime: contractTestRef
+  }, validSecret, { issuedAt: contractEpoch, ttlMs: 20 * 60 * 1000 });
+
+  const disagreeSaveRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    __testReferenceTime: contractTestRef,
+    body: {
+      action: 'save', confirmed: true, title: 'Team review',
+      dateExpression: 'tomorrow at 9am', resolutionToken: disagreeToken,
+      dateLocal: '2026-10-24', timeLocal: '09:00', timeZone: 'UTC'
+    }
+  }), disagreeSaveRes);
+  assert.strictEqual(disagreeSaveRes.statusCode, 422);
+  assert.strictEqual(disagreeSaveRes.body.code, 'SCHEDULE_FIELD_MISMATCH');
+
+  // D. Token crossing calendar boundary to 00:05 UTC (Oct 24) saves successfully
+  const midnightCrossedRef = '2026-10-24T00:05:00.000Z';
+  const boundarySaveRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    __testReferenceTime: midnightCrossedRef,
+    body: {
+      action: 'save', confirmed: true, title: 'Team review',
+      dateExpression: 'tomorrow at 9am', resolutionToken: contractToken,
+      dateLocal: '2026-10-24', timeLocal: '09:00', timeZone: 'UTC'
+    }
+  }), boundarySaveRes);
+  assert.strictEqual(boundarySaveRes.statusCode, 201);
+  assert.strictEqual(boundarySaveRes.body.reminder.dateLocal, '2026-10-24');
+  assert.strictEqual(boundarySaveRes.body.reminder.dueAt, '2026-10-24T09:00:00.000Z');
+
+  // E. Future-issued token rejected
+  const futureToken = handler.createResolutionToken({
+    ownerId: sessionData.ownerId,
+    dateExpression: 'tomorrow at 9am',
+    timeZone: 'UTC',
+    dateLocal: '2026-10-24',
+    timeLocal: '09:00',
+    schedulingStatus: 'scheduled',
+    dueAt: '2026-10-24T09:00:00.000Z',
+    referenceTime: contractTestRef
+  }, validSecret, { issuedAt: contractEpoch + 15 * 60 * 1000, ttlMs: 20 * 60 * 1000 }); // 15m in future
+
+  const futureSaveRes = mockRes();
+  await handler(mockReq('POST', {
+    headers: { cookie: sessionCookie },
+    __testReferenceTime: contractTestRef,
+    body: {
+      action: 'save', confirmed: true, title: 'Team review',
+      dateExpression: 'tomorrow at 9am', resolutionToken: futureToken,
+      dateLocal: '2026-10-24', timeLocal: '09:00', timeZone: 'UTC'
+    }
+  }), futureSaveRes);
+  assert.strictEqual(futureSaveRes.statusCode, 422);
+  assert.strictEqual(futureSaveRes.body.code, 'INVALID_RESOLUTION_TOKEN');
+
+  pass('15. Exact contract verified: signed dueAt invariance, date boundary crossing, clarification tokens nullified, and temporal limits');
 
   console.log(`\n====================================================`);
   console.log(`🎉 ALL ${passed}/${total} INTEGRATION TESTS PASSED`);
   console.log(`====================================================\n`);
+  handler.setReferenceClock(null);
 }
 
 main().catch((err) => {
+  handler.setReferenceClock(null);
   console.error('\n❌ Integration test failed:', err);
   process.exit(1);
 });

@@ -14,12 +14,14 @@ function res() {
 
 function req(method, options) {
   options = options || {};
-  return {
+  const r = {
     method: method,
     headers: Object.assign({ host: 'localhost:3000', origin: 'http://localhost:3000', 'sec-fetch-site': 'same-origin' }, options.headers || {}),
     body: options.body || {},
     query: options.query || {}
   };
+  if (options.__testReferenceTime) r.__testReferenceTime = options.__testReferenceTime;
+  return r;
 }
 
 function cookieOf(response) {
@@ -314,6 +316,7 @@ async function main() {
     const mismatchSave = res();
     await handler(req('POST', {
       headers: { cookie: validCookie },
+      __testReferenceTime: '2035-10-23T10:00:00.000Z',
       body: {
         action: 'save', confirmed: true, title: 'Mismatch test',
         dateExpression: 'tomorrow at 7pm', dateLocal: '2035-12-25', timeLocal: '10:00', timeZone: 'Asia/Kolkata',
@@ -394,6 +397,7 @@ async function main() {
     // ----------------------------------------------------
     process.stdout.write('Testing Suite 7: Stateless resolution verification & trust boundary...\n');
     const testFixedRef = '2026-10-23T10:00:00.000Z';
+    handler.setReferenceClock(() => testFixedRef);
 
     // 1. Normal preview followed by matching save succeeds while signed token is valid
     const normalPreview = res();
@@ -680,8 +684,247 @@ async function main() {
 
     process.stdout.write('  PASS Suite 7: Stateless resolution verification & trust boundary verified\n');
 
+    // ----------------------------------------------------
+    // Suite 8: Final Security & Correctness Audit — Timestamp Contract & Drift Prevention
+    // ----------------------------------------------------
+    process.stdout.write('Testing Suite 8: Timestamp contract, temporal validation & boundary drift...\n');
+
+    // 1. Invariant: Signed dueAt cannot disagree with independently resolved timestamp
+    const disagreeToken = handler.createResolutionToken({
+      ownerId: sessionObj.ownerId,
+      dateExpression: 'tomorrow at 7pm',
+      timeZone: 'Asia/Kolkata',
+      dateLocal: '2026-10-24',
+      timeLocal: '19:00',
+      schedulingStatus: 'scheduled',
+      dueAt: '2026-10-25T13:30:00.000Z', // Forged timestamp disagreeing with resolver (2026-10-24T13:30:00.000Z)
+      referenceTime: testFixedRef
+    }, validSecret);
+
+    const disagreeSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      __testReferenceTime: testFixedRef,
+      body: {
+        action: 'save', confirmed: true, title: 'Disagreeing timestamp test',
+        taskType: 'work', dateExpression: 'tomorrow at 7pm', resolutionToken: disagreeToken,
+        dateLocal: '2026-10-24', timeLocal: '19:00', timeZone: 'Asia/Kolkata'
+      }
+    }), disagreeSave);
+    assert.strictEqual(disagreeSave.statusCode, 422, 'Disagreeing signed dueAt must be rejected with 422');
+    assert.strictEqual(disagreeSave.body.code, 'SCHEDULE_FIELD_MISMATCH');
+
+    // Date-only token with non-null dueAt must be rejected
+    const fixedEpoch = new Date(testFixedRef).getTime();
+    const forgedDateOnlyPayload = Buffer.from(JSON.stringify({
+      v: 1,
+      ownerId: sessionObj.ownerId,
+      dateExpression: 'tomorrow',
+      timeZone: 'Asia/Kolkata',
+      dateLocal: '2026-10-24',
+      timeLocal: '',
+      schedulingStatus: 'date_only',
+      dueAt: '2026-10-24T13:30:00.000Z', // Forged non-null dueAt
+      referenceTime: testFixedRef,
+      issuedAt: fixedEpoch,
+      expiresAt: fixedEpoch + 20 * 60 * 1000
+    })).toString('base64url');
+    const forgedDateOnlySig = crypto.createHmac('sha256', validSecret).update(forgedDateOnlyPayload).digest('base64url');
+    const dateOnlyForgedDueAtToken = forgedDateOnlyPayload + '.' + forgedDateOnlySig;
+
+    const dateOnlyForgedDueAtSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      __testReferenceTime: testFixedRef,
+      body: {
+        action: 'save', confirmed: true, title: 'Date-only with dueAt test',
+        taskType: 'work', dateExpression: 'tomorrow', resolutionToken: dateOnlyForgedDueAtToken,
+        dateLocal: '2026-10-24', timeLocal: '', timeZone: 'Asia/Kolkata'
+      }
+    }), dateOnlyForgedDueAtSave);
+    assert.strictEqual(dateOnlyForgedDueAtSave.statusCode, 422);
+    assert.strictEqual(dateOnlyForgedDueAtSave.body.code, 'SCHEDULE_FIELD_MISMATCH');
+
+    // 2. Future-issued token rejected
+    const futureIssuedToken = handler.createResolutionToken({
+      ownerId: sessionObj.ownerId,
+      dateExpression: 'tomorrow at 7pm',
+      timeZone: 'Asia/Kolkata',
+      dateLocal: '2026-10-24',
+      timeLocal: '19:00',
+      schedulingStatus: 'scheduled',
+      dueAt: '2026-10-24T13:30:00.000Z',
+      referenceTime: testFixedRef
+    }, validSecret, { issuedAt: fixedEpoch + 10 * 60 * 1000, ttlMs: 20 * 60 * 1000 }); // 10 minutes in future
+
+    const futureIssuedSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Future issued token',
+        taskType: 'work', dateExpression: 'tomorrow at 7pm', resolutionToken: futureIssuedToken,
+        dateLocal: '2026-10-24', timeLocal: '19:00', timeZone: 'Asia/Kolkata'
+      }
+    }), futureIssuedSave);
+    assert.strictEqual(futureIssuedSave.statusCode, 422);
+    assert.strictEqual(futureIssuedSave.body.code, 'INVALID_RESOLUTION_TOKEN');
+
+    // Overlong-lifetime token rejected (> 20 min TTL)
+    const overlongToken = handler.createResolutionToken({
+      ownerId: sessionObj.ownerId,
+      dateExpression: 'tomorrow at 7pm',
+      timeZone: 'Asia/Kolkata',
+      dateLocal: '2026-10-24',
+      timeLocal: '19:00',
+      schedulingStatus: 'scheduled',
+      dueAt: '2026-10-24T13:30:00.000Z',
+      referenceTime: testFixedRef
+    }, validSecret, { issuedAt: fixedEpoch - 1000, ttlMs: 40 * 60 * 1000 }); // 40 minutes TTL
+
+    const overlongSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Overlong token',
+        taskType: 'work', dateExpression: 'tomorrow at 7pm', resolutionToken: overlongToken,
+        dateLocal: '2026-10-24', timeLocal: '19:00', timeZone: 'Asia/Kolkata'
+      }
+    }), overlongSave);
+    assert.strictEqual(overlongSave.statusCode, 422);
+    assert.strictEqual(overlongSave.body.code, 'INVALID_RESOLUTION_TOKEN');
+
+    // Malformed token without delimiter rejected
+    const malformedResToken = 'not_a_valid_token_string';
+    const malformedSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      body: {
+        action: 'save', confirmed: true, title: 'Malformed token',
+        taskType: 'work', dateExpression: 'tomorrow at 7pm', resolutionToken: malformedResToken,
+        dateLocal: '2026-10-24', timeLocal: '19:00', timeZone: 'Asia/Kolkata'
+      }
+    }), malformedSave);
+    assert.strictEqual(malformedSave.statusCode, 422);
+    assert.strictEqual(malformedSave.body.code, 'INVALID_RESOLUTION_TOKEN');
+
+    // 3. Calendar boundary crossing: preview at 23:55 UTC (Oct 23), saved at 00:05 UTC the next day (Oct 24)
+    const previewTimeT0 = '2026-10-23T23:55:00.000Z';
+    const boundaryPreview = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      __testReferenceTime: previewTimeT0,
+      body: {
+        action: 'parse',
+        text: 'Deploy application tomorrow at 7pm',
+        timeZone: 'UTC'
+      }
+    }), boundaryPreview);
+    assert.strictEqual(boundaryPreview.statusCode, 200);
+    const boundaryToken = boundaryPreview.body.draft.resolutionToken;
+    assert.ok(boundaryToken);
+    assert.strictEqual(boundaryPreview.body.draft.dateLocal, '2026-10-24');
+    assert.strictEqual(boundaryPreview.body.draft.timeLocal, '19:00');
+
+    // Clock advances 10 minutes across midnight to 00:05 UTC (Oct 24)
+    const saveTimeT1 = '2026-10-24T00:05:00.000Z';
+    const boundarySave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      __testReferenceTime: saveTimeT1,
+      body: {
+        action: 'save', confirmed: true, title: 'Deploy application',
+        taskType: 'work', dateExpression: 'tomorrow at 7pm', resolutionToken: boundaryToken,
+        dateLocal: '2026-10-24', timeLocal: '19:00', timeZone: 'UTC'
+      }
+    }), boundarySave);
+    assert.strictEqual(boundarySave.statusCode, 201, 'Save crossing midnight must resolve against signed token anchor');
+    assert.strictEqual(boundarySave.body.reminder.dateLocal, '2026-10-24');
+
+    // But if current time has genuinely passed the scheduled time while token is still active, TIME_IN_PAST must still be enforced
+    const nearPreviewTime = '2026-10-24T18:50:00.000Z';
+    const nearPreview = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      __testReferenceTime: nearPreviewTime,
+      body: {
+        action: 'parse',
+        text: 'Call client today at 6:55pm',
+        timeZone: 'UTC'
+      }
+    }), nearPreview);
+    assert.strictEqual(nearPreview.statusCode, 200);
+    const nearToken = nearPreview.body.draft.resolutionToken;
+    assert.ok(nearToken);
+
+    // 6 minutes later (18:56 UTC), token is still valid (expires in 14 min), but scheduled time (18:55 UTC) has passed
+    const pastTimeT2 = '2026-10-24T18:56:00.000Z';
+    const pastSave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      __testReferenceTime: pastTimeT2,
+      body: {
+        action: 'save', confirmed: true, title: 'Call client',
+        taskType: 'work', dateExpression: 'today at 6:55pm', resolutionToken: nearToken,
+        dateLocal: '2026-10-24', timeLocal: '18:55', timeZone: 'UTC'
+      }
+    }), pastSave);
+    assert.strictEqual(pastSave.statusCode, 422);
+    assert.strictEqual(pastSave.body.code, 'TIME_IN_PAST');
+
+    // 4. Incomplete & clarification-only resolutions never issue saveable tokens
+    const monthlyPreview = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      __testReferenceTime: testFixedRef,
+      body: { action: 'parse', text: 'Pay taxes every month', timeZone: 'Asia/Kolkata' }
+    }), monthlyPreview);
+    assert.strictEqual(monthlyPreview.statusCode, 200);
+    assert.strictEqual(monthlyPreview.body.draft.schedulingStatus, 'needs_clarification');
+    assert.strictEqual(monthlyPreview.body.draft.resolutionToken, null, 'Clarification draft must have resolutionToken === null');
+    assert.strictEqual(monthlyPreview.body.resolutionToken, null);
+
+    const resolveIncompleteRes = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      __testReferenceTime: testFixedRef,
+      body: { action: 'resolve', dateExpression: 'tomorrow at 7', timeZone: 'Asia/Kolkata' }
+    }), resolveIncompleteRes);
+    assert.strictEqual(resolveIncompleteRes.statusCode, 200);
+    assert.strictEqual(resolveIncompleteRes.body.draft.schedulingStatus, 'needs_clarification');
+    assert.strictEqual(resolveIncompleteRes.body.draft.resolutionToken, null, 'Incomplete time must have resolutionToken === null');
+
+    // 5. Date-only resolution and persistence guarantees dueAt === null
+    const dateOnlyParse = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      __testReferenceTime: testFixedRef,
+      body: { action: 'parse', text: 'Renew passport tomorrow', timeZone: 'Asia/Kolkata' }
+    }), dateOnlyParse);
+    assert.strictEqual(dateOnlyParse.statusCode, 200);
+    assert.strictEqual(dateOnlyParse.body.draft.schedulingStatus, 'date_only');
+    assert.strictEqual(dateOnlyParse.body.draft.dueAt, null);
+    const dateOnlyToken = dateOnlyParse.body.draft.resolutionToken;
+    assert.ok(dateOnlyToken);
+
+    const dateOnlySave = res();
+    await handler(req('POST', {
+      headers: { cookie: validCookie },
+      __testReferenceTime: testFixedRef,
+      body: {
+        action: 'save', confirmed: true, title: 'Renew passport',
+        taskType: 'general', dateExpression: 'tomorrow', resolutionToken: dateOnlyToken,
+        dateLocal: '2026-10-24', timeLocal: '', timeZone: 'Asia/Kolkata'
+      }
+    }), dateOnlySave);
+    assert.strictEqual(dateOnlySave.statusCode, 201);
+    assert.strictEqual(dateOnlySave.body.reminder.dueAt, null);
+    assert.strictEqual(dateOnlySave.body.reminder.schedulingStatus, 'date_only');
+
+    process.stdout.write('  PASS Suite 8: Timestamp contract, temporal validation & boundary drift verified\n');
+
     process.stdout.write('\nPASS reminder API: all session security, length gates, CSRF, and isolation tests passed.\n');
   } finally {
+    handler.setReferenceClock(null);
     global.fetch = oldFetch;
     if (env.secret === undefined) delete process.env.MILO_SESSION_SECRET; else process.env.MILO_SESSION_SECRET = env.secret;
     if (env.url === undefined) delete process.env.UPSTASH_REDIS_REST_URL; else process.env.UPSTASH_REDIS_REST_URL = env.url;
