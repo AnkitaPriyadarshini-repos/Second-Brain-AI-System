@@ -41,6 +41,7 @@
   <link rel="stylesheet" href="css/responsive.css?v=70.0">
   <link rel="stylesheet" href="css/websocket-chat.css?v=70.0">
   <link rel="stylesheet" href="css/adaptive-fusion.css?v=70.0">
+  <link rel="stylesheet" href="vendor/katex/katex.min.css?v=1.0">
   <link rel="stylesheet" href="css/milo-workspace-studio.css?v=1.0">
   <link rel="stylesheet" href="css/onyx-theme.css?v=70.0">
   <link rel="manifest" href="manifest.json">
@@ -316,17 +317,29 @@
       <div class="onyx-model-pill-container">
         <div id="onyx-model-pill" class="onyx-model-pill" title="Select Model">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
-          <span id="onyx-model-name-label">Gemini 3.1 Flash Lite</span>
+          <span id="onyx-model-name-label">Auto (Smart Route)</span>
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div id="onyx-model-dropdown" class="onyx-model-dropdown-menu">
-          <div class="onyx-model-option selected" data-model="gemini-3.1-flash-lite">
-            <span>Gemini 3.1 Flash Lite</span>
-            <span style="font-size: 10px; color: #10B981;">Active · Default</span>
+          <div class="onyx-model-option selected" data-model="auto">
+            <span>Auto (Smart Route)</span>
+            <span style="font-size: 10px; color: #10B981;">Recommended · Fast &amp; Deep</span>
+          </div>
+          <div class="onyx-model-option" data-model="gemini-3.8-flash">
+            <span>Gemini 3.8 Flash</span>
+            <span style="font-size: 10px; color: #6B7280;">Frontier Reasoning</span>
+          </div>
+          <div class="onyx-model-option" data-model="gemini-3.6-flash">
+            <span>Gemini 3.6 Flash</span>
+            <span style="font-size: 10px; color: #6B7280;">Balanced Tier</span>
           </div>
           <div class="onyx-model-option" data-model="gemini-3.5-flash-lite">
             <span>Gemini 3.5 Flash Lite</span>
             <span style="font-size: 10px; color: #6B7280;">High-Speed Tier</span>
+          </div>
+          <div class="onyx-model-option" data-model="gemini-3.1-flash-lite">
+            <span>Gemini 3.1 Flash Lite</span>
+            <span style="font-size: 10px; color: #6B7280;">Stable Lite</span>
           </div>
           <div class="onyx-model-option" data-model="gemini-flash-latest">
             <span>Gemini Flash Latest</span>
@@ -2037,7 +2050,8 @@
   </div>
 
   <!-- JavaScript Modules -->
-  <script src="js/utils.js?v=59.0"></script>
+  <script src="vendor/katex/katex.min.js?v=1.0"></script>
+  <script src="js/utils.js?v=60.0"></script>
   <script src="js/nlp-engine.js?v=58.0"></script>
   <script src="js/store.js?v=67.0"></script>
   <script src="js/rag-engine.js?v=58.0"></script>

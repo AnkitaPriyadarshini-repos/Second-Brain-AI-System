@@ -1,9 +1,75 @@
 /* Second Brain AI System — Service Worker for Offline PWA Support */
 
-const CACHE_NAME = 'second-brain-cache-v70.0';
+const CACHE_NAME = 'second-brain-cache-v72.0';
+
+const KATEX_FONTS = [
+  './vendor/katex/fonts/KaTeX_AMS-Regular.ttf',
+  './vendor/katex/fonts/KaTeX_AMS-Regular.woff',
+  './vendor/katex/fonts/KaTeX_AMS-Regular.woff2',
+  './vendor/katex/fonts/KaTeX_Caligraphic-Bold.ttf',
+  './vendor/katex/fonts/KaTeX_Caligraphic-Bold.woff',
+  './vendor/katex/fonts/KaTeX_Caligraphic-Bold.woff2',
+  './vendor/katex/fonts/KaTeX_Caligraphic-Regular.ttf',
+  './vendor/katex/fonts/KaTeX_Caligraphic-Regular.woff',
+  './vendor/katex/fonts/KaTeX_Caligraphic-Regular.woff2',
+  './vendor/katex/fonts/KaTeX_Fraktur-Bold.ttf',
+  './vendor/katex/fonts/KaTeX_Fraktur-Bold.woff',
+  './vendor/katex/fonts/KaTeX_Fraktur-Bold.woff2',
+  './vendor/katex/fonts/KaTeX_Fraktur-Regular.ttf',
+  './vendor/katex/fonts/KaTeX_Fraktur-Regular.woff',
+  './vendor/katex/fonts/KaTeX_Fraktur-Regular.woff2',
+  './vendor/katex/fonts/KaTeX_Main-Bold.ttf',
+  './vendor/katex/fonts/KaTeX_Main-Bold.woff',
+  './vendor/katex/fonts/KaTeX_Main-Bold.woff2',
+  './vendor/katex/fonts/KaTeX_Main-BoldItalic.ttf',
+  './vendor/katex/fonts/KaTeX_Main-BoldItalic.woff',
+  './vendor/katex/fonts/KaTeX_Main-BoldItalic.woff2',
+  './vendor/katex/fonts/KaTeX_Main-Italic.ttf',
+  './vendor/katex/fonts/KaTeX_Main-Italic.woff',
+  './vendor/katex/fonts/KaTeX_Main-Italic.woff2',
+  './vendor/katex/fonts/KaTeX_Main-Regular.ttf',
+  './vendor/katex/fonts/KaTeX_Main-Regular.woff',
+  './vendor/katex/fonts/KaTeX_Main-Regular.woff2',
+  './vendor/katex/fonts/KaTeX_Math-BoldItalic.ttf',
+  './vendor/katex/fonts/KaTeX_Math-BoldItalic.woff',
+  './vendor/katex/fonts/KaTeX_Math-BoldItalic.woff2',
+  './vendor/katex/fonts/KaTeX_Math-Italic.ttf',
+  './vendor/katex/fonts/KaTeX_Math-Italic.woff',
+  './vendor/katex/fonts/KaTeX_Math-Italic.woff2',
+  './vendor/katex/fonts/KaTeX_SansSerif-Bold.ttf',
+  './vendor/katex/fonts/KaTeX_SansSerif-Bold.woff',
+  './vendor/katex/fonts/KaTeX_SansSerif-Bold.woff2',
+  './vendor/katex/fonts/KaTeX_SansSerif-Italic.ttf',
+  './vendor/katex/fonts/KaTeX_SansSerif-Italic.woff',
+  './vendor/katex/fonts/KaTeX_SansSerif-Italic.woff2',
+  './vendor/katex/fonts/KaTeX_SansSerif-Regular.ttf',
+  './vendor/katex/fonts/KaTeX_SansSerif-Regular.woff',
+  './vendor/katex/fonts/KaTeX_SansSerif-Regular.woff2',
+  './vendor/katex/fonts/KaTeX_Script-Regular.ttf',
+  './vendor/katex/fonts/KaTeX_Script-Regular.woff',
+  './vendor/katex/fonts/KaTeX_Script-Regular.woff2',
+  './vendor/katex/fonts/KaTeX_Size1-Regular.ttf',
+  './vendor/katex/fonts/KaTeX_Size1-Regular.woff',
+  './vendor/katex/fonts/KaTeX_Size1-Regular.woff2',
+  './vendor/katex/fonts/KaTeX_Size2-Regular.ttf',
+  './vendor/katex/fonts/KaTeX_Size2-Regular.woff',
+  './vendor/katex/fonts/KaTeX_Size2-Regular.woff2',
+  './vendor/katex/fonts/KaTeX_Size3-Regular.ttf',
+  './vendor/katex/fonts/KaTeX_Size3-Regular.woff',
+  './vendor/katex/fonts/KaTeX_Size3-Regular.woff2',
+  './vendor/katex/fonts/KaTeX_Size4-Regular.ttf',
+  './vendor/katex/fonts/KaTeX_Size4-Regular.woff',
+  './vendor/katex/fonts/KaTeX_Size4-Regular.woff2',
+  './vendor/katex/fonts/KaTeX_Typewriter-Regular.ttf',
+  './vendor/katex/fonts/KaTeX_Typewriter-Regular.woff',
+  './vendor/katex/fonts/KaTeX_Typewriter-Regular.woff2'
+];
+
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
+  './vendor/katex/katex.min.css',
+  './vendor/katex/katex.min.js',
   './css/style.css',
   './css/nori-companion.css',
   './css/responsive.css',
@@ -22,11 +88,11 @@ const ASSETS_TO_CACHE = [
   './js/ai-agents.js',
   './js/nori-companion.js',
   './js/app.js',
-  './js/utils.js?v=59.0',
-  './js/production-chat.js?v=6.0',
+  './js/utils.js?v=60.0',
+  './js/production-chat.js?v=7.0',
   './js/pwa-installer.js?v=61.0',
   './js/bm25-engine.js?v=1.0',
-  './js/hybrid-retrieval.js?v=1.0',
+  './js/hybrid-retrieval.js?v=2.0',
   './js/document-ingestion.js?v=1.0',
   './js/artifacts-engine.js?v=1.0',
   './js/agent-system.js?v=1.0',
@@ -39,7 +105,8 @@ const ASSETS_TO_CACHE = [
   './js/onyx-interface.js?v=70.0',
   './assets/milo_robot_mascot.png',
   './assets/nexus_yellow_bot.png',
-  './manifest.json'
+  './manifest.json',
+  ...KATEX_FONTS
 ];
 
 self.addEventListener('install', (event) => {
@@ -67,6 +134,6 @@ self.addEventListener('fetch', (event) => {
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
       }
       return networkResponse;
-    }).catch(() => caches.match(event.request))
+    }).catch(() => caches.match(event.request, { ignoreSearch: true }))
   );
 });
