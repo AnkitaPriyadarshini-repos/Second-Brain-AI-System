@@ -1,0 +1,53 @@
+/* Milo natural-language reminder prototype */
+.milo-reminder-view { max-width: 1180px; margin: 0 auto; padding: 28px clamp(16px, 3vw, 36px) 48px; color: var(--onyx-text-primary, var(--text-primary, #111827)); }
+.milo-reminder-header { margin-bottom: 24px; }
+.milo-reminder-kicker { color: var(--accent-primary, #2563eb); font-size: 11px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; margin-bottom: 10px; }
+.milo-reminder-title { font-size: clamp(25px, 3vw, 36px); line-height: 1.15; margin: 0 0 10px; letter-spacing: -.035em; }
+.milo-reminder-subtitle { color: var(--onyx-text-secondary, var(--text-secondary, #4b5563)); max-width: 760px; line-height: 1.65; margin: 0; }
+.milo-reminder-layout { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(300px, .95fr); gap: 18px; align-items: start; }
+.milo-reminder-panel, .milo-reminder-saved-panel { background: var(--onyx-bg-card, var(--surface-bg, #fff)); border: 1px solid var(--onyx-border-subtle, var(--border-color, #e5e7eb)); border-radius: 16px; padding: clamp(16px, 2vw, 24px); box-shadow: var(--onyx-shadow-card, 0 1px 3px rgba(0,0,0,.05)); min-width: 0; }
+.milo-reminder-panel h2, .milo-reminder-saved-panel h2 { font-size: 16px; margin: 0 0 6px; }
+.milo-reminder-panel p, .milo-reminder-saved-panel p { color: var(--onyx-text-secondary, var(--text-secondary, #4b5563)); line-height: 1.55; }
+.milo-reminder-field { display: flex; flex-direction: column; gap: 7px; margin-top: 16px; min-width: 0; }
+.milo-reminder-field label { font-size: 12px; font-weight: 700; color: var(--onyx-text-secondary, var(--text-secondary, #4b5563)); }
+.milo-reminder-field input, .milo-reminder-field textarea, .milo-reminder-field select { box-sizing: border-box; width: 100%; min-height: 42px; padding: 10px 12px; border: 1px solid var(--onyx-border-strong, var(--border-color, #d1d5db)); border-radius: 10px; background: var(--onyx-bg-input, var(--surface-bg, #fff)); color: var(--onyx-text-primary, var(--text-primary, #111827)); font: inherit; }
+.milo-reminder-field textarea { min-height: 112px; resize: vertical; }
+.milo-reminder-field input:focus-visible, .milo-reminder-field textarea:focus-visible, .milo-reminder-field select:focus-visible, .milo-reminder-example:focus-visible, .milo-reminder-primary:focus-visible, .milo-reminder-delete:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent-primary, #2563eb) 35%, transparent); outline-offset: 2px; }
+.milo-reminder-examples { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 2px; }
+.milo-reminder-example { border: 1px solid var(--onyx-border-subtle, #e5e7eb); border-radius: 999px; padding: 7px 10px; background: var(--onyx-bg-card-hover, #f3f4f6); color: var(--onyx-text-secondary, #4b5563); cursor: pointer; font: inherit; font-size: 12px; }
+.milo-reminder-example:hover { border-color: var(--accent-primary, #2563eb); }
+.milo-reminder-primary { border: 0; border-radius: 10px; min-height: 42px; padding: 10px 15px; margin-top: 18px; background: var(--accent-primary, #2563eb); color: #fff; font: inherit; font-weight: 750; cursor: pointer; }
+.milo-reminder-primary:disabled { cursor: not-allowed; opacity: .45; }
+.milo-reminder-notice, .milo-reminder-storage-status, .milo-reminder-inline-note { border-radius: 10px; padding: 11px 13px; font-size: 12px; line-height: 1.5; margin-top: 14px; background: var(--onyx-bg-card-hover, #f3f4f6); color: var(--onyx-text-secondary, #4b5563); }
+.milo-reminder-notice.is-error, .milo-reminder-storage-status.is-unavailable { border: 1px solid #e9b6a9; background: #fff5f1; color: #9a3412; }
+.milo-reminder-notice.is-success, .milo-reminder-storage-status.is-ready { border: 1px solid #a7d7b5; background: #f0fdf4; color: #166534; }
+.milo-reminder-notice.is-warning { border: 1px solid #f0d39d; background: #fffbeb; color: #92400e; }
+.milo-reminder-preview-summary { font-size: 12px; margin: 8px 0 4px; }
+.milo-reminder-preview-line { padding: 13px 0; border-bottom: 1px solid var(--onyx-border-subtle, #e5e7eb); }
+.milo-reminder-preview-line:last-of-type { border-bottom: 0; }
+.milo-reminder-preview-label { display: block; text-transform: uppercase; letter-spacing: .08em; font-weight: 800; font-size: 10px; color: var(--onyx-text-muted, #6b7280); margin-bottom: 6px; }
+.milo-reminder-preview-value { display: block; font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+.milo-reminder-time-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.milo-reminder-recurrence-fields { display: grid; grid-template-columns: minmax(0, 1fr) 88px; gap: 12px; }
+.milo-reminder-saved-panel { margin-top: 20px; }
+.milo-reminder-list { display: grid; gap: 10px; margin-top: 14px; }
+.milo-reminder-saved-card { display: flex; align-items: start; justify-content: space-between; gap: 14px; padding: 14px; border: 1px solid var(--onyx-border-subtle, #e5e7eb); border-radius: 12px; background: var(--onyx-bg-card, #fff); }
+.milo-reminder-saved-copy { min-width: 0; }
+.milo-reminder-saved-copy h3 { margin: 0 0 6px; font-size: 14px; overflow-wrap: anywhere; }
+.milo-reminder-saved-copy p { margin: 4px 0; font-size: 12px; overflow-wrap: anywhere; }
+.milo-reminder-status-pill { display: inline-flex; align-items: center; gap: 4px; border: 1px solid var(--onyx-border-subtle, #e5e7eb); border-radius: 999px; padding: 4px 9px; margin-top: 6px; font-size: 11px; font-weight: 600; color: var(--onyx-text-secondary, #4b5563); }
+.milo-reminder-status-pill.status-scheduled { border-color: #a7d7b5; background: #f0fdf4; color: #166534; }
+.milo-reminder-status-pill.status-date-only { border-color: #99f6e4; background: #f0fdfa; color: #0f766e; }
+.milo-reminder-status-pill.status-unscheduled { border-color: #cbd5e1; background: #f8fafc; color: #475569; }
+.milo-reminder-status-pill.status-needs-clarification { border-color: #fcd34d; background: #fffbeb; color: #92400e; }
+.milo-reminder-delete { border: 1px solid var(--onyx-border-subtle, #e5e7eb); border-radius: 8px; padding: 7px 10px; background: transparent; color: var(--onyx-text-secondary, #4b5563); cursor: pointer; font: inherit; font-size: 12px; }
+.milo-reminder-delete:hover { border-color: #dc2626; color: #b91c1c; }
+.milo-reminder-empty { padding: 20px 10px; text-align: center; font-size: 13px; color: var(--onyx-text-muted, #6b7280); }
+@media (max-width: 820px) { .milo-reminder-layout { grid-template-columns: 1fr; } }
+@media (max-width: 520px) {
+  .milo-reminder-view { padding: 20px 12px 36px; }
+  .milo-reminder-time-fields { grid-template-columns: 1fr; gap: 0; }
+  .milo-reminder-recurrence-fields { grid-template-columns: minmax(0, 1fr) 78px; }
+  .milo-reminder-saved-card { flex-direction: column; }
+  .milo-reminder-delete { align-self: flex-end; }
+}

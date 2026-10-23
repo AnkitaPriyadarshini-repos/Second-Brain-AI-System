@@ -143,6 +143,10 @@ nextApp.prepare().then(() => {
   });
   app.post('/api/share', (req, res) => shareController.createShareLink(req, res));
   app.get('/api/share/:id', (req, res) => shareController.getShareLink(req, res));
+  app.all('/api/reminders', (req, res) => {
+    const reminderHandler = require('./api/reminders');
+    return reminderHandler(req, res);
+  });
 
   app.use(express.static(__dirname));
   app.all('*', (req, res) => handle(req, res));

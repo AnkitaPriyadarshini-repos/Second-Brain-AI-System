@@ -12,7 +12,7 @@
     "start": "node server.js",
     "dev": "node server.js",
     "serve": "npx serve .",
-    "test": "node test/run_tests.js && node test/run_websocket_ssr_tests.js && node test/run_dip_repository_tests.js && node test/run_layered_architecture_tests.js && node test/run_production_blueprint_tests.js && node test/run_rag_system_tests.js && node test/run_production_audit_tests.js && node test/run_production_chat_loader_tests.js && node test/run_production_health_security_tests.js && node test/run_juno_gateway_regression.js && node test/run_chat_incident_regression_tests.js && node test/run_context_aware_workspace_tests.js && node test/run_media_coding_agent_tests.js && node test/run_store_integrity_tests.js && node test/run_robot_and_clipboard_tests.js && node test/run_session_security_tests.js && node test/run_gateway_fallback_contract_tests.js && node test/run_browser_chat_e2e_tests.js",
+    "test": "node test/run_tests.js && node test/run_websocket_ssr_tests.js && node test/run_dip_repository_tests.js && node test/run_layered_architecture_tests.js && node test/run_production_blueprint_tests.js && node test/run_rag_system_tests.js && node test/run_production_audit_tests.js && node test/run_production_chat_loader_tests.js && node test/run_production_health_security_tests.js && node test/run_juno_gateway_regression.js && node test/run_chat_incident_regression_tests.js && node test/run_context_aware_workspace_tests.js && node test/run_media_coding_agent_tests.js && node test/run_store_integrity_tests.js && node test/run_robot_and_clipboard_tests.js && node test/run_session_security_tests.js && node test/run_gateway_fallback_contract_tests.js && node test/run_reminder_parser_tests.js && node test/run_reminder_api_tests.js && node test/run_reminder_ui_contract_tests.js && node test/run_task_extraction_service_tests.js && node test/run_reminder_date_resolution_service_tests.js && node test/run_task_extraction_integration_tests.js && node test/run_browser_reminders_and_views_e2e.js && node test/run_browser_chat_e2e_tests.js",
     "test:unit": "node test/run_tests.js",
     "test:session": "node test/run_session_security_tests.js",
     "test:e2e": "node test/run_browser_chat_e2e_tests.js",
@@ -24,14 +24,18 @@
     "test:rag": "node test/run_rag_system_tests.js",
     "test:audit": "node test/run_production_audit_tests.js",
     "test:workspace": "node test/run_media_coding_agent_tests.js",
-    "test:load": "node test/load_test_100_users.js"
+    "test:load": "node test/load_test_100_users.js",
+    "test:extraction": "node test/run_task_extraction_service_tests.js",
+    "test:resolution": "node test/run_reminder_date_resolution_service_tests.js",
+    "test:reminders": "node test/run_reminder_parser_tests.js && node test/run_reminder_api_tests.js && node test/run_reminder_ui_contract_tests.js && node test/run_task_extraction_service_tests.js && node test/run_reminder_date_resolution_service_tests.js && node test/run_task_extraction_integration_tests.js && node test/run_browser_reminders_and_views_e2e.js"
   },
   "dependencies": {
     "express": "^4.19.2",
     "next": "^14.2.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "ws": "^8.17.0"
+    "ws": "^8.17.0",
+    "chrono-node": "^2.10.3"
   },
   "keywords": [
     "second-brain",
