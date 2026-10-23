@@ -132,6 +132,98 @@ async function main() {
     assert.ok(capturedSystemPrompt.includes('No private memory was retrieved for this request'), 'Prompt must not include legacy text');
     assert.ok(!capturedSystemPrompt.includes('Legacy memory text'), 'Prompt must not leak legacy context text');
 
+    // 1C: "Do you remember what a quadratic equation is?" with unrelated Transformer notes in legacy context
+    let prompt1C = '';
+    globalThis.fetch = async (url, opts) => {
+      const parsedBody = JSON.parse(opts.body);
+      prompt1C = parsedBody.systemInstruction?.parts?.[0]?.text || '';
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          candidates: [{ content: { parts: [{ text: 'A quadratic equation is ax^2 + bx + c = 0.' }] } }]
+        })
+      };
+    };
+    const req1C = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: {
+        prompt: 'Do you remember what a quadratic equation is?',
+        context: 'Title: Deep Learning & Transformer Attention Mechanisms\nContent: Softmax(Q K^T / sqrt(d_k)) computes token attention.',
+        model: 'auto'
+      }
+    };
+    const res1C = createMockRes();
+    await handler(req1C, res1C);
+    assert.strictEqual(res1C.statusCode, 200);
+    assert.strictEqual(res1C.body.grounded, false);
+    assert.ok(prompt1C.includes('No private memory was retrieved for this request'), 'Conversational "remember" query must NOT inject unrelated notes');
+    assert.ok(!prompt1C.includes('Transformer Attention'), 'Must not leak transformer note in prompt');
+
+    // 1D: Multi-entry legacy context: query about saved quadratic-equation notes must retrieve ONLY the matching entry
+    let prompt1D = '';
+    globalThis.fetch = async (url, opts) => {
+      const parsedBody = JSON.parse(opts.body);
+      prompt1D = parsedBody.systemInstruction?.parts?.[0]?.text || '';
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          candidates: [{ content: { parts: [{ text: 'Based on your saved notes, the quadratic formula is x = (-b +- sqrt(b^2 - 4ac)) / (2a).' }] } }]
+        })
+      };
+    };
+    const multiEntryLegacyContext = [
+      'Title: Quadratic Equations and Formula\nSummary: Standard polynomial form ax^2 + bx + c = 0.\nContent: Solutions are obtained by factoring, completing the square, or using the quadratic formula: x = (-b +- sqrt(b^2 - 4ac)) / (2a).',
+      'Title: Deep Learning & Transformer Attention Mechanisms\nSummary: Multi-head attention across tokens.\nContent: Softmax(Q K^T / sqrt(d_k)) calculates attention weights.'
+    ].join('\n\n---\n\n');
+
+    const req1D = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: {
+        prompt: 'What did I save about quadratic equations?',
+        context: multiEntryLegacyContext,
+        model: 'auto'
+      }
+    };
+    const res1D = createMockRes();
+    await handler(req1D, res1D);
+    assert.strictEqual(res1D.statusCode, 200);
+    assert.ok(prompt1D.includes('Quadratic Equations and Formula'), 'Matching quadratic entry must be injected');
+    assert.ok(!prompt1D.includes('Transformer Attention'), 'Unrelated Transformer entry must be excluded');
+
+    // 1E: Generic query mentioning "notes" must not bypass the relevance gate
+    let prompt1E = '';
+    globalThis.fetch = async (url, opts) => {
+      const parsedBody = JSON.parse(opts.body);
+      prompt1E = parsedBody.systemInstruction?.parts?.[0]?.text || '';
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          candidates: [{ content: { parts: [{ text: 'A quadratic equation is of degree 2.' }] } }]
+        })
+      };
+    };
+    const req1E = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: {
+        prompt: 'Take note: explain quadratic equations for my math class',
+        context: 'Title: Deep Learning & Transformer Attention Mechanisms\nContent: Softmax attention calculations.',
+        model: 'auto'
+      }
+    };
+    const res1E = createMockRes();
+    await handler(req1E, res1E);
+    globalThis.fetch = oldFetch;
+    assert.strictEqual(res1E.statusCode, 200);
+    assert.strictEqual(res1E.body.grounded, false);
+    assert.ok(prompt1E.includes('No private memory was retrieved for this request'), 'Generic query mentioning "note" must NOT bypass relevance gate');
+    assert.ok(!prompt1E.includes('Transformer Attention'), 'Must not leak transformer note');
+
     console.log('  ✅ [PASS] General math question excluded unrelated transformer notes, legacy context, and fake citations');
   }
 
@@ -299,8 +391,9 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
     const requestedModels = [
       { requested: 'gemini-3.1-flash-lite', expectedUpstream: 'gemini-3.1-flash-lite' },
       { requested: 'gemini-3.8-flash', expectedUpstream: 'gemini-3.8-flash' },
+      { requested: 'gemini-3.6-flash', expectedUpstream: 'gemini-3.6-flash' },
       { requested: 'gemini-3.5-flash-lite', expectedUpstream: 'gemini-3.5-flash-lite' },
-      { requested: 'gemini-2.5-flash', expectedUpstream: 'gemini-2.5-flash' }
+      { requested: 'gemini-2.5-flash', expectedUpstream: 'gemini-3.5-flash-lite' } // Migrated from restricted 2.5 to unrestricted 3.5
     ];
 
     for (const { requested, expectedUpstream } of requestedModels) {
@@ -396,8 +489,10 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
     const uniqueAttempted = new Set(attemptedModels);
     assert.strictEqual(attemptedModels.length, uniqueAttempted.size,
       `Fallback chain must not attempt duplicate models: ${JSON.stringify(attemptedModels)}`);
+    assert.ok(!attemptedModels.includes('gemini-2.5-flash'), 'Fallback chain must not depend on restricted gemini-2.5-flash');
+    assert.ok(!attemptedModels.includes('gemini-2.5-pro'), 'Fallback chain must not depend on restricted gemini-2.5-pro');
 
-    // Test 5C: Simple question in long chat history (>= 10 turns) must remain on fast tier with 0 thinking budget
+    // Test 5C: Simple question in long chat history (>= 10 turns) using production payload (model: 'auto')
     const longHistory = [];
     for (let i = 0; i < 10; i++) {
       longHistory.push({ role: i % 2 === 0 ? 'user' : 'model', content: `Message turn ${i + 1}` });
@@ -417,29 +512,57 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
       };
     };
 
-    const simpleReq = {
+    const autoSimpleReq = {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: { prompt: 'What is the capital of France?', history: longHistory }
+      body: { prompt: 'What is the capital of France?', model: 'auto', history: longHistory }
     };
-    const simpleRes = createMockRes();
-    await handler(simpleReq, simpleRes);
-    globalThis.fetch = oldFetch;
+    const autoSimpleRes = createMockRes();
+    await handler(autoSimpleReq, autoSimpleRes);
 
-    assert.strictEqual(simpleRes.statusCode, 200);
+    assert.strictEqual(autoSimpleRes.statusCode, 200);
     assert.ok(capturedSimpleModelUrl.includes('/models/gemini-3.5-flash-lite:generateContent'),
-      `Simple question with long history must route to gemini-3.5-flash-lite, got: ${capturedSimpleModelUrl}`);
+      `Production default auto model with simple prompt must route to gemini-3.5-flash-lite, got: ${capturedSimpleModelUrl}`);
     assert.strictEqual(capturedSimpleThinkingConfig?.thinkingBudget, 0, 'Simple question thinking budget must be minimal (0)');
 
-    console.log('  ✅ [PASS] Thinking budget applied, fallbacks deduplicated, and simple questions kept on fast 0-thinking tier');
+    // Test 5D: Explicit manual model selection must be honored over auto classifier
+    let capturedManualModelUrl = '';
+    globalThis.fetch = async (url) => {
+      capturedManualModelUrl = url;
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          candidates: [{ content: { parts: [{ text: 'Answer from manually chosen model.' }] } }]
+        })
+      };
+    };
+
+    const manualReq = {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: { prompt: 'What is the capital of France?', model: 'gemini-3.8-flash', history: longHistory }
+    };
+    const manualRes = createMockRes();
+    await handler(manualReq, manualRes);
+    globalThis.fetch = oldFetch;
+
+    assert.strictEqual(manualRes.statusCode, 200);
+    assert.ok(capturedManualModelUrl.includes('/models/gemini-3.8-flash:generateContent'),
+      `Explicit manual selection of gemini-3.8-flash must be honored, got: ${capturedManualModelUrl}`);
+
+    console.log('  ✅ [PASS] Auto routing, explicit manual model selection, and deduplicated 3.x fallbacks verified');
   }
 
   // ------------------------------------------------------------------
-  // SUITE 6: Action Toolbar SVG Sanitation & Text Copying
+  // SUITE 6: Action Toolbar SVG Sanitation & Real Production Clipboard Test
   // ------------------------------------------------------------------
-  console.log('\nSuite 6: Action Toolbar & SVG Artifact Isolation');
+  console.log('\nSuite 6: Action Toolbar & SVG Artifact Isolation (Production Controller)');
   {
-    // Simulate DOM assistant message bubble
+    const vm = require('vm');
+    const chatScript = fs.readFileSync(path.join(root, 'js/production-chat.js'), 'utf8');
+
+    // DOM harness: MockNode supporting realistic DOM manipulation
     class MockNode {
       constructor(tag = 'div', className = '') {
         this.tagName = tag.toUpperCase();
@@ -447,6 +570,7 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
         this.children = [];
         this.parentNode = null;
         this.textContent = '';
+        this.innerHTML = '';
       }
       appendChild(child) {
         child.parentNode = this;
@@ -475,11 +599,12 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
       }
       querySelectorAll(sel) {
         const found = [];
+        const selectors = sel.split(',').map(s => s.trim());
         const walk = (node) => {
           for (const c of node.children) {
             const classList = (c.className || '').split(/\s+/);
-            const matchesClass = sel.split(',').some(s => s.trim().startsWith('.') && classList.includes(s.trim().slice(1)));
-            const matchesTag = sel.split(',').some(s => s.trim().toUpperCase() === c.tagName);
+            const matchesClass = selectors.some(s => s.startsWith('.') && classList.includes(s.slice(1)));
+            const matchesTag = selectors.some(s => s.toUpperCase() === c.tagName);
             if (matchesClass || matchesTag) {
               found.push(c);
             }
@@ -498,6 +623,7 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
       cloneNode(deep) {
         const copy = new MockNode(this.tagName.toLowerCase(), this.className);
         copy.textContent = this.textContent;
+        copy.innerHTML = this.innerHTML;
         if (deep) {
           for (const c of this.children) {
             copy.appendChild(c.cloneNode(true));
@@ -507,73 +633,111 @@ Visit [MathWorld](https://mathworld.wolfram.com/QuadraticEquation.html) for deta
       }
       get innerText() {
         if (this.children.length === 0) return this.textContent;
-        return this.children.map(c => c.innerText).join(' ');
+        const direct = this.textContent ? [this.textContent] : [];
+        const childTexts = this.children.map(c => c.innerText).filter(Boolean);
+        return [...direct, ...childTexts].join(' ').trim();
       }
     }
 
-    const bubble = new MockNode('div', 'chat-message-bubble assistant-bubble');
-    const content = new MockNode('div', 'chat-message-content');
-    content.textContent = 'A quadratic equation has the form ax^2 + bx + c = 0.';
-    bubble.appendChild(content);
-
-    const actions = new MockNode('div', 'onyx-turn-actions-bar');
-    for (let i = 0; i < 5; i++) {
-      const btn = new MockNode('button', 'onyx-action-icon-btn');
-      const svg = new MockNode('svg');
-      svg.textContent = 'svg'; // Some browsers serialize SVG tag names into innerText
-      btn.appendChild(svg);
-      actions.appendChild(btn);
-    }
-    bubble.appendChild(actions);
-
-    // Verify copyTurnContent execution
     let capturedClipboardText = '';
-    const origNavDesc = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
-    Object.defineProperty(globalThis, 'navigator', {
-      value: {
+    let capturedShareData = null;
+
+    const mockCtx = {
+      window: {},
+      location: { href: 'https://second-brain-ai-system.vercel.app' },
+      document: {
+        readyState: 'loading',
+        addEventListener: () => {},
+        querySelector: () => null,
+        querySelectorAll: () => [],
+        getElementById: () => null
+      },
+      navigator: {
         clipboard: {
           writeText: (txt) => {
             capturedClipboardText = txt;
             return Promise.resolve();
           }
-        }
+        },
+        share: (data) => {
+          capturedShareData = data;
+          return Promise.resolve();
+        },
+        canShare: () => true
       },
-      configurable: true,
-      writable: true
-    });
-    globalThis.window = globalThis.window || {};
-
-    // Production copyTurnContent implementation
-    const copyTurnContent = function (btn) {
-      const b = btn ? (btn.closest('.assistant-bubble') || btn.closest('.chat-message-bubble') || btn.closest('.chat-bubble')) : null;
-      const c = b ? (b.querySelector('.chat-message-content') || b.querySelector('.chat-text')) : null;
-      let text = '';
-      if (c) {
-        const clone = c.cloneNode(true);
-        clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
-        text = (clone.innerText || clone.textContent || '').trim();
-      } else if (b) {
-        const clone = b.cloneNode(true);
-        clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
-        text = (clone.innerText || clone.textContent || '').trim();
-      }
-      if (globalThis.navigator?.clipboard && text) {
-        globalThis.navigator.clipboard.writeText(text);
-      }
+      localStorage: { getItem: () => null, setItem: () => {} },
+      setTimeout: () => {}
     };
+    mockCtx.window = mockCtx;
+    vm.createContext(mockCtx);
+    vm.runInContext(chatScript, mockCtx);
+
+    const copyTurnContent = mockCtx.window.copyTurnContent;
+    const shareTurnContent = mockCtx.window.shareTurnContent;
+
+    assert.strictEqual(typeof copyTurnContent, 'function', 'window.copyTurnContent must be loaded from production-chat.js');
+    assert.strictEqual(typeof shareTurnContent, 'function', 'window.shareTurnContent must be loaded from production-chat.js');
+
+    const bubble = new MockNode('div', 'chat-message-bubble assistant-bubble');
+    const content = new MockNode('div', 'chat-message-content');
+    const p = new MockNode('p');
+    p.textContent = 'A quadratic equation has the form ax^2 + bx + c = 0.';
+    content.appendChild(p);
+
+    // Code block with code-header-actions
+    const codeWrapper = new MockNode('div', 'code-block-wrapper');
+    const codeHeader = new MockNode('div', 'code-block-header');
+    const codeActions = new MockNode('div', 'code-header-actions');
+    const copyCodeBtn = new MockNode('button', 'code-copy-btn');
+    copyCodeBtn.textContent = '📋 Copy Code';
+    codeActions.appendChild(copyCodeBtn);
+    codeHeader.appendChild(codeActions);
+    codeWrapper.appendChild(codeHeader);
+
+    const pre = new MockNode('pre', 'code-block-content');
+    const code = new MockNode('code', 'language-python');
+    code.textContent = 'x = (-b + d) / (2*a)';
+    pre.appendChild(code);
+    codeWrapper.appendChild(pre);
+    content.appendChild(codeWrapper);
+    bubble.appendChild(content);
+
+    // Sibling action toolbar containing 5 buttons with SVGs and text labels
+    const actions = new MockNode('div', 'onyx-turn-actions-bar');
+    const actionNames = ['Copy', 'Share', 'Good', 'Poor', 'Regenerate'];
+    for (const name of actionNames) {
+      const btn = new MockNode('button', 'onyx-action-icon-btn');
+      const svg = new MockNode('svg');
+      svg.textContent = 'svg'; // SVG serialization artifact
+      btn.appendChild(svg);
+      const label = new MockNode('span', 'sr-only');
+      label.textContent = name;
+      btn.appendChild(label);
+      actions.appendChild(btn);
+    }
+    bubble.appendChild(actions);
 
     const copyBtn = actions.children[0];
+    const shareBtn = actions.children[1];
+
+    // Execute actual window.copyTurnContent from production-chat.js
     copyTurnContent(copyBtn);
 
-    assert.strictEqual(capturedClipboardText, 'A quadratic equation has the form ax^2 + bx + c = 0.');
-    assert.ok(!capturedClipboardText.includes('svg'), 'Extracted text must NOT contain "svg"');
-    assert.ok(!capturedClipboardText.includes('svgsvgsvgsvgsvg'), 'Extracted text must NOT contain "svgsvgsvgsvgsvg"');
+    assert.ok(capturedClipboardText.includes('ax^2 + bx + c = 0.'), 'Copied text must include equation');
+    assert.ok(capturedClipboardText.includes('x = (-b + d) / (2*a)'), 'Copied text must include code');
+    assert.ok(!capturedClipboardText.includes('svg'), 'Copied text must NOT contain "svg"');
+    assert.ok(!capturedClipboardText.includes('svgsvgsvgsvgsvg'), 'Copied text must NOT contain repeated "svg"');
+    assert.ok(!capturedClipboardText.includes('📋 Copy Code'), 'Copied text must NOT contain code-header-actions buttons');
+    assert.ok(!capturedClipboardText.includes('Copy'), 'Copied text must NOT contain toolbar button labels');
 
-    if (origNavDesc) {
-      Object.defineProperty(globalThis, 'navigator', origNavDesc);
-    }
+    // Execute actual window.shareTurnContent from production-chat.js
+    shareTurnContent(shareBtn);
+    assert.ok(capturedShareData, 'navigator.share must be called');
+    assert.ok(capturedShareData.text.includes('ax^2 + bx + c = 0.'), 'Share text must include answer');
+    assert.ok(!capturedShareData.text.includes('svg'), 'Share text must NOT contain "svg"');
+    assert.ok(!capturedShareData.text.includes('📋 Copy Code'), 'Share text must NOT contain button labels');
 
-    console.log('  ✅ [PASS] Action toolbar SVGs and buttons isolated from copy and share extraction');
+    console.log('  ✅ [PASS] Production window.copyTurnContent and window.shareTurnContent verified cleanly');
   }
 
   console.log('\n====================================================');

@@ -449,7 +449,7 @@
 
   class OnyxInterfaceController {
     constructor() {
-      this.currentModel = 'gemini-3.1-flash-lite';
+      this.currentModel = 'auto';
       this.currentSessionId = 'onyx_use_cases';
       this.activeAgent = 'support';
       this.activeProject = null;
@@ -463,6 +463,10 @@
       this.bindInputEvents();
       this.bindKeyboardShortcuts();
       this.bindComposerTools();
+
+      // Sync active model from Store or default to auto
+      const savedModel = (window.Store && window.Store.settings && window.Store.settings.selectedModel) || 'auto';
+      this.selectModel(savedModel, true);
 
       // On initial boot, do not overwrite live chat with demo session.
       // Leave composer hero ready for genuine user questions.
@@ -523,14 +527,23 @@
       });
     }
 
-    selectModel(modelName) {
-      this.currentModel = modelName;
+    selectModel(modelName, silent = false) {
+      this.currentModel = modelName || 'auto';
+      const modelLabels = {
+        'auto': 'Auto (Smart Route)',
+        'gemini-3.8-flash': 'Gemini 3.8 Flash',
+        'gemini-3.6-flash': 'Gemini 3.6 Flash',
+        'gemini-3.5-flash-lite': 'Gemini 3.5 Flash Lite',
+        'gemini-3.1-flash-lite': 'Gemini 3.1 Flash Lite',
+        'gemini-flash-latest': 'Gemini Flash Latest'
+      };
+      const displayLabel = modelLabels[this.currentModel] || this.currentModel;
       const label = document.getElementById('onyx-model-name-label');
-      if (label) label.textContent = modelName;
+      if (label) label.textContent = displayLabel;
 
       // Update Store if available
       if (window.Store && window.Store.settings) {
-        window.Store.settings.selectedModel = modelName;
+        window.Store.settings.selectedModel = this.currentModel;
         if (typeof window.Store.saveSettings === 'function') {
           window.Store.saveSettings();
         }
@@ -539,12 +552,12 @@
       const dropdown = document.getElementById('onyx-model-dropdown');
       if (dropdown) {
         dropdown.querySelectorAll('.onyx-model-option').forEach((opt) => {
-          opt.classList.toggle('selected', opt.getAttribute('data-model') === modelName);
+          opt.classList.toggle('selected', opt.getAttribute('data-model') === this.currentModel);
         });
         dropdown.classList.remove('open');
       }
 
-      if (window.showToast) window.showToast(`Switched active model to ${modelName}`, 'info');
+      if (!silent && window.showToast) window.showToast(`Switched active model to ${displayLabel}`, 'info');
     }
 
     bindInputEvents() {

@@ -455,12 +455,15 @@
 
       let selectedModel = (window.Store && window.Store.settings && window.Store.settings.selectedModel) ||
                             (window.OnyxInterface && window.OnyxInterface.currentModel) ||
-                            'gemini-3.8-flash';
-      const retiredModels = new Set(['gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-1.0-pro']);
-      if (retiredModels.has(String(selectedModel).toLowerCase())) {
-        selectedModel = 'gemini-3.8-flash';
+                            'auto';
+      const retiredOrLegacyModels = new Set([
+        'gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.5-pro',
+        'gemini-1.0-pro', 'gemini-2.5-flash', 'gemini-2.5-pro'
+      ]);
+      if (retiredOrLegacyModels.has(String(selectedModel).toLowerCase())) {
+        selectedModel = 'auto';
         if (window.Store && window.Store.settings) {
-          window.Store.settings.selectedModel = 'gemini-3.8-flash';
+          window.Store.settings.selectedModel = 'auto';
         }
       }
 

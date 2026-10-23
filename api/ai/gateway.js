@@ -17,24 +17,27 @@ const OVERALL_DEADLINE_MS = 24_000; // Strict deadline well within Vercel's 30s 
 
 // Upstream model registry: maps requested/advertised tiers to active, verified Google Gemini endpoints.
 // PRIMARY_MODEL (gemini-3.8-flash) represents the frontier reasoning tier.
-// FAST_MODEL (gemini-3.5-flash-lite) represents the ultra-low-latency fast tier.
-// gemini-3.1-flash-lite maps directly to its upstream model without silent redirection.
+const BALANCED_MODEL = 'gemini-3.6-flash';
+
+// Upstream model migrations: maps retired/legacy models to active, generally available Google Gemini 3.x endpoints.
+// Eliminates restricted 2.5 dependencies so users without legacy access are not locked out.
 const RETIRED_MODEL_MIGRATIONS = {
+  'gemini-2.5-flash': 'gemini-3.5-flash-lite',
+  'gemini-2.5-pro': 'gemini-3.6-flash',
   'gemini-2.0-flash': 'gemini-3.5-flash-lite',
   'gemini-2.0-flash-exp': 'gemini-3.5-flash-lite',
-  'gemini-1.5-flash': 'gemini-2.5-flash',
-  'gemini-1.5-pro': 'gemini-2.5-pro',
-  'gemini-1.0-pro': 'gemini-2.5-flash'
+  'gemini-1.5-flash': 'gemini-3.5-flash-lite',
+  'gemini-1.5-pro': 'gemini-3.6-flash',
+  'gemini-1.0-pro': 'gemini-3.5-flash-lite'
 };
 
 const MODEL_REGISTRY = {
   'gemini-3.8-flash': 'gemini-3.8-flash',
-  'gemini-3.5-flash-lite': 'gemini-3.5-flash-lite',
   'gemini-3.6-flash': 'gemini-3.6-flash',
+  'gemini-3.5-flash-lite': 'gemini-3.5-flash-lite',
   'gemini-3.1-flash-lite': 'gemini-3.1-flash-lite',
-  'gemini-2.5-flash': 'gemini-2.5-flash',
-  'gemini-2.5-pro': 'gemini-2.5-pro',
   'gemini-flash-latest': 'gemini-3.5-flash-lite',
+  'auto': PRIMARY_MODEL,
   'default': PRIMARY_MODEL
 };
 
@@ -218,39 +221,119 @@ function contextNotesToText(notes) {
 }
 
 function isExplicitVaultQuery(prompt) {
-  if (!prompt) return false;
-  return /\b(saved|notes?|vault|second brain|remember|my note|what did i save|search my)\b/i.test(prompt);
+  if (!prompt || typeof prompt !== 'string') return false;
+  const p = prompt.trim().toLowerCase();
+  // Must match explicit intent to query private notes/vault, not conversational words like "remember" or "take note"
+  const explicitVaultPatterns = [
+    /\b(?:what did i (?:save|write|note)|what do i have (?:on|about|saved))\b/i,
+    /\b(?:search|find|check|look up|show|retrieve)\s+(?:in\s+)?(?:my\s+)?(?:saved\s+)?(?:notes?|vault|second brain)\b/i,
+    /\b(?:from|in)\s+my\s+(?:saved\s+)?(?:notes?|vault|second brain)\b/i,
+    /\bmy\s+saved\s+(?:notes?|content|items?|knowledge)\b/i,
+    /\b(?:saved|vault)\s+notes?\s+(?:about|on|for)\b/i
+  ];
+  return explicitVaultPatterns.some((pattern) => pattern.test(p));
 }
 
-function filterRelevantLegacyContext(prompt, legacyContext) {
-  if (!prompt || !legacyContext) return '';
-  if (isExplicitVaultQuery(prompt)) return sanitizeContext(legacyContext);
+function splitLegacyContextIntoEntries(legacyContext) {
+  if (!legacyContext || typeof legacyContext !== 'string') return [];
+  const text = legacyContext.trim();
+  if (!text) return [];
 
+  // Delimited by markdown dividers (---, ***, ===)
+  if (/(?:\r?\n){1,2}\s*(?:---|\*\*\*|===)\s*(?:\r?\n){1,2}/.test(text)) {
+    return text.split(/(?:\r?\n){1,2}\s*(?:---|\*\*\*|===)\s*(?:\r?\n){1,2}/)
+      .map((e) => e.trim())
+      .filter(Boolean);
+  }
+
+  // Delimited by repeated headers: Title: or Note \d+: or [Note \d+]
+  if (/(?:^|\n)(?:Title:|Note \d+:|\[Note \d+\])/i.test(text)) {
+    const parts = text.split(/(?=(?:^|\n)(?:Title:|Note \d+:|\[Note \d+\]))/i)
+      .map((e) => e.trim())
+      .filter(Boolean);
+    if (parts.length > 1) {
+      return parts;
+    }
+  }
+
+  return [text];
+}
+
+function extractLegacyQueryTerms(prompt) {
+  if (!prompt || typeof prompt !== 'string') return [];
   const stopWords = new Set([
     'what', 'did', 'i', 'save', 'about', 'notes', 'note', 'on', 'find', 'show', 'retrieve',
     'the', 'is', 'a', 'an', 'in', 'to', 'for', 'with', 'tell', 'me', 'my', 'how', 'do',
-    'can', 'are', 'was', 'were', 'explain'
+    'can', 'are', 'was', 'were', 'explain', 'search', 'remember', 'vault', 'you', 'your',
+    'have', 'from', 'second', 'brain', 'look', 'up', 'check', 'any', 'please'
   ]);
-  const promptTerms = prompt.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter((t) => t.length > 1 && !stopWords.has(t));
-  if (!promptTerms.length) return '';
+  return prompt
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
+    .split(/\s+/)
+    .filter((t) => t.length > 1 && !stopWords.has(t));
+}
 
-  const cleanContext = legacyContext.toLowerCase();
+function isLegacyEntryRelevant(entry, queryTerms) {
+  if (!entry || !queryTerms.length) return false;
+  const entryLower = entry.toLowerCase();
+
+  const titleMatch = entryLower.match(/(?:title:\s*|^)([^\n]+)/i);
+  const titleText = titleMatch ? titleMatch[1] : '';
+
   let matchedTerms = 0;
-  for (const term of promptTerms) {
-    if (new RegExp('\\b' + term + '\\b', 'i').test(cleanContext)) {
+  let titleHits = 0;
+
+  for (const term of queryTerms) {
+    const stem = term.length > 3 && term.endsWith('s') ? term.slice(0, -1) : term;
+    const regex = new RegExp('\\b' + stem, 'i');
+    const inTitle = regex.test(titleText);
+    const inBody = regex.test(entryLower);
+
+    if (inTitle) {
+      matchedTerms++;
+      titleHits++;
+    } else if (inBody) {
       matchedTerms++;
     }
   }
 
-  const matchRatio = matchedTerms / promptTerms.length;
-  if (promptTerms.length >= 2 && matchRatio < 0.5) {
-    return '';
+  if (matchedTerms === 0) return false;
+
+  if (queryTerms.length >= 2) {
+    if (titleHits > 0) return true;
+    return (matchedTerms / queryTerms.length) >= 0.5;
   }
-  if (matchedTerms === 0) {
+
+  return matchedTerms >= 1;
+}
+
+function filterRelevantLegacyContext(prompt, legacyContext) {
+  if (!prompt || !legacyContext) return '';
+  const entries = splitLegacyContextIntoEntries(legacyContext);
+  if (!entries.length) return '';
+
+  const queryTerms = extractLegacyQueryTerms(prompt);
+  const explicitVault = isExplicitVaultQuery(prompt);
+
+  // Broad explicit browse/list queries without topic terms (e.g. "search my notes", "show my saved notes")
+  if (explicitVault && queryTerms.length === 0) {
+    return sanitizeContext(entries.join('\n\n---\n\n'));
+  }
+
+  // Generic non-vault queries without clear topic terms must not receive private context
+  if (queryTerms.length === 0) {
     return '';
   }
 
-  return sanitizeContext(legacyContext);
+  // Filter each entry independently and include ONLY matching entries
+  const relevantEntries = entries.filter((entry) => isLegacyEntryRelevant(entry, queryTerms));
+
+  if (!relevantEntries.length) {
+    return '';
+  }
+
+  return sanitizeContext(relevantEntries.join('\n\n---\n\n'));
 }
 
 function sanitizeCitations(citations) {
@@ -507,7 +590,8 @@ export default async function handler(req, res) {
 
   try {
     const attemptedResolvedModels = new Set();
-    let initialModel = clientRequestedModel && MODEL_REGISTRY[clientRequestedModel.toLowerCase()]
+    const isAutoMode = !clientRequestedModel || clientRequestedModel.toLowerCase() === 'auto' || clientRequestedModel.toLowerCase() === 'default';
+    let initialModel = (!isAutoMode && MODEL_REGISTRY[clientRequestedModel.toLowerCase()])
       ? clientRequestedModel
       : route.model;
     const resolvedInitial = resolveUpstreamModel(initialModel);
@@ -565,9 +649,10 @@ export default async function handler(req, res) {
       } catch (_) {}
     }
 
-    // Model fallback chain: ALWAYS resolve model ID and never attempt the same resolved model twice
+    // Model fallback chain: ALWAYS resolve model ID and never attempt the same resolved model twice.
+    // Uses generally available 3.x endpoints without restricted 2.5 dependencies.
     if ((!result || !result.response?.ok) && getRemainingBudget() > 5000) {
-      const fallbackCandidates = [FAST_MODEL, 'gemini-2.5-flash'];
+      const fallbackCandidates = [FAST_MODEL, BALANCED_MODEL, 'gemini-3.1-flash-lite'];
       const nextCandidate = fallbackCandidates.find((cand) => !attemptedResolvedModels.has(resolveUpstreamModel(cand)));
 
       if (nextCandidate) {
