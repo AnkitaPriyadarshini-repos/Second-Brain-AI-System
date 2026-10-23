@@ -1,6 +1,6 @@
 import authGuard from '../auth-guard.js';
 
-const PRIMARY_MODEL = 'gemini-3.5-flash-lite';
+const PRIMARY_MODEL = 'gemini-3.8-flash';
 const FAST_MODEL = 'gemini-3.5-flash-lite';
 const MAX_CONTEXT = 9000;
 const MAX_HISTORY_ITEMS = 16;
@@ -16,20 +16,21 @@ const PROVIDER_TIMEOUT_MS = 8_500; // Bounded provider call timeout
 const OVERALL_DEADLINE_MS = 24_000; // Strict deadline well within Vercel's 30s maxDuration
 
 // Upstream model registry: maps requested/advertised tiers to active, verified Google Gemini endpoints.
-// Sets gemini-3.8-flash as primary frontier reasoning model and gemini-3.5-flash-lite as fast tier.
-// Includes compatibility aliases for gemini-3.6-flash, gemini-2.5-flash, and older versions.
+// PRIMARY_MODEL (gemini-3.8-flash) represents the frontier reasoning tier.
+// FAST_MODEL (gemini-3.5-flash-lite) represents the ultra-low-latency fast tier.
+// gemini-3.1-flash-lite maps directly to its upstream model without silent redirection.
 const MODEL_REGISTRY = {
   'gemini-3.8-flash': 'gemini-3.8-flash',
   'gemini-3.5-flash-lite': 'gemini-3.5-flash-lite',
   'gemini-3.6-flash': 'gemini-3.6-flash',
-  'gemini-3.1-flash-lite': 'gemini-3.5-flash-lite',
-  'gemini-2.5-flash': 'gemini-3.8-flash',
-  'gemini-2.0-flash': 'gemini-3.8-flash',
-  'gemini-1.5-flash': 'gemini-3.5-flash-lite',
-  'gemini-1.5-pro': 'gemini-3.8-flash',
-  'gemini-2.0-flash-lite': 'gemini-3.5-flash-lite',
+  'gemini-3.1-flash-lite': 'gemini-3.1-flash-lite',
+  'gemini-2.5-flash': 'gemini-2.5-flash',
+  'gemini-2.5-pro': 'gemini-2.5-pro',
+  'gemini-2.0-flash': 'gemini-2.0-flash',
+  'gemini-1.5-flash': 'gemini-1.5-flash',
+  'gemini-1.5-pro': 'gemini-1.5-pro',
   'gemini-flash-latest': 'gemini-3.5-flash-lite',
-  'default': 'gemini-3.5-flash-lite'
+  'default': PRIMARY_MODEL
 };
 
 function resolveUpstreamModel(modelName) {
@@ -71,7 +72,6 @@ function normalizeHistory(history) {
 }
 
 function getClientKey(req) {
-  // Use platform-verified IP from authGuard to avoid spoofing
   return authGuard.getVerifiedClientIp(req);
 }
 
@@ -92,11 +92,10 @@ function checkRateLimit(key, maxLimit = AUTH_RATE_LIMIT) {
   };
 }
 
-function cacheKey(prompt, context, history) {
-  // Only cache short-lived, context-free, stateless prompts. Never share
-  // answers derived from a user's private memory or conversation history.
+function cacheKey(prompt, context, history, model) {
   if (context || history.length) return null;
-  return prompt.toLowerCase().replace(/\s+/g, ' ').trim();
+  const modelKey = model ? String(model).trim() : 'auto';
+  return `${modelKey}:${prompt.toLowerCase().replace(/\s+/g, ' ').trim()}`;
 }
 
 function cleanupCaches() {
@@ -146,8 +145,6 @@ function sanitizeContextNotes(notes) {
         ? note.tags.map((tag) => clean(tag, 80)).filter(Boolean).slice(0, 20)
         : [];
 
-      // Notes are untrusted DATA. Strip obvious instruction wrappers before
-      // they are inserted into the model context.
       const safeTitle = title.replace(/<\/?(?:system|developer|assistant|tool|instruction)[^>]*>/gi, '');
       const safeSummary = summary.replace(/<\/?(?:system|developer|assistant|tool|instruction)[^>]*>/gi, '');
       const safeContent = content.replace(/<\/?(?:system|developer|assistant|tool|instruction)[^>]*>/gi, '');
@@ -162,6 +159,39 @@ function sanitizeContextNotes(notes) {
       };
     })
     .filter((note) => note.title || note.summary || note.content);
+}
+
+function filterRelevantNotes(prompt, notes) {
+  if (!prompt || !Array.isArray(notes) || !notes.length) return [];
+  const stopWords = new Set([
+    'what', 'did', 'i', 'save', 'about', 'notes', 'note', 'on', 'find', 'show', 'retrieve',
+    'the', 'is', 'a', 'an', 'in', 'to', 'for', 'with', 'tell', 'me', 'my', 'how', 'do',
+    'can', 'are', 'was', 'were', 'explain'
+  ]);
+  const promptTerms = prompt.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter((t) => t.length > 1 && !stopWords.has(t));
+  if (!promptTerms.length) return [];
+
+  return notes.filter((note) => {
+    const titleText = (note.title || '').toLowerCase();
+    const tagText = Array.isArray(note.tags) ? note.tags.join(' ').toLowerCase() : (note.tags || '').toLowerCase();
+    const bodyText = `${note.content || ''} ${note.summary || ''}`.toLowerCase();
+
+    let matches = 0;
+    let hasTitleHit = false;
+    for (const term of promptTerms) {
+      const regex = new RegExp('\\b' + term + '\\b', 'i');
+      if (regex.test(titleText)) { matches += 3; hasTitleHit = true; }
+      else if (regex.test(tagText)) { matches += 2; }
+      else if (regex.test(bodyText)) { matches += 1; }
+    }
+
+    const maxPossible = promptTerms.length * 3.0;
+    const ratio = matches / maxPossible;
+    if (promptTerms.length >= 2 && !hasTitleHit && ratio < 0.20) {
+      return false;
+    }
+    return ratio >= 0.15;
+  });
 }
 
 function contextNotesToText(notes) {
@@ -236,10 +266,28 @@ function extractAnswer(data) {
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey, requestId, timeoutMs = PROVIDER_TIMEOUT_MS }) {
+async function callGemini({ model, systemPrompt, contents, thinkingLevel = 'low', apiKey, requestId, timeoutMs = PROVIDER_TIMEOUT_MS }) {
   const resolvedModel = resolveUpstreamModel(model);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  const generationConfig = {
+    maxOutputTokens: (resolvedModel.includes('pro') || resolvedModel === PRIMARY_MODEL) ? 8192 : 4096
+  };
+
+  // Configure native thinking budget for models that support it (Gemini 2.5 and 3.x)
+  if (/gemini-(?:2\.5|3\.)/i.test(resolvedModel)) {
+    const budgetMap = {
+      minimal: 0,
+      low: 1024,
+      medium: 2048,
+      high: 4096
+    };
+    const budget = budgetMap[thinkingLevel] !== undefined ? budgetMap[thinkingLevel] : 1024;
+    generationConfig.thinkingConfig = {
+      thinkingBudget: budget
+    };
+  }
 
   try {
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${resolvedModel}:generateContent`, {
@@ -251,9 +299,7 @@ async function callGemini({ model, systemPrompt, contents, thinkingLevel, apiKey
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: systemPrompt }] },
         contents,
-        generationConfig: {
-          maxOutputTokens: (resolvedModel.includes('pro') || model === PRIMARY_MODEL) ? 8192 : 4096
-        }
+        generationConfig
       }),
       signal: controller.signal
     });
@@ -297,14 +343,12 @@ export default async function handler(req, res) {
     return res.status(405).json({ success: false, error: 'Method not allowed.', requestId });
   }
 
-  // Extract client identity and platform-verified IP
   const clientIdentity = authGuard.extractClientIdentity(req);
   res.setHeader('X-Milo-Client-Id', clientIdentity.id);
   if (clientIdentity.isGuest && clientIdentity.token) {
     res.setHeader('X-Milo-Guest-Token', clientIdentity.token);
   }
 
-  // Check rate limit (quota is 30 for users, 15 for guests)
   cleanupCaches();
   const maxLimit = clientIdentity.isGuest ? GUEST_RATE_LIMIT : AUTH_RATE_LIMIT;
   const rateLimitKey = `${clientIdentity.id}:${clientIdentity.ip}`;
@@ -322,7 +366,6 @@ export default async function handler(req, res) {
     });
   }
 
-  // Check circuit breaker state
   if (Date.now() < circuitBreaker.cooldownUntil) {
     const remainingCooldownSec = Math.ceil((circuitBreaker.cooldownUntil - Date.now()) / 1000);
     return res.status(503).json({
@@ -346,20 +389,25 @@ export default async function handler(req, res) {
   const history = normalizeHistory(body.history);
   const clientRequestedModel = clean(body.model);
 
-  // The browser sends structured note objects. For compatibility with older
-  // clients we also accept the original plain `context` string.
-  const contextNotes = sanitizeContextNotes(body.contextNotes);
+  // Authenticate and filter context notes against the query to prevent citation leakage
+  const rawContextNotes = sanitizeContextNotes(body.contextNotes);
+  const relevantContextNotes = filterRelevantNotes(prompt, rawContextNotes);
   const legacyContext = sanitizeContext(body.context);
-  const context = contextNotesToText(contextNotes) || legacyContext;
-  const citations = sanitizeCitations(body.citations);
+  const context = contextNotesToText(relevantContextNotes) || legacyContext;
+
+  // Filter citations to only those notes that actually matched the prompt
+  const relevantNoteIds = new Set(relevantContextNotes.map((n) => n.id));
+  const relevantNoteTitles = new Set(relevantContextNotes.map((n) => n.title.toLowerCase()));
+  const incomingCitations = sanitizeCitations(body.citations);
+  const citations = incomingCitations.filter((c) => relevantNoteIds.has(c.id) || relevantNoteTitles.has(c.title.toLowerCase()));
+  const isGrounded = citations.length > 0 && Boolean(context);
 
   if (!prompt) return res.status(400).json({ success: false, error: 'Prompt is required.', requestId });
   if (prompt.length > MAX_MESSAGE) {
     return res.status(413).json({ success: false, error: 'That message is too long. Please shorten it.', requestId });
   }
 
-  // Duplicate in-flight submission guard (prevent rapid double-clicks/submits)
-  const inFlightKey = `${clientIdentity.id}:${prompt.slice(0, 80)}`;
+  const inFlightKey = `${clientIdentity.id}:${clientRequestedModel || ''}:${prompt.slice(0, 80)}`;
   const existingInFlight = activeInFlightRequests.get(inFlightKey);
   if (existingInFlight && Date.now() - existingInFlight < 5_000) {
     return res.status(429).json({
@@ -371,7 +419,7 @@ export default async function handler(req, res) {
   activeInFlightRequests.set(inFlightKey, Date.now());
 
   const route = classifyRequest(prompt, context, history);
-  const key = cacheKey(prompt, context, history);
+  const key = cacheKey(prompt, context, history, clientRequestedModel);
 
   if (key) {
     const cached = answerCache.get(key);
@@ -406,9 +454,13 @@ export default async function handler(req, res) {
   const getRemainingBudget = () => OVERALL_DEADLINE_MS - (Date.now() - startedAt);
 
   try {
-    let model = clientRequestedModel && MODEL_REGISTRY[clientRequestedModel.toLowerCase()]
-      ? resolveUpstreamModel(clientRequestedModel)
+    const attemptedResolvedModels = new Set();
+    let initialModel = clientRequestedModel && MODEL_REGISTRY[clientRequestedModel.toLowerCase()]
+      ? clientRequestedModel
       : route.model;
+    const resolvedInitial = resolveUpstreamModel(initialModel);
+    attemptedResolvedModels.add(resolvedInitial);
+
     let thinkingLevel = route.thinkingLevel;
     const modelAttempts = [];
     const recordAttempt = (res) => {
@@ -423,7 +475,7 @@ export default async function handler(req, res) {
     let result = null;
     try {
       result = await callGemini({
-        model,
+        model: resolvedInitial,
         systemPrompt,
         contents,
         thinkingLevel,
@@ -433,74 +485,83 @@ export default async function handler(req, res) {
       });
       recordAttempt(result);
     } catch (primaryErr) {
-      console.warn(`[milo/gateway] ${requestId}: Primary model ${model} threw ${primaryErr?.name || primaryErr?.message}. Falling back.`);
+      console.warn(`[milo/gateway] ${requestId}: Primary model ${resolvedInitial} threw ${primaryErr?.name || primaryErr?.message}. Falling back.`);
       modelAttempts.push({
-        model,
+        model: resolvedInitial,
         status: primaryErr?.name === 'AbortError' ? 504 : 503,
         message: primaryErr?.name === 'AbortError' ? 'Primary provider timeout' : (primaryErr?.message || 'Provider connection error')
       });
     }
 
-    // Handle transient retry with exponential backoff on 429 / 503
-    if (result && !result.response?.ok && [429, 503].includes(result.response?.status) && getRemainingBudget() > 9000) {
-      const retryHeader = result.response?.headers?.get?.('retry-after');
-      const waitSec = parseInt(retryHeader, 10);
-      const waitMs = (!isNaN(waitSec) && waitSec > 0 && waitSec <= 2) ? waitSec * 1000 : (350 + Math.floor(Math.random() * 250));
+    // Bounded retry on transient 429 only if Retry-After is explicitly specified and reasonable (<= 2s)
+    const retryHeader = result?.response?.headers?.get?.('retry-after');
+    const waitSec = retryHeader ? parseInt(retryHeader, 10) : NaN;
+    if (result && !result.response?.ok && result.response?.status === 429 && !isNaN(waitSec) && waitSec > 0 && waitSec <= 2 && getRemainingBudget() > 10000) {
+      const waitMs = waitSec * 1000;
       await sleep(waitMs);
       try {
         result = await callGemini({
-          model,
+          model: resolvedInitial,
           systemPrompt,
           contents,
-          thinkingLevel,
+          thinkingLevel: 'minimal',
           apiKey,
           requestId,
           timeoutMs: Math.min(PROVIDER_TIMEOUT_MS, Math.max(3000, getRemainingBudget() - 1500))
         });
         recordAttempt(result);
-      } catch (_) {
-        // Fall through to fallback chain
-      }
+      } catch (_) {}
     }
 
-    // Model fallback chain if initial model returns 400/404/429/500/502/503/504 or threw timeout/error
+    // Model fallback chain: ALWAYS resolve model ID and never attempt the same resolved model twice
     if ((!result || !result.response?.ok) && getRemainingBudget() > 5000) {
-      const fallbackModel = (result?.resolvedModel || model) === FAST_MODEL ? PRIMARY_MODEL : FAST_MODEL;
-      console.warn(`[milo/gateway] ${requestId}: Initial model failed or timed out. Falling back to ${fallbackModel}`);
-      try {
-        result = await callGemini({
-          model: fallbackModel,
-          systemPrompt,
-          contents,
-          thinkingLevel: 'low',
-          apiKey,
-          requestId,
-          timeoutMs: Math.min(PROVIDER_TIMEOUT_MS, Math.max(3000, getRemainingBudget() - 1000))
-        });
-        recordAttempt(result);
-      } catch (fallbackErr) {
-        modelAttempts.push({
-          model: fallbackModel,
-          status: fallbackErr?.name === 'AbortError' ? 504 : 503,
-          message: fallbackErr?.name === 'AbortError' ? 'Fallback provider timeout' : (fallbackErr?.message || 'Fallback provider error')
-        });
-      }
+      const fallbackCandidates = [FAST_MODEL, PRIMARY_MODEL, 'gemini-2.5-flash', 'gemini-1.5-flash'];
+      const nextCandidate = fallbackCandidates.find((cand) => !attemptedResolvedModels.has(resolveUpstreamModel(cand)));
 
-      // Third tier fallback if still failing and time permits
-      if ((!result || !result.response?.ok) && getRemainingBudget() > 4000) {
-        const tertiaryModel = 'gemini-1.5-flash';
+      if (nextCandidate) {
+        const resolvedFallback = resolveUpstreamModel(nextCandidate);
+        attemptedResolvedModels.add(resolvedFallback);
+        console.warn(`[milo/gateway] ${requestId}: Initial model ${resolvedInitial} failed or timed out. Falling back to ${resolvedFallback}`);
         try {
           result = await callGemini({
-            model: tertiaryModel,
+            model: resolvedFallback,
             systemPrompt,
             contents,
             thinkingLevel: 'low',
             apiKey,
             requestId,
-            timeoutMs: Math.min(4000, Math.max(2500, getRemainingBudget() - 800))
+            timeoutMs: Math.min(PROVIDER_TIMEOUT_MS, Math.max(3000, getRemainingBudget() - 1000))
           });
           recordAttempt(result);
-        } catch (_) {}
+        } catch (fallbackErr) {
+          modelAttempts.push({
+            model: resolvedFallback,
+            status: fallbackErr?.name === 'AbortError' ? 504 : 503,
+            message: fallbackErr?.name === 'AbortError' ? 'Fallback provider timeout' : (fallbackErr?.message || 'Fallback provider error')
+          });
+        }
+      }
+
+      // Third tier fallback if still failing and time permits
+      if ((!result || !result.response?.ok) && getRemainingBudget() > 3500) {
+        const tertiaryCandidates = ['gemini-2.5-flash', 'gemini-1.5-flash', FAST_MODEL];
+        const tertiaryModel = tertiaryCandidates.find((cand) => !attemptedResolvedModels.has(resolveUpstreamModel(cand)));
+        if (tertiaryModel) {
+          const resolvedTertiary = resolveUpstreamModel(tertiaryModel);
+          attemptedResolvedModels.add(resolvedTertiary);
+          try {
+            result = await callGemini({
+              model: resolvedTertiary,
+              systemPrompt,
+              contents,
+              thinkingLevel: 'minimal',
+              apiKey,
+              requestId,
+              timeoutMs: Math.min(3500, Math.max(2000, getRemainingBudget() - 500))
+            });
+            recordAttempt(result);
+          } catch (_) {}
+        }
       }
     }
 
@@ -508,7 +569,6 @@ export default async function handler(req, res) {
       const response = result?.response;
       const data = result?.data;
       const lastStatus = response?.status || (modelAttempts[modelAttempts.length - 1]?.status) || 502;
-      // Record failure for circuit breaker only on upstream 5xx/overload outages
       if ([500, 502, 503, 504].includes(lastStatus)) {
         circuitBreaker.consecutiveFailures++;
         if (circuitBreaker.consecutiveFailures >= circuitBreaker.threshold) {
@@ -533,7 +593,6 @@ export default async function handler(req, res) {
 
     const { response, data } = result;
 
-    // Success resets circuit breaker consecutive failures
     circuitBreaker.consecutiveFailures = 0;
 
     const answer = extractAnswer(data);
@@ -545,7 +604,7 @@ export default async function handler(req, res) {
       });
     }
 
-    const returnedModel = result.resolvedModel || model;
+    const returnedModel = result.resolvedModel || resolvedInitial;
     if (key) answerCache.set(key, {
       answer,
       model: returnedModel,
@@ -555,9 +614,13 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       model: returnedModel,
+      requestedModel: clientRequestedModel || route.model,
+      actualUpstreamModel: result.resolvedModel,
+      attemptCount: modelAttempts.length,
+      modelAttempts,
       answer,
-      grounded: Boolean(context),
-      citations,
+      grounded: isGrounded,
+      citations: isGrounded ? citations : [],
       cached: false,
       intent: route.intent,
       thinkingLevel,

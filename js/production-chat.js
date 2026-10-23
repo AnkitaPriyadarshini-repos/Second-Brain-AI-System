@@ -77,17 +77,27 @@
         const tags = Array.isArray(note.tags) ? note.tags.join(' ') : clean(note.tags);
         const haystack = `${title} ${summary} ${content} ${tags}`.toLowerCase();
         let score = 0;
+        let matchedTokens = 0;
 
         if (normalizedQuery.length >= 8 && haystack.includes(normalizedQuery)) score += 10;
         queryTokens.forEach((token) => {
           const safeToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-          if (new RegExp(`\\b${safeToken}\\b`, 'i').test(haystack)) score += 1;
-          if (title.toLowerCase().includes(token)) score += 4;
-          if (tags.toLowerCase().includes(token)) score += 2;
+          let hit = false;
+          if (new RegExp(`\\b${safeToken}\\b`, 'i').test(haystack)) { score += 1; hit = true; }
+          if (title.toLowerCase().includes(token)) { score += 4; hit = true; }
+          if (tags.toLowerCase().includes(token)) { score += 2; hit = true; }
+          if (hit) matchedTokens++;
         });
+
+        const coverage = queryTokens.length ? (matchedTokens / queryTokens.length) : 0;
+        const hasTitleHit = queryTokens.some((t) => title.toLowerCase().includes(t));
+        if (queryTokens.length >= 2 && coverage < 0.5 && !hasTitleHit) {
+          score = 0;
+        }
+
         return { note, score };
       })
-        .filter((item) => item.score > 0)
+        .filter((item) => item.score >= 3)
         .sort((a, b) => b.score - a.score)
         .slice(0, 6);
 
@@ -163,20 +173,20 @@
       const actions = document.createElement('div');
       actions.className = 'onyx-turn-actions-bar';
       actions.innerHTML = `
-        <button class="onyx-action-icon-btn" onclick="window.copyTurnContent(this)" title="Copy">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <button class="onyx-action-icon-btn" onclick="window.copyTurnContent(this)" title="Copy" aria-label="Copy response">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         </button>
-        <button class="onyx-action-icon-btn" onclick="window.shareTurnContent ? window.shareTurnContent(this) : (window.shareSession && window.shareSession())" title="Share response">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+        <button class="onyx-action-icon-btn" onclick="window.shareTurnContent ? window.shareTurnContent(this) : (window.shareSession && window.shareSession())" title="Share response" aria-label="Share response">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
         </button>
-        <button class="onyx-action-icon-btn" onclick="window.rateTurn && window.rateTurn(true, this)" title="Good response">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+        <button class="onyx-action-icon-btn" onclick="window.rateTurn && window.rateTurn(true, this)" title="Good response" aria-label="Good response">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
         </button>
-        <button class="onyx-action-icon-btn" onclick="window.rateTurn && window.rateTurn(false, this)" title="Poor response">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
+        <button class="onyx-action-icon-btn" onclick="window.rateTurn && window.rateTurn(false, this)" title="Poor response" aria-label="Poor response">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
         </button>
-        <button class="onyx-action-icon-btn" onclick="window.retryLastPrompt && window.retryLastPrompt()" title="Regenerate">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        <button class="onyx-action-icon-btn" onclick="window.retryLastPrompt && window.retryLastPrompt()" title="Regenerate" aria-label="Regenerate response">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
         </button>
       `;
       bubble.appendChild(actions);
@@ -476,7 +486,7 @@
       }
 
       let answer = clean(data.answer);
-      if (Array.isArray(data.citations) && data.citations.length) {
+      if (data.grounded && Array.isArray(data.citations) && data.citations.length) {
         answer += `\n\n---\n**From your Second Brain:** ${data.citations.map((c) => c.title).join(' · ')}`;
       }
       replaceMessage(thinking, answer);
@@ -729,15 +739,24 @@
   };
   window.copyTurnContent = function (btn) {
     const bubble = btn ? (btn.closest('.assistant-bubble') || btn.closest('.chat-message-bubble') || btn.closest('.chat-bubble')) : null;
-    const content = bubble ? (bubble.querySelector('.chat-message-content') || bubble.querySelector('.chat-text') || bubble) : null;
-    const text = content ? (content.innerText || content.textContent || '').trim() : '';
+    const content = bubble ? (bubble.querySelector('.chat-message-content') || bubble.querySelector('.chat-text')) : null;
+    let text = '';
+    if (content) {
+      const clone = content.cloneNode(true);
+      clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
+      text = (clone.innerText || clone.textContent || '').trim();
+    } else if (bubble) {
+      const clone = bubble.cloneNode(true);
+      clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
+      text = (clone.innerText || clone.textContent || '').trim();
+    }
     if (window.copyToClipboard && text) {
       window.copyToClipboard(text, btn);
     } else if (navigator.clipboard && text) {
       navigator.clipboard.writeText(text).then(() => {
         if (btn) {
           const orig = btn.innerHTML;
-          btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+          btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"/></svg>`;
           setTimeout(() => { btn.innerHTML = orig; }, 2000);
         }
         if (window.showToast) window.showToast('Copied response to clipboard', 'success');
@@ -746,8 +765,17 @@
   };
   window.shareTurnContent = function (btn) {
     const bubble = btn ? (btn.closest('.assistant-bubble') || btn.closest('.chat-message-bubble') || btn.closest('.chat-bubble')) : null;
-    const content = bubble ? (bubble.querySelector('.chat-message-content') || bubble.querySelector('.chat-text') || bubble) : null;
-    const text = content ? (content.innerText || content.textContent || '').trim() : '';
+    const content = bubble ? (bubble.querySelector('.chat-message-content') || bubble.querySelector('.chat-text')) : null;
+    let text = '';
+    if (content) {
+      const clone = content.cloneNode(true);
+      clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
+      text = (clone.innerText || clone.textContent || '').trim();
+    } else if (bubble) {
+      const clone = bubble.cloneNode(true);
+      clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
+      text = (clone.innerText || clone.textContent || '').trim();
+    }
     const shareData = {
       title: 'Milo AI Response',
       text: text ? `Milo Answer:\n${text}` : 'Shared via Milo AI Workspace',

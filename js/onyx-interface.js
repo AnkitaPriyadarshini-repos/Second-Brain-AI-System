@@ -743,7 +743,13 @@
         if (bubble) {
           const contentEl = bubble.querySelector('.chat-text, .chat-message-content, .onyx-turn-content');
           if (contentEl) {
-            text = (contentEl.innerText || contentEl.textContent || '').trim();
+            const clone = contentEl.cloneNode(true);
+            clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
+            text = (clone.innerText || clone.textContent || '').trim();
+          } else {
+            const clone = bubble.cloneNode(true);
+            clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
+            text = (clone.innerText || clone.textContent || '').trim();
           }
         }
       }
@@ -759,7 +765,7 @@
         navigator.clipboard.writeText(text).then(() => {
           if (btn) {
             const orig = btn.innerHTML;
-            btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+            btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"/></svg>`;
             setTimeout(() => { btn.innerHTML = orig; }, 2000);
           }
           if (window.showToast) window.showToast('Copied answer to clipboard', 'success');
@@ -774,7 +780,11 @@
                        btn.parentElement?.closest('.chat-bubble, .chat-message-bubble, .assistant-bubble');
         if (bubble) {
           const contentEl = bubble.querySelector('.chat-text, .chat-message-content, .onyx-turn-content');
-          if (contentEl) text = (contentEl.innerText || contentEl.textContent || '').trim();
+          if (contentEl) {
+            const clone = contentEl.cloneNode(true);
+            clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
+            text = (clone.innerText || clone.textContent || '').trim();
+          }
         }
       }
       const shareData = {
