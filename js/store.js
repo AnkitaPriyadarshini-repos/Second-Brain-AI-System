@@ -523,6 +523,9 @@
       if (!this.settings.selectedModel) {
         this.settings.selectedModel = 'auto';
       }
+      if (!this.settings.assistantMode || !['milo', 'coach', 'research', 'coding'].includes(this.settings.assistantMode)) {
+        this.settings.assistantMode = 'milo';
+      }
       // Ensure Onyx enterprise theme is always active
       this.settings.theme = 'onyx';
       this._setItem(SETTINGS_KEY, JSON.stringify(this.settings));
@@ -964,6 +967,19 @@
 
     setActiveThreadId: function (id) {
       this._setItem('second_brain_active_thread_v2', id);
+    },
+
+    getAssistantMode: function () {
+      return (this.settings && this.settings.assistantMode) ? this.settings.assistantMode : 'milo';
+    },
+
+    setAssistantMode: function (mode) {
+      const valid = ['milo', 'coach', 'research', 'coding'];
+      const target = valid.includes(mode) ? mode : 'milo';
+      if (!this.settings) this.settings = {};
+      this.settings.assistantMode = target;
+      this.saveSettings();
+      return target;
     }
   };
 

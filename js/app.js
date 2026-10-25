@@ -1496,6 +1496,14 @@
         chipsEl.classList.remove('hidden');
         chipsEl.style.display = 'flex';
       }
+      const welcomeSuggestions = document.getElementById('milo-welcome-suggestions');
+      if (welcomeSuggestions) {
+        welcomeSuggestions.classList.remove('hidden');
+        welcomeSuggestions.style.display = 'flex';
+      }
+      if (typeof window.MiloWelcome !== 'undefined' && typeof window.MiloWelcome.onConversationStateChange === 'function') {
+        window.MiloWelcome.onConversationStateChange(true);
+      }
       if (inputEl) {
         inputEl.value = '';
         inputEl.focus();
@@ -1572,8 +1580,14 @@
           targetContainer.style.display = 'none';
         }
         if (heroView) heroView.style.display = 'flex';
+        if (typeof window.MiloWelcome !== 'undefined' && typeof window.MiloWelcome.onConversationStateChange === 'function') {
+          window.MiloWelcome.onConversationStateChange(true);
+        }
       } else {
         if (heroView) heroView.style.display = 'none';
+        if (typeof window.MiloWelcome !== 'undefined' && typeof window.MiloWelcome.onConversationStateChange === 'function') {
+          window.MiloWelcome.onConversationStateChange(false);
+        }
         if (targetContainer) {
           targetContainer.innerHTML = '';
           targetContainer.style.display = 'flex';

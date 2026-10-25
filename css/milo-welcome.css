@@ -1,0 +1,502 @@
+/**
+ * Milo AI Workspace — Khoj-Inspired Interactive Welcome Screen Styles
+ *
+ * Design System:
+ * - Quiet, premium dark workspace (#0B0C0E / #0E1217)
+ * - Restrained warm accent on selected mode and primary action (#E09F3E / #F59E0B)
+ * - Subtle borders (rgba(255, 255, 255, 0.08) - rgba(255, 255, 255, 0.12))
+ * - Clean obsidian/navy surfaces with gentle blur
+ * - High text contrast (#F3F4F6 primary, #94A3B8 secondary, #64748B muted)
+ * - Compact mode pills, responsive 3-card starter grid, and expandable "More ideas" drawer
+ */
+
+:root {
+  --milo-warm-accent: #E09F3E;
+  --milo-warm-accent-hover: #F59E0B;
+  --milo-warm-accent-subtle: rgba(224, 159, 62, 0.12);
+  --milo-warm-accent-border: rgba(224, 159, 62, 0.42);
+  --milo-surface-card: rgba(18, 22, 30, 0.85);
+  --milo-surface-card-hover: rgba(28, 34, 46, 0.95);
+  --milo-border-subtle: rgba(255, 255, 255, 0.08);
+  --milo-border-hover: rgba(255, 255, 255, 0.18);
+  --milo-text-title: #F3F4F6;
+  --milo-text-body: #94A3B8;
+  --milo-text-dim: #64748B;
+  --milo-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 1. Centered Welcome Container */
+.milo-welcome-view,
+#chat-hero-view.claude-hero-center {
+  max-width: 780px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: min(5vh, 40px) 16px 12px !important;
+  text-align: center !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+
+/* 2. Hero Mascot & Branding Header */
+.milo-welcome-brand-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.milo-welcome-mascot-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px 12px 4px 6px;
+  border-radius: 9999px;
+  border: 1px solid var(--milo-border-subtle);
+  backdrop-filter: blur(8px);
+}
+
+.milo-welcome-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(224, 159, 62, 0.25), rgba(99, 102, 241, 0.25));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(224, 159, 62, 0.2);
+}
+
+.milo-welcome-avatar-img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  display: block;
+}
+
+.milo-welcome-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--milo-text-body);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.milo-welcome-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+  animation: miloPulse 2.4s infinite ease-in-out;
+}
+
+@keyframes miloPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+.milo-welcome-headline {
+  font-size: clamp(26px, 3.8vw, 36px) !important;
+  font-weight: 700 !important;
+  color: var(--milo-text-title) !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+  max-width: 680px !important;
+}
+
+.milo-welcome-subtitle {
+  font-size: 14.5px !important;
+  line-height: 1.55 !important;
+  color: var(--milo-text-body) !important;
+  margin: 0 auto !important;
+  max-width: 580px !important;
+}
+
+/* 3. Mode Navigation Tablist */
+.milo-mode-nav-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 640px;
+  margin-top: 18px;
+}
+
+.milo-mode-tablist {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  background: rgba(15, 18, 26, 0.8);
+  border: 1px solid var(--milo-border-subtle);
+  border-radius: 9999px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.milo-mode-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--milo-text-body);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s var(--milo-ease-out);
+  user-select: none;
+  min-height: 34px;
+  box-sizing: border-box;
+}
+
+.milo-mode-pill:hover {
+  color: var(--milo-text-title);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.milo-mode-pill.active {
+  background: var(--milo-warm-accent-subtle);
+  border-color: var(--milo-warm-accent-border);
+  color: var(--milo-warm-accent);
+  font-weight: 600;
+  box-shadow: 0 0 16px rgba(224, 159, 62, 0.14);
+}
+
+.milo-mode-pill:focus-visible {
+  outline: 2px solid var(--milo-warm-accent);
+  outline-offset: 2px;
+}
+
+.milo-mode-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.milo-mode-label {
+  line-height: 1;
+}
+
+/* Mode Guidance & Capability Notice Panel */
+.milo-mode-panel {
+  margin-top: 10px;
+  min-height: 38px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.milo-mode-desc {
+  font-size: 12.5px;
+  color: var(--milo-text-dim);
+  margin: 0;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.milo-capability-notice {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  color: #38BDF8;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* 4. Suggestion Cards Section */
+.milo-welcome-suggestions {
+  width: 100%;
+  max-width: 760px;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.milo-primary-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.milo-suggestion-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 13px 14px;
+  background: var(--milo-surface-card);
+  border: 1px solid var(--milo-border-subtle);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s var(--milo-ease-out);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  color: inherit;
+  font-family: inherit;
+}
+
+.milo-suggestion-card:hover {
+  background: var(--milo-surface-card-hover);
+  border-color: var(--milo-border-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+.milo-suggestion-card:active {
+  transform: translateY(0);
+}
+
+.milo-suggestion-card:focus-visible {
+  outline: 2px solid var(--milo-warm-accent);
+  outline-offset: 2px;
+}
+
+.milo-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.milo-card-tag {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--milo-warm-accent);
+  background: var(--milo-warm-accent-subtle);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.milo-card-emoji {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.milo-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--milo-text-title);
+  margin-bottom: 4px;
+  line-height: 1.35;
+}
+
+.milo-card-prompt {
+  font-size: 11.5px;
+  color: var(--milo-text-body);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.milo-card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--milo-warm-accent);
+  margin-top: 8px;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: all 0.18s var(--milo-ease-out);
+}
+
+.milo-suggestion-card:hover .milo-card-action,
+.milo-suggestion-card:focus-visible .milo-card-action {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 5. "More Ideas" Expand Control & Secondary Grid */
+.milo-more-ideas-wrap {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.milo-more-ideas-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--milo-border-subtle);
+  border-radius: 9999px;
+  color: var(--milo-text-body);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s var(--milo-ease-out);
+  min-height: 32px;
+}
+
+.milo-more-ideas-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: var(--milo-border-hover);
+  color: var(--milo-text-title);
+}
+
+.milo-more-ideas-btn:focus-visible {
+  outline: 2px solid var(--milo-warm-accent);
+  outline-offset: 2px;
+}
+
+.milo-chevron-icon {
+  transition: transform 0.22s var(--milo-ease-out);
+}
+
+.milo-chevron-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.milo-more-ideas-drawer {
+  width: 100%;
+  margin-top: 10px;
+  transition: opacity 0.22s var(--milo-ease-out), transform 0.22s var(--milo-ease-out);
+}
+
+.milo-more-ideas-drawer.collapsed {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.milo-more-ideas-drawer.expanded {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.milo-secondary-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.milo-secondary-card {
+  padding: 10px 12px;
+  background: rgba(14, 18, 25, 0.7);
+}
+
+.milo-secondary-card .milo-card-title {
+  font-size: 12.5px;
+}
+
+.milo-secondary-card .milo-card-prompt {
+  font-size: 11px;
+}
+
+/* 6. Screen Reader Live Announcer Utility */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* 7. Responsive Mobile Overrides */
+@media (max-width: 768px) {
+  .milo-welcome-view,
+  #chat-hero-view.claude-hero-center {
+    padding: 20px 12px 10px !important;
+  }
+
+  .milo-welcome-headline {
+    font-size: 24px !important;
+  }
+
+  .milo-welcome-subtitle {
+    font-size: 13.5px !important;
+  }
+
+  .milo-mode-tablist {
+    flex-wrap: wrap;
+    justify-content: center;
+    border-radius: 14px;
+    padding: 6px;
+    gap: 4px;
+  }
+
+  .milo-mode-pill {
+    padding: 6px 12px;
+    font-size: 12px;
+    min-height: 32px;
+  }
+
+  .milo-primary-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .milo-secondary-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .milo-suggestion-card {
+    padding: 12px;
+  }
+
+  .milo-card-action {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 8. Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  .milo-welcome-pulse-dot {
+    animation: none !important;
+  }
+
+  .milo-suggestion-card,
+  .milo-mode-pill,
+  .milo-more-ideas-btn,
+  .milo-chevron-icon,
+  .milo-more-ideas-drawer,
+  .milo-card-action {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .milo-suggestion-card:hover {
+    transform: none !important;
+  }
+}

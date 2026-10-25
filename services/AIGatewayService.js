@@ -155,11 +155,14 @@ class AIGatewayService {
     });
   }
 
-  async processGatewayRequest({ prompt, contextNotes = [], history = [], model = 'second-brain-hybrid', userId = 'anonymous', apiKey = null }) {
+  async processGatewayRequest({ prompt, contextNotes = [], history = [], model = 'second-brain-hybrid', mode = 'milo', userId = 'anonymous', apiKey = null }) {
     if (!this.checkRateLimit(userId)) return { error: 'Rate limit exceeded. Maximum 60 requests per minute.' };
     if (!prompt || typeof prompt !== 'string' || !prompt.trim()) return { error: 'Prompt string is required.' };
     if (prompt.length > 12000) return { error: 'Prompt is too large. Maximum 12,000 characters.' };
     if (contextNotes.length > 12 || history.length > 24) return { error: 'Request context is too large.' };
+
+    const validModes = new Set(['milo', 'coach', 'research', 'coding']);
+    const safeMode = validModes.has(String(mode).toLowerCase()) ? String(mode).toLowerCase() : 'milo';
 
     const secResult = this.securityAgent.inspectPrompt(prompt);
     if (!secResult.isSafe) return { error: secResult.reason, securityViolation: true };
@@ -213,6 +216,7 @@ class AIGatewayService {
     return {
       success: true,
       model: this.selectModel(model, cleanPrompt),
+      mode: safeMode,
       answer: synthesizedAnswer,
       citations,
       orchestrator: { intent: orchestratorPlan.intent, selectedTools: orchestratorPlan.selectedTools, executionSteps: orchestratorPlan.executionSteps },

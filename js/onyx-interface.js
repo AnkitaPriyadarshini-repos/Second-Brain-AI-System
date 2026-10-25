@@ -624,6 +624,11 @@
 
       if (hero) hero.style.display = 'none';
       if (chips) chips.style.display = 'none';
+      const welcomeSuggestions = document.getElementById('milo-welcome-suggestions');
+      if (welcomeSuggestions) welcomeSuggestions.style.display = 'none';
+      if (typeof window !== 'undefined' && window.MiloWelcome && typeof window.MiloWelcome.onConversationStateChange === 'function') {
+        window.MiloWelcome.onConversationStateChange(false);
+      }
       container.style.display = 'flex';
       container.innerHTML = this.renderSessionHTML(s);
 
@@ -852,6 +857,14 @@
       if (chips) {
         chips.classList.remove('hidden');
         chips.style.display = 'flex';
+      }
+      const welcomeSuggestions = document.getElementById('milo-welcome-suggestions');
+      if (welcomeSuggestions) {
+        welcomeSuggestions.classList.remove('hidden');
+        welcomeSuggestions.style.display = 'flex';
+      }
+      if (typeof window !== 'undefined' && window.MiloWelcome && typeof window.MiloWelcome.onConversationStateChange === 'function') {
+        window.MiloWelcome.onConversationStateChange(true);
       }
       if (input) {
         input.value = '';

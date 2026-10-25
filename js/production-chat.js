@@ -218,6 +218,7 @@
     const stream = document.getElementById('chat-container');
     const miloBar = document.getElementById('milo-chat-companion-bar');
     const chips = document.getElementById('hero-starter-chips');
+    const welcomeSuggestions = document.getElementById('milo-welcome-suggestions');
     if (hero) {
       hero.style.display = 'none';
       hero.classList.add('hidden');
@@ -225,6 +226,13 @@
     if (chips) {
       chips.style.display = 'none';
       chips.classList.add('hidden');
+    }
+    if (welcomeSuggestions) {
+      welcomeSuggestions.style.display = 'none';
+      welcomeSuggestions.classList.add('hidden');
+    }
+    if (typeof window !== 'undefined' && window.MiloWelcome && typeof window.MiloWelcome.onConversationStateChange === 'function') {
+      window.MiloWelcome.onConversationStateChange(false);
     }
     if (stream) stream.style.display = 'flex';
     if (miloBar) miloBar.style.display = 'flex';
@@ -467,6 +475,13 @@
         }
       }
 
+      let selectedMode = 'milo';
+      if (typeof window !== 'undefined' && window.MiloWelcome && typeof window.MiloWelcome.getSelectedMode === 'function') {
+        selectedMode = window.MiloWelcome.getSelectedMode();
+      } else if (typeof Store !== 'undefined' && typeof Store.getAssistantMode === 'function') {
+        selectedMode = Store.getAssistantMode();
+      }
+
       const response = await fetch('/api/ai/gateway', {
         method: 'POST',
         headers: {
@@ -477,6 +492,7 @@
         body: JSON.stringify({
           prompt,
           model: selectedModel,
+          mode: selectedMode,
           history: getHistory(),
           // IMPORTANT: the gateway expects note objects, not a formatted string.
           contextNotes: retrieved.contextNotes,
@@ -569,6 +585,19 @@
     if (hero) {
       hero.style.display = '';
       hero.classList.remove('hidden');
+    }
+    const chips = document.getElementById('hero-starter-chips');
+    if (chips) {
+      chips.style.display = '';
+      chips.classList.remove('hidden');
+    }
+    const welcomeSuggestions = document.getElementById('milo-welcome-suggestions');
+    if (welcomeSuggestions) {
+      welcomeSuggestions.style.display = '';
+      welcomeSuggestions.classList.remove('hidden');
+    }
+    if (typeof window !== 'undefined' && window.MiloWelcome && typeof window.MiloWelcome.onConversationStateChange === 'function') {
+      window.MiloWelcome.onConversationStateChange(true);
     }
     if (container) container.style.display = 'none';
     const miloBar = document.getElementById('milo-chat-companion-bar');
