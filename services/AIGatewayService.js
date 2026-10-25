@@ -198,18 +198,20 @@ class AIGatewayService {
 
     const relevantNotesForVerification = citations.map(c => ({ title: c.title, content: c.snippet }));
     const verification = this.verificationAgent.verifyEvidence(cleanPrompt, relevantNotesForVerification);
-    let synthesizedAnswer = await this.invokeGeminiAPI({ prompt: cleanPrompt, contextSnippets, history: safeHistory, model, apiKey });
+    const liveAnswer = await this.invokeGeminiAPI({ prompt: cleanPrompt, contextSnippets, history: safeHistory, model, apiKey });
+    let synthesizedAnswer = liveAnswer;
+    const isLiveResponse = Boolean(liveAnswer);
 
     if (!synthesizedAnswer) {
       if (citations.length > 0) {
-        synthesizedAnswer = `Based on your private knowledge vault (${citations.length} sources matched):\n\n` + citations.map((c, i) => `#### ${i + 1}. ${c.title}\n${c.snippet}`).join('\n\n') + `\n\n**Citations:**\n` + citations.map(c => `• [${c.title}]: "${c.snippet.substring(0, 100)}..."`).join('\n');
+        synthesizedAnswer = `Based on your private knowledge vault (${citations.length} sources matched):\n\n` + citations.map((c, i) => `#### ${i + 1}. ${c.title}\n${c.snippet}`).join('\n\n') + `\n\n**Citations:**\n` + citations.map(c => `• [${c.title}]: "${c.snippet.substring(0, 100)}..."`).join('\n') + `\n\n---\n*Note: Live AI provider is unreachable. Grounded vault notes retrieved via local fallback.*`;
       } else {
         if (!this.aiEngine) {
           const AIEngineClass = require('../js/ai-engine');
           this.aiEngine = new AIEngineClass();
         }
         const fallbackRes = this.aiEngine.fallbackSynthesize(cleanPrompt, model, '', null, safeHistory);
-        synthesizedAnswer = fallbackRes.text;
+        synthesizedAnswer = fallbackRes.text + `\n\n---\n*Note: Synthesized via Second Brain local fallback engine (live AI provider unreachable/unconfigured).*`;
       }
     }
 
@@ -217,6 +219,8 @@ class AIGatewayService {
       success: true,
       model: this.selectModel(model, cleanPrompt),
       mode: safeMode,
+      isFallback: !isLiveResponse,
+      provider: isLiveResponse ? 'Google Gemini' : 'Second Brain Local Offline Synthesizer',
       answer: synthesizedAnswer,
       citations,
       orchestrator: { intent: orchestratorPlan.intent, selectedTools: orchestratorPlan.selectedTools, executionSteps: orchestratorPlan.executionSteps },

@@ -1,6 +1,6 @@
 /* Second Brain AI System — Service Worker for Offline PWA Support */
 
-const CACHE_NAME = 'second-brain-cache-v72.0';
+const CACHE_NAME = 'second-brain-cache-v73.0';
 
 const KATEX_FONTS = [
   './vendor/katex/fonts/KaTeX_AMS-Regular.ttf',
