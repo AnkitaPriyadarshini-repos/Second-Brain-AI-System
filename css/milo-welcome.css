@@ -500,3 +500,175 @@
     transform: none !important;
   }
 }
+
+/* 9. Khoj-Inspired Agent Reasoning Trace Card & Persona Badge */
+.milo-agent-trace-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(22, 25, 34, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(8px);
+  width: 100%;
+  box-sizing: border-box;
+  animation: miloFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes miloFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.milo-trace-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.milo-trace-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: #cbd5e1;
+  line-height: 1.45;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.milo-trace-icon {
+  font-size: 13px;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.milo-trace-label {
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.milo-trace-val {
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.milo-trace-status-text {
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.milo-trace-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding-left: 8px;
+}
+
+.milo-trace-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #e09f3e;
+  border-radius: 50%;
+  animation: miloTraceSpin 0.8s linear infinite;
+}
+
+@keyframes miloTraceSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.milo-trace-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.16);
+  color: #10b981;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+/* Assistant Message Left Amber Accent Bar */
+.assistant-bubble .milo-assistant-response-body,
+.assistant-bubble.has-amber-accent > .chat-message-content {
+  border-left: 3px solid #e09f3e !important;
+  padding-left: 14px !important;
+  margin-left: 2px !important;
+}
+
+/* Khoj-Style Persona Pill Badge & Action Bar Alignment */
+.onyx-turn-actions-bar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  margin-top: 10px !important;
+  padding-top: 6px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.04) !important;
+  width: 100% !important;
+}
+
+.milo-turn-badge-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.milo-turn-persona-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #e09f3e;
+  background: rgba(224, 159, 62, 0.08);
+  border: 1px solid rgba(224, 159, 62, 0.22);
+  border-radius: 6px;
+  padding: 3px 8px;
+  letter-spacing: 0.02em;
+}
+
+.milo-persona-icon {
+  font-size: 12px;
+}
+
+.milo-turn-timestamp {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.milo-turn-buttons-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.milo-action-tts-btn.is-speaking {
+  color: #e09f3e !important;
+  background: rgba(224, 159, 62, 0.15) !important;
+  border-color: rgba(224, 159, 62, 0.3) !important;
+}
+

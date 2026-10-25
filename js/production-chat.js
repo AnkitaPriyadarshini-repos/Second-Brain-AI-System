@@ -15,9 +15,73 @@
   let wired = false;
   let activeQueryId = 0;
   const clean = (value) => String(value == null ? '' : value).trim();
+  const escapeHTML = (value) =>
+    String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+  const MODE_METAS = {
+    milo: { id: 'milo', name: 'Milo', icon: '🤖', modeLabel: 'text' },
+    coach: { id: 'coach', name: 'Teacher', icon: '🗂️', modeLabel: 'text' },
+    research: { id: 'research', name: 'Research', icon: '🔬', modeLabel: 'text' },
+    coding: { id: 'coding', name: 'Coding', icon: '💻', modeLabel: 'text' }
+  };
+
+  function getActiveModeMeta() {
+    let modeId = 'milo';
+    try {
+      if (typeof window !== 'undefined' && window.MiloWelcome && typeof window.MiloWelcome.getSelectedMode === 'function') {
+        modeId = window.MiloWelcome.getSelectedMode();
+      } else if (typeof Store !== 'undefined' && typeof Store.getAssistantMode === 'function') {
+        modeId = Store.getAssistantMode();
+      }
+    } catch (_) {}
+    return MODE_METAS[modeId] || MODE_METAS.milo;
+  }
+
+  function createTraceCardElement(opts = {}) {
+    const card = document.createElement('div');
+    card.className = 'milo-agent-trace-card';
+    card.setAttribute('data-agent-trace', 'true');
+    card.setAttribute('role', 'region');
+    card.setAttribute('aria-label', 'Agent reasoning trace');
+
+    const dataSources = opts.dataSources || 'default, general';
+    const responseMode = opts.responseMode || 'text';
+    const status = opts.status || 'Generating a well-informed response';
+    const isDone = Boolean(opts.isDone);
+
+    card.innerHTML = `
+      <div class="milo-trace-left">
+        <div class="milo-trace-row">
+          <span class="milo-trace-icon" aria-hidden="true">📁</span>
+          <span class="milo-trace-label">Chose Data Sources to Search:</span>
+          <span class="milo-trace-val milo-trace-val-sources">${escapeHTML(dataSources)}</span>
+        </div>
+        <div class="milo-trace-row">
+          <span class="milo-trace-icon" aria-hidden="true">⚙️</span>
+          <span class="milo-trace-label">Decided Response Mode:</span>
+          <span class="milo-trace-val milo-trace-val-mode">${escapeHTML(responseMode)}</span>
+        </div>
+        <div class="milo-trace-row milo-trace-status-row">
+          <span class="milo-trace-icon" aria-hidden="true">☁️</span>
+          <span class="milo-trace-status-text">${escapeHTML(status)}</span>
+        </div>
+      </div>
+      <div class="milo-trace-right">
+        ${isDone ? '<span class="milo-trace-check" aria-label="Completed">✓</span>' : '<span class="milo-trace-spinner" aria-label="Generating response"></span>'}
+      </div>
+    `;
+    return card;
+  }
+
   const STOP_WORDS = new Set(
     'a an and are as at be by can could do for from how i if in is it me my of on or please tell that the this to was what when where who why will with you your about saved save note notes'.split(' ')
   );
+
 
   function getHistory() {
     try {
@@ -124,7 +188,7 @@
     }
   }
 
-  function appendMessage(role, text) {
+  function appendMessage(role, text, opts = {}) {
     const container = document.getElementById('chat-container');
     if (!container) return null;
 
@@ -132,8 +196,19 @@
     bubble.className = `chat-message-bubble ${role === 'user' ? 'user-bubble' : 'assistant-bubble'}`;
     bubble.setAttribute('role', role === 'assistant' ? 'status' : 'article');
 
+    if (role === 'assistant') {
+      const modeMeta = getActiveModeMeta();
+      const traceCard = createTraceCardElement({
+        dataSources: opts.dataSources || 'default, general',
+        responseMode: opts.responseMode || modeMeta.modeLabel || 'text',
+        status: opts.status || 'Generating a well-informed response',
+        isDone: Boolean(opts.isDone)
+      });
+      bubble.appendChild(traceCard);
+    }
+
     const content = document.createElement('div');
-    content.className = 'chat-message-content';
+    content.className = 'chat-message-content' + (role === 'assistant' ? ' milo-assistant-response-body' : '');
     if (role === 'assistant' && typeof window.formatMarkdownText === 'function') {
       content.innerHTML = window.formatMarkdownText(text);
     } else {
@@ -151,7 +226,7 @@
     return bubble;
   }
 
-  function replaceMessage(bubble, text) {
+  function replaceMessage(bubble, text, opts = {}) {
     if (!bubble) return;
     const content = bubble.querySelector('.chat-message-content') || bubble;
     let formatted = '';
@@ -169,27 +244,75 @@
     }
     content.innerHTML = formatted;
 
-    if (bubble.classList.contains('assistant-bubble') && !bubble.querySelector('.onyx-turn-actions-bar') && !text.startsWith('Thinking') && !text.startsWith('Searching') && !text.startsWith('Generating')) {
-      const actions = document.createElement('div');
-      actions.className = 'onyx-turn-actions-bar';
-      actions.innerHTML = `
-        <button class="onyx-action-icon-btn" onclick="window.copyTurnContent(this)" title="Copy" aria-label="Copy response">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        </button>
-        <button class="onyx-action-icon-btn" onclick="window.shareTurnContent ? window.shareTurnContent(this) : (window.shareSession && window.shareSession())" title="Share response" aria-label="Share response">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-        </button>
-        <button class="onyx-action-icon-btn" onclick="window.rateTurn && window.rateTurn(true, this)" title="Good response" aria-label="Good response">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
-        </button>
-        <button class="onyx-action-icon-btn" onclick="window.rateTurn && window.rateTurn(false, this)" title="Poor response" aria-label="Poor response">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
-        </button>
-        <button class="onyx-action-icon-btn" onclick="window.retryLastPrompt && window.retryLastPrompt()" title="Regenerate" aria-label="Regenerate response">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-        </button>
-      `;
-      bubble.appendChild(actions);
+    if (bubble.classList.contains('assistant-bubble')) {
+      bubble.classList.add('has-amber-accent');
+      if (!content.classList.contains('milo-assistant-response-body')) {
+        content.classList.add('milo-assistant-response-body');
+      }
+
+      // Ensure trace card exists and update state
+      let traceCard = bubble.querySelector('.milo-agent-trace-card');
+      const modeMeta = getActiveModeMeta();
+      const dataSources = opts.dataSources || (traceCard && traceCard.querySelector('.milo-trace-val-sources') ? traceCard.querySelector('.milo-trace-val-sources').textContent : 'default, general');
+      const responseMode = opts.responseMode || (traceCard && traceCard.querySelector('.milo-trace-val-mode') ? traceCard.querySelector('.milo-trace-val-mode').textContent : (modeMeta.modeLabel || 'text'));
+
+      if (!traceCard) {
+        traceCard = createTraceCardElement({
+          dataSources,
+          responseMode,
+          status: opts.status || 'Generating a well-informed response',
+          isDone: true
+        });
+        bubble.insertBefore(traceCard, content);
+      } else {
+        const right = traceCard.querySelector('.milo-trace-right');
+        if (right && !text.startsWith('Thinking') && !text.startsWith('Searching') && !text.startsWith('Generating')) {
+          right.innerHTML = '<span class="milo-trace-check" aria-label="Completed">✓</span>';
+        }
+        if (opts.dataSources) {
+          const sourcesEl = traceCard.querySelector('.milo-trace-val-sources');
+          if (sourcesEl) sourcesEl.textContent = opts.dataSources;
+        }
+        if (opts.status) {
+          const statusEl = traceCard.querySelector('.milo-trace-status-text');
+          if (statusEl) statusEl.textContent = opts.status;
+        }
+      }
+
+      if (!bubble.querySelector('.onyx-turn-actions-bar') && !text.startsWith('Thinking') && !text.startsWith('Searching') && !text.startsWith('Generating')) {
+        const actions = document.createElement('div');
+        actions.className = 'onyx-turn-actions-bar';
+        actions.innerHTML = `
+          <div class="milo-turn-badge-group">
+            <span class="milo-turn-persona-badge">
+              <span class="milo-persona-icon">${modeMeta.icon}</span>
+              <span class="milo-persona-name">${escapeHTML(modeMeta.name)}</span>
+            </span>
+            <span class="milo-turn-timestamp">Just now</span>
+          </div>
+          <div class="milo-turn-buttons-group">
+            <button class="onyx-action-icon-btn milo-action-tts-btn" onclick="window.speakTurnContent(this)" title="Read aloud" aria-label="Read response aloud">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+            </button>
+            <button class="onyx-action-icon-btn" onclick="window.copyTurnContent(this)" title="Copy" aria-label="Copy response">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+            <button class="onyx-action-icon-btn" onclick="window.shareTurnContent ? window.shareTurnContent(this) : (window.shareSession && window.shareSession())" title="Share response" aria-label="Share response">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            </button>
+            <button class="onyx-action-icon-btn" onclick="window.rateTurn && window.rateTurn(true, this)" title="Good response" aria-label="Good response">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+            </button>
+            <button class="onyx-action-icon-btn" onclick="window.rateTurn && window.rateTurn(false, this)" title="Poor response" aria-label="Poor response">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
+            </button>
+            <button class="onyx-action-icon-btn" onclick="window.retryLastPrompt && window.retryLastPrompt()" title="Regenerate" aria-label="Regenerate response">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            </button>
+          </div>
+        `;
+        bubble.appendChild(actions);
+      }
     }
   }
 
@@ -455,10 +578,14 @@
 
     try {
       const retrieved = retrieveNotes(prompt);
+      const dataSourcesStr = (retrieved.contextNotes && retrieved.contextNotes.length > 0)
+        ? `Vault (${retrieved.contextNotes.length} notes), Second Brain`
+        : 'default, general';
+
       if (retrieved.contextNotes && retrieved.contextNotes.length > 0) {
-        replaceMessage(thinking, 'Searching saved notes in Second Brain…');
+        replaceMessage(thinking, 'Searching saved notes in Second Brain…', { dataSources: dataSourcesStr });
       } else {
-        replaceMessage(thinking, 'Generating response with Milo AI…');
+        replaceMessage(thinking, 'Generating response with Milo AI…', { dataSources: dataSourcesStr });
       }
 
       let selectedModel = (window.Store && window.Store.settings && window.Store.settings.selectedModel) ||
@@ -515,7 +642,7 @@
       if (data.grounded && Array.isArray(data.citations) && data.citations.length) {
         answer += `\n\n---\n**From your Second Brain:** ${data.citations.map((c) => c.title).join(' · ')}`;
       }
-      replaceMessage(thinking, answer);
+      replaceMessage(thinking, answer, { dataSources: dataSourcesStr });
       saveTurn(prompt, answer);
       if (typeof MiloCompanion !== 'undefined') {
         MiloCompanion.setGlobalState('responding');
@@ -529,9 +656,12 @@
       console.error('[Milo chat]', error);
       const isTimeout = error?.name === 'AbortError';
       const retrieved = retrieveNotes(prompt);
+      const dataSourcesStr = (retrieved.contextNotes && retrieved.contextNotes.length > 0)
+        ? `Vault (${retrieved.contextNotes.length} notes), Second Brain`
+        : 'default, general';
       if (retrieved.contextNotes && retrieved.contextNotes.length > 0) {
         const fallback = localFallback(prompt, retrieved);
-        replaceMessage(thinking, fallback);
+        replaceMessage(thinking, fallback, { dataSources: dataSourcesStr });
       } else {
         const userMsg = isTimeout
           ? 'Milo took longer than expected to respond. Please try asking again.'
@@ -782,11 +912,11 @@
     let text = '';
     if (content) {
       const clone = content.cloneNode(true);
-      clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
+      clone.querySelectorAll('.onyx-turn-actions-bar, .milo-agent-trace-card, svg, button, .code-header-actions').forEach((el) => el.remove());
       text = (clone.innerText || clone.textContent || '').trim();
     } else if (bubble) {
       const clone = bubble.cloneNode(true);
-      clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
+      clone.querySelectorAll('.onyx-turn-actions-bar, .milo-agent-trace-card, svg, button, .code-header-actions').forEach((el) => el.remove());
       text = (clone.innerText || clone.textContent || '').trim();
     }
     if (window.copyToClipboard && text) {
@@ -802,17 +932,46 @@
       });
     }
   };
+  window.speakTurnContent = function (btn) {
+    if (typeof window === 'undefined') return;
+    if (!('speechSynthesis' in window)) {
+      if (window.showToast) window.showToast('Text-to-speech not supported in this browser', 'info');
+      return;
+    }
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      if (btn) btn.classList.remove('is-speaking');
+      return;
+    }
+    const bubble = btn ? (btn.closest('.assistant-bubble') || btn.closest('.chat-message-bubble')) : null;
+    const content = bubble ? (bubble.querySelector('.chat-message-content') || bubble) : null;
+    if (!content) return;
+    const clone = content.cloneNode(true);
+    clone.querySelectorAll('.onyx-turn-actions-bar, .milo-agent-trace-card, svg, button, .code-header-actions, pre').forEach((el) => el.remove());
+    const rawText = (clone.innerText || clone.textContent || '').trim();
+    if (!rawText) return;
+
+    const utterance = new SpeechSynthesisUtterance(rawText);
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    if (btn) {
+      btn.classList.add('is-speaking');
+      utterance.onend = () => btn.classList.remove('is-speaking');
+      utterance.onerror = () => btn.classList.remove('is-speaking');
+    }
+    window.speechSynthesis.speak(utterance);
+  };
   window.shareTurnContent = function (btn) {
     const bubble = btn ? (btn.closest('.assistant-bubble') || btn.closest('.chat-message-bubble') || btn.closest('.chat-bubble')) : null;
     const content = bubble ? (bubble.querySelector('.chat-message-content') || bubble.querySelector('.chat-text')) : null;
     let text = '';
     if (content) {
       const clone = content.cloneNode(true);
-      clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
+      clone.querySelectorAll('.onyx-turn-actions-bar, .milo-agent-trace-card, svg, button, .code-header-actions').forEach((el) => el.remove());
       text = (clone.innerText || clone.textContent || '').trim();
     } else if (bubble) {
       const clone = bubble.cloneNode(true);
-      clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
+      clone.querySelectorAll('.onyx-turn-actions-bar, .milo-agent-trace-card, svg, button, .code-header-actions').forEach((el) => el.remove());
       text = (clone.innerText || clone.textContent || '').trim();
     }
     const shareData = {
