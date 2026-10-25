@@ -22,6 +22,47 @@
 
 ---
 
+## 🎬 See it in action
+
+<p align="center">
+  <img src="docs/assets/see-it-in-action.png" alt="Milo AI See it in action — Khoj-style quadratic equation reasoning trace" width="850">
+</p>
+
+### ⚡ Grounded Multi-Step Reasoning & Mathematical Typesetting
+
+When querying Milo, every turn surfaces dynamic data-source routing, decided response personas, live reasoning execution traces, and high-precision LaTeX mathematical typesetting:
+
+> **User Prompt**: `explain the quadratic equation to me`
+
+```yaml
+📁 Chose Data Sources to Search : default, general
+⚙️ Decided Response Mode        : text (general reasoning)
+☁️ Generating Response          : Completed ✓
+```
+
+> **Milo AI (Teacher / Coach Persona Active)**:
+>
+> Absolutely, I'd be happy to explain the quadratic equation to you!
+>
+> A quadratic equation is a type of polynomial equation of the second degree, which means it involves at least one term that is squared. The general form of a quadratic equation is:
+>
+> $$ax^2 + bx + c = 0$$
+>
+> where $x$ represents the variable or unknown we are trying to solve for, and $a$, $b$, and $c$ are coefficients with $a \neq 0$. If $a = 0$, the equation becomes linear, not quadratic.
+>
+> The solutions to the quadratic equation can be found using the quadratic formula:
+>
+> $$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
+>
+> This formula gives you the values of $x$ that make the equation true. The term under the square root, $b^2 - 4ac$, is called the discriminant. It can tell us about the nature of the roots of the quadratic equation:
+> - If the discriminant is positive, there are two distinct real roots.
+> - If the discriminant is zero, there is one real root.
+> - If the discriminant is negative, there are two complex roots.
+>
+> <sub>*Just now · 🔊 Read Aloud · 📋 Copy · 🗂️ Teacher Persona Active*</sub>
+
+---
+
 ## 🔒 Security and Data Processing
 
 ![Security and Data Processing Architecture](docs/assets/architecture.png)

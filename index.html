@@ -41,8 +41,10 @@
   <link rel="stylesheet" href="css/responsive.css?v=70.0">
   <link rel="stylesheet" href="css/websocket-chat.css?v=70.0">
   <link rel="stylesheet" href="css/adaptive-fusion.css?v=70.0">
+  <link rel="stylesheet" href="vendor/katex/katex.min.css?v=1.0">
   <link rel="stylesheet" href="css/milo-workspace-studio.css?v=1.0">
   <link rel="stylesheet" href="css/onyx-theme.css?v=70.0">
+  <link rel="stylesheet" href="css/milo-welcome.css?v=1.0">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FFFFFF">
 </head>
@@ -268,8 +270,8 @@
 
       <section id="view-jarvis" class="view-section active claude-hero-section">
         
-    <!-- Central Hero Workspace View (Headline, Subtitle) -->
-    <div id="chat-hero-view" class="chat-hero-view claude-hero-center">
+    <!-- Central Hero Workspace View (Headline, Subtitle, Assistant Modes) -->
+    <div id="chat-hero-view" class="chat-hero-view claude-hero-center milo-welcome-view">
       
       <!-- Hidden Mascot Compatibility Stub (Zero visual footprint) -->
       <div class="milo-hero-robot-container" id="milo-hero-gadget-container" style="display: none !important; width: 0 !important; height: 0 !important; overflow: hidden !important;" aria-hidden="true">
@@ -279,12 +281,26 @@
         <div class="milo-robot-floor-shadow" style="display: none !important;"></div>
       </div>
 
-      <!-- Welcome Headline Section -->
-      <div class="claude-brand-headline-wrapper">
-        <h1 class="claude-serif-headline">How can Milo help you today?</h1>
-        <p class="hero-subtitle-text">
-          Search across Slack, Google Drive, email, CRM, tickets, and your personal knowledge base.
+      <!-- Milo Branding & Welcome Headline Section -->
+      <div id="milo-welcome-brand-wrap" class="milo-welcome-brand-wrap">
+        <div class="milo-welcome-mascot-row">
+          <div class="milo-welcome-avatar" aria-hidden="true">
+            <img src="assets/milo_robot_mascot.png" alt="" class="milo-welcome-avatar-img" onerror="this.src='assets/logo.svg'">
+          </div>
+          <span class="milo-welcome-badge">
+            <span class="milo-welcome-pulse-dot" aria-hidden="true"></span>
+            <span>Milo AI</span>
+          </span>
+        </div>
+        <h1 class="claude-serif-headline milo-welcome-headline" id="milo-welcome-title">How can Milo help you today?</h1>
+        <p class="hero-subtitle-text milo-welcome-subtitle">
+          Your personal AI workspace for research, coding, planning, and knowledge synthesis.
         </p>
+      </div>
+
+      <!-- Assistant Mode Selector Pills (Milo, Coach, Research, Coding) -->
+      <div id="milo-mode-nav-container" class="milo-mode-nav-container">
+        <!-- Rendered dynamically by MiloWelcome with ARIA keyboard navigation -->
       </div>
 
       <div id="nori-companion-target" style="display: none;"></div>
@@ -316,17 +332,29 @@
       <div class="onyx-model-pill-container">
         <div id="onyx-model-pill" class="onyx-model-pill" title="Select Model">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
-          <span id="onyx-model-name-label">Gemini 3.1 Flash Lite</span>
+          <span id="onyx-model-name-label">Auto (Smart Route)</span>
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div id="onyx-model-dropdown" class="onyx-model-dropdown-menu">
-          <div class="onyx-model-option selected" data-model="gemini-3.1-flash-lite">
-            <span>Gemini 3.1 Flash Lite</span>
-            <span style="font-size: 10px; color: #10B981;">Active · Default</span>
+          <div class="onyx-model-option selected" data-model="auto">
+            <span>Auto (Smart Route)</span>
+            <span style="font-size: 10px; color: #10B981;">Recommended · Fast &amp; Deep</span>
+          </div>
+          <div class="onyx-model-option" data-model="gemini-3.8-flash">
+            <span>Gemini 3.8 Flash</span>
+            <span style="font-size: 10px; color: #6B7280;">Frontier Reasoning</span>
+          </div>
+          <div class="onyx-model-option" data-model="gemini-3.6-flash">
+            <span>Gemini 3.6 Flash</span>
+            <span style="font-size: 10px; color: #6B7280;">Balanced Tier</span>
           </div>
           <div class="onyx-model-option" data-model="gemini-3.5-flash-lite">
             <span>Gemini 3.5 Flash Lite</span>
             <span style="font-size: 10px; color: #6B7280;">High-Speed Tier</span>
+          </div>
+          <div class="onyx-model-option" data-model="gemini-3.1-flash-lite">
+            <span>Gemini 3.1 Flash Lite</span>
+            <span style="font-size: 10px; color: #6B7280;">Stable Lite</span>
           </div>
           <div class="onyx-model-option" data-model="gemini-flash-latest">
             <span>Gemini Flash Latest</span>
@@ -416,17 +444,88 @@
         </div>
       </form>
  
-      <!-- Starter Chips (Options placed comfortably below the chat box) -->
-      <div id="hero-starter-chips" class="tufy-starter-chips-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px; margin-bottom: 6px;">
-        <button type="button" class="tufy-starter-chip" onclick="if(window.OnyxInterface) window.OnyxInterface.loadSession('onyx_use_cases');" style="background: #FFFFFF; border: 1px solid #E5E7EB; color: #374151; padding: 7px 14px; border-radius: 9999px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; font-size: 13px; font-weight: 500;">
-          <span>✨ Milo Use Cases</span>
-        </button>
-        <button type="button" class="tufy-starter-chip" onclick="if(window.insertSampleQuery) window.insertSampleQuery('Enterprise search across tools');" style="background: #FFFFFF; border: 1px solid #E5E7EB; color: #374151; padding: 7px 14px; border-radius: 9999px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; font-size: 13px; font-weight: 500;">
-          <span>🔍 Enterprise Search</span>
-        </button>
-        <button type="button" class="tufy-starter-chip" onclick="if(window.insertSampleQuery) window.insertSampleQuery('Synthesize customer feedback and signals');" style="background: #FFFFFF; border: 1px solid #E5E7EB; color: #374151; padding: 7px 14px; border-radius: 9999px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); cursor: pointer; font-size: 13px; font-weight: 500;">
-          <span>📊 Customer Intelligence</span>
-        </button>
+      <!-- Starter Chips & Khoj-Inspired Suggestion Cards (Primary + More ideas) -->
+      <div id="hero-starter-chips" class="tufy-starter-chips-container" style="display: flex; flex-direction: column; align-items: center; width: 100%; margin-top: 14px; margin-bottom: 6px;">
+        <div id="milo-welcome-suggestions" class="milo-welcome-suggestions">
+          <div class="milo-primary-cards-grid" role="region" aria-label="Prompt suggestions">
+            <button type="button" class="milo-suggestion-card" data-prompt="Explain a difficult concept using examples." onclick="if(window.MiloWelcome) window.MiloWelcome.handleSuggestionSelected('Explain a difficult concept using examples.');" aria-label="Learn: Explain a difficult concept using examples">
+              <div class="milo-card-header">
+                <span class="milo-card-tag">Learn</span>
+                <span class="milo-card-emoji" aria-hidden="true">💡</span>
+              </div>
+              <div class="milo-card-title">Explain a concept</div>
+              <div class="milo-card-prompt">Explain a difficult concept using examples.</div>
+              <div class="milo-card-action" aria-hidden="true">
+                <span>Use prompt</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
+            </button>
+            <button type="button" class="milo-suggestion-card" data-prompt="Help me debug and improve my code." onclick="if(window.MiloWelcome) window.MiloWelcome.handleSuggestionSelected('Help me debug and improve my code.');" aria-label="Build: Help me debug and improve my code">
+              <div class="milo-card-header">
+                <span class="milo-card-tag">Build</span>
+                <span class="milo-card-emoji" aria-hidden="true">🛠️</span>
+              </div>
+              <div class="milo-card-title">Debug &amp; improve code</div>
+              <div class="milo-card-prompt">Help me debug and improve my code.</div>
+              <div class="milo-card-action" aria-hidden="true">
+                <span>Use prompt</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
+            </button>
+            <button type="button" class="milo-suggestion-card" data-prompt="Turn my goal into milestones and actionable tasks." onclick="if(window.MiloWelcome) window.MiloWelcome.handleSuggestionSelected('Turn my goal into milestones and actionable tasks.');" aria-label="Plan: Turn my goal into milestones and actionable tasks">
+              <div class="milo-card-header">
+                <span class="milo-card-tag">Plan</span>
+                <span class="milo-card-emoji" aria-hidden="true">🎯</span>
+              </div>
+              <div class="milo-card-title">Actionable milestones</div>
+              <div class="milo-card-prompt">Turn my goal into milestones and actionable tasks.</div>
+              <div class="milo-card-action" aria-hidden="true">
+                <span>Use prompt</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
+            </button>
+          </div>
+          <div class="milo-more-ideas-wrap">
+            <button type="button" id="milo-more-ideas-btn" class="milo-more-ideas-btn" onclick="if(window.MiloWelcome) window.MiloWelcome.toggleMoreIdeas();" aria-expanded="false" aria-controls="milo-more-ideas-drawer">
+              <span>More ideas</span>
+              <svg class="milo-chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+          <div id="milo-more-ideas-drawer" class="milo-more-ideas-drawer collapsed" role="region" aria-label="Additional prompt ideas" style="display: none;">
+            <div class="milo-secondary-cards-grid">
+              <button type="button" class="milo-suggestion-card milo-secondary-card" data-prompt="Explore my saved notes." onclick="if(window.MiloWelcome) window.MiloWelcome.handleSuggestionSelected('Explore my saved notes.');" aria-label="Vault: Explore my saved notes">
+                <div class="milo-card-header"><span class="milo-card-tag">Vault</span><span class="milo-card-emoji" aria-hidden="true">🧠</span></div>
+                <div class="milo-card-title">Explore saved notes</div>
+                <div class="milo-card-prompt">Explore my saved notes.</div>
+                <div class="milo-card-action" aria-hidden="true"><span>Use prompt</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+              </button>
+              <button type="button" class="milo-suggestion-card milo-secondary-card" data-prompt="Research a topic and cite sources." onclick="if(window.MiloWelcome) window.MiloWelcome.handleSuggestionSelected('Research a topic and cite sources.');" aria-label="Research: Research a topic and cite sources">
+                <div class="milo-card-header"><span class="milo-card-tag">Research</span><span class="milo-card-emoji" aria-hidden="true">🔬</span></div>
+                <div class="milo-card-title">Topic &amp; citations</div>
+                <div class="milo-card-prompt">Research a topic and cite sources.</div>
+                <div class="milo-card-action" aria-hidden="true"><span>Use prompt</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+              </button>
+              <button type="button" class="milo-suggestion-card milo-secondary-card" data-prompt="Prepare for an interview on systems design and data structures." onclick="if(window.MiloWelcome) window.MiloWelcome.handleSuggestionSelected('Prepare for an interview on systems design and data structures.');" aria-label="Career: Prepare for an interview">
+                <div class="milo-card-header"><span class="milo-card-tag">Career</span><span class="milo-card-emoji" aria-hidden="true">💼</span></div>
+                <div class="milo-card-title">Prepare for interview</div>
+                <div class="milo-card-prompt">Prepare for an interview on systems design and data structures.</div>
+                <div class="milo-card-action" aria-hidden="true"><span>Use prompt</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+              </button>
+              <button type="button" class="milo-suggestion-card milo-secondary-card" data-prompt="Summarize a document with key takeaways and action items." onclick="if(window.MiloWelcome) window.MiloWelcome.handleSuggestionSelected('Summarize a document with key takeaways and action items.');" aria-label="Summary: Summarize a document">
+                <div class="milo-card-header"><span class="milo-card-tag">Summary</span><span class="milo-card-emoji" aria-hidden="true">📄</span></div>
+                <div class="milo-card-title">Summarize a document</div>
+                <div class="milo-card-prompt">Summarize a document with key takeaways and action items.</div>
+                <div class="milo-card-action" aria-hidden="true"><span>Use prompt</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+              </button>
+              <button type="button" class="milo-suggestion-card milo-secondary-card" data-prompt="Create a study or project plan with weekly milestones." onclick="if(window.MiloWelcome) window.MiloWelcome.handleSuggestionSelected('Create a study or project plan with weekly milestones.');" aria-label="Plan: Create a study or project plan">
+                <div class="milo-card-header"><span class="milo-card-tag">Plan</span><span class="milo-card-emoji" aria-hidden="true">📅</span></div>
+                <div class="milo-card-title">Study or project plan</div>
+                <div class="milo-card-prompt">Create a study or project plan with weekly milestones.</div>
+                <div class="milo-card-action" aria-hidden="true"><span>Use prompt</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Bottom Platform Footer Credit -->
@@ -2037,7 +2136,8 @@
   </div>
 
   <!-- JavaScript Modules -->
-  <script src="js/utils.js?v=59.0"></script>
+  <script src="vendor/katex/katex.min.js?v=1.0"></script>
+  <script src="js/utils.js?v=60.0"></script>
   <script src="js/nlp-engine.js?v=58.0"></script>
   <script src="js/store.js?v=67.0"></script>
   <script src="js/rag-engine.js?v=58.0"></script>
@@ -2063,6 +2163,7 @@
   <script src="js/onyx-interface.js?v=70.0"></script>
   <script src="js/pwa-installer.js?v=61.0"></script>
   <script src="js/nori-companion.js?v=70.0"></script>
+  <script src="js/milo-welcome.js?v=1.0"></script>
   <script src="js/app.js?v=70.0"></script>
 </body>
 </html>

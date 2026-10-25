@@ -34,7 +34,7 @@
       this.k1 = options.k1 || 1.2;
       this.b = options.b || 0.75;
       this.rrfK = options.rrfK || 60; // Standard reciprocal rank fusion constant
-      this.minRelevanceThreshold = options.minRelevanceThreshold || 0.16;
+      this.minRelevanceThreshold = typeof options.minRelevanceThreshold === 'number' ? options.minRelevanceThreshold : 0.16;
       this.maxCitations = options.maxCitations || 6;
       this.stopWords = options.stopWords || DEFAULT_STOP_WORDS;
     }
@@ -222,6 +222,9 @@
         };
       });
 
+      const docToParsed = new Map();
+      parsedDocs.forEach((p) => docToParsed.set(p.doc, p));
+
       // Calculate avg doc length
       let totalLen = 0;
       parsedDocs.forEach((p) => { totalLen += p.docLen; });
@@ -279,40 +282,89 @@
         .filter((item) => item.vectorScore > 0)
         .sort((a, b) => b.vectorScore - a.vectorScore);
 
-      // 3. Reciprocal Rank Fusion (RRF)
+      // 3. Reciprocal Rank Fusion (RRF) & Confidence Metric
       const bm25RankMap = new Map();
-      bm25Ranked.forEach((item, idx) => bm25RankMap.set(item.p.doc, idx + 1));
+      const bm25ScoreMap = new Map();
+      bm25Ranked.forEach((item, idx) => {
+        bm25RankMap.set(item.p.doc, idx + 1);
+        bm25ScoreMap.set(item.p.doc, item.bm25Score);
+      });
 
       const vectorRankMap = new Map();
-      vectorRanked.forEach((item, idx) => vectorRankMap.set(item.p.doc, idx + 1));
+      const vectorScoreMap = new Map();
+      vectorRanked.forEach((item, idx) => {
+        vectorRankMap.set(item.p.doc, idx + 1);
+        vectorScoreMap.set(item.p.doc, item.vectorScore);
+      });
 
       const combinedDocs = new Set([...bm25RankMap.keys(), ...vectorRankMap.keys()]);
       const fusedResults = [];
 
       for (const doc of combinedDocs) {
+        const p = docToParsed.get(doc);
+        if (!p) continue;
+
         const r1 = bm25RankMap.get(doc) || 999;
         const r2 = vectorRankMap.get(doc) || 999;
+        const bm25Score = bm25ScoreMap.get(doc) || 0;
+        const vectorScore = vectorScoreMap.get(doc) || 0;
 
         const rrfScore = 1.0 / (this.rrfK + r1) + 1.0 / (this.rrfK + r2);
         const metadataBoost = this.calculateMetadataBoost(doc, queryTokens);
-        const finalScore = rrfScore * (1.0 + metadataBoost);
+
+        // Calculate query keyword coverage and field matches
+        const matchedTokens = queryTokens.filter((t) => (p.tf[t] || 0) > 0);
+        const coverage = queryTokens.length ? (matchedTokens.length / queryTokens.length) : 0;
+        const titleMatches = queryTokens.filter((t) => p.titleTokens.includes(t));
+        const tagMatches = queryTokens.filter((t) => p.tagTokens.includes(t));
+        const summaryMatches = queryTokens.filter((t) => p.summaryTokens.includes(t));
+        const hasTitleOrTagHit = titleMatches.length > 0 || tagMatches.length > 0;
+
+        let confidence = 0.0;
+        if (coverage > 0) {
+          const coverageWeight = 0.40;
+          const bm25Weight = 0.35;
+          const vectorWeight = 0.25;
+          const normalizedBm25 = Math.min(1.0, bm25Score / 4.0);
+
+          confidence = (coverage * coverageWeight) + (normalizedBm25 * bm25Weight) + (vectorScore * vectorWeight) + metadataBoost;
+
+          // Title / Tag match boost
+          if (titleMatches.length > 0) {
+            confidence += 0.20 * Math.min(2, titleMatches.length);
+          }
+          if (tagMatches.length > 0) {
+            confidence += 0.10 * Math.min(2, tagMatches.length);
+          }
+
+          // Penalize multi-token queries where only a single incidental word matched deep in body with zero title/tag/summary hits
+          if (queryTokens.length >= 2 && coverage < 0.5 && !hasTitleOrTagHit && summaryMatches.length === 0) {
+            confidence *= 0.20;
+          }
+
+          confidence = Math.min(1.0, Math.max(0.0, confidence));
+        }
+
+        const finalScore = rrfScore * (1.0 + metadataBoost) * Math.max(0.05, confidence);
 
         fusedResults.push({
           doc,
           rrfScore,
           metadataBoost,
+          bm25Score,
+          vectorScore,
+          coverage,
+          confidence,
           finalScore
         });
       }
 
-      fusedResults.sort((a, b) => b.finalScore - a.finalScore);
+      // Sort by confidence and finalScore
+      fusedResults.sort((a, b) => (b.confidence * b.finalScore) - (a.confidence * a.finalScore));
 
-      // Check if top match passes relevance threshold
-      // Baseline RRF for top item without match: ~ 1/(60+1) + 1/(60+1) = ~0.0328
-      // If no BM25 term hit occurred, or score is too low, filter it out.
+      // Filter against the configured minRelevanceThreshold
       const qualified = fusedResults.filter((item) => {
-        const hasLexicalHit = bm25RankMap.has(item.doc);
-        return hasLexicalHit && item.finalScore >= 0.012;
+        return item.confidence >= this.minRelevanceThreshold;
       });
 
       if (!qualified.length) {
@@ -320,7 +372,7 @@
           contextNotes: [],
           citations: [],
           isGrounded: false,
-          retrievalMethod: 'BM25+RRF (no qualified matches)',
+          retrievalMethod: 'BM25 + Cosine Vector + RRF (no qualified matches)',
           query: cleanQuery
         };
       }
@@ -328,7 +380,7 @@
       const topCandidates = qualified.slice(0, this.maxCitations);
 
       // 4. Chunking & Rich Citation Metadata Extraction
-      const citations = topCandidates.map(({ doc, finalScore }, index) => {
+      const citations = topCandidates.map(({ doc, confidence }, index) => {
         const chunk = this.extractBestChunk(doc, queryTokens);
         return {
           id: doc.id || `src_${index + 1}`,
@@ -338,7 +390,7 @@
           tags: Array.isArray(doc.tags) ? doc.tags : [],
           url: doc.url || doc.sourceUrl || '',
           snippet: chunk,
-          relevanceScore: parseFloat(Math.min(1.0, finalScore * 25).toFixed(2)),
+          relevanceScore: parseFloat(confidence.toFixed(2)),
           retrievalMethod: 'BM25+RRF Hybrid'
         };
       });

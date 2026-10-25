@@ -311,7 +311,9 @@
       theme: 'onyx',
       privacyMode: true, // Default privacy mode on-device as requested in PDF page 7
       ttsEnabled: true,
-      apiKey: ''
+      apiKey: '',
+      selectedModel: 'auto',
+      modelMigrationVersion: 2
     },
     isOffline: false,
     offlineQueue: [],
@@ -481,6 +483,54 @@
                         (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test');
       const isExplicitDemo = this._getItem('second_brain_demo_mode') === 'true';
 
+      // 1. Load and migrate settings FIRST so this.settings is fully initialized
+      const savedSettings = this._getItem(SETTINGS_KEY);
+      let parsedSettings = {};
+      if (savedSettings) {
+        try {
+          parsedSettings = JSON.parse(savedSettings) || {};
+          this.settings = { ...this.settings, ...parsedSettings };
+        } catch (e) { }
+      }
+
+      // One-time versioned migration of old default model preferences
+      // Old versions of Milo defaulted selectedModel to 'gemini-3.8-flash' (or had older retired models)
+      // and lacked modelMigrationVersion.
+      const currentMigrationVersion = 2;
+      const savedMigrationVersion = (parsedSettings && typeof parsedSettings.modelMigrationVersion === 'number')
+        ? parsedSettings.modelMigrationVersion
+        : 0;
+
+      const retiredModels = new Set([
+        'gemini-2.0-flash', 'gemini-2.0-flash-exp', 'gemini-1.5-flash', 'gemini-1.5-pro',
+        'gemini-1.0-pro', 'gemini-2.5-flash', 'gemini-2.5-pro'
+      ]);
+
+      if (savedMigrationVersion < currentMigrationVersion) {
+        // Detect old default settings: either no selectedModel was set, or it was the legacy default 'gemini-3.8-flash', or a retired model
+        if (!parsedSettings.selectedModel || parsedSettings.selectedModel === 'gemini-3.8-flash' || retiredModels.has(String(parsedSettings.selectedModel).toLowerCase())) {
+          this.settings.selectedModel = 'auto';
+        }
+        this.settings.modelMigrationVersion = currentMigrationVersion;
+      } else {
+        // Migration was already applied previously: preserve manual user selections (e.g. gemini-3.8-flash or gemini-3.1-flash-lite)!
+        // Only sanitize if someone has a genuinely retired model (e.g. gemini-2.0-flash)
+        if (this.settings.selectedModel && retiredModels.has(this.settings.selectedModel.toLowerCase())) {
+          this.settings.selectedModel = 'auto';
+        }
+      }
+
+      if (!this.settings.selectedModel) {
+        this.settings.selectedModel = 'auto';
+      }
+      if (!this.settings.assistantMode || !['milo', 'coach', 'research', 'coding'].includes(this.settings.assistantMode)) {
+        this.settings.assistantMode = 'milo';
+      }
+      // Ensure Onyx enterprise theme is always active
+      this.settings.theme = 'onyx';
+      this._setItem(SETTINGS_KEY, JSON.stringify(this.settings));
+
+      // 2. Load and initialize notes
       const savedNotes = this._getItem(STORAGE_KEY);
       if (savedNotes) {
         try {
@@ -496,11 +546,11 @@
         // First-time initialization
         if (isTestEnv || isExplicitDemo) {
           this.notes = generate100PreSeededNotes();
-          this.saveNotes();
+          this._setItem(STORAGE_KEY, JSON.stringify(this.notes));
         } else {
           // In real user browser, start with clean, unpolluted vault
           this.notes = [];
-          this.saveNotes();
+          this._setItem(STORAGE_KEY, JSON.stringify(this.notes));
         }
       }
 
@@ -508,16 +558,6 @@
       if (savedDismissed) {
         try { this.dismissedIds = JSON.parse(savedDismissed); } catch (e) { }
       }
-
-      const savedSettings = this._getItem(SETTINGS_KEY);
-      if (savedSettings) {
-        try {
-          this.settings = { ...this.settings, ...JSON.parse(savedSettings) };
-        } catch (e) { }
-      }
-      // Ensure Onyx enterprise theme is always active
-      this.settings.theme = 'onyx';
-      this._setItem(SETTINGS_KEY, JSON.stringify(this.settings));
 
       const savedGoals = this._getItem(GOALS_KEY);
       if (savedGoals) {
@@ -529,6 +569,11 @@
         this.goals = generateDefaultGoals();
         this._setItem(GOALS_KEY, JSON.stringify(this.goals));
       }
+    },
+
+    saveSettings: function () {
+      this._setItem(SETTINGS_KEY, JSON.stringify(this.settings));
+      this.notifyListeners();
     },
 
     getRepository: function (name) {
@@ -922,6 +967,19 @@
 
     setActiveThreadId: function (id) {
       this._setItem('second_brain_active_thread_v2', id);
+    },
+
+    getAssistantMode: function () {
+      return (this.settings && this.settings.assistantMode) ? this.settings.assistantMode : 'milo';
+    },
+
+    setAssistantMode: function (mode) {
+      const valid = ['milo', 'coach', 'research', 'coding'];
+      const target = valid.includes(mode) ? mode : 'milo';
+      if (!this.settings) this.settings = {};
+      this.settings.assistantMode = target;
+      this.saveSettings();
+      return target;
     }
   };
 

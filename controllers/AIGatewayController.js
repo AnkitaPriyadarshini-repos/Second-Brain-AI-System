@@ -22,6 +22,7 @@ class AIGatewayController {
         : [];
     const history = Array.isArray(body.history) ? body.history : [];
     const model = typeof body.model === 'string' ? body.model : undefined;
+    const mode = typeof body.mode === 'string' ? body.mode : (typeof body.assistantMode === 'string' ? body.assistantMode : undefined);
     const userId = String(req.headers['x-user-id'] || req.ip || 'client').slice(0, 128);
 
     // Reject pathological payloads before they reach retrieval/model execution.
@@ -33,7 +34,7 @@ class AIGatewayController {
     }
 
     if (process.env.NODE_ENV !== 'test') {
-      console.log(`[${requestId}] AI Query start - user:${userId} model:${model || 'default'} context:${contextNotes.length}`);
+      console.log(`[${requestId}] AI Query start - user:${userId} model:${model || 'default'} mode:${mode || 'milo'} context:${contextNotes.length}`);
     }
 
     try {
@@ -42,6 +43,7 @@ class AIGatewayController {
         contextNotes,
         history,
         model,
+        mode,
         userId,
         requestId
       });

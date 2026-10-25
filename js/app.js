@@ -1496,6 +1496,14 @@
         chipsEl.classList.remove('hidden');
         chipsEl.style.display = 'flex';
       }
+      const welcomeSuggestions = document.getElementById('milo-welcome-suggestions');
+      if (welcomeSuggestions) {
+        welcomeSuggestions.classList.remove('hidden');
+        welcomeSuggestions.style.display = 'flex';
+      }
+      if (typeof window.MiloWelcome !== 'undefined' && typeof window.MiloWelcome.onConversationStateChange === 'function') {
+        window.MiloWelcome.onConversationStateChange(true);
+      }
       if (inputEl) {
         inputEl.value = '';
         inputEl.focus();
@@ -1572,8 +1580,14 @@
           targetContainer.style.display = 'none';
         }
         if (heroView) heroView.style.display = 'flex';
+        if (typeof window.MiloWelcome !== 'undefined' && typeof window.MiloWelcome.onConversationStateChange === 'function') {
+          window.MiloWelcome.onConversationStateChange(true);
+        }
       } else {
         if (heroView) heroView.style.display = 'none';
+        if (typeof window.MiloWelcome !== 'undefined' && typeof window.MiloWelcome.onConversationStateChange === 'function') {
+          window.MiloWelcome.onConversationStateChange(false);
+        }
         if (targetContainer) {
           targetContainer.innerHTML = '';
           targetContainer.style.display = 'flex';
@@ -2073,23 +2087,23 @@
         
         const actionsHTML = `
           <div class="onyx-turn-actions-bar" style="margin-top: 14px; display: flex; align-items: center; gap: 8px;">
-            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.copyCurrentTurn(this)" title="Copy">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.copyCurrentTurn(this)" title="Copy" aria-label="Copy response">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             </button>
-            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.rateTurn(true, this)" title="Good response">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.rateTurn(true, this)" title="Good response" aria-label="Good response">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
             </button>
-            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.rateTurn(false, this)" title="Poor response">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
+            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.rateTurn(false, this)" title="Poor response" aria-label="Poor response">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
             </button>
-            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.regenerateShowcase()" title="Regenerate">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.regenerateShowcase()" title="Regenerate" aria-label="Regenerate response">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
             </button>
-            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.reportIssue()" title="Report issue">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.reportIssue()" title="Report issue" aria-label="Report issue">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
             </button>
-            <button type="button" class="onyx-sources-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.openSourcesDrawer()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <button type="button" class="onyx-sources-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.openSourcesDrawer()" aria-label="View connected sources">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
               <span>${sourcesCount > 0 ? sourcesCount + ' ' : ''}Sources</span>
             </button>
           </div>

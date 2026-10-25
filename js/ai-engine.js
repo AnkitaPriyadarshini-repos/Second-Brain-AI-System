@@ -422,7 +422,8 @@ export function HydratedComponent({ data }) {
       return {
         text: `Hi! 😊 How can I help you today?\n\nFeel free to ask me any question, such as:\n• **General AI Knowledge** (e.g., *"What is artificial intelligence?"* or *"What is the capital of Japan?"*)\n• **Coding & Algorithms** (e.g., *"Explain recursion in C++"*)\n• **Follow-Up Deep Dives** (e.g., *"Tell me more about recursion"*)\n• **Your Vault Notes** (e.g., *"What did I save about deep learning?"*)`,
         thinkingProcess: ['Processed natural greeting prompt'],
-        provider: 'Second Brain AI (Gemini Flash)',
+        provider: 'Second Brain Local Offline Synthesizer',
+        isFallback: true,
         grounded: false,
         citations: []
       };
@@ -432,7 +433,8 @@ export function HydratedComponent({ data }) {
       return {
         text: `I'm operating at peak performance and ready to help! 🚀 What question or topic would you like to explore today?`,
         thinkingProcess: ['Processed user greeting query'],
-        provider: 'Second Brain AI (Gemini Flash)',
+        provider: 'Second Brain Local Offline Synthesizer',
+        isFallback: true,
         grounded: false,
         citations: []
       };
@@ -461,7 +463,8 @@ export function HydratedComponent({ data }) {
       return {
         text: `### 🔄 Deep-Dive: Advanced Recursion Concepts & Mechanisms\n\nBuilding upon basic recursion, here are the critical low-level mechanics and optimization paradigms:\n\n#### 1. How the System Call Stack Manages Recursion\nEvery recursive function call creates an **Activation Record (Stack Frame)** on the memory stack. Each frame stores:\n- Local variables\n- Parameter values\n- Return address (pointing back to the instruction after the call)\n\nWhen the **base case** evaluates to \`true\`, function calls finish and unwind in **LIFO (Last-In, First-Out)** order.\n\n#### 2. Tail Call Optimization (TCO) in C++\nIn **Tail Recursion**, the recursive call is the absolute final statement executed before returning. Modern C++ compilers (\`g++ -O2\` or \`clang++\`) perform Tail Call Elimination, transforming recursion into a flat \`jump\` loop:\n\n\`\`\`cpp\n// Tail Recursive Factorial in C++\nlong long tailFactorial(int n, long long accumulator = 1) {\n    if (n <= 1) return accumulator; \n    return tailFactorial(n - 1, n * accumulator); // Accumulator carries result state\n}\n\`\`\`\n*Space Complexity with TCO:* $\\mathcal{O}(1)$ auxiliary memory.\n\n#### 3. Stack Overflow & Prevention Strategies\nIf recursion exceeds stack depth limit (typically 1 MB – 8 MB), a \`Segmentation Fault\` occurs. To prevent stack overflow:\n- **Memoization (Top-Down Dynamic Programming):** Store results of expensive function calls to prevent redundant recursive branches ($O(2^N) \\rightarrow O(N)$).\n- **Explicit Stack / Iteration:** Replace implicit call stack with an explicit \`std::stack<T>\` on heap memory.`,
         thinkingProcess: ['Detected multi-turn follow-up query on recursion', 'Provided advanced recursion deep dive (call stack, tail recursion, stack overflow, memoization) without repeating intro'],
-        provider: 'Second Brain AI (Gemini Flash)',
+        provider: 'Second Brain Local Offline Synthesizer',
+        isFallback: true,
         grounded: false,
         citations: []
       };
@@ -474,7 +477,8 @@ export function HydratedComponent({ data }) {
       return {
         text: `### 🔄 Recursion in C++ Explained\n\n**Recursion** in C++ is a programming technique where a function calls itself directly or indirectly to break down a complex problem into smaller subproblems.\n\n#### 1. The Two Essential Components of Recursion\nEvery valid recursive function in C++ MUST contain:\n1. **Base Case:** The condition under which the function stops calling itself (prevents infinite loops).\n2. **Recursive Step:** The logic where the function calls itself with modified parameters moving closer to the base case.\n\n#### 2. C++ Code Example: Factorial Calculation\n\`\`\`cpp\n#include <iostream>\n\n// Recursive function to calculate factorial of n\nlong long factorial(int n) {\n    // Base Case: 0! = 1 and 1! = 1\n    if (n <= 1) {\n        return 1;\n    }\n    // Recursive Step: n! = n * (n - 1)!\n    return n * factorial(n - 1);\n}\n\nint main() {\n    int num = 5;\n    std::cout << "Factorial of " << num << " = " << factorial(num) << std::endl;\n    return 0;\n}\n\`\`\`\n\n#### 3. Execution Stack Trace for \`factorial(3)\`\n- \`factorial(3)\` calls \`3 * factorial(2)\`\n- \`factorial(2)\` calls \`2 * factorial(1)\`\n- \`factorial(1)\` hits **Base Case** $\\rightarrow$ returns \`1\`\n- Unwinding stack: \`2 * 1 = 2\` $\\rightarrow$ \`3 * 2 = 6\` (Final Output: \`6\`).\n\n#### 4. Time & Space Complexity\n- **Time Complexity:** $\\mathcal{O}(N)$ for $N$ recursive steps.\n- **Space Complexity:** $\\mathcal{O}(N)$ auxiliary stack space due to function call stack frames.`,
         thinkingProcess: ['Processed C++ recursion explanation request', 'Generated C++ code, base case breakdown, call stack trace, and complexity analysis'],
-        provider: 'Second Brain AI (Gemini Flash)',
+        provider: 'Second Brain Local Offline Synthesizer',
+        isFallback: true,
         grounded: false,
         citations: []
       };
@@ -485,7 +489,8 @@ export function HydratedComponent({ data }) {
       return {
         text: `### 🇯🇵 Capital of Japan\n\nThe capital of Japan is **Tokyo** (officially **Tokyo Metropolis**).\n\n#### Key Facts:\n- **Location:** Located on the eastern coast of Honshu, the main island of Japan.\n- **Population:** Over 14 million residents in the metropolis, and 37+ million in Greater Tokyo (the world's most populous urban agglomeration).\n- **History:** Formerly known as **Edo**, it became the official capital of Japan in **1868** when Emperor Meiji moved the imperial seat from Kyoto and renamed the city Tokyo ("Eastern Capital").`,
         thinkingProcess: ['Identified geography query for Japan capital', 'Synthesized direct factual answer for Tokyo'],
-        provider: 'Second Brain AI (Gemini Flash)',
+        provider: 'Second Brain Local Offline Synthesizer',
+        isFallback: true,
         grounded: false,
         citations: []
       };
@@ -496,7 +501,8 @@ export function HydratedComponent({ data }) {
       return {
         text: `### 🤖 Artificial Intelligence (AI) Overview\n\n**Artificial Intelligence (AI)** refers to the simulation of human intelligence in machines programmed to think, learn, reason, and solve problems.\n\n#### Core Pillars of AI:\n1. **Machine Learning (ML):** Algorithms that analyze data, identify patterns, and make predictions without explicit step-by-step programming.\n2. **Deep Learning (DL):** Multi-layered artificial neural networks inspired by the biological human brain, enabling computer vision, speech recognition, and LLMs.\n3. **Generative AI & LLMs:** Models trained on vast text/multimodal datasets to synthesize human-like text, code, images, and audio (e.g. Gemini, GPT-4).\n4. **Robotics & Autonomous Systems:** Physical and software agents designed to navigate and act within complex environments.\n\n#### Primary Applications:\n- **Healthcare & Drug Discovery:** Protein folding predictions, medical imaging diagnostics.\n- **Software Development:** Automated code generation, vulnerability scanning, personal knowledge agents.\n- **Finance & Logistics:** High-frequency trading, automated fraud prevention, supply chain optimization.`,
         thinkingProcess: ['Processed General AI definition prompt', 'Structured comprehensive Markdown breakdown of AI pillars and applications'],
-        provider: 'Second Brain AI (Gemini Flash)',
+        provider: 'Second Brain Local Offline Synthesizer',
+        isFallback: true,
         grounded: false,
         citations: []
       };
@@ -532,7 +538,8 @@ export function HydratedComponent({ data }) {
       return {
         text: `### 🌲 Binary Tree Data Structure Overview\n\nA **Binary Tree** is a non-linear hierarchical data structure where each node has at most **two children**, referred to as the **left child** and the **right child**.\n\n#### 1. Core Properties & Terms\n- **Root Node:** The topmost node in the tree.\n- **Leaf Node:** A node with no children (both left and right are \`null\`/\`None\`).\n- **Height:** The length of the longest path from the root to a leaf node.\n\n#### 2. Node Implementation in Python\n\`\`\`python\nclass TreeNode:\n    def __init__(self, value):\n        self.val = value\n        self.left = None\n        self.right = None\n\n# Constructing a simple tree\nroot = TreeNode(1)\nroot.left = TreeNode(2)\nroot.right = TreeNode(3)\n\`\`\`\n\n#### 3. Common Traversal Methods\n1. **In-Order (Left $\\rightarrow$ Root $\\rightarrow$ Right):** Produces sorted order for Binary Search Trees (BST).\n2. **Pre-Order (Root $\\rightarrow$ Left $\\rightarrow$ Right):** Useful for copying a tree.\n3. **Post-Order (Left $\\rightarrow$ Right $\\rightarrow$ Root):** Useful for node deletion.\n4. **Level-Order (BFS):** Traverses nodes level by level using a Queue.\n\n#### 4. Complexity\n- **Balanced BST Search/Insert/Delete:** $O(\\log N)$ time.\n- **Degenerate Tree:** $O(N)$ time.`,
         thinkingProcess: ['Identified Binary Tree data structure topic', 'Structured overview, code snippet, and traversal algorithms'],
-        provider: 'Second Brain AI (Gemini Flash)',
+        provider: 'Second Brain Local Offline Synthesizer',
+        isFallback: true,
         grounded: false,
         citations: []
       };
@@ -543,7 +550,8 @@ export function HydratedComponent({ data }) {
       return {
         text: `### ☕ Java Program for Factorial Calculation\n\nHere is a complete Java program demonstrating both **iterative** and **recursive** approaches to calculate the factorial ($N!$) of a number:\n\n\`\`\`java\npublic class FactorialCalculator {\n\n    // Method 1: Iterative Approach (O(N) time, O(1) space)\n    public static long calculateFactorialIterative(int n) {\n        if (n < 0) throw new IllegalArgumentException("Factorial is not defined for negative numbers.");\n        long factorial = 1;\n        for (int i = 1; i <= n; i++) {\n            factorial *= i;\n        }\n        return factorial;\n    }\n\n    // Method 2: Recursive Approach (O(N) time, O(N) stack space)\n    public static long calculateFactorialRecursive(int n) {\n        if (n < 0) throw new IllegalArgumentException("Factorial is not defined for negative numbers.");\n        if (n == 0 || n == 1) return 1;\n        return n * calculateFactorialRecursive(n - 1);\n    }\n\n    public static void main(String[] args) {\n        int number = 5;\n        System.out.println("Iterative Factorial of " + number + " = " + calculateFactorialIterative(number));\n        System.out.println("Recursive Factorial of " + number + " = " + calculateFactorialRecursive(number));\n    }\n}\n\`\`\`\n\n#### Output for $N = 5$:\n\`\`\`\nIterative Factorial of 5 = 120\nRecursive Factorial of 5 = 120\n\`\`\`\n\n#### Complexity Analysis:\n- **Iterative:** Time = $O(N)$, Space = $O(1)$.\n- **Recursive:** Time = $O(N)$, Auxiliary Stack Space = $O(N)$.`,
         thinkingProcess: ['Parsed Java Factorial programming query', 'Generated complete working Java code with iterative & recursive methods'],
-        provider: 'Second Brain AI (Gemini Flash)',
+        provider: 'Second Brain Local Offline Synthesizer',
+        isFallback: true,
         grounded: false,
         citations: []
       };
@@ -554,7 +562,8 @@ export function HydratedComponent({ data }) {
       return {
         text: `### 🌿 Photosynthesis Explained\n\n**Photosynthesis** is the biological process by which green plants, algae, and certain bacteria convert **light energy** into **chemical energy** (glucose), releasing oxygen as a byproduct.\n\n#### 1. The Chemical Equation\n$$\\text{6CO}_2 + \\text{6H}_2\\text{O} + \\text{Light Energy} \\xrightarrow{\\text{Chlorophyll}} \\text{C}_6\\text{H}_{12}\\text{O}_6 + \\text{6O}_2$$\n\n#### 2. Two Main Stages\n1. **Light-Dependent Reactions (Thylakoid membranes):** Sunlight splits Water ($\\text{H}_2\\text{O}$), generating ATP, NADPH, and releasing Oxygen ($\\text{O}_2$).\n2. **Calvin Cycle (Stroma):** Uses ATP and NADPH to convert Carbon Dioxide ($\\text{CO}_2$) into Glucose.`,
         thinkingProcess: ['Identified Photosynthesis biological process query', 'Structured chemical equation and reaction stages'],
-        provider: 'Second Brain AI (Gemini Flash)',
+        provider: 'Second Brain Local Offline Synthesizer',
+        isFallback: true,
         grounded: false,
         citations: []
       };
@@ -565,7 +574,8 @@ export function HydratedComponent({ data }) {
       return {
         text: `### 🔢 Arithmetic Solution\n\n$$\\mathbf{25 \\times 37 = 925}$$\n\n#### Step-by-Step Breakdown:\n$$25 \\times 37 = 25 \\times (30 + 7)$$\n$$= (25 \\times 30) + (25 \\times 7)$$\n$$= 750 + 175 = \\mathbf{925}$$`,
         thinkingProcess: ['Parsed arithmetic calculation 25 x 37', 'Calculated result 925 with step-by-step distributive expansion'],
-        provider: 'Second Brain AI (Gemini Flash)',
+        provider: 'Second Brain Local Offline Synthesizer',
+        isFallback: true,
         grounded: false,
         citations: []
       };
@@ -576,7 +586,8 @@ export function HydratedComponent({ data }) {
       return {
         text: `### 📊 MongoDB vs PostgreSQL Comparison\n\n| Feature | MongoDB (NoSQL) | PostgreSQL (Relational SQL) |\n| :--- | :--- | :--- |\n| **Data Model** | Document (JSON / BSON) | Relational Tables (Rows & Columns) |\n| **Schema** | Dynamic / Flexible | Rigid / Strictly Enforced |\n| **Transactions** | Multi-document ACID | Full ACID compliant by design |\n| **Scaling** | Native Horizontal Sharding | Primary Vertical Scaling; Read Replicas |\n\n#### Recommendations:\n- **MongoDB:** Ideal for unstructured JSON APIs and dynamic document structures.\n- **PostgreSQL:** Ideal for complex relational data, financial integrity, and strict ACID guarantees.`,
         thinkingProcess: ['Identified database comparison topic: MongoDB vs PostgreSQL', 'Structured comparative Markdown table'],
-        provider: 'Second Brain AI (Gemini Flash)',
+        provider: 'Second Brain Local Offline Synthesizer',
+        isFallback: true,
         grounded: false,
         citations: []
       };
@@ -611,7 +622,8 @@ export function HydratedComponent({ data }) {
     return {
       text: output,
       thinkingProcess: [`Processed intent for "${cleanPrompt.substring(0, 30)}..."`, 'Synthesized structured Markdown output'],
-      provider: `Second Brain AI (Gemini Flash)`,
+      provider: 'Second Brain Local Offline Synthesizer',
+      isFallback: true,
       grounded: !!ragContext,
       citations: []
     };
