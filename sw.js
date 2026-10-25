@@ -1,6 +1,7 @@
 /* Second Brain AI System — Service Worker for Offline PWA Support */
 
 const CACHE_NAME = 'second-brain-cache-v73.0';
+const CACHE_PREFIX = 'second-brain-cache-';
 
 const KATEX_FONTS = [
   './vendor/katex/fonts/KaTeX_AMS-Regular.ttf',
@@ -119,7 +120,11 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then((cacheNames) => Promise.all(cacheNames.map((cache) => cache !== CACHE_NAME ? caches.delete(cache) : undefined)))
+      .then((cacheNames) => Promise.all(
+        cacheNames
+          .filter((cache) => (cache.startsWith(CACHE_PREFIX) || cache.startsWith('milo-')) && cache !== CACHE_NAME)
+          .map((cache) => caches.delete(cache))
+      ))
       .then(() => self.clients.claim())
   );
 });
