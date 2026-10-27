@@ -3246,14 +3246,17 @@
 
     if (exportVaultBtn) {
       exportVaultBtn.addEventListener('click', () => {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(Store.getNotes(), null, 2));
+        const jsonPayload = (typeof Store.exportVaultJSON === 'function')
+          ? Store.exportVaultJSON()
+          : JSON.stringify(Store.getNotes(), null, 2);
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonPayload);
         const dlAnchor = document.createElement('a');
         dlAnchor.setAttribute("href", dataStr);
         dlAnchor.setAttribute("download", `second_brain_vault_${Date.now()}.json`);
         document.body.appendChild(dlAnchor);
         dlAnchor.click();
         dlAnchor.remove();
-        showToast('Vault exported as JSON.');
+        showToast('Vault exported as JSON backup.');
       });
     }
 
@@ -3264,12 +3267,29 @@
           const reader = new FileReader();
           reader.onload = (event) => {
             try {
-              const importedNotes = JSON.parse(event.target.result);
-              if (Array.isArray(importedNotes)) {
+              const raw = event.target.result;
+              if (typeof Store.restoreVaultBackup === 'function') {
+                const res = Store.restoreVaultBackup(raw);
+                if (res.success) {
+                  showToast(`Restored vault backup (${res.count} notes) successfully.`);
+                  refreshAllViews();
+                  return;
+                }
+              }
+              const parsed = JSON.parse(raw);
+              let importedNotes = null;
+              if (Array.isArray(parsed)) {
+                importedNotes = parsed;
+              } else if (parsed && Array.isArray(parsed.notes)) {
+                importedNotes = parsed.notes;
+              }
+              if (importedNotes) {
                 Store.notes = importedNotes;
                 Store.saveNotes();
                 showToast(`Imported ${importedNotes.length} notes successfully.`);
                 refreshAllViews();
+              } else {
+                showToast('Invalid JSON vault file: no notes found.');
               }
             } catch (err) {
               showToast('Invalid JSON vault file.');

@@ -4,24 +4,34 @@
 **Target Repository:** `AnkitaPriyadarshini-repos/Second-Brain-AI-System`  
 **Certification Branch:** `audit/milo-100-user-certification`  
 **Base Commit:** `e1941873ededd3b8bf3f92cd278d74cc9184ec79`  
-**Second Pass Reported HEAD:** `0f5415e`  
-**Pass 2 Audit Date:** 2026-10-27 / 2026-10-28  
+**Audit Baseline Commit:** `10adc59`  
+**Audit Date:** 2026-10-28  
 **Audience:** Project Owner, Engineering Leads, Deployment Operators, SRE
 
 ---
 
-## 1. Executive Certification Decision & Release Gate Verdicts
+## 1. Executive Certification Decision & Decision Matrix
 
-The second certification pass against `audit/milo-100-user-certification` has validated the core backend engine, hardened cryptographic session token handling, implemented persistent PostgreSQL vault storage, built distributed REST pipeline rate limiting with graceful local degradation, and established bounded smoke tests for upstream Gemini APIs.
+The final blocker audit against `audit/milo-100-user-certification` has validated the core backend engine, verified client-first note persistence in browser local storage with 100% fidelity export/import, confirmed stateless Vercel serverless compatibility, and established clear operational boundaries for the pilot.
 
-The release verdict for each deployment target is classified below using official certification standards (**VERIFIED**, **VERIFIED WITH LIMITATIONS**, **NOT VERIFIED**, **FAILED**, **BLOCKED**):
+### Standardized Decision Matrix
 
-| Deployment Target | Target Audience & Concurrency | Release Gate Verdict | Operating Conditions & Limitations |
-| :--- | :--- | :--- | :--- |
-| **Target A** | Internal Testing (1–5 users) | **VERIFIED** | Ready for immediate dogfooding. Requires `MILO_SESSION_SECRET` (>= 32 chars) and `GEMINI_API_KEY` in environment. Hermetic tests pass 100%. |
-| **Target B** | Invited Pilot (10–25 users) | **VERIFIED WITH LIMITATIONS** | Safe to launch once `MILO_SESSION_SECRET` is set in Vercel. Upstream Free Tier Gemini is capped at 15 RPM (~2–3 concurrent prompt queries); pilot users must be staggered or Gemini Tier 1 Pay-as-you-go enabled. |
-| **Target C** | 100 Concurrent Application-Core Users | **VERIFIED WITH LIMITATIONS** | Core Node.js engine benchmarked at **703.2 RPS** sustained at **100–150 concurrency** with 0 errors. Certified for single-process Node.js or when PostgreSQL and Upstash KV are attached. Does NOT certify ephemeral serverless state without databases. |
-| **Target D** | 100 Concurrent Live End-to-End Users | **BLOCKED** | **Blocked pending cloud provisioning.** Live upstream Gemini (100 concurrency requires Tier 1 quota >= 1,000 RPM), shared Upstash Redis/KV, and live PostgreSQL (`DATABASE_URL`) credentials must be provisioned and authorized by the operator. Mocked load tests do not prove live cloud capacity. |
+| Area | Status | Evidence | Required Action |
+| :--- | :---: | :--- | :--- |
+| **Authentication and session security** | **PASS** | 32-character policy, fail-closed semantics, constant-time `timingSafeEqual`. | Operator must set `MILO_SESSION_SECRET` in Vercel. |
+| **Browser-local note persistence** | **PASS** | `test:client-storage` verified local note creation, pinning, search, and reload survival. | Local-first privacy notice active in `index.html`. |
+| **Backup and recovery** | **PASS** | `Store.exportVaultJSON()` and `Store.restoreVaultBackup()` verified with 100% fidelity. | Tested in `run_client_storage_and_recovery_tests.js`. |
+| **Multi-user data isolation** | **PASS** | Browser origin sandbox guarantees client vault isolation. PostgreSQL composite key `(user_id, id)` verified. | None. Fully verified. |
+| **Gemini connectivity** | **BLOCKED (LIVE) / PASS (LOCAL)** | Fallback models and 429 quota handling verified locally. Live call blocked without key. | Operator must set `GEMINI_API_KEY` and run smoke test. |
+| **Vercel route compatibility** | **PASS** | Stateless routes (`/api/ai/gateway`, `/api/ingest/url`, `/api/media/image`) verified compatible. | None. Verified. |
+| **WebSocket/chat functionality** | **NOT APPLICABLE (PILOT)** | Primary chat uses HTTP `fetch('/api/ai/gateway')`. WebSockets are local-only. | Exclude WebSockets from Vercel pilot scope. |
+| **Video job persistence** | **BLOCKED (MULTI-CONTAINER)** | Relies on ephemeral `/tmp/milo_jobs`. Multi-container polling will 404. | Mark video generation as experimental / local. |
+| **PostgreSQL, if required** | **NOT APPLICABLE (PILOT) / BLOCKED (100-USER)** | Client-first pilot does not require server database. Tested in mock harness. | Attach managed database (`DATABASE_URL`) for 100-user scale. |
+| **Redis rate limiting, if required** | **NOT APPLICABLE (PILOT) / BLOCKED (100-USER)** | Outage fail-safe clamps to 5 req/min in memory. Multi-process sync verified in mock harness. | Attach Upstash Redis (`UPSTASH_REDIS_REST_URL`) for 100-user scale. |
+| **Preview deployment** | **UNVERIFIED** | Local tests pass 100%. Vercel cloud settings cannot be read from local shell. | Operator must verify Preview deployment URL. |
+| **10–25-user pilot** | **CONDITIONAL GO** | 10–25 users safely run client PKM and AI Gateway within Vercel execution bounds. | Configure `MILO_SESSION_SECRET` and `GEMINI_API_KEY` in Vercel. |
+| **100-user live capacity** | **BLOCKED** | Mock benchmark sustained 703 RPS. Real cloud staging infrastructure not provisioned. | Provision PostgreSQL, Upstash Redis, and Gemini Tier 1 Paid Quota. |
+
 
 ---
 
