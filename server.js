@@ -25,9 +25,22 @@ const shareController = new ShareControllerClass();
 const dev = process.env.NODE_ENV !== 'production';
 const PORT = process.env.PORT || 3000;
 
-const nextApp = next({ dev, dir: __dirname });
-const handle = nextApp.getRequestHandler();
-const activeUsers = new Map();
+// Validate required security configuration during production startup
+if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+  const sessionSecret = (
+    process.env.MILO_SESSION_SECRET ||
+    process.env.SESSION_SECRET ||
+    process.env.JUNO_SESSION_SECRET ||
+    ''
+  ).trim();
+
+  if (!sessionSecret || sessionSecret.length < 32) {
+    console.error('🛑 CRITICAL_STARTUP_FAILURE: MILO_SESSION_SECRET must be configured with at least 32 characters in production.');
+    if (!process.env.VERCEL) {
+      process.exit(1);
+    }
+  }
+}
 
 nextApp.prepare().then(() => {
   const app = express();

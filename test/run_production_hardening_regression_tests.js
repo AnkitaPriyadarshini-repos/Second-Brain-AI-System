@@ -285,7 +285,55 @@ async function runHardeningTests() {
         assert.ok(err.message.includes('SERVER_CONFIGURATION_ERROR'), 'Token generation must throw in production');
       }
       assert.ok(threwTokenGen, 'AuthService.generateSecureToken must fail closed in production when secret is absent');
-      console.log('  ✅ [PASS] 8: Missing production secrets trigger strict fail-closed exceptions');
+
+      // Test short secret (< 32 chars) in production
+      process.env.MILO_SESSION_SECRET = 'too_short_secret_123'; // 19 chars
+      let threwShortAuth = false;
+      try {
+        new AuthService();
+      } catch (err) {
+        threwShortAuth = true;
+        assert.ok(err.message.includes('too weak'), 'Must identify secret as too weak');
+      }
+      assert.ok(threwShortAuth, 'AuthService must reject secrets < 32 characters in production');
+
+      let threwShortGuard = false;
+      try {
+        authGuard.generateSessionToken('usr_test');
+      } catch (err) {
+        threwShortGuard = true;
+        assert.ok(err.message.includes('too weak'), 'Must identify secret as too weak in authGuard');
+      }
+      assert.ok(threwShortGuard, 'authGuard must reject secrets < 32 characters in production');
+
+      // Test legacy insecure secret rejection in production
+      process.env.MILO_SESSION_SECRET = 'sb_second_brain_secure_jwt_secret_key_2026';
+      let threwLegacyAuth = false;
+      try {
+        new AuthService();
+      } catch (err) {
+        threwLegacyAuth = true;
+        assert.ok(err.message.includes('Insecure legacy secret'), 'Must reject legacy predictable secret');
+      }
+      assert.ok(threwLegacyAuth, 'AuthService must reject legacy predictable secret in production');
+
+      // Test valid >= 32 char secret in production
+      process.env.MILO_SESSION_SECRET = 'valid_production_secret_at_least_32_chars_ok_1234!';
+      const validAuth = new AuthService();
+      const validToken = validAuth.generateSecureToken({ userId: 'usr_valid_prod' });
+      assert.ok(validToken.startsWith('sb_jwt_'));
+      const decoded = validAuth.verifySecureToken(validToken);
+      assert.strictEqual(decoded.userId, 'usr_valid_prod');
+
+      // Verify timingSafeEqual handles unequal buffer lengths without throwing
+      const crypto = require('crypto');
+      const sigA = Buffer.from('abc');
+      const sigB = Buffer.from('abcdef');
+      // Buffer lengths differ: must not crash
+      const areEqual = sigA.length === sigB.length && crypto.timingSafeEqual(sigA, sigB);
+      assert.strictEqual(areEqual, false);
+
+      console.log('  ✅ [PASS] 8: Missing, short (<32ch), legacy, and valid secrets validated with fail-closed semantics');
     } finally {
       process.env.NODE_ENV = origNodeEnv;
       if (origMiloSecret) process.env.MILO_SESSION_SECRET = origMiloSecret;

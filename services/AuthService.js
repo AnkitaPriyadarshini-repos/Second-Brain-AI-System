@@ -9,7 +9,7 @@ const DatabaseService = require('./DatabaseService');
 class AuthService {
   constructor(dbInstance) {
     this.db = dbInstance || DatabaseService.dbInstance || new DatabaseService();
-    this.otpStore = new Map();
+    this.MIN_SECRET_LENGTH = 32;
     this.LEGACY_INSECURE_SECRET = 'sb_second_brain_secure_jwt_secret_key_2026';
     
     // Resolve approved session/jwt secret with fail-closed semantics in production
@@ -20,13 +20,23 @@ class AuthService {
       ''
     ).trim();
 
-    if (envSecret.length >= 16) {
+    if (envSecret === this.LEGACY_INSECURE_SECRET || envSecret === 'milo_production_hardening_secret_fallback_2026') {
+      if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+        throw new Error('SERVER_CONFIGURATION_ERROR: Insecure legacy secret detected. Production policy requires a unique 32+ character random secret.');
+      }
+      this.JWT_SECRET = '';
+    } else if (envSecret.length >= this.MIN_SECRET_LENGTH) {
       this.JWT_SECRET = envSecret;
+    } else if (envSecret.length > 0 && envSecret.length < this.MIN_SECRET_LENGTH) {
+      if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+        throw new Error(`SERVER_CONFIGURATION_ERROR: Session secret is too weak (${envSecret.length} chars). Production policy requires at least 32 characters of high-entropy secret material.`);
+      }
+      this.JWT_SECRET = '';
     } else if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
       // In local dev and tests, use a safe non-empty development secret so local unit tests & local dev work cleanly
       this.JWT_SECRET = 'sb_dev_jwt_secret_32bytes_value_2026!';
     } else {
-      // In production (or Vercel), fail closed if secret is missing or under 16 characters
+      // In production (or Vercel), fail closed if secret is missing
       this.JWT_SECRET = '';
     }
 
@@ -100,7 +110,7 @@ class AuthService {
 
       const bufA = Buffer.from(signature);
       const bufB = Buffer.from(expectedSig);
-      if (!crypto.timingSafeEqual(bufA, bufB)) {
+      if (bufA.length !== bufB.length || !crypto.timingSafeEqual(bufA, bufB)) {
         return null; // Tampered or forged signature
       }
 

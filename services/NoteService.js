@@ -15,20 +15,21 @@
       return this.container.resolve('NoteRepository');
     }
 
-    getAllNotes() {
-      return this.repository.getAll();
+    getAllNotes(userId) {
+      return this.repository.getAll(userId);
     }
 
-    getNoteById(id) {
+    getNoteById(id, userId) {
       if (!id) throw new Error('Note ID is required');
-      return this.repository.getById(id);
+      return this.repository.getById(id, userId);
     }
 
-    createNote(noteDto) {
+    createNote(noteDto, userId) {
       if (!noteDto || !noteDto.content) {
         throw new Error('Note content cannot be empty');
       }
 
+      const cleanUserId = userId || noteDto.userId || noteDto.user_id || 'usr_default';
       const title = noteDto.title || 'Untitled Note';
       const content = noteDto.content;
       const sourceType = noteDto.sourceType || 'typing';
@@ -44,6 +45,8 @@
 
       const newNote = {
         id: noteDto.id || `note-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        userId: cleanUserId,
+        user_id: cleanUserId,
         title,
         content,
         summary,
@@ -52,27 +55,27 @@
         dateStr,
         tags,
         entities,
-        pinned: false,
-        createdAt: Date.now(),
+        pinned: Boolean(noteDto.pinned),
+        createdAt: noteDto.createdAt || Date.now(),
         updatedAt: Date.now()
       };
 
-      return this.repository.save(newNote);
+      return this.repository.save(newNote, cleanUserId);
     }
 
-    searchNotes(query) {
-      if (!query || typeof query !== 'string') return this.getAllNotes();
-      return this.repository.search(query.trim());
+    searchNotes(query, userId) {
+      if (!query || typeof query !== 'string') return this.getAllNotes(userId);
+      return this.repository.search(query.trim(), userId);
     }
 
-    togglePin(id) {
+    togglePin(id, userId) {
       if (!id) throw new Error('Note ID is required to toggle pin state');
-      return this.repository.togglePin(id);
+      return this.repository.togglePin(id, userId);
     }
 
-    deleteNote(id) {
+    deleteNote(id, userId) {
       if (!id) throw new Error('Note ID is required to delete note');
-      return this.repository.delete(id);
+      return this.repository.delete(id, userId);
     }
   }
 

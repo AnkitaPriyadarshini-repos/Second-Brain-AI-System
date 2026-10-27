@@ -14,6 +14,10 @@
 
 const crypto = require('crypto');
 
+const MIN_SECRET_LENGTH = 32;
+const LEGACY_KNOWN_FALLBACK = 'milo_production_hardening_secret_fallback_2026';
+const LEGACY_KNOWN_JWT_FALLBACK = 'sb_second_brain_secure_jwt_secret_key_2026';
+
 // Approved server-side environment variables for session signing
 function getConfiguredSecret() {
   const secret = (
@@ -23,8 +27,21 @@ function getConfiguredSecret() {
     ''
   ).trim();
 
-  if (secret.length >= 16) {
+  if (secret === LEGACY_KNOWN_FALLBACK || secret === LEGACY_KNOWN_JWT_FALLBACK) {
+    if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+      throw new Error('SERVER_CONFIGURATION_ERROR: Insecure legacy secret detected. Production policy requires a unique 32+ character random secret.');
+    }
+    return '';
+  }
+
+  if (secret.length >= MIN_SECRET_LENGTH) {
     return secret;
+  }
+
+  if (secret.length > 0 && secret.length < MIN_SECRET_LENGTH) {
+    if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+      throw new Error(`SERVER_CONFIGURATION_ERROR: Session secret is too weak (${secret.length} characters). Production policy requires at least 32 characters.`);
+    }
   }
 
   // In hermetic test runners (NODE_ENV=test), provide a deterministic test secret so tests run cleanly
@@ -35,7 +52,6 @@ function getConfiguredSecret() {
   return '';
 }
 
-const LEGACY_KNOWN_FALLBACK = 'milo_production_hardening_secret_fallback_2026';
 const GUEST_TTL_MS = 1000 * 60 * 60 * 24; // 24 hours
 const USER_TTL_MS = 1000 * 60 * 60 * 24 * 14; // 14 days
 
@@ -43,8 +59,12 @@ const USER_TTL_MS = 1000 * 60 * 60 * 24 * 14; // 14 days
  * Returns whether an approved server-side session secret is configured.
  */
 function isSecretConfigured() {
-  const secret = getConfiguredSecret();
-  return typeof secret === 'string' && secret.length >= 16;
+  try {
+    const secret = getConfiguredSecret();
+    return typeof secret === 'string' && secret.length >= MIN_SECRET_LENGTH;
+  } catch (_) {
+    return false;
+  }
 }
 
 /**
@@ -147,7 +167,7 @@ function verifySessionToken(token) {
   // Use timing-safe comparison to prevent side-channel timing attacks
   const bufA = Buffer.from(signature);
   const bufB = Buffer.from(expectedSig);
-  if (!crypto.timingSafeEqual(bufA, bufB)) {
+  if (bufA.length !== bufB.length || !crypto.timingSafeEqual(bufA, bufB)) {
     return null; // Tampered or forged token
   }
 

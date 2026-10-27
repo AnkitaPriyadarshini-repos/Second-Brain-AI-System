@@ -1,4 +1,12 @@
 import authGuard from '../auth-guard.js';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+let distributedLimiter = null;
+try {
+  const DistributedRateLimiter = require('../../services/DistributedRateLimiter');
+  distributedLimiter = DistributedRateLimiter.rateLimiter || new DistributedRateLimiter();
+} catch (_) {}
 
 const PRIMARY_MODEL = 'gemini-3.8-flash';
 const FAST_MODEL = 'gemini-3.5-flash-lite';
@@ -511,16 +519,22 @@ export default async function handler(req, res) {
   cleanupCaches();
   const maxLimit = clientIdentity.isGuest ? GUEST_RATE_LIMIT : AUTH_RATE_LIMIT;
   const rateLimitKey = `${clientIdentity.id}:${clientIdentity.ip}`;
-  const limit = checkRateLimit(rateLimitKey, maxLimit);
+  const limit = (distributedLimiter && distributedLimiter.isDistributedConfigured())
+    ? await distributedLimiter.checkLimit(rateLimitKey, maxLimit)
+    : checkRateLimit(rateLimitKey, maxLimit);
 
   res.setHeader('X-RateLimit-Limit', String(maxLimit));
   res.setHeader('X-RateLimit-Remaining', String(limit.remaining));
   res.setHeader('X-RateLimit-Reset', String(limit.resetSeconds));
+  if (limit.distributed) res.setHeader('X-RateLimit-Mode', 'distributed');
+  if (limit.degraded) res.setHeader('X-RateLimit-Degraded', 'true');
 
   if (!limit.allowed) {
+    res.setHeader('Retry-After', String(limit.resetSeconds));
     return res.status(429).json({
       success: false,
       error: 'Milo is receiving a lot of requests right now. Please try again in a minute.',
+      retryAfterSeconds: limit.resetSeconds,
       requestId
     });
   }

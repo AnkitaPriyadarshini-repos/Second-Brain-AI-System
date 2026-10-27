@@ -150,6 +150,43 @@ const prodProc = spawnSync(process.execPath, [
 assert.strictEqual(prodProc.status, 0, `Unconfigured production check failed with code ${prodProc.status}: ${prodProc.stderr}`);
 console.log('  ✅ [PASS] Production environment fails closed safely without crashing when secret is unconfigured');
 
+// Suite 4B: Rejection of Short (<32 Chars) and Legacy Secrets in Production
+console.log('\nSuite 4B: Rejection of Short Secrets and Insecure Legacy Secrets');
+const shortSecretProc = spawnSync(process.execPath, [
+  '-e',
+  `
+  process.env.MILO_SESSION_SECRET = 'short_secret_under_32_chars!';
+  process.env.NODE_ENV = 'production';
+  process.env.VERCEL = '1';
+
+  const ag = require('./api/auth-guard');
+  if (ag.isSecretConfigured()) process.exit(10);
+
+  let rejectedShort = false;
+  try {
+    ag.generateSessionToken('user_y');
+  } catch (err) {
+    rejectedShort = err.message.includes('too weak');
+  }
+  if (!rejectedShort) process.exit(20);
+
+  // Test legacy fallback secret in production
+  process.env.MILO_SESSION_SECRET = 'milo_production_hardening_secret_fallback_2026';
+  let rejectedLegacy = false;
+  try {
+    ag.generateSessionToken('user_z');
+  } catch (err) {
+    rejectedLegacy = err.message.includes('Insecure legacy secret');
+  }
+  if (!rejectedLegacy) process.exit(30);
+
+  process.exit(0);
+  `
+], { cwd: path.join(__dirname, '..'), encoding: 'utf8' });
+
+assert.strictEqual(shortSecretProc.status, 0, `Short/legacy secret check failed with code ${shortSecretProc.status}: ${shortSecretProc.stderr}`);
+console.log('  ✅ [PASS] Short (<32 chars) and legacy fallback secrets strictly rejected with fail-closed exceptions');
+
 // Suite 5: Anti-Spoofing & Platform-Verified IP Extraction
 console.log('\nSuite 5: Anti-Spoofing & Platform-Verified IP Extraction');
 const spoofReq = {

@@ -26,6 +26,11 @@
     "test:rag": "node test/run_rag_system_tests.js",
     "test:audit": "node test/run_production_audit_tests.js",
     "test:workspace": "node test/run_media_coding_agent_tests.js",
+    "test:hardening": "node test/run_production_hardening_regression_tests.js",
+    "test:persistence": "node test/run_postgres_and_persistence_tests.js",
+    "test:distributed": "node test/run_distributed_rate_limiting_tests.js",
+    "test:gemini": "node test/real_gemini_smoke_test.js",
+    "test:all": "npm test && node test/run_production_hardening_regression_tests.js && node test/run_postgres_and_persistence_tests.js && node test/run_distributed_rate_limiting_tests.js && node test/real_gemini_smoke_test.js",
     "test:load": "node test/load_test_100_users.js"
   },
   "dependencies": {
