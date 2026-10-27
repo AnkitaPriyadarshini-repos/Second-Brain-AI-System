@@ -465,7 +465,8 @@ async function callGemini({ model, systemPrompt, contents, thinkingLevel = 'low'
     const data = await response.json().catch(() => ({}));
     return { response, data, resolvedModel };
   } catch (error) {
-    console.error('[milo/gateway]', requestId, error?.name || error?.message || error);
+    const safeErrorMsg = String(error?.name || error?.message || error).replace(/AIza[0-9A-Za-z-_]{35}/g, '[REDACTED]').replace(/[A-Za-z0-9_-]{35,}/g, '[REDACTED]');
+    console.error('[milo/gateway]', requestId, safeErrorMsg);
     throw error;
   } finally {
     clearTimeout(timeout);
@@ -632,6 +633,14 @@ export default async function handler(req, res) {
     const resolvedInitial = resolveUpstreamModel(initialModel);
     attemptedResolvedModels.add(resolvedInitial);
 
+function redactSecrets(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/AIza[0-9A-Za-z-_]{15,}/g, '[REDACTED]')
+    .replace(/(?:key|secret|token|password)=[^&\s]+/gi, '$1=[REDACTED]')
+    .replace(/[A-Za-z0-9_-]{28,}/g, '[REDACTED]');
+}
+
     let thinkingLevel = route.thinkingLevel;
     const modelAttempts = [];
     const recordAttempt = (res) => {
@@ -639,7 +648,7 @@ export default async function handler(req, res) {
       modelAttempts.push({
         model: res.resolvedModel,
         status: res.response?.status,
-        message: res.data?.error?.message ? String(res.data.error.message).replace(/[A-Za-z0-9_-]{35,}/g, '[REDACTED]') : null
+        message: res.data?.error?.message ? redactSecrets(res.data.error.message) : null
       });
     };
 
@@ -752,15 +761,16 @@ export default async function handler(req, res) {
         }
       }
 
-      const providerMessage = data?.error?.message || `Gemini returned HTTP ${lastStatus}`;
-      console.error('[milo/gateway]', requestId, lastStatus, providerMessage);
+      const rawProviderMessage = data?.error?.message || `Gemini returned HTTP ${lastStatus}`;
+      const safeProviderMessage = redactSecrets(rawProviderMessage);
+      console.error('[milo/gateway]', requestId, lastStatus, safeProviderMessage);
       return res.status(lastStatus === 429 ? 429 : 502).json({
         success: false,
         error: lastStatus === 429
           ? 'The AI service is temporarily busy. Please try again in a moment.'
           : 'The AI service could not complete this request. Please try again.',
         providerStatus: lastStatus,
-        providerMessage: data?.error?.message ? String(data.error.message).replace(/[A-Za-z0-9_-]{35,}/g, '[REDACTED]') : null,
+        providerMessage: data?.error?.message ? redactSecrets(data.error.message) : null,
         modelAttempts,
         requestId
       });

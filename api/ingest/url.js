@@ -113,8 +113,14 @@ function extractArticleFromHTML(html) {
   };
 }
 
-function fetchSafeUrl(targetUrl) {
+const MAX_REDIRECTS = 5;
+
+function fetchSafeUrl(targetUrl, redirectCount = 0) {
   return new Promise((resolve, reject) => {
+    if (redirectCount > MAX_REDIRECTS) {
+      return reject(new Error('Exceeded maximum allowable redirect limit (5).'));
+    }
+
     let parsedUrl;
     try {
       parsedUrl = new URL(targetUrl);
@@ -148,7 +154,7 @@ function fetchSafeUrl(targetUrl) {
             if (isDangerousDestination(redirectUrl.hostname)) {
               return reject(new Error('Redirect destination is a forbidden private address.'));
             }
-            return resolve(fetchSafeUrl(redirectUrl.href));
+            return resolve(fetchSafeUrl(redirectUrl.href, redirectCount + 1));
           } catch (e) {
             return reject(new Error('Failed to resolve redirect destination.'));
           }

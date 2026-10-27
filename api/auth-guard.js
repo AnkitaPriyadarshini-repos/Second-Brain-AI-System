@@ -292,5 +292,6 @@ module.exports = {
   assertOwnership,
   assertAuthenticatedUser,
   checkRateLimit,
-  isSecretConfigured
+  isSecretConfigured,
+  signString
 };
