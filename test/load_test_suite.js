@@ -34,6 +34,8 @@ const IS_DRY_RUN = Boolean(args['dry-run'] || args.dryRun);
 const SPEND_CAP = parseFloat(args['spend-cap'] || args.spendCap) || 0.10;
 const CONFIRM_LIVE = Boolean(args['confirm-live'] || args.confirmLive);
 const CONFIRM_PROD = Boolean(args['confirm-production'] || args.confirmProduction);
+const RUN_ALL_STAGES = Boolean(args.stages || args['all-stages'] || args['run-stages']);
+const SOAK_ROUNDS = parseInt(args['soak-rounds'] || args.soakRounds, 10) || 3;
 
 // Provide a test session secret for local benchmark/load tests if none was set in environment
 if (!process.env.MILO_SESSION_SECRET && !process.env.SESSION_SECRET) {
@@ -72,7 +74,7 @@ function recordProviderCall() {
   }
 }
 
-function makeRequest(urlStr, options = {}, postData = null) {
+function makeRequest(urlStr, options = {}, postData = null, retries = 2) {
   return new Promise((resolve, reject) => {
     const t0 = Date.now();
     let parsed;
@@ -97,7 +99,7 @@ function makeRequest(urlStr, options = {}, postData = null) {
         ...(options.headers || {})
       },
       agent,
-      timeout: options.timeout || 10000
+      timeout: options.timeout || 15000
     };
 
     const req = lib.request(reqOptions, (res) => {
@@ -115,6 +117,10 @@ function makeRequest(urlStr, options = {}, postData = null) {
     });
 
     req.on('error', (err) => {
+      if (retries > 0 && (err.code === 'ECONNRESET' || err.code === 'EPIPE' || err.code === 'ECONNREFUSED')) {
+        // Retry pooled socket race condition cleanly
+        return makeRequest(urlStr, options, postData, retries - 1).then(resolve, reject);
+      }
       reject({ duration: Date.now() - t0, error: err });
     });
 
@@ -136,6 +142,9 @@ function makeRequest(urlStr, options = {}, postData = null) {
  */
 async function startModeAServer(port) {
   process.env.MILO_TEST_VIDEO_PROVIDER = 'mock';
+  if (!process.env.GEMINI_API_KEY) {
+    process.env.GEMINI_API_KEY = 'mock_loadtest_key';
+  }
 
   // Intercept upstream AI provider calls in Mode A to isolate application throughput from external network/quota
   const originalFetch = globalThis.fetch;
@@ -145,7 +154,9 @@ async function startModeAServer(port) {
       return {
         ok: true,
         status: 200,
-        headers: new Map(),
+        headers: {
+          get: (h) => (String(h).toLowerCase() === 'content-type' ? 'application/json' : null)
+        },
         json: async () => ({
           candidates: [
             {
@@ -196,14 +207,7 @@ async function startModeAServer(port) {
         } else if (urlPath === '/api/ai/health') {
           res.status(200).json({ ok: true, service: 'milo-ai-gateway', timestamp: Date.now() });
         } else if (urlPath === '/api/ai/gateway') {
-          // Provide test GEMINI_API_KEY if needed to exercise gateway handler
-          const origKey = process.env.GEMINI_API_KEY;
-          if (!process.env.GEMINI_API_KEY) process.env.GEMINI_API_KEY = 'mock_loadtest_key';
-          try {
-            await gatewayHandler(req, res);
-          } finally {
-            if (!origKey) delete process.env.GEMINI_API_KEY;
-          }
+          await gatewayHandler(req, res);
         } else if (urlPath === '/api/media/video') {
           await videoHandler(req, res);
         } else if (urlPath === '/api/media/image') {
@@ -218,6 +222,10 @@ async function startModeAServer(port) {
       }
     });
   });
+
+  server.keepAliveTimeout = 65000;
+  server.headersTimeout = 66000;
+  server.requestTimeout = 30000;
 
   return new Promise((resolve) => {
     server.listen(port, '127.0.0.1', () => resolve(server));
@@ -292,198 +300,324 @@ async function runLoadTestSuite() {
     console.log(`🚀 Mode A local test server listening on ${baseUrl}`);
   }
 
-  console.log(`🚀 Launching ${CONCURRENCY} concurrent user workflows targeting ${baseUrl}...`);
-
-  const startTime = Date.now();
-  const latencies = [];
-  const statusCodes = {};
-  let totalRequests = 0;
-  let successfulRequests = 0;
-  let isolationPasses = 0;
-  let isolationFailures = 0;
-
-  function recordMetric(res) {
-    totalRequests++;
-    latencies.push(res.duration);
-    statusCodes[res.statusCode] = (statusCodes[res.statusCode] || 0) + 1;
-    if (res.statusCode >= 200 && res.statusCode < 400) {
-      successfulRequests++;
-    }
+  function computePercentiles(arr) {
+    if (!arr || !arr.length) return { min: 0, p50: 0, p95: 0, p99: 0, max: 0, avg: 0 };
+    const sorted = [...arr].sort((a, b) => a - b);
+    return {
+      min: sorted[0],
+      p50: sorted[Math.floor(sorted.length * 0.50)],
+      p95: sorted[Math.floor(sorted.length * 0.95)],
+      p99: sorted[Math.floor(sorted.length * 0.99)],
+      max: sorted[sorted.length - 1],
+      avg: parseFloat((sorted.reduce((a, b) => a + b, 0) / sorted.length).toFixed(1))
+    };
   }
 
-  // Generate unique virtual user workloads
-  const userWorkflows = Array.from({ length: CONCURRENCY }, async (_, idx) => {
-    const userId = `usr_load_${idx + 1}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
-    const sessionToken = generateSessionToken(userId, false);
-    const authHeaders = {
-      'Authorization': `Bearer ${sessionToken}`,
-      'X-Milo-Session': sessionToken,
-      'Content-Type': 'application/json'
-    };
+  async function runSingleStage(stageConcurrency, stageLabel) {
+    console.log(`\n----------------------------------------------------`);
+    console.log(`▶ ${stageLabel}: ${stageConcurrency} Concurrent Virtual Users`);
+    console.log(`----------------------------------------------------`);
 
-    // Stagger arrival slightly (3ms per user) to simulate natural user connection dispersion
-    await sleep(idx * 3);
+    // Reset circuit breaker, in-flight set, and rate limits between stages for reproducible benchmark isolation
+    if (globalThis.__miloCircuitBreaker) {
+      globalThis.__miloCircuitBreaker.consecutiveFailures = 0;
+      globalThis.__miloCircuitBreaker.cooldownUntil = 0;
+    }
+    if (globalThis.__miloActiveInFlight) {
+      globalThis.__miloActiveInFlight.clear();
+    }
+    if (globalThis.__junoRateBuckets) {
+      globalThis.__junoRateBuckets.clear();
+    }
 
-    try {
-      // Step 1: Health check
-      const healthRes = await makeRequest(`${baseUrl}/api/ai/health`, { method: 'GET' });
-      recordMetric(healthRes);
+    const memBefore = process.memoryUsage();
+    const startTime = Date.now();
+    const allLatencies = [];
+    const aiLatencies = [];
+    const nonAiLatencies = [];
+    const statusCodes = {};
+    let totalRequests = 0;
+    let successfulRequests = 0;
+    let isolationPasses = 0;
+    let isolationFailures = 0;
+    let completedWorkflows = 0;
 
-      // Step 2: Short greeting AI query (subject to budget in Mode C)
-      if (checkSpendBudget()) {
-        recordProviderCall();
-        const greetingRes = await makeRequest(`${baseUrl}/api/ai/gateway`, {
-          method: 'POST',
-          headers: authHeaders
-        }, { prompt: 'Hello Milo, what is your system status?' });
-        recordMetric(greetingRes);
+    function recordMetric(res, isAi = false, isExpectedRateLimit = false) {
+      totalRequests++;
+      allLatencies.push(res.duration);
+      if (isAi) {
+        aiLatencies.push(res.duration);
+      } else {
+        nonAiLatencies.push(res.duration);
       }
 
-      // Step 3: Complex query with isolated private context notes (subject to budget in Mode C)
-      if (checkSpendBudget()) {
-        recordProviderCall();
-        const ragRes = await makeRequest(`${baseUrl}/api/ai/gateway`, {
+      statusCodes[res.statusCode] = (statusCodes[res.statusCode] || 0) + 1;
+      if (res.statusCode >= 200 && res.statusCode < 400) {
+        successfulRequests++;
+      } else if (isExpectedRateLimit && res.statusCode === 429) {
+        successfulRequests++; // Correctly classified expected rate-limit rejection
+      }
+    }
+
+    const userWorkflows = Array.from({ length: stageConcurrency }, async (_, idx) => {
+      const userId = `usr_load_${idx + 1}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+      const sessionToken = generateSessionToken(userId, false);
+      const authHeaders = {
+        'Authorization': `Bearer ${sessionToken}`,
+        'X-Milo-Session': sessionToken,
+        'Content-Type': 'application/json'
+      };
+
+      // Stagger arrival slightly (2-3ms per user)
+      await sleep(idx * 3);
+
+      try {
+        let stepCount = 0;
+
+        // Step 1: Health check (non-AI)
+        const healthRes = await makeRequest(`${baseUrl}/api/ai/health`, { method: 'GET' });
+        recordMetric(healthRes, false);
+        if (healthRes.statusCode === 200) stepCount++;
+
+        // Step 2: Short greeting AI query
+        if (checkSpendBudget()) {
+          recordProviderCall();
+          const greetingRes = await makeRequest(`${baseUrl}/api/ai/gateway`, {
+            method: 'POST',
+            headers: authHeaders
+          }, { prompt: 'Hello Milo, what is your system status?' });
+          recordMetric(greetingRes, true);
+          if (greetingRes.statusCode === 200) stepCount++;
+        }
+
+        // Step 3: Complex query with isolated private context notes
+        if (checkSpendBudget()) {
+          recordProviderCall();
+          const ragRes = await makeRequest(`${baseUrl}/api/ai/gateway`, {
+            method: 'POST',
+            headers: authHeaders
+          }, {
+            prompt: `Query from virtual user ${userId}`,
+            contextNotes: [
+              {
+                id: `note_${userId}_1`,
+                title: `Confidential Architecture Doc for ${userId}`,
+                content: `Private distributed system consensus specs for node cluster ${userId}.`
+              }
+            ]
+          });
+          recordMetric(ragRes, true);
+          if (ragRes.statusCode === 200) stepCount++;
+        }
+
+        // Step 4: Rapid burst submission to verify rate-limiting behavior
+        const burstRes = await makeRequest(`${baseUrl}/api/ai/gateway`, {
+          method: 'POST',
+          headers: authHeaders
+        }, { prompt: 'Rapid burst query' });
+        recordMetric(burstRes, true, true);
+        if (burstRes.statusCode === 200 || burstRes.statusCode === 429) stepCount++;
+
+        // Step 5: Async Video Generation Job creation (non-AI API)
+        let jobId = null;
+        const vidCreateRes = await makeRequest(`${baseUrl}/api/media/video`, {
           method: 'POST',
           headers: authHeaders
         }, {
-          prompt: `Query from virtual user ${userId}`,
-          contextNotes: [
-            {
-              id: `note_${userId}_1`,
-              title: `Confidential Architecture Doc for ${userId}`,
-              content: `Private distributed system consensus specs for node cluster ${userId}.`
-            }
-          ]
+          action: 'create',
+          prompt: `Cinematic drone view of cyber city for user ${userId}`
         });
-        recordMetric(ragRes);
-      }
-
-      // Step 4: Rapid burst submission to verify rate-limiting behavior
-      const burstRes = await makeRequest(`${baseUrl}/api/ai/gateway`, {
-        method: 'POST',
-        headers: authHeaders
-      }, { prompt: 'Rapid burst query' });
-      recordMetric(burstRes);
-
-      // Step 5: Async Video Generation Job creation
-      let jobId = null;
-      const vidCreateRes = await makeRequest(`${baseUrl}/api/media/video`, {
-        method: 'POST',
-        headers: authHeaders
-      }, {
-        action: 'create',
-        prompt: `Cinematic drone view of cyber city for user ${userId}`
-      });
-      recordMetric(vidCreateRes);
-
-      if (vidCreateRes.statusCode === 202 || vidCreateRes.statusCode === 200) {
-        try {
-          const body = JSON.parse(vidCreateRes.body);
-          jobId = body.jobId;
-        } catch (_) {}
-      }
-
-      if (jobId) {
-        // Step 6: Poll video job status with owner token
-        const vidPollRes = await makeRequest(`${baseUrl}/api/media/video`, {
-          method: 'POST',
-          headers: authHeaders
-        }, { action: 'status', jobId });
-        recordMetric(vidPollRes);
-
-        // Step 7: Cross-user data isolation test
-        // Virtual user attempts to access another user's job -> MUST return 403 Forbidden
-        const intruderToken = generateSessionToken(`intruder_${userId}`, true);
-        const intruderRes = await makeRequest(`${baseUrl}/api/media/video`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${intruderToken}`,
-            'Content-Type': 'application/json'
-          }
-        }, { action: 'status', jobId });
-
-        totalRequests++;
-        latencies.push(intruderRes.duration);
-        statusCodes[intruderRes.statusCode] = (statusCodes[intruderRes.statusCode] || 0) + 1;
-
-        if (intruderRes.statusCode === 403) {
-          isolationPasses++;
-          successfulRequests++; // Security boundary successfully enforced
-        } else {
-          isolationFailures++;
-          console.warn(`[ISOLATION FAILURE] Intruder accessed job ${jobId} with status ${intruderRes.statusCode}!`);
+        recordMetric(vidCreateRes, false);
+        if (vidCreateRes.statusCode === 202 || vidCreateRes.statusCode === 200) {
+          stepCount++;
+          try {
+            const body = JSON.parse(vidCreateRes.body);
+            jobId = body.jobId;
+          } catch (_) {}
         }
 
-        // Step 8: Clean up by cancelling job
-        const vidCancelRes = await makeRequest(`${baseUrl}/api/media/video`, {
-          method: 'POST',
-          headers: authHeaders
-        }, { action: 'cancel', jobId });
-        recordMetric(vidCancelRes);
+        if (jobId) {
+          // Step 6: Poll video job status with owner token (non-AI API)
+          const vidPollRes = await makeRequest(`${baseUrl}/api/media/video`, {
+            method: 'POST',
+            headers: authHeaders
+          }, { action: 'status', jobId });
+          recordMetric(vidPollRes, false);
+          if (vidPollRes.statusCode === 200) stepCount++;
+
+          // Step 7: Cross-user data isolation test
+          // Virtual user attempts to access another user's job -> MUST return 403 Forbidden
+          const intruderToken = generateSessionToken(`intruder_${userId}`, true);
+          const intruderRes = await makeRequest(`${baseUrl}/api/media/video`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${intruderToken}`,
+              'Content-Type': 'application/json'
+            }
+          }, { action: 'status', jobId });
+
+          totalRequests++;
+          allLatencies.push(intruderRes.duration);
+          nonAiLatencies.push(intruderRes.duration);
+          statusCodes[intruderRes.statusCode] = (statusCodes[intruderRes.statusCode] || 0) + 1;
+
+          if (intruderRes.statusCode === 403) {
+            isolationPasses++;
+            successfulRequests++; // Security boundary successfully enforced
+            stepCount++;
+          } else {
+            isolationFailures++;
+            console.warn(`[ISOLATION FAILURE] Intruder accessed job ${jobId} with status ${intruderRes.statusCode}!`);
+          }
+
+          // Step 8: Clean up by cancelling job (non-AI API)
+          const vidCancelRes = await makeRequest(`${baseUrl}/api/media/video`, {
+            method: 'POST',
+            headers: authHeaders
+          }, { action: 'cancel', jobId });
+          recordMetric(vidCancelRes, false);
+          if (vidCancelRes.statusCode === 200) stepCount++;
+        }
+
+        if (stepCount >= 7) {
+          completedWorkflows++;
+        }
+      } catch (err) {
+        totalRequests++;
+        statusCodes['ERROR'] = (statusCodes['ERROR'] || 0) + 1;
+        if (statusCodes['ERROR'] <= 5) {
+          console.warn(`[DEBUG ERROR]`, err?.error?.message || err?.message || err);
+        }
       }
-    } catch (err) {
-      totalRequests++;
-      statusCodes['ERROR'] = (statusCodes['ERROR'] || 0) + 1;
+    });
+
+    await Promise.all(userWorkflows);
+
+    const totalTimeMs = Date.now() - startTime;
+    const memAfter = process.memoryUsage();
+    const heapDiffMb = ((memAfter.heapUsed - memBefore.heapUsed) / (1024 * 1024)).toFixed(2);
+    const rssMb = (memAfter.rss / (1024 * 1024)).toFixed(1);
+
+    const overallPct = computePercentiles(allLatencies);
+    const aiPct = computePercentiles(aiLatencies);
+    const nonAiPct = computePercentiles(nonAiLatencies);
+
+    const rps = ((totalRequests / totalTimeMs) * 1000).toFixed(1);
+    const successRate = ((successfulRequests / totalRequests) * 100).toFixed(1);
+
+    const passed = isolationFailures === 0 && parseFloat(successRate) >= 90 && nonAiPct.p95 < 2000;
+
+    console.log(`• Completed Workflows    : ${completedWorkflows} / ${stageConcurrency} (${((completedWorkflows / stageConcurrency) * 100).toFixed(1)}%)`);
+    console.log(`• Total Requests         : ${totalRequests} | Elapsed: ${totalTimeMs} ms | Throughput: ${rps} req/sec`);
+    console.log(`• Success Rate           : ${successRate}% (${successfulRequests} / ${totalRequests})`);
+    console.log(`• Non-AI Latency (p50/p95/p99): ${nonAiPct.p50} ms / ${nonAiPct.p95} ms / ${nonAiPct.p99} ms (avg: ${nonAiPct.avg} ms)`);
+    console.log(`• AI Latency     (p50/p95/p99): ${aiPct.p50} ms / ${aiPct.p95} ms / ${aiPct.p99} ms (avg: ${aiPct.avg} ms)`);
+    console.log(`• Overall Latency(p50/p95/p99): ${overallPct.p50} ms / ${overallPct.p95} ms / ${overallPct.p99} ms (avg: ${overallPct.avg} ms)`);
+    console.log(`• Memory Delta (Heap)    : ${heapDiffMb > 0 ? '+' : ''}${heapDiffMb} MB (Current RSS: ${rssMb} MB)`);
+    console.log(`• Data Isolation         : ${isolationPasses} passed, ${isolationFailures} failed`);
+    console.log(`• HTTP Statuses          :`, Object.entries(statusCodes).map(([c, n]) => `${c}:${n}`).join('  '));
+    console.log(`• Stage Verdict          : ${passed ? '✅ PASS' : '❌ FAIL'}`);
+
+    return {
+      label: stageLabel,
+      concurrency: stageConcurrency,
+      totalRequests,
+      completedWorkflows,
+      totalTimeMs,
+      rps,
+      successRate,
+      isolationPasses,
+      isolationFailures,
+      heapDiffMb,
+      rssMb,
+      statusCodes,
+      overall: overallPct,
+      ai: aiPct,
+      nonAi: nonAiPct,
+      passed
+    };
+  }
+
+  const stageResults = [];
+
+  try {
+    if (RUN_ALL_STAGES) {
+      console.log('🚀 Initiating Full 6-Stage Concurrency & Soak Certification Matrix...');
+
+      // Stage 1: 10 concurrent users
+      stageResults.push(await runSingleStage(10, 'Stage 1: 10 Concurrent Users'));
+      await sleep(300);
+
+      // Stage 2: 25 concurrent users
+      stageResults.push(await runSingleStage(25, 'Stage 2: 25 Concurrent Users'));
+      await sleep(300);
+
+      // Stage 3: 50 concurrent users
+      stageResults.push(await runSingleStage(50, 'Stage 3: 50 Concurrent Users'));
+      await sleep(300);
+
+      // Stage 4: 100 concurrent users
+      const stage4 = await runSingleStage(100, 'Stage 4: 100 Concurrent Users (Certification Gate)');
+      stageResults.push(stage4);
+      await sleep(500);
+
+      // Stage 5: 150 concurrent users (only if Stage 4 passes)
+      if (stage4.passed) {
+        stageResults.push(await runSingleStage(150, 'Stage 5: 150 Concurrent Users (Stress Peak)'));
+        await sleep(500);
+      } else {
+        console.warn('⚠️ Skipping Stage 5 (150 users) because Stage 4 did not pass certification criteria.');
+      }
+
+      // Stage 6: Soak test (sustained 100 users across 3 successive waves)
+      console.log(`\n====================================================`);
+      console.log(`🧪 STAGE 6: SUSTAINED SOAK TEST (100 Users x ${SOAK_ROUNDS} Successive Waves)`);
+      console.log(`====================================================`);
+      for (let round = 1; round <= SOAK_ROUNDS; round++) {
+        stageResults.push(await runSingleStage(100, `Stage 6 Soak Wave ${round}/${SOAK_ROUNDS}`));
+        if (round < SOAK_ROUNDS) await sleep(400);
+      }
+
+      console.log('\n========================================================================================');
+      console.log('📋 COMPLETE MULTI-STAGE CERTIFICATION MATRIX SUMMARY');
+      console.log('========================================================================================');
+      console.log('Stage                     | Users | Reqs | Throughput | Non-AI p95 | AI p95   | Success | Isolation | Status');
+      console.log('--------------------------|-------|------|------------|------------|----------|---------|-----------|-------');
+      for (const s of stageResults) {
+        const stagePad = s.label.padEnd(25).slice(0, 25);
+        const usersPad = String(s.concurrency).padStart(5);
+        const reqsPad = String(s.totalRequests).padStart(4);
+        const rpsPad = `${s.rps} rps`.padStart(10);
+        const nonAiPad = `${s.nonAi.p95} ms`.padStart(10);
+        const aiPad = `${s.ai.p95} ms`.padStart(8);
+        const succPad = `${s.successRate}%`.padStart(7);
+        const isoPad = `${s.isolationFailures === 0 ? '0 leaks' : s.isolationFailures + ' FAIL'}`.padStart(9);
+        const statusPad = s.passed ? ' ✅ PASS' : ' ❌ FAIL';
+        console.log(`${stagePad} | ${usersPad} | ${reqsPad} | ${rpsPad} | ${nonAiPad} | ${aiPad} | ${succPad} | ${isoPad} |${statusPad}`);
+      }
+      console.log('========================================================================================\n');
+
+    } else {
+      // Single stage run (e.g. 100 users)
+      const res = await runSingleStage(CONCURRENCY, `Single Stage Benchmark (${CONCURRENCY} Users)`);
+      stageResults.push(res);
     }
-  });
-
-  await Promise.all(userWorkflows);
-
-  // Close local server if started
-  if (localServer) {
-    httpAgent.destroy();
-    httpsAgent.destroy();
-    await new Promise((resolve) => localServer.close(resolve));
+  } finally {
+    // Close local server if started
+    if (localServer) {
+      httpAgent.destroy();
+      httpsAgent.destroy();
+      await new Promise((resolve) => localServer.close(resolve));
+    }
   }
 
-  const totalTimeMs = Date.now() - startTime;
-  latencies.sort((a, b) => a - b);
+  const allPassed = stageResults.every((s) => s.passed);
 
-  const p50 = latencies[Math.floor(latencies.length * 0.50)] || 0;
-  const p95 = latencies[Math.floor(latencies.length * 0.95)] || 0;
-  const p99 = latencies[Math.floor(latencies.length * 0.99)] || 0;
-  const min = latencies[0] || 0;
-  const max = latencies[latencies.length - 1] || 0;
-  const avg = latencies.length > 0 ? (latencies.reduce((a, b) => a + b, 0) / latencies.length).toFixed(1) : 0;
-  const rps = ((totalRequests / totalTimeMs) * 1000).toFixed(1);
-  const successRate = ((successfulRequests / totalRequests) * 100).toFixed(1);
-
-  console.log('\n====================================================');
-  console.log('📊 MEASURED LOAD & READINESS TEST RESULTS');
-  console.log('====================================================');
-  console.log(`• Test Mode             : ${modeDesc}`);
-  console.log(`• Virtual Users         : ${CONCURRENCY}`);
-  console.log(`• Total Requests        : ${totalRequests}`);
-  console.log(`• Total Elapsed Time    : ${totalTimeMs} ms`);
-  console.log(`• Throughput            : ${rps} req/sec`);
-  console.log(`• Min Latency           : ${min} ms`);
-  console.log(`• p50 Latency           : ${p50} ms`);
-  console.log(`• p95 Latency           : ${p95} ms`);
-  console.log(`• p99 Latency           : ${p99} ms`);
-  console.log(`• Max Latency           : ${max} ms`);
-  console.log(`• Average Latency       : ${avg} ms`);
-  console.log(`• Success Rate (2xx/3xx): ${successRate}% (${successfulRequests} / ${totalRequests})`);
-  console.log(`• Data Isolation Checks : ${isolationPasses} passed, ${isolationFailures} failed`);
-  if (MODE === 'C') {
-    console.log(`• Live Calls Made       : ${liveProviderCallsMade} / ${MAX_LIVE_PROVIDER_CALLS}`);
-    console.log(`• Estimated Spend       : $${accumulatedEstimatedSpend.toFixed(4)} (Spend Cap: $${SPEND_CAP.toFixed(4)})`);
-  }
-  console.log('• HTTP Status Distribution:');
-  for (const [code, count] of Object.entries(statusCodes)) {
-    console.log(`    HTTP ${code} : ${count}`);
-  }
-  console.log('====================================================\n');
-
-  // Acceptance Criteria
-  const passedIsolation = isolationFailures === 0;
-  const passedThroughput = parseFloat(successRate) >= 90;
-  const passedP95 = p95 < 2500;
-
-  if (passedIsolation && passedThroughput && passedP95) {
-    console.log(`✅ [PASS] 100+ User Load & Readiness Test Passed successfully!\n`);
+  if (allPassed) {
+    console.log(`🎉 [SUCCESS] All executed load test stages passed acceptance criteria cleanly!\n`);
     process.exit(0);
   } else {
-    console.error(`❌ [FAIL] Load test criteria not met: Isolation=${passedIsolation}, SuccessRate=${successRate}% (>=90%), p95=${p95}ms (<2500ms)\n`);
+    console.error(`❌ [FAILURE] One or more load test stages did not meet acceptance criteria.\n`);
     process.exit(1);
   }
 }

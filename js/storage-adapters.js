@@ -20,17 +20,18 @@
     IMessageRepository = global.RepositoryInterfaces.IMessageRepository;
   }
 
-  // Safe localStorage helper
+  // Safe localStorage helper with persistent memory singleton for Node.js runtime
+  const nodeStorage = {
+    _data: {},
+    getItem(k) { return Object.prototype.hasOwnProperty.call(this._data, k) ? this._data[k] : null; },
+    setItem(k, v) { this._data[k] = String(v); },
+    removeItem(k) { delete this._data[k]; }
+  };
+
   const getStorage = () => {
     if (typeof window !== 'undefined' && window.localStorage) return window.localStorage;
     if (typeof global !== 'undefined' && global.window && global.window.localStorage) return global.window.localStorage;
-    // Minimal fallback object
-    return {
-      _data: {},
-      getItem(k) { return this._data[k] || null; },
-      setItem(k, v) { this._data[k] = String(v); },
-      removeItem(k) { delete this._data[k]; }
-    };
+    return nodeStorage;
   };
 
   /**

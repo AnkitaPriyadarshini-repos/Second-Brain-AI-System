@@ -90,7 +90,7 @@ async function generateViaGeminiImagen({ prompt, aspectRatio, apiKey }) {
         'Content-Type': 'application/json',
         'Content-Length': Buffer.byteLength(payload)
       },
-      timeout: 45000
+      timeout: 22000
     }, (res) => {
       let data = '';
       res.on('data', chunk => { data += chunk; });
@@ -122,7 +122,7 @@ async function generateViaGeminiImagen({ prompt, aspectRatio, apiKey }) {
     req.on('error', (err) => reject(new Error(`Imagen network error: ${err.message}`)));
     req.on('timeout', () => {
       req.destroy();
-      reject(new Error('Imagen generation timed out after 45s'));
+      reject(new Error('Imagen generation timed out after 22s'));
     });
     req.write(payload);
     req.end();

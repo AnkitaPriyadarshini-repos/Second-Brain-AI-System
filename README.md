@@ -1,4 +1,4 @@
-# 🧠 Second Brain AI — Enterprise Knowledge & Agentic AI Platform
+# 🧠 Second Brain AI / Milo — Personal Knowledge & Agentic AI Platform
 
 <p align="center">
   <a href="https://second-brain-ai-system.vercel.app">
@@ -8,7 +8,7 @@
     <img src="https://img.shields.io/badge/GitHub-Repository-10b981?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Repo">
   </a>
   <a href="test/run_tests.js">
-    <img src="https://img.shields.io/badge/Tests-100%25%20Passing-00f2fe?style=for-the-badge&logo=github-actions" alt="Tests Passed">
+    <img src="https://img.shields.io/badge/Tests-Automated%20Suites%20Passing-00f2fe?style=for-the-badge&logo=github-actions" alt="Tests Passed">
   </a>
   <a href="manifest.json">
     <img src="https://img.shields.io/badge/PWA-Installable%20Offline-38bdf8?style=for-the-badge" alt="PWA Installable">
@@ -18,7 +18,7 @@
   </a>
 </p>
 
-**Second Brain AI** (powered by Milo Enterprise System) is an open, private, and grounded enterprise AI workspace. It combines deep document-level access control, hybrid lexical and semantic search, self-hosted and cloud LLM routing, diff-first coding assistants, image/video creative studios, and multi-step reasoning capabilities.
+**Second Brain AI** (powered by Milo) is an open-source, private, and grounded personal AI workspace. It combines local document indexing, hybrid BM25 and vector similarity search, resilient Gemini 3.x AI gateway routing, interactive persona modes, diff-first coding assistants, creative media tools, and multi-step reasoning capabilities.
 
 ---
 
@@ -65,51 +65,71 @@ When querying Milo, every turn surfaces dynamic data-source routing, decided res
 
 ## 🔒 Security and Data Processing
 
-![Security and Data Processing Architecture](docs/assets/architecture.png)
-
-When connecting up your organization's knowledge, it is critical that this sensitive IP is not leaked to the wrong parties. Second Brain AI is architected from the ground up to keep your data secure within your own infrastructure (VPC, private datacenter, or air-gapped environment).
+Second Brain AI is designed to protect personal notes and user sessions through layered server-side guards:
 
 ### Key Architectural Tenets
 
-- **Strict Document-Level Access Control (ACLs)**:
-  Sync workers ingest documents along with native permission structures from **Slack, Google Drive, Confluence, Jira, GitHub, and 50+ enterprise integrations**. Permissions are evaluated dynamically at query time so users and agents only ever see records they are authorized to access.
+- **Verified Identity Derivation**:
+  Identity is strictly derived from cryptographically verified HMAC/JWT session tokens (`Authorization: Bearer sb_jwt_...`) with timing-safe signature comparison. Untrusted client headers like `x-user-id` are ignored.
 
-- **Private & Air-Gapped Inference**:
-  Full native compatibility with **Self-Hosted LLMs** (via Ollama, vLLM, and open weights models such as Llama 3, DeepSeek, and Mistral) allows 100% of reasoning to occur inside your secure perimeter without transmitting any bytes across the public internet.
+- **Hybrid Lexical & Semantic Retrieval**:
+  Combines local note vector embeddings (cosine similarity) with BM25 keyword matching for transparent, grounded retrieval over personal notes without transmitting raw vaults to unauthorized endpoints.
 
-- **Hybrid Semantic & Lexical Indexing**:
-  Combines dense vector embeddings with BM25 keyword matching and cross-encoder rerankers in a **Hybrid Index (OpenSearch / Qdrant)**, delivering grounded retrieval with sub-millisecond precision.
+- **Resilient AI Gateway**:
+  Routes prompt requests through Google Gemini 3.x models (`gemini-3.8-flash`, `gemini-3.6-flash`, `gemini-3.5-flash-lite`, `gemini-3.1-flash-lite`) with per-model timeouts, automatic tier-downgrade fallback on upstream 503/429 errors, and local offline synthesis when providers are unreachable.
 
-- **MCP (Model Context Protocol) Agent Connectivity**:
-  Standardized protocol clients enable autonomous agents to discover and interact with private organizational data securely and deterministically.
-
-- **Optional Hosted LLM Gateway**:
-  Connections to frontier cloud models (Gemini 2.5 Pro, GPT-5, Claude 3.7) are strictly opt-in, featuring zero data retention and enterprise-grade DLP masking.
+- **Input Validation & Abuse Prevention**:
+  Enforces client-identity rate limiting (15-60 req/min depending on endpoint), URL length bounding (2048 chars), private network IP blocking (SSRF prevention), and safe 22-second timeouts on expensive operations.
 
 ---
 
 ## ✨ Features & Capabilities
 
-### 1. Milo Enterprise Interface
-- **Modern Minimalist Canvas**: Crisp typography, high-contrast readability, collapsible sidebar, and intuitive session management.
-- **Multi-Step Reasoning Accordion**: Interactive collapsible chain-of-thought blocks (`Thought for 27s · 2 steps`) revealing system reasoning paths.
-- **Inline Grounded Citations**: Interactive source badges (`Fireflies`, `Confluence`, `Google Drive`) linked directly to source passages.
-- **Floating Model Switcher**: Rapidly switch between `GPT-5.0 Sol`, `Claude 3.7 Sonnet`, `Gemini 2.5 Pro`, and self-hosted models.
-- **Sources & Connectors Drawer**: Real-time management of connected workspaces, repositories, and document sync streams.
+### 1. Milo Interactive Welcome Screen & Assistant Modes
+- **Interactive Welcome Screen**: Mascot greeting, quick-prompt suggestions, and categorized ideas.
+- **4 Specialized Assistant Modes**:
+  - **Milo (General)**: Balanced, concise personal knowledge assistant.
+  - **Coach (Teacher)**: Socratic explanations with LaTeX mathematical rendering and analogies.
+  - **Research (Deep Dive)**: Multi-angle synthesis with explicit capability notices when live web search is unconfigured.
+  - **Coding (Developer)**: Diff-first code inspection, patch generation, and confirmation safety gates.
 
-### 2. Autonomous Agents Fleet
-- **Customer Support AI**: Synthesize customer tickets and FAQs with verifiable attribution.
-- **Sales Assistant**: Generate account briefs, handle objections, and pull relevant proof points.
-- **IT Helpdesk**: Diagnose system access issues, guide software provisioning, and search internal wikis.
-- **Diff-First Coding Agent**: Inspect repository files, calculate unified diffs, and enforce safe user confirmations before applying patches.
+### 2. Grounded RAG & Personal Notes Vault
+- **Multi-Turn Chat History**: Preserved across user sessions with isolated storage per user identity.
+- **Auto-Tagging & Entity Extraction**: Automatically extracts concepts, dates, and technologies.
+- **Citation Preservation**: Verifiable citation footnotes linked to specific saved notes.
 
 ### 3. Creative Studio (Image & Video Generation)
-- **Image Generation**: High-fidelity visual creation with custom aspect ratios (`1:1`, `16:9`, `9:16`) and intelligent prompt enhancement.
-- **Video Generation Lifecycle**: Asynchronous queue management with live polling, progress tracking, and instant preview.
+- **Image Generation**: High-fidelity visual creation via Gemini Imagen 3 with automatic fallback to Pollinations Flux. Bounded to a 22-second execution timeout.
+- **Video Generation Lifecycle**: Asynchronous queue management with disk-cached job state and polling status endpoints.
 
-### 4. Enterprise Offline & PWA Support
-- Offline-first Service Worker caching with background sync.
-- Installable on desktop (Windows, macOS, Linux) and mobile (Android, iOS) with native standalone window framing.
+### 4. PWA & Offline Support
+- Service Worker caching for instant asset loading and offline accessibility.
+- Installable on desktop and mobile platforms with native standalone window framing.
+
+---
+
+## 📊 Verified Capabilities
+
+The following capabilities have been empirically audited and verified through automated test suites:
+
+- **100-User Internal Application Benchmark**: Evaluated in Mode A (deterministic mock provider) up to 150 concurrent users. Achieved **630.9 RPS** with **178ms p95 latency** at 100 users, and completed a 3-wave sustained soak test with 100% success rate and zero memory leaks.
+- **Session Security & Tenant Isolation**: Verified zero cross-tenant note access and timing-safe session signature verification.
+- **Graceful Upstream Degradation**: Automated tests verify that when Gemini returns 503 or 429, the gateway smoothly attempts lower tiers and falls back to clean, labeled responses without crashing.
+- **21 Passing Automated Test Suites**: Comprehensive coverage across unit, integration, RAG, session security, welcome screen, and browser E2E workflows.
+
+---
+
+## ⚠️ Known Limitations & Operational Prerequisites
+
+Before deploying to high-traffic production environments, note the following architectural boundaries:
+
+1. **Serverless Multi-Instance Consistency**:
+   - Vercel functions execute in ephemeral, stateless micro-containers. In-memory rate-limiting counters (`__junoRateBuckets`) and asynchronous job records (`/tmp/milo_jobs`) do not synchronize across separate Vercel instances or regions.
+   - **Requirement for 100+ concurrent multi-instance production**: A distributed Redis/KV store (e.g. Upstash) or Postgres must be configured.
+2. **Upstream AI Quota & Spend Controls**:
+   - Upstream capacity is bounded by your Google Gemini API tier (e.g., Pay-as-you-go Tier 1 vs Free Tier TPM/RPM limits). Under real multi-user traffic, high concurrency may encounter upstream 429 quota limits without spend tier provisioning.
+3. **Research Mode External Web Search**:
+   - When external search provider keys (e.g. Google Search API) are unconfigured, Research mode transparently notes that live internet querying is unavailable and draws exclusively on grounded vault notes.
 
 ---
 
@@ -117,7 +137,7 @@ When connecting up your organization's knowledge, it is critical that this sensi
 
 ### Prerequisites
 - Node.js 18+ installed
-- (Optional) Ollama or vLLM running locally for private air-gapped inference
+- Google Gemini API key (optional for basic offline/mock usage; required for live AI responses)
 
 ### 1. Clone & Install
 ```bash
@@ -126,10 +146,10 @@ cd Second-Brain-AI-System
 npm install
 ```
 
-### 2. Configure Environment (Optional for Hosted LLMs)
+### 2. Configure Environment
 ```bash
 cp .env.example .env
-# Add GEMINI_API_KEY or local inference endpoints if desired
+# Edit .env and supply your GEMINI_API_KEY and MILO_SESSION_SECRET
 ```
 
 ### 3. Run Locally
@@ -143,20 +163,11 @@ npm start
 npm test
 ```
 
----
-
-## 🛡️ Production Readiness & Audit Verification
-
-The codebase is audited continuously across 13 test suites and 60+ automated unit and integration tests:
-
-| Test Suite | Scope | Status |
-|---|---|---|
-| **Core RAG & Search** | Grounded vault retrieval, BM25 + Vector scoring | ✅ 100% Passed |
-| **Chat Safety & Guards** | Prompt injection protection, SSRF guards, DLP | ✅ 100% Passed |
-| **Milo Enterprise UI** | Layout integrity, theme specificity, responsive views | ✅ 100% Passed |
-| **Diff-First Coding** | Patch generation, rollback snapshots, Git export | ✅ 100% Passed |
-| **Media Studio APIs** | Image & Video generation asynchronous lifecycle | ✅ 100% Passed |
-| **Service Worker & PWA** | Offline cache validation, manifest checksums | ✅ 100% Passed |
+### 5. Run Concurrent User Load Benchmark
+```bash
+# Run local 6-stage mock-provider benchmark (10 to 150 concurrent users)
+node test/load_test_suite.js --mode=A --stages=all
+```
 
 ---
 

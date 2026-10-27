@@ -4,6 +4,7 @@
  */
 
 const AIGatewayService = require('../services/AIGatewayService');
+const authGuard = require('../api/auth-guard');
 
 class AIGatewayController {
   constructor() {
@@ -23,7 +24,10 @@ class AIGatewayController {
     const history = Array.isArray(body.history) ? body.history : [];
     const model = typeof body.model === 'string' ? body.model : undefined;
     const mode = typeof body.mode === 'string' ? body.mode : (typeof body.assistantMode === 'string' ? body.assistantMode : undefined);
-    const userId = String(req.headers['x-user-id'] || req.ip || 'client').slice(0, 128);
+    
+    // Derive identity securely from verified session token or signed guest hash, never trusting raw x-user-id
+    const clientIdentity = authGuard.extractClientIdentity(req);
+    const userId = clientIdentity.id;
 
     // Reject pathological payloads before they reach retrieval/model execution.
     if (prompt.length > 12000) {

@@ -10,7 +10,25 @@ class AuthService {
   constructor(dbInstance) {
     this.db = dbInstance || DatabaseService.dbInstance || new DatabaseService();
     this.otpStore = new Map();
-    this.JWT_SECRET = process.env.JWT_SECRET || 'sb_second_brain_secure_jwt_secret_key_2026';
+    this.LEGACY_INSECURE_SECRET = 'sb_second_brain_secure_jwt_secret_key_2026';
+    
+    // Resolve approved session/jwt secret with fail-closed semantics in production
+    const envSecret = (
+      process.env.JWT_SECRET ||
+      process.env.MILO_SESSION_SECRET ||
+      process.env.SESSION_SECRET ||
+      ''
+    ).trim();
+
+    if (envSecret.length >= 16) {
+      this.JWT_SECRET = envSecret;
+    } else if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+      // In local dev and tests, use a safe non-empty development secret so local unit tests & local dev work cleanly
+      this.JWT_SECRET = 'sb_dev_jwt_secret_32bytes_value_2026!';
+    } else {
+      // In production (or Vercel), fail closed if secret is missing or under 16 characters
+      this.JWT_SECRET = '';
+    }
 
     // Seed default user if not existing
     const defaultEmail = 'user@secondbrain.ai';
@@ -21,18 +39,22 @@ class AuthService {
         name: 'User',
         role: 'Pro Developer',
         createdAt: new Date().toISOString(),
-        passwordHash: this.hashPassword('sb_pass_hash_123')
+        passwordHash: this.hashPassword('sb_pass_hash_123', 'default_seed_salt_001')
       };
       this.db.saveUser(defaultUser);
     }
   }
 
-  hashPassword(password) {
+  hashPassword(password, salt = 'sb_salt_2026') {
     if (!password) return 'no_password';
-    return crypto.pbkdf2Sync(password, 'sb_salt_2026', 1000, 32, 'sha256').toString('hex');
+    return crypto.pbkdf2Sync(password, salt, 1000, 32, 'sha256').toString('hex');
   }
 
   generateSecureToken(payload) {
+    if (!this.JWT_SECRET) {
+      throw new Error('SERVER_CONFIGURATION_ERROR: Session secret is not configured.');
+    }
+
     const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
     const body = Buffer.from(JSON.stringify({
       ...payload,
@@ -50,18 +72,37 @@ class AuthService {
 
   verifySecureToken(token) {
     if (!token || !token.startsWith('sb_jwt_')) return null;
+    if (!this.JWT_SECRET) return null; // Fail closed if secret not configured
+
     try {
       const rawToken = token.replace('sb_jwt_', '');
       const parts = rawToken.split('.');
       if (parts.length !== 3) return null;
 
       const [header, body, signature] = parts;
+      const payloadString = `${header}.${body}`;
+
+      // Invalidate and reject any token signed with legacy insecure fallback secret
+      const legacySig = crypto
+        .createHmac('sha256', this.LEGACY_INSECURE_SECRET)
+        .update(payloadString)
+        .digest('base64url');
+      if (signature === legacySig && this.JWT_SECRET !== this.LEGACY_INSECURE_SECRET) {
+        return null;
+      }
+
       const expectedSig = crypto
         .createHmac('sha256', this.JWT_SECRET)
-        .update(`${header}.${body}`)
+        .update(payloadString)
         .digest('base64url');
 
-      if (signature !== expectedSig) return null;
+      if (signature.length !== expectedSig.length) return null;
+
+      const bufA = Buffer.from(signature);
+      const bufB = Buffer.from(expectedSig);
+      if (!crypto.timingSafeEqual(bufA, bufB)) {
+        return null; // Tampered or forged signature
+      }
 
       const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
       if (payload.exp && Math.floor(Date.now() / 1000) > payload.exp) {

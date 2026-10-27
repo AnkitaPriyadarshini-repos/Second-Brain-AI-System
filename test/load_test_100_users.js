@@ -15,7 +15,7 @@ const args = process.argv.slice(2);
 if (!args.some(a => a.startsWith('--mode'))) {
   args.unshift('--mode=A');
 }
-if (!args.some(a => a.startsWith('--concurrency'))) {
+if (!args.some(a => a.startsWith('--concurrency')) && !args.some(a => a.includes('stages'))) {
   args.unshift('--concurrency=100');
 }
 

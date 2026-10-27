@@ -8,9 +8,12 @@
 const https = require('https');
 const http = require('http');
 const { URL } = require('url');
+const authGuard = require('../auth-guard');
 
 const MAX_RESPONSE_BYTES = 512 * 1024; // 512 KB
 const REQUEST_TIMEOUT_MS = 10_000;      // 10 seconds
+const MAX_URL_LENGTH = 2048;            // 2048 characters
+const INGEST_RATE_LIMIT = 15;           // 15 requests per minute
 
 /**
  * Checks if a hostname or IP string resolves to a private or dangerous network range.
@@ -189,13 +192,36 @@ async function handler(req, res) {
     return res.status(405).json({ success: false, error: 'Method not allowed.' });
   }
 
+  const clientIdentity = authGuard.extractClientIdentity(req);
+  const rateLimitKey = `ingest_${clientIdentity.id}:${clientIdentity.ip}`;
+  const rateCheck = authGuard.checkRateLimit(rateLimitKey, INGEST_RATE_LIMIT, 60000);
+
+  res.setHeader('X-RateLimit-Limit', String(INGEST_RATE_LIMIT));
+  res.setHeader('X-RateLimit-Remaining', String(rateCheck.remaining));
+  res.setHeader('X-RateLimit-Reset', String(rateCheck.resetSeconds));
+
+  if (!rateCheck.allowed) {
+    return res.status(429).json({
+      success: false,
+      error: 'URL ingestion rate limit exceeded. Please wait a minute before submitting another URL.'
+    });
+  }
+
   const { url } = req.body || {};
   if (!url || typeof url !== 'string' || !url.trim()) {
     return res.status(400).json({ success: false, error: 'A valid URL string is required.' });
   }
 
+  const cleanUrl = url.trim();
+  if (cleanUrl.length > MAX_URL_LENGTH) {
+    return res.status(400).json({
+      success: false,
+      error: `URL exceeds maximum allowable length of ${MAX_URL_LENGTH} characters.`
+    });
+  }
+
   try {
-    const rawHtml = await fetchSafeUrl(url.trim());
+    const rawHtml = await fetchSafeUrl(cleanUrl);
     const extracted = extractArticleFromHTML(rawHtml);
 
     if (!extracted.text || extracted.text.length < 50) {

@@ -76,12 +76,17 @@ class AIGatewayService {
   }
 
   selectModel(model, prompt) {
-    if (model === 'gemini-3.6-flash' || model === 'gemini-3.5-flash-lite') return model;
-    if (model && (model.includes('2.0') || model.includes('thinking'))) return 'gemini-2.0-flash';
-    if (model && (model.includes('pro') || model.includes('1.5-pro'))) return 'gemini-1.5-pro';
+    if (model === 'gemini-3.8-flash' || model === 'gemini-3.6-flash' || model === 'gemini-3.5-flash-lite' || model === 'gemini-3.1-flash-lite') {
+      return model;
+    }
+    // Migrate legacy/retired model strings to active 3.x tiers
+    if (model && (model.includes('3.8') || model.includes('pro') || model.includes('thinking'))) return 'gemini-3.8-flash';
+    if (model && (model.includes('2.5') || model.includes('3.6'))) return 'gemini-3.6-flash';
+    if (model && (model.includes('2.0') || model.includes('1.5') || model.includes('flash'))) return 'gemini-3.5-flash-lite';
+    
     const text = String(prompt || '').toLowerCase();
     const complex = /\b(code|debug|architecture|security|algorithm|prove|derive|analy[sz]e|research|compare|calculate|design|optimi[sz]e)\b/.test(text);
-    return complex ? 'gemini-2.0-flash' : 'gemini-1.5-flash';
+    return complex ? 'gemini-3.8-flash' : 'gemini-3.5-flash-lite';
   }
 
   getApiKey(apiKey) {

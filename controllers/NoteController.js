@@ -16,6 +16,11 @@
       }
     }
 
+    clearCache() {
+      this._cachedResponse = null;
+      if (this._cacheMap) this._cacheMap.clear();
+    }
+
     getNotes(req, res) {
       try {
         const query = req && req.query ? req.query.q : null;
@@ -48,6 +53,7 @@
       try {
         const body = (req && req.body) ? req.body : req;
         const createdNote = this.noteService.createNote(body);
+        this.clearCache(); // Invalidate cached notes on new creation
         if (res && typeof res.json === 'function') {
           return res.status(201).json({ success: true, message: 'Note created successfully', data: createdNote });
         }
@@ -64,6 +70,7 @@
       try {
         const id = (req && req.params && req.params.id) ? req.params.id : (req && req.id ? req.id : null);
         const updated = this.noteService.togglePin(id);
+        this.clearCache(); // Invalidate cached notes on pin toggle
         if (res && typeof res.json === 'function') {
           return res.status(200).json({ success: true, data: updated });
         }
@@ -80,6 +87,7 @@
       try {
         const id = (req && req.params && req.params.id) ? req.params.id : (req && req.id ? req.id : null);
         const result = this.noteService.deleteNote(id);
+        this.clearCache(); // Invalidate cached notes on deletion
         if (res && typeof res.json === 'function') {
           return res.status(200).json({ success: true, deleted: result });
         }
