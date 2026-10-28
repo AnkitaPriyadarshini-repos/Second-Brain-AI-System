@@ -1,134 +1,110 @@
-# Milo AI — Production Operational Runbook & Incident Response Guide
+# Milo AI — Production Operational Runbook & Incident Playbook
 
 **Document Reference:** `reports/milo-production-runbook.md`  
-**Certification Pass:** Pass 2 (Post-Hardening Independent Verification Gate)  
-**Applicability:** Production & Staging Environments (`https://second-brain-ai-system.vercel.app`)  
-**Effective Date:** 2026-10-28  
-**Reported HEAD Reference:** `0f5415e`  
-**Active Certification Branch:** `audit/milo-100-user-certification`  
-**Audience:** Site Reliability Engineers (SRE), DevOps, Backend Engineers, On-Call Operators
+**Target Repository:** `AnkitaPriyadarshini-repos/Second-Brain-AI-System`  
+**Audited Branch:** `scalability/milo-200-user-certification`  
+**Git Commit SHA:** `200770f9ed1aa14240b4128c207f59dc46e48fe2` (`200770f`)  
+**Timestamp:** 2026-10-28T18:35:00+05:30  
+**Roles:** SRE, Cloud Infrastructure Engineer, Application Security Engineer, Release Manager  
 
 ---
 
-## 1. System Overview & Critical Endpoints
+## 1. Pre-Deployment Verification Checklist
 
-| Endpoint | Protocol | Function | Failure Mode / SLA |
-|---|---|---|---|
-| `/api/ai/health` | HTTP GET | AI provider connectivity & readiness check | Returns `200 OK` if key configured, `503` if missing. No secrets exposed. |
-| `/api/ai/gateway` | HTTP POST | Core conversational AI & grounded RAG gateway | 24s overall deadline; tiered fallbacks (`3.8` -> `3.6` -> `3.5` -> `3.1`). |
-| `/api/notes` | HTTP GET/POST | Note management, search, and user vault isolation | Sub-50ms p95; per-user cache maps, invalidated on mutations. Routes to PostgreSQL when `DATABASE_URL` is set. |
-| `/api/notes/:id/pin` | HTTP POST | Toggle note pinned state | 404 unauthorized if note belongs to another user. |
-| `/api/notes/:id` | HTTP DELETE | Delete note | 404 unauthorized if note belongs to another user. |
-| `/api/ingest/url` | HTTP POST | Safe web content ingestion with SSRF protection | 15 req/min client-identity limit; max 2048 chars; blocks private IPs. |
-| `/api/media/image` | HTTP POST | Creative image generation (Imagen 3 / Flux) | 22s bounded timeout with clean fallback to Pollinations. |
-| `/api/media/video` | HTTP POST | Asynchronous video queue (create/poll/cancel) | Throttled disk cleanup (60s); client-isolated ownership enforcement. |
-| `/ws/chat` | WebSocket | Real-time interactive chat streaming (Local/SSR) | Sub-300ms round-trip delivery threshold. |
-
----
-
-## 2. Observability, Logging & Correlation IDs
-
-### Request Tracking Headers
-Every API request and response is tagged with correlation identifiers:
-- `X-Milo-Request-Id` / `X-Juno-Request-Id`: Format `juno_<timestamp_base36>_<random_hex>`
-- `X-Milo-Client-Id`: Verified user or guest identity (`usr_*` or `guest_*`)
-- `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`: Rate limit telemetry
-- `X-RateLimit-Mode`: Set to `distributed` when Upstash Redis is active
-- `X-RateLimit-Degraded`: Set to `true` if Redis is down and strict fail-safe throttling is engaged
-- `Retry-After`: Standard HTTP 429 retry window in seconds
-
-### Log Sanitization Policy
-All server logs emitted via `console.log`, `console.warn`, and `console.error` are automatically scrubbed:
-- Google Gemini API keys (`AIza...`) are masked as `[REDACTED]`.
-- Long random tokens and session keys (>= 28 chars) are masked as `[REDACTED]`.
-- User prompts and private note vaults are excluded from diagnostic error logs.
-
----
-
-## 3. Incident Response Runbooks
-
-### Runbook A: Upstream Gemini Quota Exhaustion (HTTP 429)
-
-**Symptoms:**
-- Elevated HTTP 429 status codes returned to clients from `/api/ai/gateway`.
-- User notice: *"Milo is receiving a lot of requests right now. Please try again in a minute."*
-- Log entry: `[milo/gateway] <req_id> 429 Resource has been exhausted (e.g. check quota)`
-
-**Root Causes:**
-1. Upstream Google Gemini Free Tier limit (15 RPM) exceeded during concurrent usage.
-2. Per-client token-bucket rate limit (30 req/min for auth users, 15 req/min for guests) exceeded.
-
-**Remediation Steps:**
-1. Check response header `X-RateLimit-Remaining`: If `0`, client sent too many requests.
-2. If `X-RateLimit-Remaining > 0`, error originated from Google Cloud API:
-   - Open **Google Cloud Console** -> **APIs & Services** -> **Enabled APIs & Services** -> **Generative Language API**.
-   - Check Quotas: Upgrade from Free Tier to **Pay-as-you-go (Tier 1)** to raise RPM from 15 to 1,000–4,000 RPM.
-   - Verify billing account is active.
-
----
-
-### Runbook B: Session Secret Configuration Failure (`SERVER_CONFIGURATION_ERROR`)
-
-**Symptoms:**
-- Server crashes on startup with: `🛑 CRITICAL_STARTUP_FAILURE: MILO_SESSION_SECRET must be configured with at least 32 characters in production.`
-- Client authentication requests return HTTP 500 with `SERVER_CONFIGURATION_ERROR: Session secret is too weak (<N> chars). Production policy requires at least 32 characters.`
-
-**Remediation Steps:**
-1. Generate a cryptographically random 32-byte secret:
+Before promoting any candidate release or deploying to Preview/Production:
+1. **Branch & Commit Verification:**
+   - Confirm active branch is clean: `git status`
+   - Confirm commit SHA matches certified audit commit (`git rev-parse HEAD`)
+2. **Local Regression Pipeline (Zero Failure Tolerance):**
    ```bash
-   openssl rand -base64 32
-   # Or using Node.js:
-   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+   npm run test:all
    ```
-2. In Vercel Project Settings -> **Environment Variables**:
-   - Set `MILO_SESSION_SECRET` = `<generated_32_byte_string>`
-   - Environments: **Production**, **Preview**, **Development**
-3. Redeploy the application.
-
----
-
-### Runbook C: Redis Outage & Rate-Limiter Fail-Safe Degradation
-
-**Symptoms:**
-- Server logs contain: `[DistributedRateLimiter] Redis outage/timeout (<error>). Activating strict fail-safe degradation.`
-- Responses contain header: `X-RateLimit-Degraded: true`
-- Users making more than 5 requests/min receive HTTP 429.
-
-**Expected System Behavior:**
-- The fail-safe policy intentionally clamps maximum allowable requests to **5 req/min per client** during Redis downtime, preventing unmetered requests from flooding upstream Gemini APIs and burning cost.
-
-**Remediation Steps:**
-1. Verify Upstash Redis / Vercel KV status at `https://status.upstash.com/`.
-2. Check `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` in Vercel project environment variables.
-3. Test connectivity:
+   Must exit with code 0 across all 25 test files and 44 test suites.
+3. **Local Vercel Preview Build:**
    ```bash
-   curl -X POST "$UPSTASH_REDIS_REST_URL/pipeline" \
-     -H "Authorization: Bearer $UPSTASH_REDIS_REST_TOKEN" \
-     -H "Content-Type: application/json" \
-     -d '[["PING"]]'
+   npx vercel build --yes
    ```
-4. Once Redis service recovers, `DistributedRateLimiter` automatically resumes normal 30 req/min limits without restarting containers.
+   Must succeed with exit code 0 and generate `.vercel/output`.
+4. **Environment Secrets Audit (Vercel Dashboard):**
+   - Confirm `MILO_SESSION_SECRET` is set (length >= 32 characters, random 256-bit entropy).
+   - Confirm `GEMINI_API_KEY` is set and linked to a Google Cloud project with Tier 1 paid billing enabled.
+   - Verify secrets exist for both **Preview** and **Production** targets.
 
 ---
 
-### Runbook D: PostgreSQL Connection Failure & Storage Outage
+## 2. Deployment Procedures
 
-**Symptoms:**
-- Note creation or retrieval fails with `DATABASE_CONNECTION_ERROR` or `DATABASE_QUERY_ERROR`.
-- Controlled error returned to client: HTTP 500 with descriptive error (no silent loss).
+### 2.1 Preview Deployment & Smoke Verification
+```bash
+# 1. Deploy candidate branch to Vercel Preview (never --prod)
+npx vercel deploy --prebuilt
 
-**Remediation Steps:**
-1. Check PostgreSQL cluster status (Neon / AWS RDS / Supabase).
-2. If running under serverless concurrency, ensure a connection pooler like **PgBouncer** or **Neon connection pooling** (`?sslmode=require&pooler=true`) is active.
-3. If running schema migrations, execute `pgService.initSchema()`.
+# 2. Record the deployed URL from CLI output:
+# e.g., https://second-brain-ai-<hash>-ankitapriyadarshini-repos-projects.vercel.app
+
+# 3. Verify health probe (requires Vercel protection bypass header if SSO is enabled):
+curl -s -H "x-vercel-protection-bypass: <bypass_secret>" \
+  https://<preview-url>/api/health
+# Expected: {"status":"healthy","uptime":...}
+```
+
+### 2.2 Production Promotion Protocol
+Only promote to production after all 15 acceptance gates are satisfied and signed off:
+```bash
+# Production promotion command (requires release manager approval):
+npx vercel deploy --prod --prebuilt
+```
 
 ---
 
-## 4. Release Verdicts by Deployment Target
+## 3. Incident Response Playbooks
 
-| Target | Verdict | Operational Prerequisite |
-|---|---|---|
-| **Target A: Internal testing (1–5 users)** | **VERIFIED** | Ready immediately. 32-char session secret enforced. |
-| **Target B: Invited pilot (10–25 users)** | **VERIFIED WITH LIMITATIONS** | Single Node or persistent PostgreSQL active. Free Tier acceptable with staggered queries; Paid Tier recommended. |
-| **Target C: 100 concurrent core users** | **VERIFIED WITH LIMITATIONS** | Core application certified up to 703 RPS. Not a proof of unprovisioned cloud state. |
-| **Target D: 100 concurrent live end-to-end** | **BLOCKED** | Blocked pending operator provisioning of Upstash Redis, PostgreSQL, and Google Cloud Tier 1 Paid Quota. |
+### Playbook 1: Upstream Gemini 429 Quota Exhaustion
+- **Symptom:** Gateway returns HTTP 429 `RESOURCE_EXHAUSTED` or logs indicate `The model is overloaded. Key [REDACTED] failed`.
+- **Root Cause:** Fleet request rate exceeded Google AI RPM/TPM tier quota (e.g., account still on 15 RPM Free Tier).
+- **Automated Mitigation:** Gateway automatically cascades through fallback models (`gemini-3.8-flash` -> `3.6-flash` -> `3.5-flash-lite` -> `3.1-flash-lite`).
+- **Operator Action:**
+  1. Open [Google Cloud Console -> Quotas & System Limits](https://console.cloud.google.com).
+  2. Confirm project billing is active (Tier 1 Pay-as-you-go).
+  3. Request an emergency quota increase for `gemini-3.8-flash` from 2,000 RPM to 4,000 RPM.
+  4. If quota exhaustion persists, temporarily decrease `MAX_GLOBAL_CONCURRENT_AI` in `api/ai/gateway.js` from 75 to 40.
+
+### Playbook 2: Circuit Breaker Tripped (HTTP 503)
+- **Symptom:** Gateway returns HTTP 503 `CIRCUIT_BREAKER_OPEN`.
+- **Root Cause:** 5 consecutive 5xx errors from Google Gemini API (upstream outage or regional failure).
+- **Mitigation:** Circuit breaker trips for 15 seconds to shed load and protect downstream clients.
+- **Operator Action:**
+  1. Check [Google Cloud Status Dashboard](https://status.cloud.google.com).
+  2. Inspect serverless logs: `npx vercel logs <deployment-url>`.
+  3. Breaker will automatically attempt half-open probe after 15 seconds. If Google AI recovers, breaker resets to `CLOSED`.
+
+### Playbook 3: Redis Degradation Mode (Upstash Outage)
+- **Symptom:** Serverless logs show `[DistributedRateLimiter] Redis outage/timeout (fetch failed). Activating strict fail-safe degradation`.
+- **Root Cause:** Upstash Redis connection timeout or API outage.
+- **Mitigation:** Distributed rate limiter clamps down immediately to **5 requests per minute** per client local ceiling. System prevents unbounded upstream spend.
+- **Operator Action:**
+  1. Check Upstash status at [status.upstash.com](https://status.upstash.com).
+  2. Verify `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` credentials in Vercel settings.
+
+---
+
+## 4. Rollback Triggers & Instant Rollback Procedure
+
+### Rollback Trigger Criteria:
+Initiate an immediate rollback if ANY of the following occur within 15 minutes of release:
+1. Error rate on `/api/ai/gateway` exceeds 2.0% across 5 minutes.
+2. Latency p95 exceeds 5,000 ms on non-AI endpoints or 10,000 ms on AI endpoints.
+3. Any cross-tenant data leakage or security isolation defect is reported.
+4. Serverless lambda crashes (`FUNCTION_INVOCATION_FAILED`).
+
+### Instant Rollback Execution:
+```bash
+# Method A: Instant Rollback via Vercel CLI
+npx vercel rollback <prior_certified_deployment_id>
+
+# Method B: Vercel Dashboard Instant Rollback
+# 1. Open Vercel Dashboard -> Project second-brain-ai-app -> Deployments.
+# 2. Locate prior stable deployment (e.g. commit 1345b30).
+# 3. Click the three dots (...) -> Promote to Production / Rollback.
+# Traffic shifts instantly (0s downtime) via Vercel Edge routing.
+```
