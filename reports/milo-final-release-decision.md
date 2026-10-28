@@ -3,8 +3,10 @@
 **Document Reference:** `reports/milo-final-release-decision.md`  
 **Target Repository:** `AnkitaPriyadarshini-repos/Second-Brain-AI-System`  
 **Audited Branch:** `scalability/milo-200-user-certification`  
-**Git Commit SHA:** `cb7e11cf3563290aecf0b5fceb04c8d8977b364f`  
-**Timestamp:** 2026-10-28T19:08:00+05:30  
+**Git Commit SHA:** `04c26aad320a09962e039bf921a1ca4926243f5c`  
+**Latest Deployed Preview Deployment ID:** `dpl_CMr1rgqrnrsbFt1vFhZvXBYpbHzK`  
+**Latest Deployed Preview URL:** `https://second-brain-ai-l6ibz3g8r-ankitapriyadarshini-repos-projects.vercel.app`  
+**Timestamp:** 2026-10-28T19:15:00+05:30  
 **Evaluator Roles:** Principal Software Architect, Senior SRE, Application Security Engineer, Performance Engineer, Release Manager  
 
 ---
@@ -25,7 +27,7 @@ In strict compliance with the core certification principle (**local mock benchma
 ### Verdict B: Real-User Production Deployment Readiness
 ### **STATUS: CONDITIONAL GO (10–25 USER INVITED PILOT ONLY)**
 ### **200-USER GENERAL PRODUCTION ROLLOUT: BLOCKED**
-- **Empirical Grounding:** The candidate branch was compiled and deployed to Vercel Preview (`dpl_FdsqHSG5z5h1csuaJUJaKmh2jMRh` at `https://second-brain-ai-cxrmgt0ve-ankitapriyadarshini-repos-projects.vercel.app`).
+- **Empirical Grounding:** The candidate branch was compiled and deployed to Vercel Preview (`dpl_CMr1rgqrnrsbFt1vFhZvXBYpbHzK` at `https://second-brain-ai-l6ibz3g8r-ankitapriyadarshini-repos-projects.vercel.app`).
 - **Cloud Blockers Identified:**
   1. **Vercel Deployment Protection (SSO):** Probing `/api/health` returned HTTP 302 redirecting to `https://vercel.com/sso-api?url=...` (or HTTP 200 with `<title>Login – Vercel</title>` if followed). Direct POST requests return HTTP 401 `{"error":{"message":"Protected deployment"}}`. Vercel SSO stops unauthenticated external HTTP load traffic at the edge before reaching serverless functions.
   2. **Missing Preview Secrets:** `npx vercel env ls` proves that `MILO_SESSION_SECRET` and `GEMINI_API_KEY` are only configured in `Development` and `Production`, and are **completely missing from Preview**.
@@ -44,15 +46,15 @@ In strict compliance with the core certification principle (**local mock benchma
 | **4** | **Cross-User Data Isolation** | **PASS** | 1,685 cross-user intrusion attempts blocked with 0 data leaks. | None |
 | **5** | **Queue Bounds & Overload** | **PASS** | Concurrency cap (75), 1s timeout, HTTP 429 `Retry-After` verified. | None |
 | **6** | **Distributed Rate Limiting** | **BLOCKED** | Mock multi-process tests passed; live Upstash Redis is unprovisioned. | Provision Upstash Redis REST credentials in Vercel. |
-| **7** | **Preview Deployment** | **PASS** | Deployed `dpl_FdsqHSG5z5h1csuaJUJaKmh2jMRh` (`READY` state). | None |
+| **7** | **Preview Deployment** | **PASS** | Deployed `dpl_CMr1rgqrnrsbFt1vFhZvXBYpbHzK` (`READY` state). | None |
 | **8** | **Live HTTP Staging Load** | **BLOCKED** | Direct HTTP probes intercepted by Vercel SSO login (`VERCEL_SSO_BLOCKED`). | Disable preview protection or supply bypass token. |
 | **9** | **Live Gemini Smoke Test** | **BLOCKED** | Safety gate active; `--run-live=true` requires live paid key. | Configure paid Gemini API key in Vercel Preview. |
 | **10** | **Quota & Spend Safeguards** | **PASS** | 24s execution budget, model fallbacks, 75 concurrency cap verified. | Configure GCP billing budget alerts ($25 soft, $50 hard). |
 | **11** | **Client Storage & Recovery** | **PASS** | 6 storage unit tests & 8 Chrome CDP E2E tests passed cleanly. | None |
 | **12** | **Media Job Durability** | **PASS** | Stateless image proxy verified; video job store documented as ephemeral. | Add Redis/DB for multi-container video jobs if required. |
 | **13** | **Observability & Runbook** | **PASS** | Structured logs, secret scrubbers, and operational runbook verified. | None |
-| **14** | **Production Configuration** | **BLOCKED** | Missing `MILO_SESSION_SECRET` and `GEMINI_API_KEY` in Preview. | Enable environment variables for Preview in Vercel. |
-| **15** | **Final 200-User Decision** | **CONDITIONAL GO** | 10–25 user pilot authorized; 200 real users blocked on cloud setup. | Fulfill operator checklist before scaling to 200 users. |
+| **14** | **Production Configuration** | **BLOCKED** | Missing `MILO_SESSION_SECRET` and `GEMINI_API_KEY` in Preview. | Enable dedicated Preview environment variables in Vercel. |
+| **15** | **Final 200-User Decision** | **BLOCKED FOR 200 USERS** | 10–25 user pilot authorized; 200 real users blocked on cloud setup. | Fulfill operator checklist before scaling to 200 users. |
 
 ---
 
@@ -68,8 +70,8 @@ The available empirical evidence justifies an **invited external pilot of 10–2
 ## 4. Operator Checklist to Unlock Full 200-User Certification
 
 To unlock the full 200-user general production rollout:
-- [ ] **Step 1:** Enable `MILO_SESSION_SECRET` and `GEMINI_API_KEY` for **Preview** in Vercel Project Settings.
-- [ ] **Step 2:** Either temporarily disable Vercel Authentication for Preview or generate a Protection Bypass secret for automation.
+- [ ] **Step 1:** Configure dedicated Preview secrets in Vercel Project Settings (generate a strong 64-hex character string for `MILO_SESSION_SECRET` and provide a restricted test `GEMINI_API_KEY` for **Preview only**).
+- [ ] **Step 2:** Generate a **Protection Bypass for Automation** secret in Vercel Settings -> Deployment Protection.
 - [ ] **Step 3:** Confirm Google Cloud billing is active on Tier 1 (Pay-as-you-go) with at least 1,000 RPM quota for `gemini-3.8-flash`.
 - [ ] **Step 4:** Set budget alerts at $25.00 and $50.00 in Google Cloud Billing.
 - [ ] **Step 5:** Execute Mode B live staging load test against the unblocked Preview URL using `--bypass-secret`.
