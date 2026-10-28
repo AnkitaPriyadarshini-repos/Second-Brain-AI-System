@@ -3,10 +3,10 @@
 **Document Reference:** `reports/milo-live-staging-verification.md`  
 **Target Repository:** `AnkitaPriyadarshini-repos/Second-Brain-AI-System`  
 **Audited Branch:** `scalability/milo-200-user-certification`  
-**Certified Git Commit SHA:** `04c26aad320a09962e039bf921a1ca4926243f5c`  
+**Certified Git Commit SHA:** `a71bf68217d12d447faded3da8cb78b96d95b33b` (`a71bf68`)  
 **Latest Deployed Preview Deployment ID:** `dpl_CMr1rgqrnrsbFt1vFhZvXBYpbHzK`  
 **Latest Deployed Preview URL:** `https://second-brain-ai-l6ibz3g8r-ankitapriyadarshini-repos-projects.vercel.app`  
-**Audit Timestamp:** 2026-10-28T19:15:00+05:30  
+**Audit Timestamp:** 2026-10-28T19:30:00+05:30  
 **Lead Roles:** Principal SRE, Cloud Infrastructure Architect, Application Security Engineer, Performance Engineer, Release Manager  
 
 ---
@@ -14,23 +14,24 @@
 ## 1. Executive Summary & Build Correspondence Investigation
 
 ### 1.1 Deployed Commit vs Application Code Verification
-Investigation of the repository history revealed:
-- **Build Commit `200770f` vs Candidate Commit `04c26aa`:**
+Investigation of the repository history and deployment confirmed:
+- **Build Commit `200770f` vs Candidate Commit `a71bf68`:**
   A strict code-level diff was executed:
   ```bash
-  $ git diff 200770f 04c26aa -- api/ js/ controllers/ services/ server.js index.html
+  $ git diff 200770f a71bf68 -- api/ js/ controllers/ services/ server.js index.html package.json vercel.json
   ```
-  **Result:** Zero diff. The application runtime code, middleware, controllers, routes, and client logic in `04c26aa` are 100% identical to `200770f`.
-- The differences between `200770f` and `04c26aa` consist solely of:
-  1. Test harness enhancements in [`test/load_test_suite.js`](file:///c:/Users/ankit/resume/Second-Brain-AI-System/test/load_test_suite.js) (adding Vercel protection bypass header support and Vercel edge SSO detection).
-  2. Audit documentation reports in [`reports/`](file:///c:/Users/ankit/resume/Second-Brain-AI-System/reports).
-- **Deployment Status:** To eliminate any version ambiguity, a fresh prebuilt Preview deployment was compiled and deployed:
+  **Result:** Zero diff (100% byte-for-byte identical). The application runtime code, middleware, controllers, routes, and client logic in candidate commit `a71bf68` are identical to `200770f`.
+- The differences between `200770f` and `a71bf68` consist exclusively of:
+  1. Dedicated verification probe [`test/verify_preview_deployment.js`](file:///c:/Users/ankit/resume/Second-Brain-AI-System/test/verify_preview_deployment.js) for non-destructive edge and SSO detection.
+  2. Test harness enhancements in [`test/load_test_suite.js`](file:///c:/Users/ankit/resume/Second-Brain-AI-System/test/load_test_suite.js) (Vercel protection bypass header forwarding and Vercel edge SSO interception detection).
+  3. Audit documentation and release decision reports in [`reports/`](file:///c:/Users/ankit/resume/Second-Brain-AI-System/reports).
+- **Deployment Status:** Deployment compiled and running on Vercel Preview:
   - **Deployment ID:** `dpl_CMr1rgqrnrsbFt1vFhZvXBYpbHzK`
   - **URL:** `https://second-brain-ai-l6ibz3g8r-ankitapriyadarshini-repos-projects.vercel.app`
   - **Target:** `preview`
-  - **State:** `READY`
+  - **State:** `READY` (`● Ready`)
   - **Runtime:** `nodejs24.x` on AWS Lambda (`iad1`)
-  - **Prior Deployment Reference:** `dpl_FdsqHSG5z5h1csuaJUJaKmh2jMRh` (`https://second-brain-ai-cxrmgt0ve-ankitapriyadarshini-repos-projects.vercel.app`)
+  - **Code Correspondence:** Proven 100% equivalent to candidate commit `a71bf68`.
 
 ---
 
@@ -72,14 +73,31 @@ In the [Vercel Project Dashboard](https://vercel.com/ankitapriyadarshini-repos-p
 ## 3. Authorized Testing Protocol for Protected Preview
 
 Empirical probing confirmed that Vercel Deployment Protection intercepts unauthenticated traffic at the edge:
-- **HTTP GET `/api/health`:** Responds with **HTTP 302 Found**, redirecting to `https://vercel.com/sso-api?url=...` with cookie `_vercel_sso_nonce`. Clients following redirects receive HTTP 200 with `<title>Login – Vercel</title>`.
-- **HTTP POST (JSON) `/api/ai/gateway`:** Responds with **HTTP 401 Unauthorized**:
-  ```json
-  {"error":{"message":"Protected deployment","code":"401"},"protection":{"password_enabled":false,"vercel_auth_enabled":true}}
+- **Dedicated Probe Execution ([test/verify_preview_deployment.js](file:///c:/Users/ankit/resume/Second-Brain-AI-System/test/verify_preview_deployment.js)):**
+  ```bash
+  $ node test/verify_preview_deployment.js
+  ====================================================
+  🔍 MILO AI — PREVIEW DEPLOYMENT VERIFICATION PROBE
+  Target: https://second-brain-ai-l6ibz3g8r-ankitapriyadarshini-repos-projects.vercel.app
+  Bypass Token: [NOT PROVIDED]
+  ====================================================
+
+  ▶ Probing GET /api/health ...
+  🔒 [VERCEL SSO INTERCEPTION DETECTED]
+     HTTP Status: 401
+     Response Type: application/json
+     Vercel Deployment Protection intercepted the request before reaching serverless lambdas.
+     A Vercel login page returning HTTP 200 or 401 is NOT counted as an application health success.
+     To bypass: provide --bypass-secret=<token> or set VERCEL_PROTECTION_BYPASS.
+
+  ▶ Probing GET /api/ai/health ...
+  🔒 [VERCEL SSO INTERCEPTION DETECTED]
+     HTTP Status: 401
+     Vercel Deployment Protection intercepted the request.
   ```
 - **Approved Protection-Bypass Workflow:**
   In Vercel Project Settings -> **Deployment Protection** -> Under **Vercel Authentication**, generate a **Protection Bypass for Automation** secret.
-  The test harness [`test/load_test_suite.js`](file:///c:/Users/ankit/resume/Second-Brain-AI-System/test/load_test_suite.js) automatically passes:
+  The test harness [`test/load_test_suite.js`](file:///c:/Users/ankit/resume/Second-Brain-AI-System/test/load_test_suite.js) and probe [`test/verify_preview_deployment.js`](file:///c:/Users/ankit/resume/Second-Brain-AI-System/test/verify_preview_deployment.js) automatically pass:
   ```http
   x-vercel-protection-bypass: <your_bypass_secret>
   ```
