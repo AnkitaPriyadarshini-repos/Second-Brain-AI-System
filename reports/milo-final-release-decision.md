@@ -3,8 +3,8 @@
 **Document Reference:** `reports/milo-final-release-decision.md`  
 **Target Repository:** `AnkitaPriyadarshini-repos/Second-Brain-AI-System`  
 **Audited Branch:** `scalability/milo-200-user-certification`  
-**Git Commit SHA:** `200770f9ed1aa14240b4128c207f59dc46e48fe2` (`200770f`)  
-**Timestamp:** 2026-10-28T18:35:00+05:30  
+**Git Commit SHA:** `cb7e11cf3563290aecf0b5fceb04c8d8977b364f`  
+**Timestamp:** 2026-10-28T19:08:00+05:30  
 **Evaluator Roles:** Principal Software Architect, Senior SRE, Application Security Engineer, Performance Engineer, Release Manager  
 
 ---
@@ -15,8 +15,8 @@ In strict compliance with the core certification principle (**local mock benchma
 
 ### Verdict A: Code & Local Benchmark Readiness
 ### **STATUS: GO (CERTIFIED FOR 300 CONCURRENT USERS LOCAL MOCK)**
-- **Empirical Grounding:** All 25 test files and 44 regression suites passed cleanly (`npm run test:all`).
-- **Load Test Certification:** Multi-stage load test (`test:load:200`) executed 13,880 requests across 10, 25, 50, 100, 150, 200, 250, and 300 simulated users plus a 3-wave sustained soak test.
+- **Empirical Grounding:** All 25 test files and 44 regression suites passed cleanly ([`npm run test:all`](file:///c:/Users/ankit/resume/Second-Brain-AI-System/package.json#L35)).
+- **Load Test Certification:** Multi-stage load test ([`test/load_test_suite.js`](file:///c:/Users/ankit/resume/Second-Brain-AI-System/test/load_test_suite.js)) executed 13,880 requests across 10, 25, 50, 100, 150, 200, 250, and 300 simulated users plus a 3-wave sustained soak test.
 - **Results:** 100.0% success rate, 0 cross-user data leaks across 1,685 intrusion probes, flat memory (RSS 95.4MB–116.4MB), and sub-350ms p95 latency.
 - **Architectural Safeguards:** Bounded in-flight concurrency (`MAX_GLOBAL_CONCURRENT_AI = 75`), circuit breaker, and memory pruning are fully implemented and verified.
 
@@ -27,9 +27,9 @@ In strict compliance with the core certification principle (**local mock benchma
 ### **200-USER GENERAL PRODUCTION ROLLOUT: BLOCKED**
 - **Empirical Grounding:** The candidate branch was compiled and deployed to Vercel Preview (`dpl_FdsqHSG5z5h1csuaJUJaKmh2jMRh` at `https://second-brain-ai-cxrmgt0ve-ankitapriyadarshini-repos-projects.vercel.app`).
 - **Cloud Blockers Identified:**
-  1. **Vercel Deployment Protection:** Direct HTTP requests are intercepted by Vercel SSO login (`<title>Login – Vercel</title>`), preventing automated cloud load tests from exercising serverless API routes.
+  1. **Vercel Deployment Protection (SSO):** Probing `/api/health` returned HTTP 302 redirecting to `https://vercel.com/sso-api?url=...` (or HTTP 200 with `<title>Login – Vercel</title>` if followed). Direct POST requests return HTTP 401 `{"error":{"message":"Protected deployment"}}`. Vercel SSO stops unauthenticated external HTTP load traffic at the edge before reaching serverless functions.
   2. **Missing Preview Secrets:** `npx vercel env ls` proves that `MILO_SESSION_SECRET` and `GEMINI_API_KEY` are only configured in `Development` and `Production`, and are **completely missing from Preview**.
-  3. **Live Gemini Quota Verification:** Live Gemini testing remains blocked by safety gates to protect billing. Operating 200 real users requires confirmed Tier 1 paid billing (1,000–2,000 RPM); running on the Free Tier (15 RPM) will cause immediate fleet-wide HTTP 429 failures.
+  3. **Live Gemini Quota Verification:** Live Gemini testing remains blocked by safety gates to protect billing. Operating 200 real users requires confirmed Tier 1 paid billing (1,000–2,000 RPM); running on the Free Tier (15 RPM) will cause immediate fleet-wide HTTP 429 quota exhaustion.
   4. **Unprovisioned Shared Redis:** `UPSTASH_REDIS_REST_URL` is unconfigured in Vercel.
 
 ---
@@ -45,7 +45,7 @@ In strict compliance with the core certification principle (**local mock benchma
 | **5** | **Queue Bounds & Overload** | **PASS** | Concurrency cap (75), 1s timeout, HTTP 429 `Retry-After` verified. | None |
 | **6** | **Distributed Rate Limiting** | **BLOCKED** | Mock multi-process tests passed; live Upstash Redis is unprovisioned. | Provision Upstash Redis REST credentials in Vercel. |
 | **7** | **Preview Deployment** | **PASS** | Deployed `dpl_FdsqHSG5z5h1csuaJUJaKmh2jMRh` (`READY` state). | None |
-| **8** | **Live HTTP Staging Load** | **BLOCKED** | Direct HTTP probes intercepted by Vercel SSO login (`Login – Vercel`). | Disable preview protection or supply bypass token. |
+| **8** | **Live HTTP Staging Load** | **BLOCKED** | Direct HTTP probes intercepted by Vercel SSO login (`VERCEL_SSO_BLOCKED`). | Disable preview protection or supply bypass token. |
 | **9** | **Live Gemini Smoke Test** | **BLOCKED** | Safety gate active; `--run-live=true` requires live paid key. | Configure paid Gemini API key in Vercel Preview. |
 | **10** | **Quota & Spend Safeguards** | **PASS** | 24s execution budget, model fallbacks, 75 concurrency cap verified. | Configure GCP billing budget alerts ($25 soft, $50 hard). |
 | **11** | **Client Storage & Recovery** | **PASS** | 6 storage unit tests & 8 Chrome CDP E2E tests passed cleanly. | None |
@@ -72,5 +72,5 @@ To unlock the full 200-user general production rollout:
 - [ ] **Step 2:** Either temporarily disable Vercel Authentication for Preview or generate a Protection Bypass secret for automation.
 - [ ] **Step 3:** Confirm Google Cloud billing is active on Tier 1 (Pay-as-you-go) with at least 1,000 RPM quota for `gemini-3.8-flash`.
 - [ ] **Step 4:** Set budget alerts at $25.00 and $50.00 in Google Cloud Billing.
-- [ ] **Step 5:** Execute Mode B live staging load test against the unblocked Preview URL.
+- [ ] **Step 5:** Execute Mode B live staging load test against the unblocked Preview URL using `--bypass-secret`.
 - [ ] **Step 6:** Execute live Gemini smoke test: `GEMINI_API_KEY=<key> node test/real_gemini_smoke_test.js --run-live=true`.

@@ -37,6 +37,22 @@ const CONFIRM_PROD = Boolean(args['confirm-production'] || args.confirmProductio
 const RUN_ALL_STAGES = Boolean(args.stages || args['all-stages'] || args['run-stages']);
 const SOAK_ROUNDS = parseInt(args['soak-rounds'] || args.soakRounds, 10) || 3;
 
+// Vercel Deployment Protection Bypass Configuration (for Mode B Live Staging)
+const VERCEL_BYPASS_SECRET = (
+  args['bypass-secret'] ||
+  args.bypassSecret ||
+  process.env.VERCEL_PROTECTION_BYPASS ||
+  process.env.VERCEL_AUTOMATION_BYPASS_SECRET ||
+  ''
+).trim();
+
+const VERCEL_BYPASS_COOKIE = (
+  args['bypass-cookie'] ||
+  args.bypassCookie ||
+  process.env.VERCEL_PROTECTION_COOKIE ||
+  ''
+).trim();
+
 // Provide a test session secret for local benchmark/load tests if none was set in environment
 if (!process.env.MILO_SESSION_SECRET && !process.env.SESSION_SECRET) {
   process.env.MILO_SESSION_SECRET = 'milo_load_test_secret_32bytes_random_testing_val!';
@@ -74,6 +90,19 @@ function recordProviderCall() {
   }
 }
 
+function isGenuineApplicationHealth(res) {
+  if (!res || res.statusCode !== 200) return false;
+  if (res.isVercelEdgeProtected) return false;
+  const contentType = (res.headers && res.headers['content-type']) || '';
+  if (!contentType.includes('application/json')) return false;
+  try {
+    const data = JSON.parse(res.body);
+    return Boolean(data && (data.ok === true || data.status === 'healthy' || data.service === 'milo-ai-system' || data.service === 'milo-ai-gateway'));
+  } catch (_) {
+    return false;
+  }
+}
+
 function makeRequest(urlStr, options = {}, postData = null, retries = 2) {
   return new Promise((resolve, reject) => {
     const t0 = Date.now();
@@ -88,16 +117,27 @@ function makeRequest(urlStr, options = {}, postData = null, retries = 2) {
     const lib = isHttps ? https : http;
     const agent = isHttps ? httpsAgent : httpAgent;
 
+    const reqHeaders = {
+      'Accept': 'application/json, text/html, */*',
+      ...(options.headers || {})
+    };
+
+    if (VERCEL_BYPASS_SECRET) {
+      reqHeaders['x-vercel-protection-bypass'] = VERCEL_BYPASS_SECRET;
+    }
+    if (VERCEL_BYPASS_COOKIE) {
+      reqHeaders['Cookie'] = VERCEL_BYPASS_COOKIE.startsWith('_vercel_jwt=')
+        ? VERCEL_BYPASS_COOKIE
+        : `_vercel_jwt=${VERCEL_BYPASS_COOKIE}`;
+    }
+
     const reqOptions = {
       protocol: parsed.protocol,
       hostname: parsed.hostname,
       port: parsed.port || (isHttps ? 443 : 80),
       path: parsed.pathname + parsed.search,
       method: options.method || 'GET',
-      headers: {
-        'Accept': 'application/json, text/html, */*',
-        ...(options.headers || {})
-      },
+      headers: reqHeaders,
       agent,
       timeout: options.timeout || 15000
     };
@@ -107,11 +147,23 @@ function makeRequest(urlStr, options = {}, postData = null, retries = 2) {
       res.on('data', (chunk) => { body += chunk; });
       res.on('end', () => {
         const duration = Date.now() - t0;
+
+        // Detect Vercel Deployment Protection (SSO / Edge gate interception)
+        let isVercelEdgeProtected = false;
+        if (res.statusCode === 401 && body.includes('"Protected deployment"') && body.includes('"vercel_auth_enabled"')) {
+          isVercelEdgeProtected = true;
+        } else if ((res.statusCode === 302 || res.statusCode === 307) && res.headers['location'] && res.headers['location'].includes('sso-api')) {
+          isVercelEdgeProtected = true;
+        } else if (res.statusCode === 200 && (body.includes('<title>Login – Vercel</title>') || (body.includes('data-dpl-id') && res.headers['content-type']?.includes('text/html')))) {
+          isVercelEdgeProtected = true;
+        }
+
         resolve({
           statusCode: res.statusCode,
           duration,
           headers: res.headers,
-          body
+          body,
+          isVercelEdgeProtected
         });
       });
     });
@@ -345,7 +397,7 @@ async function runLoadTestSuite() {
     let isolationFailures = 0;
     let completedWorkflows = 0;
 
-    function recordMetric(res, isAi = false, isExpectedRateLimit = false) {
+    function recordMetric(res, isAi = false, isExpectedRateLimit = false, isExplicitSuccess = null) {
       totalRequests++;
       allLatencies.push(res.duration);
       if (isAi) {
@@ -355,7 +407,14 @@ async function runLoadTestSuite() {
       }
 
       statusCodes[res.statusCode] = (statusCodes[res.statusCode] || 0) + 1;
-      if (res.statusCode >= 200 && res.statusCode < 400) {
+      if (res.isVercelEdgeProtected) {
+        statusCodes['VERCEL_SSO_BLOCKED'] = (statusCodes['VERCEL_SSO_BLOCKED'] || 0) + 1;
+        return; // Intercepted by Vercel edge - NOT an application success
+      }
+
+      if (isExplicitSuccess !== null) {
+        if (isExplicitSuccess) successfulRequests++;
+      } else if (res.statusCode >= 200 && res.statusCode < 400) {
         successfulRequests++;
       } else if (isExpectedRateLimit && res.statusCode === 429) {
         successfulRequests++; // Correctly classified expected rate-limit rejection
@@ -377,10 +436,18 @@ async function runLoadTestSuite() {
       try {
         let stepCount = 0;
 
-        // Step 1: Health check (non-AI)
-        const healthRes = await makeRequest(`${baseUrl}/api/ai/health`, { method: 'GET' });
-        recordMetric(healthRes, false);
-        if (healthRes.statusCode === 200) stepCount++;
+        // Step 1: Health check (non-AI) — strictly verifies genuine JSON application payload
+        const healthRes = await makeRequest(`${baseUrl}/api/health`, { method: 'GET' });
+        const isHealthy = isGenuineApplicationHealth(healthRes);
+        recordMetric(healthRes, false, false, isHealthy);
+        if (isHealthy) stepCount++;
+
+        if (healthRes.isVercelEdgeProtected && idx === 0) {
+          console.warn(`\n🚨 [VERCEL DEPLOYMENT PROTECTION ACTIVE]
+   Request to ${baseUrl}/api/health was intercepted by Vercel Edge SSO (HTTP ${healthRes.statusCode}).
+   Milo serverless functions cannot be reached without an automation bypass secret.
+   To unblock: supply --bypass-secret=<token> or set VERCEL_PROTECTION_BYPASS=<token>.\n`);
+        }
 
         // Step 2: Short greeting AI query
         if (checkSpendBudget()) {
@@ -390,7 +457,7 @@ async function runLoadTestSuite() {
             headers: authHeaders
           }, { prompt: 'Hello Milo, what is your system status?' });
           recordMetric(greetingRes, true);
-          if (greetingRes.statusCode === 200) stepCount++;
+          if (greetingRes.statusCode === 200 && !greetingRes.isVercelEdgeProtected) stepCount++;
         }
 
         // Step 3: Complex query with isolated private context notes
@@ -410,7 +477,7 @@ async function runLoadTestSuite() {
             ]
           });
           recordMetric(ragRes, true);
-          if (ragRes.statusCode === 200) stepCount++;
+          if (ragRes.statusCode === 200 && !ragRes.isVercelEdgeProtected) stepCount++;
         }
 
         // Step 4: Rapid burst submission to verify rate-limiting behavior
@@ -419,7 +486,7 @@ async function runLoadTestSuite() {
           headers: authHeaders
         }, { prompt: 'Rapid burst query' });
         recordMetric(burstRes, true, true);
-        if (burstRes.statusCode === 200 || burstRes.statusCode === 429) stepCount++;
+        if ((burstRes.statusCode === 200 || burstRes.statusCode === 429) && !burstRes.isVercelEdgeProtected) stepCount++;
 
         // Step 5: Async Video Generation Job creation (non-AI API)
         let jobId = null;
@@ -431,7 +498,7 @@ async function runLoadTestSuite() {
           prompt: `Cinematic drone view of cyber city for user ${userId}`
         });
         recordMetric(vidCreateRes, false);
-        if (vidCreateRes.statusCode === 202 || vidCreateRes.statusCode === 200) {
+        if ((vidCreateRes.statusCode === 202 || vidCreateRes.statusCode === 200) && !vidCreateRes.isVercelEdgeProtected) {
           stepCount++;
           try {
             const body = JSON.parse(vidCreateRes.body);
@@ -446,7 +513,7 @@ async function runLoadTestSuite() {
             headers: authHeaders
           }, { action: 'status', jobId });
           recordMetric(vidPollRes, false);
-          if (vidPollRes.statusCode === 200) stepCount++;
+          if (vidPollRes.statusCode === 200 && !vidPollRes.isVercelEdgeProtected) stepCount++;
 
           // Step 7: Cross-user data isolation test
           // Virtual user attempts to access another user's job -> MUST return 403 Forbidden
@@ -464,7 +531,9 @@ async function runLoadTestSuite() {
           nonAiLatencies.push(intruderRes.duration);
           statusCodes[intruderRes.statusCode] = (statusCodes[intruderRes.statusCode] || 0) + 1;
 
-          if (intruderRes.statusCode === 403) {
+          if (intruderRes.isVercelEdgeProtected) {
+            statusCodes['VERCEL_SSO_BLOCKED'] = (statusCodes['VERCEL_SSO_BLOCKED'] || 0) + 1;
+          } else if (intruderRes.statusCode === 403) {
             isolationPasses++;
             successfulRequests++; // Security boundary successfully enforced
             stepCount++;
@@ -479,7 +548,7 @@ async function runLoadTestSuite() {
             headers: authHeaders
           }, { action: 'cancel', jobId });
           recordMetric(vidCancelRes, false);
-          if (vidCancelRes.statusCode === 200) stepCount++;
+          if (vidCancelRes.statusCode === 200 && !vidCancelRes.isVercelEdgeProtected) stepCount++;
         }
 
         if (stepCount >= 7) {
