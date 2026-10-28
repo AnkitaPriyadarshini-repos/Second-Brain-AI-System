@@ -126,6 +126,9 @@ function cleanupCaches() {
   for (const [key, value] of rateBuckets) {
     if (now - value.startedAt > RATE_WINDOW_MS * 2) rateBuckets.delete(key);
   }
+  for (const [key, timestamp] of activeInFlightRequests) {
+    if (now - timestamp > 35_000) activeInFlightRequests.delete(key);
+  }
 }
 
 function classifyRequest(prompt, context, history) {
@@ -666,6 +669,24 @@ function redactSecrets(text) {
       });
     };
 
+    const MAX_GLOBAL_CONCURRENT_AI = parseInt(process.env.MILO_MAX_CONCURRENT_AI || '75', 10);
+    let waitedMs = 0;
+    while ((globalThis.__miloGlobalInFlightAICalls || 0) >= MAX_GLOBAL_CONCURRENT_AI && waitedMs < 1000) {
+      await sleep(100);
+      waitedMs += 100;
+    }
+    if ((globalThis.__miloGlobalInFlightAICalls || 0) >= MAX_GLOBAL_CONCURRENT_AI) {
+      res.setHeader('Retry-After', '2');
+      res.setHeader('X-RateLimit-Reason', 'concurrency-limit');
+      return res.status(429).json({
+        success: false,
+        error: 'Milo is currently experiencing high concurrent demand. Please retry in a few seconds.',
+        retryAfterSeconds: 2,
+        requestId
+      });
+    }
+
+    globalThis.__miloGlobalInFlightAICalls = (globalThis.__miloGlobalInFlightAICalls || 0) + 1;
     let result = null;
     try {
       result = await callGemini({
@@ -829,6 +850,9 @@ function redactSecrets(text) {
     });
   } catch (error) {
     circuitBreaker.consecutiveFailures++;
+    if (circuitBreaker.consecutiveFailures >= circuitBreaker.threshold) {
+      circuitBreaker.cooldownUntil = Date.now() + circuitBreaker.cooldownDurationMs;
+    }
     return res.status(error?.name === 'AbortError' ? 504 : 502).json({
       success: false,
       error: error?.name === 'AbortError'
@@ -838,5 +862,6 @@ function redactSecrets(text) {
     });
   } finally {
     activeInFlightRequests.delete(inFlightKey);
+    globalThis.__miloGlobalInFlightAICalls = Math.max(0, (globalThis.__miloGlobalInFlightAICalls || 1) - 1);
   }
 }

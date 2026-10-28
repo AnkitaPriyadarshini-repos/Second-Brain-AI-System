@@ -122,6 +122,10 @@ nextApp.prepare().then(() => {
   app.post('/api/auth/otp', (req, res) => authController.sendOTP(req, res));
   app.get('/api/auth/me', (req, res) => authController.me(req, res));
   app.post('/api/auth/logout', (req, res) => authController.logout(req, res));
+  app.get('/api/health', (req, res) => {
+    const healthHandler = require('./api/health');
+    return healthHandler(req, res);
+  });
   app.get('/api/ai/health', (req, res) => {
     const direct = (
       process.env.MILO_GEMINI_KEY ||

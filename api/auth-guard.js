@@ -269,10 +269,22 @@ function assertOwnership(resourceOwnerId, clientIdentity) {
 // In-memory sliding window rate limiter
 const rateWindows = new Map();
 
+function pruneRateWindows() {
+  const now = Date.now();
+  if (rateWindows.size > 200) {
+    for (const [key, entry] of rateWindows) {
+      if (now > entry.resetAt) {
+        rateWindows.delete(key);
+      }
+    }
+  }
+}
+
 /**
  * Enforce rate limit per identity
  */
 function checkRateLimit(key, maxRequests = 30, windowMs = 60000) {
+  pruneRateWindows();
   const now = Date.now();
   const entry = rateWindows.get(key) || { count: 0, resetAt: now + windowMs };
 

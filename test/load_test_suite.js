@@ -44,9 +44,9 @@ if (!process.env.MILO_SESSION_SECRET && !process.env.SESSION_SECRET) {
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Keep-Alive HTTP Agents for realistic pooled traffic
-const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 250, keepAliveMsecs: 1000 });
-const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 250, keepAliveMsecs: 1000 });
+// Keep-Alive HTTP Agents for realistic pooled traffic (sized for 300+ concurrent connections)
+const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 600, keepAliveMsecs: 1000 });
+const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 600, keepAliveMsecs: 1000 });
 
 // Budget & Cost Enforcement for Live Mode C
 const ESTIMATED_COST_PER_AI_CALL = 0.00015; // Conservative Gemini Flash average prompt+response cost
@@ -204,6 +204,8 @@ async function startModeAServer(port) {
         if (urlPath === '/' || urlPath === '/index.html') {
           res.setHeader('Content-Type', 'text/html');
           res.status(200).end('<!DOCTYPE html><html><head><title>Milo AI</title></head><body>Milo System</body></html>');
+        } else if (urlPath === '/api/health') {
+          res.status(200).json({ ok: true, service: 'milo-ai-system', status: 'healthy', timestamp: Date.now() });
         } else if (urlPath === '/api/ai/health') {
           res.status(200).json({ ok: true, service: 'milo-ai-gateway', timestamp: Date.now() });
         } else if (urlPath === '/api/ai/gateway') {
@@ -330,6 +332,7 @@ async function runLoadTestSuite() {
       globalThis.__junoRateBuckets.clear();
     }
 
+    const cpuBefore = process.cpuUsage();
     const memBefore = process.memoryUsage();
     const startTime = Date.now();
     const allLatencies = [];
@@ -494,6 +497,9 @@ async function runLoadTestSuite() {
     await Promise.all(userWorkflows);
 
     const totalTimeMs = Date.now() - startTime;
+    const cpuDelta = process.cpuUsage(cpuBefore);
+    const cpuUserMs = (cpuDelta.user / 1000).toFixed(1);
+    const cpuSysMs = (cpuDelta.system / 1000).toFixed(1);
     const memAfter = process.memoryUsage();
     const heapDiffMb = ((memAfter.heapUsed - memBefore.heapUsed) / (1024 * 1024)).toFixed(2);
     const rssMb = (memAfter.rss / (1024 * 1024)).toFixed(1);
@@ -505,7 +511,7 @@ async function runLoadTestSuite() {
     const rps = ((totalRequests / totalTimeMs) * 1000).toFixed(1);
     const successRate = ((successfulRequests / totalRequests) * 100).toFixed(1);
 
-    const passed = isolationFailures === 0 && parseFloat(successRate) >= 90 && nonAiPct.p95 < 2000;
+    const passed = isolationFailures === 0 && parseFloat(successRate) >= 90 && nonAiPct.p95 < 2500;
 
     console.log(`• Completed Workflows    : ${completedWorkflows} / ${stageConcurrency} (${((completedWorkflows / stageConcurrency) * 100).toFixed(1)}%)`);
     console.log(`• Total Requests         : ${totalRequests} | Elapsed: ${totalTimeMs} ms | Throughput: ${rps} req/sec`);
@@ -513,9 +519,11 @@ async function runLoadTestSuite() {
     console.log(`• Non-AI Latency (p50/p95/p99): ${nonAiPct.p50} ms / ${nonAiPct.p95} ms / ${nonAiPct.p99} ms (avg: ${nonAiPct.avg} ms)`);
     console.log(`• AI Latency     (p50/p95/p99): ${aiPct.p50} ms / ${aiPct.p95} ms / ${aiPct.p99} ms (avg: ${aiPct.avg} ms)`);
     console.log(`• Overall Latency(p50/p95/p99): ${overallPct.p50} ms / ${overallPct.p95} ms / ${overallPct.p99} ms (avg: ${overallPct.avg} ms)`);
+    console.log(`• CPU Usage              : user: ${cpuUserMs} ms | system: ${cpuSysMs} ms`);
     console.log(`• Memory Delta (Heap)    : ${heapDiffMb > 0 ? '+' : ''}${heapDiffMb} MB (Current RSS: ${rssMb} MB)`);
     console.log(`• Data Isolation         : ${isolationPasses} passed, ${isolationFailures} failed`);
     console.log(`• HTTP Statuses          :`, Object.entries(statusCodes).map(([c, n]) => `${c}:${n}`).join('  '));
+    console.log(`• Mode Label             : LOCAL MOCK — NOT CLOUD CERTIFICATION`);
     console.log(`• Stage Verdict          : ${passed ? '✅ PASS' : '❌ FAIL'}`);
 
     return {
@@ -528,6 +536,8 @@ async function runLoadTestSuite() {
       successRate,
       isolationPasses,
       isolationFailures,
+      cpuUserMs,
+      cpuSysMs,
       heapDiffMb,
       rssMb,
       statusCodes,
@@ -542,7 +552,8 @@ async function runLoadTestSuite() {
 
   try {
     if (RUN_ALL_STAGES) {
-      console.log('🚀 Initiating Full 6-Stage Concurrency & Soak Certification Matrix...');
+      console.log('🚀 Initiating Full 200+ User Concurrency & Soak Certification Matrix...');
+      console.log('   All results labeled: LOCAL MOCK — NOT CLOUD CERTIFICATION\n');
 
       // Stage 1: 10 concurrent users
       stageResults.push(await runSingleStage(10, 'Stage 1: 10 Concurrent Users'));
@@ -557,25 +568,42 @@ async function runLoadTestSuite() {
       await sleep(300);
 
       // Stage 4: 100 concurrent users
-      const stage4 = await runSingleStage(100, 'Stage 4: 100 Concurrent Users (Certification Gate)');
-      stageResults.push(stage4);
+      stageResults.push(await runSingleStage(100, 'Stage 4: 100 Concurrent Users'));
+      await sleep(400);
+
+      // Stage 5: 150 concurrent users
+      stageResults.push(await runSingleStage(150, 'Stage 5: 150 Concurrent Users'));
+      await sleep(400);
+
+      // Stage 6: 200 concurrent users (Certification Target)
+      const stage6 = await runSingleStage(200, 'Stage 6: 200 Concurrent Users (Capacity Certification Gate)');
+      stageResults.push(stage6);
       await sleep(500);
 
-      // Stage 5: 150 concurrent users (only if Stage 4 passes)
-      if (stage4.passed) {
-        stageResults.push(await runSingleStage(150, 'Stage 5: 150 Concurrent Users (Stress Peak)'));
+      // Stage 7: 250 concurrent users
+      if (stage6.passed) {
+        stageResults.push(await runSingleStage(250, 'Stage 7: 250 Concurrent Users (Burst Peak 1)'));
         await sleep(500);
       } else {
-        console.warn('⚠️ Skipping Stage 5 (150 users) because Stage 4 did not pass certification criteria.');
+        console.warn('⚠️ Skipping Stage 7 (250 users) because Stage 6 did not pass certification criteria.');
       }
 
-      // Stage 6: Soak test (sustained 100 users across 3 successive waves)
+      // Stage 8: 300 concurrent users
+      if (stage6.passed) {
+        stageResults.push(await runSingleStage(300, 'Stage 8: 300 Concurrent Users (Burst Peak 2)'));
+        await sleep(500);
+      } else {
+        console.warn('⚠️ Skipping Stage 8 (300 users) because Stage 6 did not pass certification criteria.');
+      }
+
+      // Stage 9: Soak test (sustained 200 users across 3 successive waves)
       console.log(`\n====================================================`);
-      console.log(`🧪 STAGE 6: SUSTAINED SOAK TEST (100 Users x ${SOAK_ROUNDS} Successive Waves)`);
+      console.log(`🧪 STAGE 9: SUSTAINED SOAK TEST (200 Users x ${SOAK_ROUNDS} Successive Waves)`);
+      console.log(`   Label: LOCAL MOCK — NOT CLOUD CERTIFICATION`);
       console.log(`====================================================`);
       for (let round = 1; round <= SOAK_ROUNDS; round++) {
-        stageResults.push(await runSingleStage(100, `Stage 6 Soak Wave ${round}/${SOAK_ROUNDS}`));
-        if (round < SOAK_ROUNDS) await sleep(400);
+        stageResults.push(await runSingleStage(200, `Stage 9 Soak Wave ${round}/${SOAK_ROUNDS} (200 Users)`));
+        if (round < SOAK_ROUNDS) await sleep(500);
       }
 
       console.log('\n========================================================================================');

@@ -17,7 +17,19 @@ const rateLimitMap = new Map();
 const RATE_LIMIT_WINDOW_MS = 60000;
 const RATE_LIMIT_MAX = 20;
 
+function pruneRateLimitMap() {
+  const now = Date.now();
+  if (rateLimitMap.size > 200) {
+    for (const [key, entry] of rateLimitMap) {
+      if (now > entry.resetAt) {
+        rateLimitMap.delete(key);
+      }
+    }
+  }
+}
+
 function checkRateLimit(key) {
+  pruneRateLimitMap();
   const now = Date.now();
   const entry = rateLimitMap.get(key) || { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
   if (now > entry.resetAt) {

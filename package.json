@@ -33,7 +33,8 @@
     "test:distributed": "node test/run_distributed_rate_limiting_tests.js",
     "test:gemini": "node test/real_gemini_smoke_test.js",
     "test:all": "npm test && node test/run_production_hardening_regression_tests.js && node test/run_postgres_and_persistence_tests.js && node test/run_client_storage_and_recovery_tests.js && node test/run_browser_notes_e2e_tests.js && node test/run_distributed_rate_limiting_tests.js && node test/real_gemini_smoke_test.js",
-    "test:load": "node test/load_test_100_users.js"
+    "test:load": "node test/load_test_100_users.js",
+    "test:load:200": "node test/load_test_200_users.js"
   },
   "dependencies": {
     "express": "^4.19.2",

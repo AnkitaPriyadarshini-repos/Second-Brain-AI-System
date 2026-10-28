@@ -106,7 +106,26 @@ class DistributedRateLimiter {
     return this._checkLocalBucket(key, maxLimit, windowMs);
   }
 
+  _pruneBuckets() {
+    const now = Date.now();
+    if (this.localBuckets.size > 200) {
+      for (const [key, val] of this.localBuckets) {
+        if (now - val.startedAt > 120_000) {
+          this.localBuckets.delete(key);
+        }
+      }
+    }
+    if (this.degradedLocalBuckets.size > 200) {
+      for (const [key, val] of this.degradedLocalBuckets) {
+        if (now - val.startedAt > 120_000) {
+          this.degradedLocalBuckets.delete(key);
+        }
+      }
+    }
+  }
+
   _checkLocalBucket(key, maxLimit, windowMs) {
+    this._pruneBuckets();
     const now = Date.now();
     const existing = this.localBuckets.get(key);
     const windowSec = Math.ceil(windowMs / 1000);
@@ -140,6 +159,7 @@ class DistributedRateLimiter {
   }
 
   _checkDegradedLocalBucket(key, degradedLimit, windowMs) {
+    this._pruneBuckets();
     const now = Date.now();
     const existing = this.degradedLocalBuckets.get(key);
     const windowSec = Math.ceil(windowMs / 1000);
