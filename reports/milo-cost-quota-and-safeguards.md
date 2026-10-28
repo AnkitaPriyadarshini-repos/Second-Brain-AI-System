@@ -3,8 +3,9 @@
 **Document Reference:** `reports/milo-cost-quota-and-safeguards.md`  
 **Target Repository:** `AnkitaPriyadarshini-repos/Second-Brain-AI-System`  
 **Audited Branch:** `scalability/milo-200-user-certification`  
-**Git Commit SHA:** `200770f9ed1aa14240b4128c207f59dc46e48fe2` (`200770f`)  
-**Timestamp:** 2026-10-28T18:35:00+05:30  
+**Certified Git Commit SHA:** `a71bf68217d12d447faded3da8cb78b96d95b33b` (`a71bf68`, equivalent runtime code to `200770f`)  
+**Latest Deployed Preview Deployment ID:** `dpl_CMr1rgqrnrsbFt1vFhZvXBYpbHzK`  
+**Timestamp:** 2026-10-28T19:40:00+05:30  
 
 ---
 
