@@ -36,49 +36,64 @@ function escapeHTML(str) {
 /**
  * Robust Unicode plain-text mathematical renderer for when KaTeX is unavailable.
  * Gracefully converts common LaTeX symbols, fractions, square roots, superscripts,
- * and Greek letters into clean, human-readable Unicode mathematical typography.
+ * subscripts, matrices, and Greek letters into clean, human-readable Unicode mathematical typography.
  */
 function renderMathFallback(latex, isDisplay) {
   let text = String(latex || '').trim();
   if (!text) return '';
 
-  // 1. Common Greek letters
+  // 1. Comprehensive Greek letters
   const greek = {
     '\\alpha': 'α', '\\beta': 'β', '\\gamma': 'γ', '\\delta': 'δ', '\\Delta': 'Δ',
-    '\\epsilon': 'ε', '\\zeta': 'ζ', '\\eta': 'η', '\\theta': 'θ', '\\Theta': 'Θ',
-    '\\iota': 'ι', '\\kappa': 'κ', '\\lambda': 'λ', '\\Lambda': 'Λ', '\\mu': 'μ',
-    '\\nu': 'ν', '\\xi': 'ξ', '\\pi': 'π', '\\Pi': 'Π', '\\rho': 'ρ',
-    '\\sigma': 'σ', '\\Sigma': 'Σ', '\\tau': 'τ', '\\phi': 'φ', '\\Phi': 'Φ',
-    '\\chi': 'χ', '\\psi': 'ψ', '\\omega': 'ω', '\\Omega': 'Ω'
+    '\\epsilon': 'ε', '\\varepsilon': 'ε', '\\zeta': 'ζ', '\\eta': 'η', '\\theta': 'θ', '\\Theta': 'Θ',
+    '\\vartheta': 'θ', '\\iota': 'ι', '\\kappa': 'κ', '\\lambda': 'λ', '\\Lambda': 'Λ',
+    '\\mu': 'μ', '\\nu': 'ν', '\\xi': 'ξ', '\\Xi': 'Ξ', '\\pi': 'π', '\\Pi': 'Π',
+    '\\varpi': 'ϖ', '\\rho': 'ρ', '\\varrho': 'ϱ', '\\sigma': 'σ', '\\Sigma': 'Σ',
+    '\\varsigma': 'ς', '\\tau': 'τ', '\\upsilon': 'υ', '\\Upsilon': 'Υ',
+    '\\phi': 'φ', '\\varphi': 'ϕ', '\\Phi': 'Φ', '\\chi': 'χ', '\\psi': 'ψ',
+    '\\Psi': 'Ψ', '\\omega': 'ω', '\\Omega': 'Ω', '\\Gamma': 'Γ'
   };
   for (const [k, v] of Object.entries(greek)) {
     text = text.split(k).join(v);
   }
 
-  // 2. Mathematical operators & relations
+  // 2. Mathematical operators, relations & symbols
   const symbols = {
     '\\pm': '±', '\\mp': '∓', '\\times': '×', '\\cdot': '·', '\\div': '÷',
     '\\approx': '≈', '\\neq': '≠', '\\ne': '≠', '\\leq': '≤', '\\le': '≤',
     '\\geq': '≥', '\\ge': '≥', '\\infty': '∞', '\\sum': '∑', '\\prod': '∏',
-    '\\int': '∫', '\\partial': '∂', '\\nabla': '∇', '\\in': '∈', '\\notin': '∉',
-    '\\subset': '⊂', '\\subseteq': '⊆', '\\cup': '∪', '\\cap': '∩',
-    '\\forall': '∀', '\\exists': '∃', '\\to': '→', '\\rightarrow': '→',
+    '\\coprod': '∐', '\\int': '∫', '\\iint': '∬', '\\iiint': '∭', '\\oint': '∮',
+    '\\partial': '∂', '\\nabla': '∇', '\\in': '∈', '\\notin': '∉',
+    '\\subset': '⊂', '\\subseteq': '⊆', '\\supset': '⊃', '\\supseteq': '⊇',
+    '\\cup': '∪', '\\cap': '∩', '\\setminus': '∖',
+    '\\forall': '∀', '\\exists': '∃', '\\nexists': '∄',
+    '\\to': '→', '\\rightarrow': '→', '\\leftarrow': '←',
     '\\Leftarrow': '⇐', '\\Rightarrow': '⇒', '\\Leftrightarrow': '⇔',
-    '\\ldots': '…', '\\cdots': '…', '\\quad': '  ', '\\qquad': '    ',
-    '\\,': ' ', '\\;': ' ', '\\:': ' ', '\\!': ''
+    '\\leftrightarrow': '↔', '\\iff': '⇔', '\\implies': '⇒',
+    '\\ldots': '…', '\\cdots': '…', '\\vdots': '⋮', '\\ddots': '⋱',
+    '\\quad': '  ', '\\qquad': '    ',
+    '\\,': ' ', '\\;': ' ', '\\:': ' ', '\\!': '',
+    '\\circ': '∘', '\\bullet': '•', '\\star': '⋆', '\\ast': '∗'
   };
   for (const [k, v] of Object.entries(symbols)) {
     text = text.split(k).join(v);
   }
 
-  // 3. Square roots: \sqrt[n]{x} and \sqrt{x}
-  text = text.replace(/\\sqrt\[([^\]]+)\]\{([^}]*)\}/g, '^($1)√($2)');
-  text = text.replace(/\\sqrt\{([^}]*)\}/g, (m, inner) => inner.trim() ? '√(' + inner.trim() + ')' : '√');
+  // 3. Matrices
+  text = text.replace(/\\begin\{(?:matrix|pmatrix|bmatrix|vmatrix|Bmatrix)\}([\s\S]*?)\\end\{(?:matrix|pmatrix|bmatrix|vmatrix|Bmatrix)\}/g, (m, body) => {
+    const rows = body.trim().split(/\\\\|\n/).map(r => r.trim()).filter(Boolean);
+    const formattedRows = rows.map(r => r.split('&').map(c => c.trim()).join('  '));
+    return '[ ' + formattedRows.join(' ; ') + ' ]';
+  });
+
+  // 4. Square roots: \sqrt[n]{x} and \sqrt{x}
+  text = text.replace(/\\sqrt\[([^\]]+)\]\s*\{([^}]*)\}/g, '^($1)√($2)');
+  text = text.replace(/\\sqrt\s*\{([^}]*)\}/g, (m, inner) => inner.trim() ? '√(' + inner.trim() + ')' : '√');
   text = text.replace(/\\sqrt(?![a-zA-Z])/g, '√');
 
-  // 4. Fractions \frac{num}{den}
-  while (/\\frac\{([^{}]*)\}\{([^{}]*)\}/.test(text)) {
-    text = text.replace(/\\frac\{([^{}]*)\}\{([^{}]*)\}/g, (m, n, d) => {
+  // 5. Fractions \frac{num}{den}
+  while (/\\frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}/.test(text)) {
+    text = text.replace(/\\frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}/g, (m, n, d) => {
       n = n.trim();
       d = d.trim();
       if (!n && !d) return '';
@@ -90,7 +105,7 @@ function renderMathFallback(latex, isDisplay) {
     });
   }
   // Handle incomplete fractions like \frac{num}{ or \frac{num}
-  text = text.replace(/\\frac\{([^{}]+)\}(?:\{([^{}]*))?/g, (m, n, d) => {
+  text = text.replace(/\\frac\s*\{([^{}]+)\}(?:\s*\{([^{}]*))?/g, (m, n, d) => {
     n = (n || '').trim();
     d = (d || '').trim();
     if (!n && !d) return '';
@@ -101,7 +116,7 @@ function renderMathFallback(latex, isDisplay) {
   });
   text = text.replace(/\\frac(?![a-zA-Z])/g, '');
 
-  // 5. Superscripts and Subscripts
+  // 6. Superscripts and Subscripts
   const supers = {
     '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴',
     '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹',
@@ -123,14 +138,14 @@ function renderMathFallback(latex, isDisplay) {
   text = text.replace(/_([0-9+\-aeoxijk])/g, (m, c) => subs[c] || c);
   text = text.replace(/_\{([^}]+)\}/g, '_($1)');
 
-  // 6. Formatting wrappers \text{...}, \mathrm{...}, \mathbf{...}, \left, \right
-  text = text.replace(/\\(?:text|mathrm|mathbf|mathit|textbf)\{([^}]+)\}/g, '$1');
-  text = text.replace(/\\left([([{}|])/g, '$1');
-  text = text.replace(/\\right([)\]{}]|\|)/g, '$1');
+  // 7. Formatting wrappers \text{...}, \mathrm{...}, \mathbf{...}, \left, \right
+  text = text.replace(/\\(?:text|mathrm|mathbf|mathit|textbf|mathbb|mathcal)\{([^}]+)\}/g, '$1');
+  text = text.replace(/\\left\s*([([{}|])/g, '$1');
+  text = text.replace(/\\right\s*([)\]{}]|\|)/g, '$1');
+  text = text.replace(/\\left\./g, '');
+  text = text.replace(/\\right\./g, '');
   text = text.replace(/[{}]/g, '');
-  text = text.replace(/\\([a-zA-Z]+)/g, '$1');
   text = text.replace(/\\\\/g, '\n');
-  text = text.replace(/\\/g, '');
   text = text.replace(/\s+/g, ' ').trim();
 
   const safeLabel = escapeHTML(text);
@@ -165,7 +180,7 @@ function renderMath(latex, isDisplay) {
       return katexLib.renderToString(cleanLatex, {
         displayMode: Boolean(isDisplay),
         output: 'html',
-        throwOnError: true,
+        throwOnError: false,
         strict: false
       });
     } catch (_) {
@@ -203,22 +218,43 @@ function formatMarkdownText(mdText) {
     return `@@INLINECODE${idx}@@`;
   });
 
-  // 3. Extract and stash display math $$...$$
+  // 3a. Extract display math $$...$$
   text = text.replace(/\$\$([\s\S]+?)\$\$/g, (match, formula) => {
     const idx = mathBlocks.length;
     mathBlocks.push({ formula: formula.trim(), display: true });
     return `@@MATHBLOCK${idx}@@`;
   });
 
-  // 4. Extract and stash inline math $...$
-  text = text.replace(/(^|[^\w\\$])\$([^\n$]+?)\$(?!\w)/g, (match, prefix, formula) => {
+  // 3b. Extract display math \[...\]
+  text = text.replace(/\\\[([\s\S]+?)\\\]/g, (match, formula) => {
+    const idx = mathBlocks.length;
+    mathBlocks.push({ formula: formula.trim(), display: true });
+    return `@@MATHBLOCK${idx}@@`;
+  });
+
+  // 3c. Extract standalone LaTeX environments \begin{equation/align/gather/multline}...
+  text = text.replace(/(\\begin\{(?:equation\*?|align\*?|gather\*?|multline\*?)\}[\s\S]+?\\end\{(?:equation\*?|align\*?|gather\*?|multline\*?)\})/g, (match, formula) => {
+    const idx = mathBlocks.length;
+    mathBlocks.push({ formula: formula.trim(), display: true });
+    return `@@MATHBLOCK${idx}@@`;
+  });
+
+  // 4a. Extract inline math \(...\)
+  text = text.replace(/\\\(([\s\S]+?)\\\)/g, (match, formula) => {
+    const idx = mathBlocks.length;
+    mathBlocks.push({ formula: formula.trim(), display: false });
+    return `@@MATHBLOCK${idx}@@`;
+  });
+
+  // 4b. Extract inline math $...$
+  text = text.replace(/(?<!\\)\$(?!\$)((?:[^\n$\\]|\\.)+?)(?<!\s)(?<!\\)\$(?!\d)/g, (match, formula) => {
     // Avoid currency numbers like $5.00 or $100
-    if (/^\s*[0-9]+(?:\.[0-9]+)?\s*$/.test(formula)) {
+    if (/^\s*[\d,]+(?:\.[0-9]+)?\s*$/.test(formula)) {
       return match;
     }
     const idx = mathBlocks.length;
     mathBlocks.push({ formula: formula.trim(), display: false });
-    return `${prefix}@@MATHBLOCK${idx}@@`;
+    return `@@MATHBLOCK${idx}@@`;
   });
 
   // 5. Neutralize dangerous event handlers and script protocols outside code blocks
@@ -283,6 +319,11 @@ function formatMarkdownText(mdText) {
   html = html.replace(/\\\\/g, '@@ESCAPED_BS@@');
   html = html.replace(/(^|[^\\])\\\s*(\n|$)/g, '$1<br>');
   html = html.replace(/@@ESCAPED_BS@@/g, '\\');
+
+  // 13c. Unescape literal dollars: \$ -> $
+  html = html.replace(/\\\\\$/g, '@@ESCAPED_DOLLAR@@');
+  html = html.replace(/\\([$])/g, '$1');
+  html = html.replace(/@@ESCAPED_DOLLAR@@/g, '\\$');
 
   // 14. Paragraphs and line breaks
   html = html.replace(/\n\n+/g, '<br><br>');

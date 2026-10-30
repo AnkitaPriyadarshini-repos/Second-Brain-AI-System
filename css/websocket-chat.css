@@ -291,6 +291,23 @@
   word-break: break-word;
 }
 
+.ws-msg-text .katex-display {
+  margin: 0.5rem 0;
+  overflow-x: auto;
+  max-width: 100%;
+}
+.ws-msg-text .katex {
+  font-size: 1.05em;
+  color: inherit;
+}
+.ws-msg-text .math-display {
+  margin: 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+
 /* Input Area */
 .ws-input-form {
   padding: 1rem 1.25rem;

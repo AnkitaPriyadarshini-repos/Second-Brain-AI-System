@@ -2122,7 +2122,15 @@
             let currentIdx = 0;
             activeStreamingTimer = setInterval(() => {
               currentIdx += 2;
-              const chunk = words.slice(0, currentIdx).join(' ');
+              let chunk = words.slice(0, currentIdx).join(' ');
+              // Balance unclosed delimiters during streaming so math/code renders smoothly
+              const codeFences = (chunk.match(/```/g) || []).length;
+              if (codeFences % 2 === 1) chunk += '\n```';
+              const dDollars = (chunk.match(/\$\$/g) || []).length;
+              if (dDollars % 2 === 1) chunk += '$$';
+              const lastLine = chunk.split('\n').pop() || '';
+              const sDollars = (lastLine.match(/(?<!\\)\$(?!\$)/g) || []).length;
+              if (sDollars % 2 === 1 && !lastLine.endsWith('$')) chunk += '$';
               textContentEl.innerHTML = formatMarkdownText(chunk) + '<span class="typing-cursor"></span>';
               targetContainer.scrollTop = targetContainer.scrollHeight;
 
@@ -3574,12 +3582,9 @@
 
     function cleanRogueText(text) {
       if (!text) return '';
-      let cleaned = text
+      return String(text)
         .replace(/\(Ref item \d+: [^)]+\)/gi, '')
-        .replace(/\.\s*\./g, '.')
         .trim();
-
-      return cleaned;
     }
 
     function formatMarkdownText(text) {
@@ -3588,38 +3593,15 @@
       if (typeof window !== 'undefined' && typeof window.formatMarkdownText === 'function' && window.formatMarkdownText !== formatMarkdownText) {
         return window.formatMarkdownText(cleaned);
       }
-      
-      let html = cleaned;
-      // 1. Code blocks with syntax highlighting & copy header
-      html = html.replace(/```([a-zA-Z0-9_]*)\n([\s\S]*?)```/g, (match, lang, code) => {
-        const cleanLang = lang.trim() || 'code';
-        const escapedCode = escapeHTML(code.trim());
-        return `<div class="code-block-wrapper">
-          <div class="code-block-header">
-            <span class="code-lang-label">${cleanLang}</span>
-            <button class="code-copy-btn" onclick="window.copyCodeFromBlock(this)">📋 Copy Code</button>
-          </div>
-          <pre class="code-block-content"><code class="language-${cleanLang}">${escapedCode}</code></pre>
-        </div>`;
-      });
-
-      // 2. Inline code
-      html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
-
-      // 3. Headings
-      html = html.replace(/^#### (.*$)/gim, '<h4 style="color: var(--text-primary); margin: 10px 0 4px;">$1</h4>');
-      html = html.replace(/^### (.*$)/gim, '<h3 style="color: var(--accent-indigo); margin: 12px 0 6px;">$1</h3>');
-      html = html.replace(/^## (.*$)/gim, '<h2 style="color: var(--accent-indigo); margin: 14px 0 8px;">$1</h2>');
-
-      // 4. Bold & Italic
-      html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-      html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-
-      // 5. Paragraph line breaks
-      html = html.replace(/\n\n/g, '<br><br>');
-      html = html.replace(/\n/g, '<br>');
-
-      return html;
+      if (typeof require === 'function') {
+        try {
+          const utils = require('./utils');
+          if (utils && typeof utils.formatMarkdownText === 'function') {
+            return utils.formatMarkdownText(cleaned);
+          }
+        } catch (_) {}
+      }
+      return cleaned;
     }
 
     // ----------------------------------------------------

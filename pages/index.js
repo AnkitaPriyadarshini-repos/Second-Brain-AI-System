@@ -18,7 +18,8 @@ function Home({ initialHistory, initialMetrics, ssrPerformance }) {
         name: 'description',
         content: 'High-performance real-time chat application powered by Next.js Server-Side Rendering and WebSockets for sub-300ms delivery latency.'
       }),
-      React.createElement('meta', { name: 'viewport', content: 'width=device-width, initial-scale=1' })
+      React.createElement('meta', { name: 'viewport', content: 'width=device-width, initial-scale=1' }),
+      React.createElement('link', { rel: 'stylesheet', href: '/vendor/katex/katex.min.css' })
     ),
     React.createElement(
       'main',

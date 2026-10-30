@@ -2718,6 +2718,62 @@ kbd {
 .md-ul { margin: 6px 0; padding-left: 16px; list-style-type: none; }
 .md-li { margin: 4px 0; line-height: 1.5; color: var(--text-secondary); }
 
+/* --- Mathematical Typesetting (KaTeX & Fallback) --- */
+.katex-display {
+  display: block;
+  margin: 14px 0;
+  text-align: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  padding: 8px 4px;
+  scrollbar-width: thin;
+}
+
+.katex-display > .katex {
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.katex {
+  font-size: 1.12em;
+  text-rendering: auto;
+  line-height: 1.25;
+}
+
+.katex-html {
+  color: inherit;
+}
+
+.math-display {
+  display: block;
+  margin: 14px 0;
+  padding: 10px 16px;
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.18);
+  border-radius: 8px;
+  text-align: center;
+  font-family: 'KaTeX_Math', 'Fira Code', monospace;
+  font-size: 1.05em;
+  overflow-x: auto;
+  color: inherit;
+  line-height: 1.5;
+}
+
+.math-inline {
+  display: inline-block;
+  padding: 0 3px;
+  font-family: 'KaTeX_Math', 'Fira Code', monospace;
+  font-size: 1.02em;
+  color: inherit;
+}
+
+.math-fallback {
+  letter-spacing: 0.02em;
+}
+
+
 /* Toast Notifications */
 .toast-container {
   position: fixed;
