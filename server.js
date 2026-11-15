@@ -14,6 +14,8 @@ const GoalControllerClass = require('./controllers/GoalController');
 const AuthControllerClass = require('./controllers/AuthController');
 const AIGatewayControllerClass = require('./controllers/AIGatewayController');
 const ShareControllerClass = require('./controllers/ShareController');
+const CoordinatorControllerClass = require('./controllers/CoordinatorController');
+const Logger = require('./services/Logger');
 
 const noteController = new NoteControllerClass();
 const chatController = new ChatControllerClass();
@@ -21,18 +23,33 @@ const goalController = new GoalControllerClass();
 const authController = new AuthControllerClass();
 const aiGatewayController = new AIGatewayControllerClass();
 const shareController = new ShareControllerClass();
+const coordinatorController = new CoordinatorControllerClass();
 
 const dev = process.env.NODE_ENV !== 'production';
 const PORT = process.env.PORT || 3000;
 
-const nextApp = next({ dev, dir: __dirname });
-const handle = nextApp.getRequestHandler();
-const activeUsers = new Map();
+// Validate required security configuration during production startup
+if (process.env.NODE_ENV === 'production' || process.env.VERCEL) {
+  const sessionSecret = (
+    process.env.MILO_SESSION_SECRET ||
+    process.env.SESSION_SECRET ||
+    process.env.JUNO_SESSION_SECRET ||
+    ''
+  ).trim();
+
+  if (!sessionSecret || sessionSecret.length < 32) {
+    console.error('🛑 CRITICAL_STARTUP_FAILURE: MILO_SESSION_SECRET must be configured with at least 32 characters in production.');
+    if (!process.env.VERCEL) {
+      process.exit(1);
+    }
+  }
+}
 
 nextApp.prepare().then(() => {
   const app = express();
   app.disable('x-powered-by');
   app.use(express.json({ limit: '256kb' }));
+  app.use(Logger.middleware());
 
   const server = http.createServer(app);
   const wss = new WebSocketServer({ noServer: false, server, path: '/ws/chat', maxPayload: 256 * 1024 });
@@ -106,9 +123,15 @@ nextApp.prepare().then(() => {
   app.post('/api/goals/:id/progress', (req, res) => goalController.updateProgress(req, res));
   app.post('/api/auth/register', (req, res) => authController.register(req, res));
   app.post('/api/auth/login', (req, res) => authController.login(req, res));
+  app.post('/api/auth/guest', (req, res) => authController.guest(req, res));
+  app.post('/api/auth/oauth', (req, res) => authController.oauth(req, res));
   app.post('/api/auth/otp', (req, res) => authController.sendOTP(req, res));
   app.get('/api/auth/me', (req, res) => authController.me(req, res));
   app.post('/api/auth/logout', (req, res) => authController.logout(req, res));
+  app.get('/api/health', (req, res) => {
+    const healthHandler = require('./api/health');
+    return healthHandler(req, res);
+  });
   app.get('/api/ai/health', (req, res) => {
     const direct = (
       process.env.MILO_GEMINI_KEY ||
@@ -133,6 +156,10 @@ nextApp.prepare().then(() => {
     const ingestHandler = require('./api/ingest/url');
     return ingestHandler(req, res);
   });
+  app.all('/api/ingest/jobs', (req, res) => {
+    const jobsHandler = require('./api/ingest/jobs');
+    return jobsHandler(req, res);
+  });
   app.post('/api/media/image', (req, res) => {
     const imageHandler = require('./api/media/image');
     return imageHandler(req, res);
@@ -143,6 +170,16 @@ nextApp.prepare().then(() => {
   });
   app.post('/api/share', (req, res) => shareController.createShareLink(req, res));
   app.get('/api/share/:id', (req, res) => shareController.getShareLink(req, res));
+
+  // Proactive Multi-Threaded Project Coordinator Routes
+  app.post('/api/projects/:projectId/coordinate', (req, res) => coordinatorController.handleCoordinate(req, res));
+  app.get('/api/projects/:projectId/threads', (req, res) => coordinatorController.handleGetThreads(req, res));
+  app.get('/api/projects/:projectId/resurface', (req, res) => coordinatorController.handleCheckResurface(req, res));
+  app.post('/api/threads/:threadId/fork', (req, res) => coordinatorController.handleFork(req, res));
+  app.post('/api/threads/:threadId/snooze', (req, res) => coordinatorController.handleSnooze(req, res));
+  app.post('/api/threads/:threadId/share', (req, res) => coordinatorController.handleCreateShare(req, res));
+  app.get('/api/threads/shared/:slug', (req, res) => coordinatorController.handleGetShared(req, res));
+  app.post('/api/threads/:threadId/btw', (req, res) => coordinatorController.handleBtw(req, res));
 
   app.use(express.static(__dirname));
   app.all('*', (req, res) => handle(req, res));

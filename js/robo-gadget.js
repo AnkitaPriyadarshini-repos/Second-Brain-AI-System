@@ -235,8 +235,16 @@
     updateGreetingText: function () {
       const headingEl = document.getElementById('robo-greeting-heading');
       const timeGreeting = this.getTimeGreeting();
+      let userName = 'Researcher';
+      try {
+        if (typeof AuthClient !== 'undefined' && AuthClient.getCurrentUser) {
+          userName = AuthClient.getCurrentUser().name || 'Researcher';
+        } else {
+          userName = localStorage.getItem('second_brain_user_name') || 'Researcher';
+        }
+      } catch (_) {}
       if (headingEl) {
-        headingEl.textContent = `${timeGreeting} Ankita! 👋 I'm Milo, your AI Brain Companion`;
+        headingEl.textContent = `${timeGreeting} ${userName}! 👋 I'm Milo, your AI Brain Companion`;
       }
     },
 

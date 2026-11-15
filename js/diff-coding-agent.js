@@ -237,42 +237,101 @@ module.exports = RateLimiter;`,
       const availableFiles = this.listFiles();
       let targetFile = 'src/session/auth.js';
 
-      if (prompt.toLowerCase().includes('rate') || prompt.toLowerCase().includes('limiter')) {
-        targetFile = 'src/api/rateLimiter.js';
-      } else if (prompt.toLowerCase().includes('package')) {
-        targetFile = 'package.json';
+      // Identify target file from prompt
+      for (const f of availableFiles) {
+        const basename = f.split('/').pop().toLowerCase();
+        if (prompt.toLowerCase().includes(basename) || prompt.toLowerCase().includes(f.toLowerCase())) {
+          targetFile = f;
+          break;
+        }
+      }
+      if (!targetFile || targetFile === 'src/session/auth.js') {
+        if (prompt.toLowerCase().includes('rate') || prompt.toLowerCase().includes('limiter')) {
+          targetFile = 'src/api/rateLimiter.js';
+        } else if (prompt.toLowerCase().includes('package')) {
+          targetFile = 'package.json';
+        }
       }
 
       const currentCode = this.getFile(targetFile) || '';
       let newCode = currentCode;
       let planDescription = '';
       let explanation = '';
+      let aiSucceeded = false;
 
-      if (targetFile === 'src/session/auth.js') {
-        planDescription = `1. Inspect token parameter in isExpired(token)
+      // Real AI Code Generation via BFF Gateway when available
+      if (typeof fetch === 'function' && typeof window !== 'undefined' && window.location && !prompt.startsWith('test:')) {
+        try {
+          const authHeaders = window.AuthClient ? window.AuthClient.getAuthHeaders() : {};
+          const systemMsg = `You are Milo Diff-First Code Agent. Analyze the target file and provide:
+1. A concise step-by-step plan
+2. An explanation of changes
+3. The complete updated file content with the fixes applied.
+
+Respond in JSON format:
+{
+  "plan": "1. step one\\n2. step two",
+  "explanation": "Summary of changes",
+  "newCode": "full updated code"
+}`;
+          const aiRes = await fetch('/api/ai/gateway', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...authHeaders },
+            body: JSON.stringify({
+              prompt: `${systemMsg}\n\nTask: ${prompt}\n\nFile: ${targetFile}\n\`\`\`\n${currentCode}\n\`\`\``,
+              stream: false,
+              model: 'gemini-1.5-pro'
+            })
+          });
+
+          if (aiRes.ok) {
+            const aiData = await aiRes.json();
+            const textResponse = aiData.text || aiData.response || (aiData.candidates && aiData.candidates[0]?.content?.parts?.[0]?.text);
+            if (textResponse) {
+              const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
+              if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                if (parsed.newCode && typeof parsed.newCode === 'string' && parsed.newCode !== currentCode) {
+                  newCode = parsed.newCode;
+                  planDescription = parsed.plan || `Applied fixes for: ${prompt}`;
+                  explanation = parsed.explanation || `Updated ${targetFile} via Milo Code Agent.`;
+                  aiSucceeded = true;
+                }
+              }
+            }
+          }
+        } catch (err) {
+          // Fall back gracefully to deterministic inspection
+        }
+      }
+
+      if (!aiSucceeded) {
+        if (targetFile === 'src/session/auth.js') {
+          planDescription = `1. Inspect token parameter in isExpired(token)
 2. Add defensive guard against undefined or null tokens (token?.exp)
 3. Ensure token object format validation before comparing Date.now()
 4. Preserve existing refresh() behavior and caller interface`;
 
-        newCode = currentCode.replace(
-          '    // BUG: Missing null-check on token object leads to uncaught TypeError\n    return Date.now() > token.exp;',
-          '    // Guarded: Defensive validation against null, missing, or malformed token objects\n    if (!token || typeof token !== \'object\' || !token.exp) return true;\n    return Date.now() > token.exp;'
-        );
-        explanation = 'Added defensive null-safety guard to isExpired() to prevent unhandled TypeError when token is undefined or missing .exp.';
-      } else if (targetFile === 'src/api/rateLimiter.js') {
-        planDescription = `1. Add burst capacity overflow guard
+          newCode = currentCode.replace(
+            '    // BUG: Missing null-check on token object leads to uncaught TypeError\n    return Date.now() > token.exp;',
+            '    // Guarded: Defensive validation against null, missing, or malformed token objects\n    if (!token || typeof token !== \'object\' || !token.exp) return true;\n    return Date.now() > token.exp;'
+          );
+          explanation = 'Added defensive null-safety guard to isExpired() to prevent unhandled TypeError when token is undefined or missing .exp.';
+        } else if (targetFile === 'src/api/rateLimiter.js') {
+          planDescription = `1. Add burst capacity overflow guard
 2. Implement reset() method for explicit testing and cleanup
 3. Add defensive integer clamping to refill rate`;
 
-        newCode = currentCode.replace(
-          '  refill() {',
-          '  reset() {\n    this.tokens = this.capacity;\n    this.lastRefill = Date.now();\n  }\n\n  refill() {'
-        );
-        explanation = 'Added reset() method for clean testing teardown and lifecycle management.';
-      } else {
-        planDescription = `1. Inspect requested file: ${targetFile}\n2. Apply localized optimization while preserving formatting`;
-        newCode = currentCode + '\n';
-        explanation = `Proposed updates to ${targetFile}.`;
+          newCode = currentCode.replace(
+            '  refill() {',
+            '  reset() {\n    this.tokens = this.capacity;\n    this.lastRefill = Date.now();\n  }\n\n  refill() {'
+          );
+          explanation = 'Added reset() method for clean testing teardown and lifecycle management.';
+        } else {
+          planDescription = `1. Inspect requested file: ${targetFile}\n2. Apply localized optimization while preserving formatting`;
+          newCode = currentCode + '\n';
+          explanation = `Proposed updates to ${targetFile}.`;
+        }
       }
 
       const diff = DiffEngine.computeDiff(currentCode, newCode);

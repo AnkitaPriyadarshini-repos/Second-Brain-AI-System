@@ -30,6 +30,21 @@ class AuthController {
     return res.status(200).json(result);
   }
 
+  guest(req, res) {
+    const result = this.authService.createGuestSession();
+    return res.status(200).json(result);
+  }
+
+  oauth(req, res) {
+    const { provider, email, name, avatar } = req.body || {};
+    const result = this.authService.oauthLogin({ provider, email, name, avatar });
+
+    if (result.error) {
+      return res.status(400).json({ success: false, error: result.error });
+    }
+    return res.status(200).json(result);
+  }
+
   sendOTP(req, res) {
     const { email } = req.body || {};
     const result = this.authService.sendOTP(email);

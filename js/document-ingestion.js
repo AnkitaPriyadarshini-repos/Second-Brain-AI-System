@@ -63,6 +63,68 @@
     }
 
     /**
+     * Asynchronous Background Ingestion with Lifecycle Polling:
+     * queued -> indexing -> ready
+     */
+    async ingestFileAsync(file, onProgress) {
+      if (!file) throw new Error('No file provided for asynchronous ingestion.');
+      const fileName = file.name || 'document';
+      const fileSize = file.size || 0;
+      const mimeType = file.type || 'text/plain';
+
+      let content = '';
+      try {
+        content = await file.text();
+      } catch (_) {}
+
+      const authHeaders = (typeof AuthClient !== 'undefined' && AuthClient.getAuthHeaders)
+        ? AuthClient.getAuthHeaders()
+        : {};
+
+      const enqueueRes = await fetch('/api/ingest/jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
+        body: JSON.stringify({ fileName, fileSize, mimeType, content })
+      });
+
+      const enqueueData = await enqueueRes.json();
+      if (!enqueueRes.ok || !enqueueData.success) {
+        throw new Error(enqueueData.error || 'Failed to enqueue ingestion job.');
+      }
+
+      const jobId = enqueueData.jobId;
+      if (typeof onProgress === 'function') {
+        onProgress({ status: 'queued', progress: 10, jobId });
+      }
+
+      for (let attempt = 0; attempt < 30; attempt++) {
+        await new Promise(r => setTimeout(r, 150));
+        const pollRes = await fetch(`/api/ingest/jobs?id=${encodeURIComponent(jobId)}`, {
+          headers: authHeaders
+        });
+        if (pollRes.ok) {
+          const pollData = await pollRes.json();
+          if (typeof onProgress === 'function') {
+            onProgress(pollData);
+          }
+          if (pollData.status === 'ready') {
+            return {
+              success: true,
+              jobId,
+              status: 'ready',
+              result: pollData.result
+            };
+          }
+          if (pollData.status === 'failed') {
+            throw new Error(pollData.error || 'Document ingestion failed.');
+          }
+        }
+      }
+
+      throw new Error('Document ingestion polling timed out.');
+    }
+
+    /**
      * Plain Text & Markdown reader
      */
     extractFromTextFile(file, fileName, fileSize, ext) {

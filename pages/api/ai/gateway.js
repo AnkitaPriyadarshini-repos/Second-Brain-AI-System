@@ -13,8 +13,10 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-  res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Content-Type-Options', 'nosniff');
+  if (req.headers?.accept !== 'text/event-stream' && !req.body?.stream) {
+    res.setHeader('Cache-Control', 'no-store');
+  }
 
   if (req.method === 'POST') {
     return await aiGatewayController.handleQuery(req, res);

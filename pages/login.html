@@ -488,12 +488,13 @@
       <!-- Social Row & Footer -->
       <div>
         <div class="social-row">
-          <a href="#" class="social-icon-btn" title="Google Login" onclick="triggerSocialAuth('Google')">G</a>
-          <a href="#" class="social-icon-btn" title="GitHub Login" onclick="triggerSocialAuth('GitHub')">🐙</a>
-          <a href="#" class="social-icon-btn" title="Twitter Login" onclick="triggerSocialAuth('Twitter')">🐦</a>
+          <a href="#" class="social-icon-btn" title="Google OAuth" onclick="triggerSocialAuth('Google'); return false;">G</a>
+          <a href="#" class="social-icon-btn" title="GitHub OAuth" onclick="triggerSocialAuth('GitHub'); return false;">🐙</a>
+          <a href="#" class="social-icon-btn" title="Guest Demo Mode" onclick="continueAsGuest(); return false;">👤</a>
         </div>
 
-        <div class="footer-note">
+        <div class="footer-note" style="display: flex; flex-direction: column; gap: 8px;">
+          <a href="#" onclick="continueAsGuest(); return false;" style="color: #06b6d4; font-weight: 500;">⚡ Continue as Guest (Isolated Demo Mode)</a>
           <a href="../index.html">← Back to Milo Studio</a>
         </div>
       </div>
@@ -581,28 +582,98 @@
       }
     }
 
-    function triggerSocialAuth(provider) {
-      alert(`🔐 Authenticating via ${provider} Single Sign-On...`);
-      localStorage.setItem('second_brain_user_name', 'User');
-      localStorage.setItem('second_brain_user_email', 'user@miloai.io');
-      window.location.href = '../index.html';
+    async function triggerSocialAuth(provider) {
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.textContent = `Authenticating with ${provider}...`;
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/auth/oauth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            provider: provider.toLowerCase(),
+            name: `${provider} User`,
+            email: `${provider.toLowerCase()}_user_${Date.now().toString(36)}@miloai.io`
+          })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'OAuth exchange failed');
+
+        localStorage.setItem('milo_auth_token', data.token);
+        localStorage.setItem('milo_auth_user', JSON.stringify(data.user));
+        localStorage.setItem('second_brain_user_name', data.user.name);
+        localStorage.setItem('second_brain_user_email', data.user.email);
+        localStorage.setItem('second_brain_user_id', data.user.id);
+
+        submitBtn.textContent = '✅ Authenticated!';
+        submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+        setTimeout(() => { window.location.href = '../index.html'; }, 500);
+      } catch (err) {
+        alert(err.message || 'OAuth authentication failed.');
+        submitBtn.textContent = 'Sign In';
+        submitBtn.disabled = false;
+      }
     }
 
-    function handleAuthSubmit(e) {
+    async function continueAsGuest() {
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.textContent = 'Creating Isolated Guest Session...';
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch('/api/auth/guest', { method: 'POST' });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || 'Guest session initialization failed');
+
+        localStorage.setItem('milo_auth_token', data.token);
+        localStorage.setItem('milo_auth_user', JSON.stringify(data.user));
+        localStorage.setItem('second_brain_user_name', data.user.name);
+        localStorage.setItem('second_brain_user_email', data.user.email);
+        localStorage.setItem('second_brain_user_id', data.user.id);
+
+        submitBtn.textContent = '✅ Guest Ready!';
+        submitBtn.style.background = 'linear-gradient(135deg, #06b6d4, #0284c7)';
+        setTimeout(() => { window.location.href = '../index.html'; }, 400);
+      } catch (err) {
+        alert(err.message || 'Guest session setup failed.');
+        submitBtn.textContent = 'Sign In';
+        submitBtn.disabled = false;
+      }
+    }
+
+    async function handleAuthSubmit(e) {
       e.preventDefault();
       const rawName = document.getElementById('input-name').value.trim();
       const rawEmail = document.getElementById('input-email').value.trim();
-      
-      const name = rawName || 'User';
-      const email = rawEmail || 'user@miloai.io';
+      const rawPassword = document.getElementById('input-password').value;
       const submitBtn = document.getElementById('submit-btn');
 
-      submitBtn.textContent = currentMode === 'login' ? 'Signing in...' : 'Creating Account...';
+      const isRegister = currentMode === 'register';
+      const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
+      const payload = isRegister
+        ? { name: rawName || 'Researcher', email: rawEmail, password: rawPassword }
+        : { email: rawEmail, password: rawPassword };
+
+      submitBtn.textContent = isRegister ? 'Creating Account...' : 'Signing in...';
       submitBtn.disabled = true;
 
-      setTimeout(() => {
-        localStorage.setItem('second_brain_user_name', name);
-        localStorage.setItem('second_brain_user_email', email);
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Authentication failed. Please check your credentials.');
+        }
+
+        localStorage.setItem('milo_auth_token', data.token);
+        localStorage.setItem('milo_auth_user', JSON.stringify(data.user));
+        localStorage.setItem('second_brain_user_name', data.user.name);
+        localStorage.setItem('second_brain_user_email', data.user.email);
+        localStorage.setItem('second_brain_user_id', data.user.id);
 
         submitBtn.textContent = '✅ Authenticated!';
         submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
@@ -610,8 +681,12 @@
 
         setTimeout(() => {
           window.location.href = '../index.html';
-        }, 800);
-      }, 1000);
+        }, 500);
+      } catch (err) {
+        alert(err.message || 'Authentication error.');
+        submitBtn.textContent = isRegister ? 'Create Account' : 'Sign In';
+        submitBtn.disabled = false;
+      }
     }
   </script>
 </body>

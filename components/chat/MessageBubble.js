@@ -1,11 +1,26 @@
 const React = require('react');
 
 /**
- * Reusable MessageBubble Component
+ * Reusable MessageBubble Component with Markdown & Mathematical Equation Support
  */
 function MessageBubble({ message }) {
   if (!message) return null;
   const isOutgoing = message.sender && (message.sender.includes('Ankita') || message.sender.includes('User'));
+
+  let formattedText = message.text;
+  let isHtml = false;
+  try {
+    const utils = require('../../js/utils');
+    if (utils && typeof utils.formatMarkdownText === 'function') {
+      formattedText = utils.formatMarkdownText(message.text);
+      isHtml = true;
+    }
+  } catch (_) {
+    if (typeof window !== 'undefined' && typeof window.formatMarkdownText === 'function') {
+      formattedText = window.formatMarkdownText(message.text);
+      isHtml = true;
+    }
+  }
 
   return React.createElement(
     'div',
@@ -29,7 +44,12 @@ function MessageBubble({ message }) {
           message.deliveryLatencyMs ? `${message.deliveryLatencyMs}ms` : '< 20ms'
         )
       ),
-      React.createElement('div', { className: 'ws-msg-text' }, message.text)
+      isHtml
+        ? React.createElement('div', {
+            className: 'ws-msg-text',
+            dangerouslySetInnerHTML: { __html: formattedText }
+          })
+        : React.createElement('div', { className: 'ws-msg-text' }, message.text)
     )
   );
 }

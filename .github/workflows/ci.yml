@@ -1,0 +1,29 @@
+name: Milo CI & RAG Groundedness Benchmark
+
+on:
+  push:
+    branches: [ main, scalability/** ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-and-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Regression Test Suites
+        run: npm test
+
+      - name: Run RAG Groundedness Benchmark
+        run: npm run eval

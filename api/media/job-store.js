@@ -38,6 +38,9 @@ function getFilePath(jobId) {
   return path.join(STORAGE_DIR, `${safeId}.json`);
 }
 
+let lastCleanupTime = 0;
+const CLEANUP_INTERVAL_MS = 60_000; // Throttle disk directory scanning to at most once per minute
+
 function cleanupExpiredJobs() {
   const now = Date.now();
   // Clean memory cache
@@ -46,6 +49,12 @@ function cleanupExpiredJobs() {
       memoryCache.delete(id);
     }
   }
+
+  // Throttle disk cleanup to prevent event-loop blocking under high-concurrency requests
+  if (now - lastCleanupTime < CLEANUP_INTERVAL_MS) {
+    return;
+  }
+  lastCleanupTime = now;
 
   // Clean disk files
   try {
@@ -139,6 +148,26 @@ const JobStore = {
   getActiveJobCountForOwner(ownerId) {
     if (!ownerId) return 0;
     cleanupExpiredJobs();
+
+    // If memory cache is cold (e.g. serverless cold start), populate from disk once
+    if (memoryCache.size === 0) {
+      try {
+        if (fs.existsSync(STORAGE_DIR)) {
+          const files = fs.readdirSync(STORAGE_DIR);
+          for (const file of files) {
+            if (!file.endsWith('.json')) continue;
+            const jobId = file.replace('.json', '');
+            try {
+              const raw = fs.readFileSync(path.join(STORAGE_DIR, file), 'utf8');
+              const parsed = JSON.parse(raw);
+              if (Date.now() - (parsed.createdAt || 0) <= JOB_TTL_MS) {
+                memoryCache.set(jobId, parsed);
+              }
+            } catch (_) {}
+          }
+        }
+      } catch (_) {}
+    }
 
     let count = 0;
     for (const job of memoryCache.values()) {

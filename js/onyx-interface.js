@@ -449,7 +449,7 @@
 
   class OnyxInterfaceController {
     constructor() {
-      this.currentModel = 'gemini-3.1-flash-lite';
+      this.currentModel = 'auto';
       this.currentSessionId = 'onyx_use_cases';
       this.activeAgent = 'support';
       this.activeProject = null;
@@ -463,6 +463,10 @@
       this.bindInputEvents();
       this.bindKeyboardShortcuts();
       this.bindComposerTools();
+
+      // Sync active model from Store or default to auto
+      const savedModel = (window.Store && window.Store.settings && window.Store.settings.selectedModel) || 'auto';
+      this.selectModel(savedModel, true);
 
       // On initial boot, do not overwrite live chat with demo session.
       // Leave composer hero ready for genuine user questions.
@@ -523,14 +527,23 @@
       });
     }
 
-    selectModel(modelName) {
-      this.currentModel = modelName;
+    selectModel(modelName, silent = false) {
+      this.currentModel = modelName || 'auto';
+      const modelLabels = {
+        'auto': 'Auto (Smart Route)',
+        'gemini-3.8-flash': 'Gemini 3.8 Flash',
+        'gemini-3.6-flash': 'Gemini 3.6 Flash',
+        'gemini-3.5-flash-lite': 'Gemini 3.5 Flash Lite',
+        'gemini-3.1-flash-lite': 'Gemini 3.1 Flash Lite',
+        'gemini-flash-latest': 'Gemini Flash Latest'
+      };
+      const displayLabel = modelLabels[this.currentModel] || this.currentModel;
       const label = document.getElementById('onyx-model-name-label');
-      if (label) label.textContent = modelName;
+      if (label) label.textContent = displayLabel;
 
       // Update Store if available
       if (window.Store && window.Store.settings) {
-        window.Store.settings.selectedModel = modelName;
+        window.Store.settings.selectedModel = this.currentModel;
         if (typeof window.Store.saveSettings === 'function') {
           window.Store.saveSettings();
         }
@@ -539,12 +552,12 @@
       const dropdown = document.getElementById('onyx-model-dropdown');
       if (dropdown) {
         dropdown.querySelectorAll('.onyx-model-option').forEach((opt) => {
-          opt.classList.toggle('selected', opt.getAttribute('data-model') === modelName);
+          opt.classList.toggle('selected', opt.getAttribute('data-model') === this.currentModel);
         });
         dropdown.classList.remove('open');
       }
 
-      if (window.showToast) window.showToast(`Switched active model to ${modelName}`, 'info');
+      if (!silent && window.showToast) window.showToast(`Switched active model to ${displayLabel}`, 'info');
     }
 
     bindInputEvents() {
@@ -611,6 +624,11 @@
 
       if (hero) hero.style.display = 'none';
       if (chips) chips.style.display = 'none';
+      const welcomeSuggestions = document.getElementById('milo-welcome-suggestions');
+      if (welcomeSuggestions) welcomeSuggestions.style.display = 'none';
+      if (typeof window !== 'undefined' && window.MiloWelcome && typeof window.MiloWelcome.onConversationStateChange === 'function') {
+        window.MiloWelcome.onConversationStateChange(false);
+      }
       container.style.display = 'flex';
       container.innerHTML = this.renderSessionHTML(s);
 
@@ -726,12 +744,18 @@
       if (modal) modal.classList.remove('open');
     }
 
+    promptConnectorAuth(connectorName) {
+      if (window.showToast) {
+        window.showToast(
+          `Enterprise OAuth Required: Connect ${connectorName} via organizational SSO in Tenant Settings.`,
+          'info'
+        );
+      }
+    }
+
     syncConnector(connectorName) {
       if (window.showToast) {
-        window.showToast(`Syncing ${connectorName}... indexing recent documents & permissions.`, 'info');
-        setTimeout(() => {
-          window.showToast(`${connectorName} successfully synchronized!`, 'success');
-        }, 1200);
+        window.showToast(`Syncing ${connectorName}... verifying active tenant permissions.`, 'info');
       }
     }
 
@@ -743,7 +767,13 @@
         if (bubble) {
           const contentEl = bubble.querySelector('.chat-text, .chat-message-content, .onyx-turn-content');
           if (contentEl) {
-            text = (contentEl.innerText || contentEl.textContent || '').trim();
+            const clone = contentEl.cloneNode(true);
+            clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
+            text = (clone.innerText || clone.textContent || '').trim();
+          } else {
+            const clone = bubble.cloneNode(true);
+            clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
+            text = (clone.innerText || clone.textContent || '').trim();
           }
         }
       }
@@ -759,7 +789,7 @@
         navigator.clipboard.writeText(text).then(() => {
           if (btn) {
             const orig = btn.innerHTML;
-            btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+            btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" aria-hidden="true" focusable="false"><polyline points="20 6 9 17 4 12"/></svg>`;
             setTimeout(() => { btn.innerHTML = orig; }, 2000);
           }
           if (window.showToast) window.showToast('Copied answer to clipboard', 'success');
@@ -774,7 +804,11 @@
                        btn.parentElement?.closest('.chat-bubble, .chat-message-bubble, .assistant-bubble');
         if (bubble) {
           const contentEl = bubble.querySelector('.chat-text, .chat-message-content, .onyx-turn-content');
-          if (contentEl) text = (contentEl.innerText || contentEl.textContent || '').trim();
+          if (contentEl) {
+            const clone = contentEl.cloneNode(true);
+            clone.querySelectorAll('.onyx-turn-actions-bar, svg, button, .code-header-actions').forEach((el) => el.remove());
+            text = (clone.innerText || clone.textContent || '').trim();
+          }
         }
       }
       const shareData = {
@@ -829,6 +863,14 @@
       if (chips) {
         chips.classList.remove('hidden');
         chips.style.display = 'flex';
+      }
+      const welcomeSuggestions = document.getElementById('milo-welcome-suggestions');
+      if (welcomeSuggestions) {
+        welcomeSuggestions.classList.remove('hidden');
+        welcomeSuggestions.style.display = 'flex';
+      }
+      if (typeof window !== 'undefined' && window.MiloWelcome && typeof window.MiloWelcome.onConversationStateChange === 'function') {
+        window.MiloWelcome.onConversationStateChange(true);
       }
       if (input) {
         input.value = '';
@@ -929,6 +971,40 @@
       if (window.showToast) window.showToast(`Active Project Scope: ${projectName}`, 'info');
     }
 
+    addForkedThreadToSidebar(forkedThread) {
+      const recentsList = document.getElementById('onyx-recents-list');
+      if (!recentsList) return;
+      const item = document.createElement('div');
+      item.className = 'onyx-sidebar-item active';
+      item.setAttribute('data-session-id', forkedThread.id);
+      item.setAttribute('title', forkedThread.title);
+      item.onclick = () => this.loadSession(forkedThread.id);
+      item.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this.escapeHTML(forkedThread.title)}</span>
+          <span style="font-size: 10px; padding: 1px 5px; border-radius: 4px; background: rgba(16, 185, 129, 0.2); color: #10B981; font-weight: 600;">Fork</span>
+        </div>
+      `;
+      recentsList.querySelectorAll('.onyx-sidebar-item').forEach(el => el.classList.remove('active'));
+      recentsList.prepend(item);
+    }
+
+    selectSubThread(subThreadId) {
+      if (window.showToast) window.showToast(`Inspecting Sub-Thread: ${subThreadId}`, 'info');
+      window.currentThreadId = subThreadId;
+      const container = document.getElementById('chat-container');
+      if (container) {
+        const subThreadIndicator = document.createElement('div');
+        subThreadIndicator.className = 'milo-subthread-banner';
+        subThreadIndicator.style.cssText = 'padding: 8px 14px; margin-bottom: 12px; border-radius: 8px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); font-size: 12px; color: #38BDF8; display: flex; justify-content: space-between; align-items: center;';
+        subThreadIndicator.innerHTML = `
+          <span>🔍 Deep Sub-Thread Inspection: <strong>${this.escapeHTML(subThreadId)}</strong></span>
+          <button type="button" onclick="if(window.OnyxInterface) window.OnyxInterface.loadSession('current')" style="background: none; border: 1px solid rgba(56, 189, 248, 0.4); color: #38BDF8; font-size: 11px; padding: 2px 8px; border-radius: 4px; cursor: pointer;">← Back to Coordinator</button>
+        `;
+        container.prepend(subThreadIndicator);
+      }
+    }
+
     escapeHTML(str) {
       if (!str) return '';
       return String(str)
@@ -941,6 +1017,9 @@
   }
 
   window.OnyxInterface = new OnyxInterfaceController();
+  window.selectSubThread = function(id) {
+    if (window.OnyxInterface) return window.OnyxInterface.selectSubThread(id);
+  };
   window.shareSession = function() {
     if (window.OnyxInterface) return window.OnyxInterface.shareSession();
   };

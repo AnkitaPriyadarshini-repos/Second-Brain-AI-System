@@ -89,6 +89,32 @@
     }
   }
 
+  // Helper for exponential backoff retries on transient errors
+  async function fetchWithRetry(url, options, maxRetries = 3) {
+    let lastErr = null;
+    let delay = 1000;
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const res = await fetch(url, options);
+        if (res.status === 429 || (res.status >= 500 && res.status !== 503)) {
+          if (attempt < maxRetries - 1) {
+            await new Promise(r => setTimeout(r, delay));
+            delay *= 2;
+            continue;
+          }
+        }
+        return res;
+      } catch (err) {
+        lastErr = err;
+        if (attempt < maxRetries - 1) {
+          await new Promise(r => setTimeout(r, delay));
+          delay *= 2;
+        }
+      }
+    }
+    if (lastErr) throw lastErr;
+  }
+
   // --- 2. Create Studio Engine Class ---
   class CreateStudioEngine {
     constructor() {
@@ -123,10 +149,14 @@
         styledPrompt = `${styledPrompt}, high resolution, professional lighting, masterpiece, style: ${style}`;
       }
 
+      const authHeaders = (typeof window !== 'undefined' && window.AuthClient)
+        ? window.AuthClient.getAuthHeaders()
+        : {};
+
       try {
-        const res = await fetch('/api/media/image', {
+        const res = await fetchWithRetry('/api/media/image', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', ...authHeaders },
           body: JSON.stringify({
             prompt: styledPrompt,
             negativePrompt,
@@ -181,9 +211,13 @@
 
       this.stopVideoPolling();
 
-      const res = await fetch('/api/media/video', {
+      const authHeaders = (typeof window !== 'undefined' && window.AuthClient)
+        ? window.AuthClient.getAuthHeaders()
+        : {};
+
+      const res = await fetchWithRetry('/api/media/video', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
         body: JSON.stringify({
           action: 'create',
           prompt: prompt.trim(),
@@ -195,6 +229,9 @@
       });
 
       const data = await res.json().catch(() => ({}));
+      if (res.status === 503) {
+        throw new Error(data.error || 'Video generation service is not yet configured for this deployment.');
+      }
       if (!res.ok || !data.success || !data.jobId) {
         throw new Error(data.error || `Failed to initiate video generation (HTTP ${res.status}).`);
       }
@@ -206,7 +243,7 @@
         duration,
         status: data.status || 'queued',
         progress: 10,
-        step: data.step || 'Allocating GPU compute'
+        step: data.step || 'Queued for generation'
       };
 
       this.notify('video:started', this.activeVideoJob);
@@ -215,11 +252,15 @@
     }
 
     pollVideoJob(jobId) {
+      const authHeaders = (typeof window !== 'undefined' && window.AuthClient)
+        ? window.AuthClient.getAuthHeaders()
+        : {};
+
       this.videoPollInterval = setInterval(async () => {
         try {
           const res = await fetch('/api/media/video', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...authHeaders },
             body: JSON.stringify({ action: 'status', jobId })
           });
           const data = await res.json().catch(() => ({}));
@@ -265,9 +306,21 @@
       if (!targetId) return;
 
       this.stopVideoPolling();
+      const authHeaders = (typeof window !== 'undefined' && window.AuthClient)
+        ? window.AuthClient.getAuthHeaders()
+        : {};
+
       try {
         await fetch('/api/media/video', {
           method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...authHeaders },
+          body: JSON.stringify({ action: 'cancel', jobId: targetId })
+        });
+      } catch (_) {}
+
+      this.activeVideoJob = null;
+      this.notify('video:cancelled', { jobId: targetId });
+    }
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'cancel', jobId: targetId })
         });

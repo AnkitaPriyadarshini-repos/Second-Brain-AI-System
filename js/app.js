@@ -1496,6 +1496,14 @@
         chipsEl.classList.remove('hidden');
         chipsEl.style.display = 'flex';
       }
+      const welcomeSuggestions = document.getElementById('milo-welcome-suggestions');
+      if (welcomeSuggestions) {
+        welcomeSuggestions.classList.remove('hidden');
+        welcomeSuggestions.style.display = 'flex';
+      }
+      if (typeof window.MiloWelcome !== 'undefined' && typeof window.MiloWelcome.onConversationStateChange === 'function') {
+        window.MiloWelcome.onConversationStateChange(true);
+      }
       if (inputEl) {
         inputEl.value = '';
         inputEl.focus();
@@ -1572,8 +1580,14 @@
           targetContainer.style.display = 'none';
         }
         if (heroView) heroView.style.display = 'flex';
+        if (typeof window.MiloWelcome !== 'undefined' && typeof window.MiloWelcome.onConversationStateChange === 'function') {
+          window.MiloWelcome.onConversationStateChange(true);
+        }
       } else {
         if (heroView) heroView.style.display = 'none';
+        if (typeof window.MiloWelcome !== 'undefined' && typeof window.MiloWelcome.onConversationStateChange === 'function') {
+          window.MiloWelcome.onConversationStateChange(false);
+        }
         if (targetContainer) {
           targetContainer.innerHTML = '';
           targetContainer.style.display = 'flex';
@@ -2073,23 +2087,23 @@
         
         const actionsHTML = `
           <div class="onyx-turn-actions-bar" style="margin-top: 14px; display: flex; align-items: center; gap: 8px;">
-            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.copyCurrentTurn(this)" title="Copy">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.copyCurrentTurn(this)" title="Copy" aria-label="Copy response">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
             </button>
-            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.rateTurn(true, this)" title="Good response">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.rateTurn(true, this)" title="Good response" aria-label="Good response">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
             </button>
-            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.rateTurn(false, this)" title="Poor response">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
+            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.rateTurn(false, this)" title="Poor response" aria-label="Poor response">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
             </button>
-            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.regenerateShowcase()" title="Regenerate">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.regenerateShowcase()" title="Regenerate" aria-label="Regenerate response">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
             </button>
-            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.reportIssue()" title="Report issue">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+            <button type="button" class="onyx-action-icon-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.reportIssue()" title="Report issue" aria-label="Report issue">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
             </button>
-            <button type="button" class="onyx-sources-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.openSourcesDrawer()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <button type="button" class="onyx-sources-btn" onclick="if(window.OnyxInterface) window.OnyxInterface.openSourcesDrawer()" aria-label="View connected sources">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
               <span>${sourcesCount > 0 ? sourcesCount + ' ' : ''}Sources</span>
             </button>
           </div>
@@ -2108,7 +2122,15 @@
             let currentIdx = 0;
             activeStreamingTimer = setInterval(() => {
               currentIdx += 2;
-              const chunk = words.slice(0, currentIdx).join(' ');
+              let chunk = words.slice(0, currentIdx).join(' ');
+              // Balance unclosed delimiters during streaming so math/code renders smoothly
+              const codeFences = (chunk.match(/```/g) || []).length;
+              if (codeFences % 2 === 1) chunk += '\n```';
+              const dDollars = (chunk.match(/\$\$/g) || []).length;
+              if (dDollars % 2 === 1) chunk += '$$';
+              const lastLine = chunk.split('\n').pop() || '';
+              const sDollars = (lastLine.match(/(?<!\\)\$(?!\$)/g) || []).length;
+              if (sDollars % 2 === 1 && !lastLine.endsWith('$')) chunk += '$';
               textContentEl.innerHTML = formatMarkdownText(chunk) + '<span class="typing-cursor"></span>';
               targetContainer.scrollTop = targetContainer.scrollHeight;
 
@@ -3232,14 +3254,17 @@
 
     if (exportVaultBtn) {
       exportVaultBtn.addEventListener('click', () => {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(Store.getNotes(), null, 2));
+        const jsonPayload = (typeof Store.exportVaultJSON === 'function')
+          ? Store.exportVaultJSON()
+          : JSON.stringify(Store.getNotes(), null, 2);
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonPayload);
         const dlAnchor = document.createElement('a');
         dlAnchor.setAttribute("href", dataStr);
         dlAnchor.setAttribute("download", `second_brain_vault_${Date.now()}.json`);
         document.body.appendChild(dlAnchor);
         dlAnchor.click();
         dlAnchor.remove();
-        showToast('Vault exported as JSON.');
+        showToast('Vault exported as JSON backup.');
       });
     }
 
@@ -3250,12 +3275,29 @@
           const reader = new FileReader();
           reader.onload = (event) => {
             try {
-              const importedNotes = JSON.parse(event.target.result);
-              if (Array.isArray(importedNotes)) {
+              const raw = event.target.result;
+              if (typeof Store.restoreVaultBackup === 'function') {
+                const res = Store.restoreVaultBackup(raw);
+                if (res.success) {
+                  showToast(`Restored vault backup (${res.count} notes) successfully.`);
+                  refreshAllViews();
+                  return;
+                }
+              }
+              const parsed = JSON.parse(raw);
+              let importedNotes = null;
+              if (Array.isArray(parsed)) {
+                importedNotes = parsed;
+              } else if (parsed && Array.isArray(parsed.notes)) {
+                importedNotes = parsed.notes;
+              }
+              if (importedNotes) {
                 Store.notes = importedNotes;
                 Store.saveNotes();
                 showToast(`Imported ${importedNotes.length} notes successfully.`);
                 refreshAllViews();
+              } else {
+                showToast('Invalid JSON vault file: no notes found.');
               }
             } catch (err) {
               showToast('Invalid JSON vault file.');
@@ -3540,12 +3582,9 @@
 
     function cleanRogueText(text) {
       if (!text) return '';
-      let cleaned = text
+      return String(text)
         .replace(/\(Ref item \d+: [^)]+\)/gi, '')
-        .replace(/\.\s*\./g, '.')
         .trim();
-
-      return cleaned;
     }
 
     function formatMarkdownText(text) {
@@ -3554,38 +3593,15 @@
       if (typeof window !== 'undefined' && typeof window.formatMarkdownText === 'function' && window.formatMarkdownText !== formatMarkdownText) {
         return window.formatMarkdownText(cleaned);
       }
-      
-      let html = cleaned;
-      // 1. Code blocks with syntax highlighting & copy header
-      html = html.replace(/```([a-zA-Z0-9_]*)\n([\s\S]*?)```/g, (match, lang, code) => {
-        const cleanLang = lang.trim() || 'code';
-        const escapedCode = escapeHTML(code.trim());
-        return `<div class="code-block-wrapper">
-          <div class="code-block-header">
-            <span class="code-lang-label">${cleanLang}</span>
-            <button class="code-copy-btn" onclick="window.copyCodeFromBlock(this)">📋 Copy Code</button>
-          </div>
-          <pre class="code-block-content"><code class="language-${cleanLang}">${escapedCode}</code></pre>
-        </div>`;
-      });
-
-      // 2. Inline code
-      html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
-
-      // 3. Headings
-      html = html.replace(/^#### (.*$)/gim, '<h4 style="color: var(--text-primary); margin: 10px 0 4px;">$1</h4>');
-      html = html.replace(/^### (.*$)/gim, '<h3 style="color: var(--accent-indigo); margin: 12px 0 6px;">$1</h3>');
-      html = html.replace(/^## (.*$)/gim, '<h2 style="color: var(--accent-indigo); margin: 14px 0 8px;">$1</h2>');
-
-      // 4. Bold & Italic
-      html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-      html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-
-      // 5. Paragraph line breaks
-      html = html.replace(/\n\n/g, '<br><br>');
-      html = html.replace(/\n/g, '<br>');
-
-      return html;
+      if (typeof require === 'function') {
+        try {
+          const utils = require('./utils');
+          if (utils && typeof utils.formatMarkdownText === 'function') {
+            return utils.formatMarkdownText(cleaned);
+          }
+        } catch (_) {}
+      }
+      return cleaned;
     }
 
     // ----------------------------------------------------
