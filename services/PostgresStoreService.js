@@ -95,7 +95,8 @@ class PostgresStoreService {
     if (!this.pool) {
       let pg;
       try {
-        pg = require('pg');
+        const dynamicRequire = eval('require');
+        pg = dynamicRequire('pg');
       } catch (err) {
         throw new Error(`DATABASE_CONNECTION_ERROR: PostgreSQL client module 'pg' is not installed. Run 'npm install pg' to enable PostgreSQL support.`);
       }

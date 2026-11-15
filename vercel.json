@@ -3,10 +3,7 @@
   "trailingSlash": false,
   "functions": {
     "api/**/*.js": {
-      "maxDuration": 60
-    },
-    "pages/api/**/*.js": {
-      "maxDuration": 60
+      "maxDuration": 30
     }
   }
 }
