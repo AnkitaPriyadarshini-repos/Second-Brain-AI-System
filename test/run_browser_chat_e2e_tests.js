@@ -56,6 +56,12 @@ function waitForHttp(port, maxAttempts = 30) {
 }
 
 async function runBrowserTests() {
+  // Check if Chrome binary exists before initializing servers or harnesses
+  if (!fs.existsSync(chromePath)) {
+    console.warn(`[SKIP] Chrome executable not found at ${chromePath}. Skipping browser chat E2E in non-GUI environment.`);
+    process.exit(0);
+  }
+
   // 1. Create Mock/Real AI server backed by local repository
   const app = express();
   app.use(express.json());
@@ -114,12 +120,6 @@ async function runBrowserTests() {
   console.log(`Local test webserver listening on http://127.0.0.1:${httpPort}`);
 
   // 2. Launch Chrome
-  if (!fs.existsSync(chromePath)) {
-    console.warn(`[SKIP] Chrome executable not found at ${chromePath}. Skipping browser chat E2E.`);
-    server.close(() => process.exit(0));
-    return;
-  }
-
   const chromeProcess = spawn(chromePath, [
     `--remote-debugging-port=${cdpPort}`,
     `--user-data-dir=${userDataDir}`,
