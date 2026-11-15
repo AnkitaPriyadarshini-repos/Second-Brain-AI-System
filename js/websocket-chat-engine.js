@@ -51,11 +51,21 @@
       if (!this.wsUrl || this.fallbackMode) return;
 
       try {
-        const WSClass = (typeof window !== 'undefined' && window.WebSocket)
-          ? window.WebSocket
-          : (typeof global !== 'undefined' && global.WebSocket)
-            ? global.WebSocket
-            : require('ws');
+        let WSClass;
+        if (typeof window !== 'undefined' && window.WebSocket) {
+          WSClass = window.WebSocket;
+        } else {
+          try {
+            WSClass = require('ws');
+          } catch (_) {
+            WSClass = (typeof global !== 'undefined' && global.WebSocket) ? global.WebSocket : null;
+          }
+        }
+
+        if (!WSClass) {
+          this.fallbackMode = true;
+          return;
+        }
 
         this.socket = new WSClass(this.wsUrl);
 

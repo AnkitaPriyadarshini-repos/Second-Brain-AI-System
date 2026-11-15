@@ -117,9 +117,9 @@ async function runAllTests() {
     });
   });
 
-  await new Promise((resolve) => testServer.listen(0, resolve));
+  await new Promise((resolve) => testServer.listen(0, '127.0.0.1', resolve));
   const testPort = testServer.address().port;
-  const wsUrl = `ws://localhost:${testPort}`;
+  const wsUrl = `ws://127.0.0.1:${testPort}`;
 
   await test('WebSocket connection should establish cleanly and perform handshake', async () => {
     const engine = new WebSocketChatEngine({ wsUrl });

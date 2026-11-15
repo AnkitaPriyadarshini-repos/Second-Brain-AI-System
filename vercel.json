@@ -1,6 +1,12 @@
 {
   "cleanUrls": true,
   "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/api/auth/:action*",
+      "destination": "/api/auth?action=:action*"
+    }
+  ],
   "functions": {
     "api/**/*.js": {
       "maxDuration": 30

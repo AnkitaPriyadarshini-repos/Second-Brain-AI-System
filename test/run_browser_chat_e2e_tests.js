@@ -115,8 +115,8 @@ async function runBrowserTests() {
 
   // 2. Launch Chrome
   if (!fs.existsSync(chromePath)) {
-    console.warn(`[SKIP] Chrome executable not found at ${chromePath}.`);
-    server.close();
+    console.warn(`[SKIP] Chrome executable not found at ${chromePath}. Skipping browser chat E2E.`);
+    server.close(() => process.exit(0));
     return;
   }
 
@@ -316,7 +316,9 @@ async function runBrowserTests() {
   }
 }
 
-runBrowserTests().catch((err) => {
+runBrowserTests().then(() => {
+  process.exit(0);
+}).catch((err) => {
   console.error('Browser chat e2e test failed:', err);
   process.exit(1);
 });
