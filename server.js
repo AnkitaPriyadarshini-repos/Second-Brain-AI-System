@@ -14,6 +14,7 @@ const GoalControllerClass = require('./controllers/GoalController');
 const AuthControllerClass = require('./controllers/AuthController');
 const AIGatewayControllerClass = require('./controllers/AIGatewayController');
 const ShareControllerClass = require('./controllers/ShareController');
+const CoordinatorControllerClass = require('./controllers/CoordinatorController');
 const Logger = require('./services/Logger');
 
 const noteController = new NoteControllerClass();
@@ -22,6 +23,7 @@ const goalController = new GoalControllerClass();
 const authController = new AuthControllerClass();
 const aiGatewayController = new AIGatewayControllerClass();
 const shareController = new ShareControllerClass();
+const coordinatorController = new CoordinatorControllerClass();
 
 const dev = process.env.NODE_ENV !== 'production';
 const PORT = process.env.PORT || 3000;
@@ -168,6 +170,16 @@ nextApp.prepare().then(() => {
   });
   app.post('/api/share', (req, res) => shareController.createShareLink(req, res));
   app.get('/api/share/:id', (req, res) => shareController.getShareLink(req, res));
+
+  // Proactive Multi-Threaded Project Coordinator Routes
+  app.post('/api/projects/:projectId/coordinate', (req, res) => coordinatorController.handleCoordinate(req, res));
+  app.get('/api/projects/:projectId/threads', (req, res) => coordinatorController.handleGetThreads(req, res));
+  app.get('/api/projects/:projectId/resurface', (req, res) => coordinatorController.handleCheckResurface(req, res));
+  app.post('/api/threads/:threadId/fork', (req, res) => coordinatorController.handleFork(req, res));
+  app.post('/api/threads/:threadId/snooze', (req, res) => coordinatorController.handleSnooze(req, res));
+  app.post('/api/threads/:threadId/share', (req, res) => coordinatorController.handleCreateShare(req, res));
+  app.get('/api/threads/shared/:slug', (req, res) => coordinatorController.handleGetShared(req, res));
+  app.post('/api/threads/:threadId/btw', (req, res) => coordinatorController.handleBtw(req, res));
 
   app.use(express.static(__dirname));
   app.all('*', (req, res) => handle(req, res));

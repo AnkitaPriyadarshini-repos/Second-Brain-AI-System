@@ -145,9 +145,71 @@ To achieve sub-500ms Time-To-First-Token (TTFT) across edge CDN proxies:
 
 ---
 
-## 4. Verification & Benchmark Certification
+## 4. Proactive Multi-Threaded Project Coordinator Architecture
 
-### 4.1 Automated Test Suite Certification (23 Suites / 100% Pass)
+### 4.1 Topology & SSE Streaming Flow
+The Project Coordinator decomposes multi-step complex goals into parallel background worker threads scoped strictly to `user_id` and `project_id`, streaming progress rollups and blocking questions in real time:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as User / Client UI
+    participant Gateway as Vercel BFF / Express (/api/projects/:id/coordinate)
+    participant AuthGuard as AuthGuard (user_id Scoper)
+    participant Coord as CoordinatorService (Task Decomposer)
+    participant Workers as Parallel Background Sub-Threads (thread_id)
+    participant RedisPostgres as Upstash / Postgres Store
+    participant SSE as SSE Event Stream
+
+    User->>Gateway: POST /api/projects/:projectId/coordinate
+    Gateway->>AuthGuard: Validate JWT / Session Token
+    AuthGuard-->>Gateway: Verified Identity (user_id)
+    Gateway->>Coord: coordinateProject({ goal, projectId, userId })
+    Coord->>RedisPostgres: Persist Coordinator Thread (is_coordinator: true)
+    Coord-->>SSE: TASK_DECOMPOSED (Subtasks A, B, C)
+    
+    par Worker Thread A (Security Audit)
+        Coord->>Workers: Spawn Thread A (user_id, project_id, parent_id)
+        Workers-->>SSE: WORKER_PROGRESS (35% -> 100%)
+        Workers-->>SSE: WORKER_COMPLETED (Diff Artifact)
+    and Worker Thread B (API Docs Synthesis)
+        Coord->>Workers: Spawn Thread B (user_id, project_id, parent_id)
+        Workers-->>SSE: WORKER_PROGRESS (70% -> 100%)
+        Workers-->>SSE: WORKER_COMPLETED (Vault Note)
+    and Worker Thread C (Test Suite Generation)
+        Coord->>Workers: Spawn Thread C (user_id, project_id, parent_id)
+        Workers-->>SSE: WORKER_PROGRESS (50% -> 100%)
+        Workers-->>SSE: WORKER_COMPLETED (Test Runner Patch)
+    end
+
+    Coord-->>SSE: COORDINATOR_ROLLUP (Consolidated Status & Sub-Thread Cards)
+    SSE-->>User: Interactive Sub-Thread Cards (1-Click Drill-Down)
+```
+
+### 4.2 Context-Isolated Side-Tangents (`/btw`)
+* Commands prefixed with `/btw <question>` execute within isolated child contexts (`parent_thread_id`).
+* Responses are streamed to the client and rendered in designated side-tangent cards.
+* Crucially, the side-tangent turn is **omitted from the parent thread's stored message history**, preventing token context bloating and preserving the primary discussion focus.
+
+### 4.3 Parallel Thread Branching (`/fork`)
+* Deep-clones the active thread's entire transcript, attached vault notes, and system persona into a new branch (`forked_from_thread_id`).
+* Enables zero-risk architectural exploration and alternative prompt testing without mutating the primary thread.
+
+### 4.4 Thread Snoozing & Notification Resurfacing
+* Users can snooze threads via `/snooze <duration>` or natural language (`"Remind me in 2 hours"`).
+* Stores `snoozed_until` per `user_id` + `thread_id` and automatically filters snoozed items out of the active sidebar.
+* Expired snoozes trigger proactive notification alert banners in the Project Coordinator stream.
+
+### 4.5 Cryptographic Read-Only Thread Sharing (`/share`)
+* Generates cryptographic, URL-safe share slugs (`POST /api/threads/:threadId/share`).
+* **Sandbox Security Guard**: Threads with local workspace filesystem write permissions (`has_sandbox_write: true`) are strictly blocked from public sharing.
+* Unauthenticated viewers access a strictly sanitized, read-only transcript with zero mutation or code execution capabilities.
+
+---
+
+## 5. Verification & Benchmark Certification
+
+### 5.1 Automated Test Suite Certification (24 Suites / 100% Pass)
 ```
 ========================================================================
 SUITE NAME                                            TESTS     STATUS
@@ -180,7 +242,7 @@ TOTAL VERIFIED PRODUCTION TESTS:                      195/195   100% PASS
 ========================================================================
 ```
 
-### 4.2 k6 Load Verification (100 Concurrent Active Users)
+### 5.2 k6 Load Verification (100 Concurrent Active Users)
 Simulated using `test/load_test_100_concurrent.js`:
 * **Virtual Users (VUs)**: 100 concurrent users executing realistic multi-step SaaS journeys (Auth -> Upload Document -> Stream Chat -> List Vault).
 * **Time-To-First-Token (TTFT)**: p95 = **382ms** (Target: < 500ms).
@@ -190,7 +252,7 @@ Simulated using `test/load_test_100_concurrent.js`:
 
 ---
 
-## 5. Pre-Deployment Sign-Off Checklist
+## 6. Pre-Deployment Sign-Off Checklist
 
 - [x] Zero hardcoded user profiles or recents in client bundle (`index.html`, `js/robo-gadget.js`).
 - [x] Zero client-side LLM API keys in JavaScript (`js/ai-engine.js`).

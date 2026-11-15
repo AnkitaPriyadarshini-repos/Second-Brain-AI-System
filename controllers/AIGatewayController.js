@@ -4,6 +4,7 @@
  */
 
 const AIGatewayService = require('../services/AIGatewayService');
+const CoordinatorService = require('../services/CoordinatorService');
 const authGuard = require('../api/auth-guard');
 const { ChatGatewaySchema } = require('../api/validation-schemas');
 const DistributedRateLimiter = require('../services/DistributedRateLimiter');
@@ -12,6 +13,7 @@ const Logger = require('../services/Logger');
 class AIGatewayController {
   constructor() {
     this.aiGatewayService = new AIGatewayService();
+    this.coordinatorService = new CoordinatorService();
     this.limiter = DistributedRateLimiter.rateLimiter || new DistributedRateLimiter();
   }
 
@@ -68,11 +70,66 @@ class AIGatewayController {
       console.log(`[${requestId}] AI Query start - user:${userId} model:${model || 'default'} mode:${mode || 'milo'} context:${contextNotes.length}`);
     }
 
+    // Context-Isolated Slash Commands (/fork, /snooze, /btw)
+    if (/^\/fork(?:\s+(.*))?$/i.test(prompt)) {
+      const branchMatch = prompt.match(/^\/fork(?:\s+(.*))?$/i);
+      const branchName = branchMatch && branchMatch[1] ? branchMatch[1].trim() : undefined;
+      const threadId = body.threadId || body.currentThreadId || 'th_active';
+      try {
+        const forked = await this.coordinatorService.forkThread({ threadId, userId, branchName });
+        return res.status(200).json({
+          success: true,
+          isFork: true,
+          forkedThread: forked,
+          answer: `🌿 **Parallel Branch Created**: Successfully deep-cloned thread history into \`${forked.title}\`. You can test alternative architectures or prompts without mutating your primary thread context.`,
+          requestId,
+          durationMs: Date.now() - startTime
+        });
+      } catch (err) {
+        return res.status(400).json({ success: false, error: err.message, requestId });
+      }
+    }
+
+    if (/^\/snooze(?:\s+(.*))?$/i.test(prompt)) {
+      const snoozeMatch = prompt.match(/^\/snooze(?:\s+(.*))?$/i);
+      const rawArg = snoozeMatch && snoozeMatch[1] ? snoozeMatch[1].trim() : '30m';
+      let durationMs = 30 * 60 * 1000;
+      if (rawArg.endsWith('m')) durationMs = parseInt(rawArg, 10) * 60 * 1000;
+      else if (rawArg.endsWith('h')) durationMs = parseInt(rawArg, 10) * 60 * 60 * 1000;
+      else if (rawArg.endsWith('d')) durationMs = parseInt(rawArg, 10) * 24 * 60 * 60 * 1000;
+
+      const threadId = body.threadId || body.currentThreadId || 'th_active';
+      try {
+        const snoozeResult = await this.coordinatorService.snoozeThread({ threadId, userId, durationMs });
+        return res.status(200).json({
+          success: true,
+          isSnooze: true,
+          snoozeResult,
+          answer: `⏰ **Thread Snoozed**: This thread is now snoozed until ${snoozeResult.snoozeExpiryISO}. It has been hidden from your active list and will resurface automatically with an alert banner when the snooze period expires.`,
+          requestId,
+          durationMs: Date.now() - startTime
+        });
+      } catch (err) {
+        return res.status(400).json({ success: false, error: err.message, requestId });
+      }
+    }
+
+    let effectivePrompt = prompt;
+    let isSideTangent = false;
+    if (/^\/btw(?:\s+(.*))?$/i.test(prompt)) {
+      const btwMatch = prompt.match(/^\/btw(?:\s+(.*))?$/i);
+      effectivePrompt = btwMatch && btwMatch[1] ? btwMatch[1].trim() : '';
+      isSideTangent = true;
+      if (!effectivePrompt) {
+        return res.status(400).json({ success: false, error: 'Usage: /btw <your side-tangent question>' });
+      }
+    }
+
     try {
       const result = await this.aiGatewayService.processGatewayRequest({
-        prompt,
+        prompt: effectivePrompt,
         contextNotes,
-        history,
+        history: isSideTangent ? [] : history, // Keep side-tangents strictly decoupled from parent history
         model,
         mode,
         userId,
@@ -137,6 +194,8 @@ class AIGatewayController {
           grounded: result.grounded,
           citations: result.citations,
           model: result.model,
+          isBtwTangent: isSideTangent,
+          doNotSaveToHistory: isSideTangent,
           requestId,
           durationMs: Date.now() - startTime
         })}\n\n`);
@@ -156,7 +215,13 @@ class AIGatewayController {
         grounded: result.grounded
       });
 
-      return res.status(200).json({ ...result, requestId, durationMs: duration });
+      return res.status(200).json({
+        ...result,
+        isBtwTangent: isSideTangent,
+        doNotSaveToHistory: isSideTangent,
+        requestId,
+        durationMs: duration
+      });
     } catch (err) {
       const duration = Date.now() - startTime;
       Logger.error('AI Query exception', { request_id: requestId, duration_ms: duration, error: err.message });

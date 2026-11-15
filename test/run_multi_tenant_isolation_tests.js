@@ -13,6 +13,7 @@ const assert = require('assert');
 const AuthService = require('../services/AuthService');
 const NoteService = require('../services/NoteService');
 const PostgresStoreService = require('../services/PostgresStoreService');
+const CoordinatorService = require('../services/CoordinatorService');
 
 async function runTenantIsolationTests() {
   console.log('====================================================');
@@ -22,6 +23,7 @@ async function runTenantIsolationTests() {
   const authService = new AuthService();
   const noteService = new NoteService();
   const postgresStore = new PostgresStoreService();
+  const coordinatorService = new CoordinatorService();
 
   // ----------------------------------------------------
   // Setup: Provision Tenant A, Tenant B, and Guest A, Guest B
@@ -170,6 +172,178 @@ async function runTenantIsolationTests() {
   assert.ok(guest1List.some(n => n.id === guestNote1.id), 'Guest 1 must see own note');
   assert.ok(!guest2List.some(n => n.id === guestNote1.id), 'Guest 2 must NOT see Guest 1 note');
   console.log('  ✅ [PASS] Ephemeral guest sessions are fully isolated from one another');
+
+  // ----------------------------------------------------
+  // Test 7: Multi-Tenant Thread Isolation & /fork Guard
+  // ----------------------------------------------------
+  console.log('\nStep 8: Testing Multi-Tenant Thread Isolation & /fork Security Guard...');
+
+  const coordThreadA = await coordinatorService.coordinateProject({
+    projectId: 'prj_titan_a',
+    goal: 'Audit auth security and generate API specifications',
+    userId: userA.user.id
+  });
+  assert.strictEqual(coordThreadA.userId, userA.user.id, 'Coordinator thread must belong to Tenant A');
+  assert.ok(coordThreadA.subThreads.length >= 2, 'Coordinator must spawn decomposed sub-threads');
+
+  // Adversary Tenant B attempts to fork Tenant A's thread
+  let forkBlocked = false;
+  try {
+    await coordinatorService.forkThread({
+      threadId: coordThreadA.id,
+      userId: userB.user.id,
+      branchName: 'adversary-exploit-branch'
+    });
+  } catch (err) {
+    forkBlocked = err.message.includes('IDOR_VIOLATION') || err.message.includes('Forbidden');
+  }
+  assert.strictEqual(forkBlocked, true, 'Tenant B must be strictly forbidden from forking Tenant A thread');
+
+  // Legitimate owner Tenant A forks own thread
+  const forkedByOwner = await coordinatorService.forkThread({
+    threadId: coordThreadA.id,
+    userId: userA.user.id,
+    branchName: 'architecture-test-branch'
+  });
+  assert.strictEqual(forkedByOwner.userId, userA.user.id);
+  assert.strictEqual(forkedByOwner.forkedFromThreadId, coordThreadA.id);
+  console.log('  ✅ [PASS] Thread forking enforces tenant isolation (zero cross-tenant branch hijacking)');
+
+  // ----------------------------------------------------
+  // Test 8: Thread Snooze & Resurfacing Isolation
+  // ----------------------------------------------------
+  console.log('\nStep 9: Testing Thread Snoozing & Notification Resurfacing Isolation...');
+
+  // Tenant B attempts to snooze Tenant A thread
+  let snoozeBlocked = false;
+  try {
+    await coordinatorService.snoozeThread({
+      threadId: coordThreadA.id,
+      userId: userB.user.id,
+      durationMs: 3600000
+    });
+  } catch (err) {
+    snoozeBlocked = err.message.includes('IDOR_VIOLATION') || err.message.includes('Forbidden');
+  }
+  assert.strictEqual(snoozeBlocked, true, 'Tenant B must be strictly blocked from snoozing Tenant A thread');
+
+  // Tenant A snoozes thread with past timestamp to simulate expiry
+  await coordinatorService.snoozeThread({
+    threadId: coordThreadA.id,
+    userId: userA.user.id,
+    untilTimestamp: Date.now() - 5000 // 5 seconds in past
+  });
+
+  const resurfacedForA = await coordinatorService.checkSnoozedResurfacing({
+    userId: userA.user.id,
+    projectId: 'prj_titan_a'
+  });
+  const resurfacedForB = await coordinatorService.checkSnoozedResurfacing({
+    userId: userB.user.id,
+    projectId: 'prj_titan_a'
+  });
+
+  assert.ok(resurfacedForA.some(r => r.threadId === coordThreadA.id), 'Tenant A must receive resurfaced notification');
+  assert.strictEqual(resurfacedForB.length, 0, 'Tenant B must receive ZERO resurfaced notifications for Tenant A');
+  console.log('  ✅ [PASS] Thread snoozing and reminder resurfacing are isolated per-tenant');
+
+  // ----------------------------------------------------
+  // Test 9: Read-Only Thread Sharing & Sandbox Write Blocking
+  // ----------------------------------------------------
+  console.log('\nStep 10: Testing Read-Only Thread Sharing Security & Sandbox Write Blocking...');
+
+  // Create thread with sandbox filesystem write enabled
+  const sandboxWriteThread = {
+    id: 'th_sandbox_diff_write',
+    userId: userA.user.id,
+    projectId: 'prj_titan_a',
+    title: 'Code Agent Sandbox Workspace with Write Access',
+    hasSandboxWrite: true,
+    messages: [{ role: 'user', content: 'Generate code diffs' }]
+  };
+  coordinatorService.threads.set(sandboxWriteThread.id, sandboxWriteThread);
+
+  let sandboxShareBlocked = false;
+  try {
+    await coordinatorService.createShareLink({
+      threadId: sandboxWriteThread.id,
+      userId: userA.user.id
+    });
+  } catch (err) {
+    sandboxShareBlocked = err.message.includes('UNSAFE_SANDBOX_THREAD');
+  }
+  assert.strictEqual(sandboxShareBlocked, true, 'Threads with sandbox write access MUST be blocked from public sharing');
+
+  // Legitimate read-only share creation
+  const readOnlyThread = {
+    id: 'th_readonly_notes',
+    userId: userA.user.id,
+    projectId: 'prj_titan_a',
+    title: 'Safe Documentation Thread',
+    hasSandboxWrite: false,
+    messages: [{ role: 'user', content: 'Explain architectural patterns' }]
+  };
+  coordinatorService.threads.set(readOnlyThread.id, readOnlyThread);
+
+  const shareResult = await coordinatorService.createShareLink({
+    threadId: readOnlyThread.id,
+    userId: userA.user.id
+  });
+  assert.ok(shareResult.shareSlug, 'Share slug must be generated');
+
+  const publicView = await coordinatorService.getSharedThread(shareResult.shareSlug);
+  assert.ok(publicView, 'Public view must be accessible via slug');
+  assert.strictEqual(publicView.readOnly, true, 'Shared view must be strictly read-only');
+
+  // Tenant B cannot revoke Tenant A share link
+  let revokeBlocked = false;
+  try {
+    await coordinatorService.revokeShareLink({
+      threadId: readOnlyThread.id,
+      userId: userB.user.id
+    });
+  } catch (err) {
+    revokeBlocked = err.message.includes('IDOR_VIOLATION') || err.message.includes('Forbidden');
+  }
+  assert.strictEqual(revokeBlocked, true, 'Tenant B cannot revoke Tenant A share links');
+
+  // Tenant A revokes link
+  await coordinatorService.revokeShareLink({
+    threadId: readOnlyThread.id,
+    userId: userA.user.id
+  });
+  const publicViewAfterRevoke = await coordinatorService.getSharedThread(shareResult.shareSlug);
+  assert.strictEqual(publicViewAfterRevoke, null, 'Revoked share link must return null');
+  console.log('  ✅ [PASS] Read-only thread sharing enforces sandbox write blocking and owner authorization');
+
+  // ----------------------------------------------------
+  // Test 10: Side-Tangent Context Isolation (/btw)
+  // ----------------------------------------------------
+  console.log('\nStep 11: Testing Side-Tangent Context Isolation (/btw)...');
+
+  const parentThread = {
+    id: 'th_parent_main_context',
+    userId: userA.user.id,
+    projectId: 'prj_titan_a',
+    title: 'Main System Architecture Discussion',
+    messages: [
+      { role: 'user', content: 'What is our primary database?' },
+      { role: 'assistant', content: 'Our primary database is PostgreSQL.' }
+    ]
+  };
+  coordinatorService.threads.set(parentThread.id, parentThread);
+  const parentMessageCountBefore = parentThread.messages.length;
+
+  const btwResult = await coordinatorService.executeBtwTangent({
+    parentThreadId: parentThread.id,
+    question: 'By the way, what was the Apollo 11 launch year?',
+    userId: userA.user.id
+  });
+
+  assert.strictEqual(btwResult.isolated, true, 'Side-tangent must report isolated context');
+  const parentMessageCountAfter = parentThread.messages.length;
+  assert.strictEqual(parentMessageCountAfter, parentMessageCountBefore, 'Parent thread history length MUST NOT change after /btw');
+  console.log('  ✅ [PASS] /btw side-tangents execute with strict context isolation (zero parent token inflation)');
 
   console.log('\n====================================================');
   console.log('🎉 ALL MULTI-TENANT ISOLATION TESTS PASSED (100% SECURE)');

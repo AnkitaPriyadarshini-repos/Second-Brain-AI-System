@@ -125,6 +125,23 @@
           </div>
         </div>
 
+        <!-- Section 2.5: Pinned & Recent Artifact Discovery Strip -->
+        <div class="onyx-sidebar-section-title" style="display: flex; justify-content: space-between; align-items: center;">
+          <span>Recent Artifacts</span>
+          <span style="font-size: 10px; color: #38BDF8; font-weight: 600; text-transform: uppercase;">Artifacts</span>
+        </div>
+        <div class="onyx-artifact-discovery-strip" id="onyx-artifact-strip" style="display: flex; gap: 6px; padding: 0 10px 10px; overflow-x: auto; scrollbar-width: none;">
+          <div class="onyx-artifact-chip" onclick="if(window.activateView) window.activateView('code')" style="display: flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 6px; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.25); color: #38BDF8; font-size: 11px; font-weight: 600; white-space: nowrap; cursor: pointer;" title="Inspect virtual sandbox diff">
+            <span>💻</span> auth-guard.patch
+          </div>
+          <div class="onyx-artifact-chip" onclick="if(window.activateView) window.activateView('vault')" style="display: flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 6px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.25); color: #10B981; font-size: 11px; font-weight: 600; white-space: nowrap; cursor: pointer;" title="Inspect Knowledge Vault specification">
+            <span>📄</span> Enterprise Arch v4
+          </div>
+          <div class="onyx-artifact-chip" onclick="if(window.activateView) window.activateView('create')" style="display: flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 6px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.25); color: #F59E0B; font-size: 11px; font-weight: 600; white-space: nowrap; cursor: pointer;" title="View studio media asset">
+            <span>🎨</span> Logo Concept v2
+          </div>
+        </div>
+
         <!-- Section 3: Recents (Dynamic multi-tenant chat threads) -->
         <div class="onyx-sidebar-section-title">Recents</div>
         <div class="onyx-sidebar-items-group" id="onyx-recents-list">

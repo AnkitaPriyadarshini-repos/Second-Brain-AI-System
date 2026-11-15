@@ -519,7 +519,163 @@
       let agentResultText = '';
 
       try {
-        if (command === 'code' && agentSystem) {
+        if ((command === 'coordinate' || command === 'coord') && typeof fetch !== 'undefined') {
+          executed = true;
+          const goal = taskPrompt || 'Audit auth security, generate API docs, and write tests';
+          replaceMessage(thinking, `🎯 **Project Coordinator Active**\n\n*Step 1: Decomposing high-level goal: "${escapeHTML(goal)}"...*`);
+          const authHeaders = (typeof AuthClient !== 'undefined' && AuthClient.getAuthHeaders)
+            ? AuthClient.getAuthHeaders()
+            : {};
+          const res = await fetch('/api/projects/prj_active/coordinate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream', ...authHeaders },
+            body: JSON.stringify({ goal, stream: true })
+          });
+
+          if (!res.ok) throw new Error(`Coordinator failed (HTTP ${res.status})`);
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+          let buffer = '';
+          const workers = [];
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop();
+
+            for (const line of lines) {
+              if (!line.trim().startsWith('data:')) continue;
+              const jsonStr = line.trim().slice(5).trim();
+              if (!jsonStr) continue;
+              try {
+                const evt = JSON.parse(jsonStr);
+                if (evt.type === 'WORKER_SPAWNED') {
+                  workers.push({ id: evt.workerThreadId, name: evt.taskName, role: evt.role, icon: evt.icon, progress: 10, status: 'RUNNING' });
+                } else if (evt.type === 'WORKER_PROGRESS') {
+                  const w = workers.find(x => x.id === evt.workerThreadId);
+                  if (w) { w.progress = evt.progress; w.status = evt.status; }
+                } else if (evt.type === 'WORKER_COMPLETED') {
+                  const w = workers.find(x => x.id === evt.workerThreadId);
+                  if (w) { w.progress = 100; w.status = 'COMPLETED'; w.artifact = evt.artifact; }
+                } else if (evt.type === 'COORDINATOR_ROLLUP') {
+                  agentResultText = evt.rollupSummary || 'Completed project delegation.';
+                }
+              } catch (_) {}
+            }
+
+            const cardsHtml = workers.map(w => `
+              <div class="coordinator-worker-card" onclick="window.selectSubThread && window.selectSubThread('${w.id}')" style="cursor: pointer; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; transition: transform 0.15s, border-color 0.15s;" onmouseover="this.style.borderColor='#38BDF8'" onmouseout="this.style.borderColor='rgba(56, 189, 248, 0.25)'">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <span style="font-size: 13px; font-weight: 600; color: #F1F5F9;">${w.icon || '⚙️'} ${escapeHTML(w.name)}</span>
+                  <span style="font-size: 11px; padding: 2px 7px; border-radius: 5px; background: ${w.status === 'COMPLETED' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(56, 189, 248, 0.2)'}; color: ${w.status === 'COMPLETED' ? '#10B981' : '#38BDF8'}; font-weight: 600;">${w.status}</span>
+                </div>
+                <div style="width: 100%; background: rgba(255,255,255,0.08); height: 5px; border-radius: 4px; overflow: hidden; margin-bottom: 6px;">
+                  <div style="width: ${w.progress}%; height: 100%; background: linear-gradient(90deg, #38BDF8, #10B981); transition: width 0.3s ease;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #94A3B8;">
+                  <span>Role: ${escapeHTML(w.role)}</span>
+                  <span style="color: #38BDF8; font-weight: 500;">Click to inspect sub-thread →</span>
+                </div>
+              </div>
+            `).join('');
+
+            replaceMessage(thinking, `
+              <div style="padding: 4px 0;">
+                <div style="font-size: 14px; font-weight: 700; color: #F1F5F9; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                  <span>🎯 Project Coordinator</span>
+                  <span style="font-size: 11px; background: rgba(56, 189, 248, 0.15); color: #38BDF8; padding: 2px 8px; border-radius: 6px; font-weight: 600;">${workers.length} Parallel Threads Active</span>
+                </div>
+                <div style="margin-bottom: 12px;">${cardsHtml}</div>
+                ${agentResultText ? `<div style="font-size: 13px; line-height: 1.5; color: #CBD5E1; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">${(typeof window.formatMarkdownText === 'function') ? window.formatMarkdownText(agentResultText) : escapeHTML(agentResultText)}</div>` : ''}
+              </div>
+            `);
+          }
+        } else if (command === 'btw') {
+          executed = true;
+          const question = taskPrompt;
+          if (!question) {
+            agentResultText = '💡 **Side-Tangent Guide**\n\nUsage: `/btw <your question>`\n*Answers your question in an isolated side-thread without bloating your active thread\'s token window.*';
+          } else {
+            replaceMessage(thinking, `💡 **Side-Tangent Active (Isolated Context)**\n\n*Answering "${escapeHTML(question)}" in a decoupled context...*`);
+            const authHeaders = (typeof AuthClient !== 'undefined' && AuthClient.getAuthHeaders) ? AuthClient.getAuthHeaders() : {};
+            const res = await fetch('/api/ai/gateway', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', ...authHeaders },
+              body: JSON.stringify({ prompt: `/btw ${question}`, stream: false })
+            });
+            const data = await res.json().catch(() => ({}));
+            const answerText = data.answer || 'Completed side-tangent inquiry.';
+            agentResultText = `
+<div class="milo-btw-tangent-card" style="border: 1px solid rgba(139, 92, 246, 0.35); background: rgba(139, 92, 246, 0.08); border-radius: 12px; padding: 14px 16px; margin: 8px 0;">
+  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+    <span style="font-size: 11px; font-weight: 700; color: #A78BFA; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 5px;">
+      💡 Isolated Side-Tangent (/btw)
+    </span>
+    <span style="font-size: 11px; color: #94A3B8; background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 6px;">Zero Context Pollution</span>
+  </div>
+  <div style="font-size: 13.5px; color: #F1F5F9; line-height: 1.55;">
+    ${(typeof window.formatMarkdownText === 'function') ? window.formatMarkdownText(answerText) : escapeHTML(answerText)}
+  </div>
+</div>`;
+          }
+          // Intentionally do NOT call saveTurn to keep history clean
+          replaceMessage(thinking, agentResultText);
+          setBusy(false);
+          window.isAIProcessing = false;
+          focusComposer();
+          return true;
+        } else if (command === 'fork') {
+          executed = true;
+          const branchName = taskPrompt || `branch-${Date.now().toString().slice(-4)}`;
+          replaceMessage(thinking, `🌿 **Forking Active Thread**\n\n*Deep-cloning transcript into branch "${escapeHTML(branchName)}"...*`);
+          const authHeaders = (typeof AuthClient !== 'undefined' && AuthClient.getAuthHeaders) ? AuthClient.getAuthHeaders() : {};
+          const res = await fetch('/api/threads/' + (window.currentThreadId || 'th_active') + '/fork', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...authHeaders },
+            body: JSON.stringify({ branchName })
+          });
+          const data = await res.json().catch(() => ({}));
+          const forked = data.forkedThread || { title: branchName, id: `fork_${Date.now()}` };
+          window.currentThreadId = forked.id;
+          if (window.OnyxInterface && typeof window.OnyxInterface.addForkedThreadToSidebar === 'function') {
+            window.OnyxInterface.addForkedThreadToSidebar(forked);
+          }
+          agentResultText = `
+<div class="milo-fork-branch-card" style="border: 1px solid rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.08); border-radius: 12px; padding: 14px 16px; margin: 8px 0;">
+  <div style="font-size: 13px; font-weight: 700; color: #10B981; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+    🌿 Switched to Forked Branch: "${escapeHTML(forked.title)}"
+  </div>
+  <div style="font-size: 12.5px; color: #CBD5E1; line-height: 1.5;">
+    Deep-cloned thread history into an isolated parallel branch. You can test alternative architectural or prompt approaches without mutating the original thread.
+  </div>
+</div>`;
+        } else if (command === 'snooze') {
+          executed = true;
+          const rawArg = taskPrompt || '30m';
+          let durationMs = 30 * 60 * 1000;
+          if (rawArg.endsWith('m')) durationMs = parseInt(rawArg, 10) * 60 * 1000;
+          else if (rawArg.endsWith('h')) durationMs = parseInt(rawArg, 10) * 60 * 60 * 1000;
+          else if (rawArg.endsWith('d')) durationMs = parseInt(rawArg, 10) * 24 * 60 * 60 * 1000;
+
+          const authHeaders = (typeof AuthClient !== 'undefined' && AuthClient.getAuthHeaders) ? AuthClient.getAuthHeaders() : {};
+          const res = await fetch('/api/threads/' + (window.currentThreadId || 'th_active') + '/snooze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...authHeaders },
+            body: JSON.stringify({ durationMs })
+          });
+          const data = await res.json().catch(() => ({}));
+          agentResultText = `
+<div class="milo-snooze-card" style="border: 1px solid rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.08); border-radius: 12px; padding: 14px 16px; margin: 8px 0;">
+  <div style="font-size: 13px; font-weight: 700; color: #F59E0B; margin-bottom: 6px;">
+    ⏰ Thread Snoozed Until ${new Date(data.snoozedUntil || (Date.now() + durationMs)).toLocaleTimeString()}
+  </div>
+  <div style="font-size: 12.5px; color: #CBD5E1; line-height: 1.5;">
+    This thread is hidden from your active list and will automatically resurface with an alert banner when the snooze period expires.
+  </div>
+</div>`;
+        } else if (command === 'code' && agentSystem) {
           executed = true;
           replaceMessage(thinking, '💻 **Coding Partner Active**\n\n*Step 1: Inspecting vault patterns and planning architecture...*');
           const res = await agentSystem.executeAgent('agent_coder', taskPrompt || 'Write clean, production-grade code architecture.', (step) => {

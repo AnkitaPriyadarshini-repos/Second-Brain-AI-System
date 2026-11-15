@@ -971,6 +971,40 @@
       if (window.showToast) window.showToast(`Active Project Scope: ${projectName}`, 'info');
     }
 
+    addForkedThreadToSidebar(forkedThread) {
+      const recentsList = document.getElementById('onyx-recents-list');
+      if (!recentsList) return;
+      const item = document.createElement('div');
+      item.className = 'onyx-sidebar-item active';
+      item.setAttribute('data-session-id', forkedThread.id);
+      item.setAttribute('title', forkedThread.title);
+      item.onclick = () => this.loadSession(forkedThread.id);
+      item.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${this.escapeHTML(forkedThread.title)}</span>
+          <span style="font-size: 10px; padding: 1px 5px; border-radius: 4px; background: rgba(16, 185, 129, 0.2); color: #10B981; font-weight: 600;">Fork</span>
+        </div>
+      `;
+      recentsList.querySelectorAll('.onyx-sidebar-item').forEach(el => el.classList.remove('active'));
+      recentsList.prepend(item);
+    }
+
+    selectSubThread(subThreadId) {
+      if (window.showToast) window.showToast(`Inspecting Sub-Thread: ${subThreadId}`, 'info');
+      window.currentThreadId = subThreadId;
+      const container = document.getElementById('chat-container');
+      if (container) {
+        const subThreadIndicator = document.createElement('div');
+        subThreadIndicator.className = 'milo-subthread-banner';
+        subThreadIndicator.style.cssText = 'padding: 8px 14px; margin-bottom: 12px; border-radius: 8px; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); font-size: 12px; color: #38BDF8; display: flex; justify-content: space-between; align-items: center;';
+        subThreadIndicator.innerHTML = `
+          <span>🔍 Deep Sub-Thread Inspection: <strong>${this.escapeHTML(subThreadId)}</strong></span>
+          <button type="button" onclick="if(window.OnyxInterface) window.OnyxInterface.loadSession('current')" style="background: none; border: 1px solid rgba(56, 189, 248, 0.4); color: #38BDF8; font-size: 11px; padding: 2px 8px; border-radius: 4px; cursor: pointer;">← Back to Coordinator</button>
+        `;
+        container.prepend(subThreadIndicator);
+      }
+    }
+
     escapeHTML(str) {
       if (!str) return '';
       return String(str)
@@ -983,6 +1017,9 @@
   }
 
   window.OnyxInterface = new OnyxInterfaceController();
+  window.selectSubThread = function(id) {
+    if (window.OnyxInterface) return window.OnyxInterface.selectSubThread(id);
+  };
   window.shareSession = function() {
     if (window.OnyxInterface) return window.OnyxInterface.shareSession();
   };
