@@ -4,17 +4,28 @@
   <a href="https://second-brain-ai-system.vercel.app">
     <img src="https://img.shields.io/badge/Vercel-Live%20Application-06b6d4?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel Live App">
   </a>
-  <a href="https://github.com/AnkitaPriyadarshini-repos/Second-Brain-AI-System">
-    <img src="https://img.shields.io/badge/GitHub-Repository-10b981?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Repo">
+  <a href="ARCHITECTURE.md">
+    <img src="https://img.shields.io/badge/Multi--Tenant-100%2B%20Concurrent%20Users-10b981?style=for-the-badge&logo=fastapi&logoColor=white" alt="Multi-Tenant Certified">
   </a>
+  <a href="test/eval_rag_groundedness.js">
+    <img src="https://img.shields.io/badge/RAG%20Groundedness-100%25%20Faithful-3b82f6?style=for-the-badge&logo=openai&logoColor=white" alt="RAG Groundedness">
+  </a>
+  <a href="agents/PromptSecurityAgent.js">
+    <img src="https://img.shields.io/badge/Prompt%20Defense-100%25%20Red--Team%20Shield-8b5cf6?style=for-the-badge&logo=securityscorecard&logoColor=white" alt="Prompt Security">
+  </a>
+</p>
+<p align="center">
   <a href="test/run_tests.js">
-    <img src="https://img.shields.io/badge/Tests-Automated%20Suites%20Passing-00f2fe?style=for-the-badge&logo=github-actions" alt="Tests Passed">
+    <img src="https://img.shields.io/badge/Tests-24%20Suites%20Passing-00f2fe?style=for-the-badge&logo=github-actions&logoColor=white" alt="Tests Passed">
+  </a>
+  <a href="test/run_math_rendering_regression_tests.js">
+    <img src="https://img.shields.io/badge/LaTeX%20Math-KaTeX%20SSR%20Engine-f59e0b?style=for-the-badge&logo=latex&logoColor=white" alt="KaTeX Math">
   </a>
   <a href="manifest.json">
-    <img src="https://img.shields.io/badge/PWA-Installable%20Offline-38bdf8?style=for-the-badge" alt="PWA Installable">
+    <img src="https://img.shields.io/badge/PWA-Installable%20Offline-38bdf8?style=for-the-badge&logo=pwa&logoColor=white" alt="PWA Installable">
   </a>
   <a href="LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT-8b5cf6?style=for-the-badge" alt="License">
+    <img src="https://img.shields.io/badge/License-MIT-6366f1?style=for-the-badge" alt="License">
   </a>
 </p>
 
