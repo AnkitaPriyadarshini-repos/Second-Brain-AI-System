@@ -34,6 +34,10 @@ assert.ok(sw.includes(`./js/${chatSrc}`), 'Service worker must cache current cha
 assert.ok(sw.includes('./js/pwa-installer.js?v=61.0'), 'Service worker must cache current PWA installer');
 assert.ok(sw.includes('./vendor/katex/katex.min.css'), 'Service worker must cache KaTeX CSS');
 assert.ok(sw.includes('./vendor/katex/katex.min.js'), 'Service worker must cache KaTeX JS');
-assert.ok(pkg.scripts.test.includes('test/run_production_chat_loader_tests.js'), 'Regression test must be part of npm test');
+assert.ok(
+  pkg.scripts.test.includes('test/run_production_chat_loader_tests.js') ||
+  pkg.scripts.test.includes('test/run_ci_regression_pipeline.js'),
+  'Regression test must be part of npm test'
+);
 
 console.log('PASS: production chat controller loads once and service-worker asset versions are aligned.');
