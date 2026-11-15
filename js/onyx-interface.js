@@ -744,12 +744,18 @@
       if (modal) modal.classList.remove('open');
     }
 
+    promptConnectorAuth(connectorName) {
+      if (window.showToast) {
+        window.showToast(
+          `Enterprise OAuth Required: Connect ${connectorName} via organizational SSO in Tenant Settings.`,
+          'info'
+        );
+      }
+    }
+
     syncConnector(connectorName) {
       if (window.showToast) {
-        window.showToast(`Syncing ${connectorName}... indexing recent documents & permissions.`, 'info');
-        setTimeout(() => {
-          window.showToast(`${connectorName} successfully synchronized!`, 'success');
-        }, 1200);
+        window.showToast(`Syncing ${connectorName}... verifying active tenant permissions.`, 'info');
       }
     }
 

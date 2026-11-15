@@ -8,6 +8,10 @@ export default function handler(req, res) {
     return authController.register(req, res);
   } else if (action === 'login' && req.method === 'POST') {
     return authController.login(req, res);
+  } else if (action === 'guest' && req.method === 'POST') {
+    return authController.guest(req, res);
+  } else if (action === 'oauth' && req.method === 'POST') {
+    return authController.oauth(req, res);
   } else if (action === 'otp' && req.method === 'POST') {
     return authController.sendOTP(req, res);
   } else if (action === 'me' && req.method === 'GET') {

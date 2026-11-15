@@ -11,35 +11,35 @@ const https = require('https');
 const http = require('http');
 const { URL } = require('url');
 const authGuard = require('../auth-guard');
+const { ImageGenerationSchema } = require('../validation-schemas');
 
 const MAX_PROMPT_LENGTH = 1500;
-const rateLimitMap = new Map();
-const RATE_LIMIT_WINDOW_MS = 60000;
-const RATE_LIMIT_MAX = 20;
+const hourlyImageBuckets = new Map();
+const HOURLY_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const AUTH_IMAGE_HOURLY_LIMIT = 5; // 5 image generations/hr per user_id
+const GUEST_IMAGE_HOURLY_LIMIT = 1;
 
-function pruneRateLimitMap() {
+function checkHourlyImageLimit(userId, isGuest) {
   const now = Date.now();
-  if (rateLimitMap.size > 200) {
-    for (const [key, entry] of rateLimitMap) {
-      if (now > entry.resetAt) {
-        rateLimitMap.delete(key);
-      }
-    }
-  }
-}
+  const maxAllowed = isGuest ? GUEST_IMAGE_HOURLY_LIMIT : AUTH_IMAGE_HOURLY_LIMIT;
+  const entry = hourlyImageBuckets.get(userId) || { count: 0, resetAt: now + HOURLY_WINDOW_MS };
 
-function checkRateLimit(key) {
-  pruneRateLimitMap();
-  const now = Date.now();
-  const entry = rateLimitMap.get(key) || { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
   if (now > entry.resetAt) {
     entry.count = 1;
-    entry.resetAt = now + RATE_LIMIT_WINDOW_MS;
+    entry.resetAt = now + HOURLY_WINDOW_MS;
   } else {
     entry.count++;
   }
-  rateLimitMap.set(key, entry);
-  return entry.count <= RATE_LIMIT_MAX;
+  hourlyImageBuckets.set(userId, entry);
+
+  const remaining = Math.max(0, maxAllowed - entry.count);
+  const resetSeconds = Math.max(1, Math.ceil((entry.resetAt - now) / 1000));
+  return {
+    allowed: entry.count <= maxAllowed,
+    remaining,
+    resetSeconds,
+    limit: maxAllowed
+  };
 }
 
 function getApiKey() {
@@ -153,25 +153,28 @@ module.exports = async function handler(req, res) {
   }
 
   const clientIdentity = authGuard.extractClientIdentity(req);
-  const rateLimitKey = `${clientIdentity.id}:${clientIdentity.ip}`;
-  if (!checkRateLimit(rateLimitKey)) {
-    return res.status(429).json({ success: false, error: 'Image generation rate limit exceeded. Please wait a minute.' });
+  const hourly = checkHourlyImageLimit(clientIdentity.id, clientIdentity.isGuest);
+  if (typeof res.setHeader === 'function') {
+    res.setHeader('X-RateLimit-Limit', String(hourly.limit));
+    res.setHeader('X-RateLimit-Remaining', String(hourly.remaining));
+    res.setHeader('X-RateLimit-Reset', String(hourly.resetSeconds));
+  }
+  if (!hourly.allowed) {
+    if (typeof res.setHeader === 'function') res.setHeader('Retry-After', String(hourly.resetSeconds));
+    return res.status(429).json({
+      success: false,
+      error: `Hourly image generation quota reached (${hourly.limit} images/hr). Please try again in ${Math.ceil(hourly.resetSeconds / 60)} minutes.`
+    });
   }
 
-  const body = req.body || {};
-  const rawPrompt = typeof body.prompt === 'string' ? body.prompt.trim() : '';
-  const negativePrompt = typeof body.negativePrompt === 'string' ? body.negativePrompt.trim() : '';
-  const requestedRatio = body.aspectRatio || '1:1';
-  const requestedProvider = body.provider || 'auto';
-  const seed = body.seed ? parseInt(body.seed, 10) : undefined;
-
-  if (!rawPrompt) {
-    return res.status(400).json({ success: false, error: 'Image prompt is required.' });
+  const parsed = ImageGenerationSchema.safeParse(req.body || {});
+  if (!parsed.success) {
+    const errorMsg = parsed.error.issues.map(i => i.message).join('; ');
+    return res.status(400).json({ success: false, error: errorMsg });
   }
 
-  if (rawPrompt.length > MAX_PROMPT_LENGTH) {
-    return res.status(400).json({ success: false, error: `Prompt exceeds maximum length of ${MAX_PROMPT_LENGTH} characters.` });
-  }
+  const { prompt: rawPrompt, negativePrompt, aspectRatio: requestedRatio, seed } = parsed.data;
+  const requestedProvider = (req.body && req.body.provider) || 'auto';
 
   const { width, height } = getDimensions(requestedRatio);
   const geminiKey = getApiKey();

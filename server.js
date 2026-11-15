@@ -14,6 +14,7 @@ const GoalControllerClass = require('./controllers/GoalController');
 const AuthControllerClass = require('./controllers/AuthController');
 const AIGatewayControllerClass = require('./controllers/AIGatewayController');
 const ShareControllerClass = require('./controllers/ShareController');
+const Logger = require('./services/Logger');
 
 const noteController = new NoteControllerClass();
 const chatController = new ChatControllerClass();
@@ -46,6 +47,7 @@ nextApp.prepare().then(() => {
   const app = express();
   app.disable('x-powered-by');
   app.use(express.json({ limit: '256kb' }));
+  app.use(Logger.middleware());
 
   const server = http.createServer(app);
   const wss = new WebSocketServer({ noServer: false, server, path: '/ws/chat', maxPayload: 256 * 1024 });
@@ -119,6 +121,8 @@ nextApp.prepare().then(() => {
   app.post('/api/goals/:id/progress', (req, res) => goalController.updateProgress(req, res));
   app.post('/api/auth/register', (req, res) => authController.register(req, res));
   app.post('/api/auth/login', (req, res) => authController.login(req, res));
+  app.post('/api/auth/guest', (req, res) => authController.guest(req, res));
+  app.post('/api/auth/oauth', (req, res) => authController.oauth(req, res));
   app.post('/api/auth/otp', (req, res) => authController.sendOTP(req, res));
   app.get('/api/auth/me', (req, res) => authController.me(req, res));
   app.post('/api/auth/logout', (req, res) => authController.logout(req, res));
@@ -149,6 +153,10 @@ nextApp.prepare().then(() => {
   app.post('/api/ingest/url', (req, res) => {
     const ingestHandler = require('./api/ingest/url');
     return ingestHandler(req, res);
+  });
+  app.all('/api/ingest/jobs', (req, res) => {
+    const jobsHandler = require('./api/ingest/jobs');
+    return jobsHandler(req, res);
   });
   app.post('/api/media/image', (req, res) => {
     const imageHandler = require('./api/media/image');

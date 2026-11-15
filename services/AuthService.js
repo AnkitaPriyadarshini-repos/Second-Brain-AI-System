@@ -243,6 +243,22 @@ class AuthService {
     const session = this.db.getSession(cleanToken);
     if (session) return session;
 
+    // Check with auth-guard for signed usr_ / guest_ tokens
+    try {
+      const authGuard = require('../api/auth-guard');
+      const authGuardPayload = authGuard.verifySessionToken(cleanToken);
+      if (authGuardPayload) {
+        return {
+          userId: authGuardPayload.id,
+          email: `${authGuardPayload.id}@session.miloai.io`,
+          name: authGuardPayload.isGuest ? 'Guest Researcher' : 'User',
+          role: authGuardPayload.isGuest ? 'Guest Demo' : 'Pro Developer',
+          isGuest: authGuardPayload.isGuest,
+          createdAt: authGuardPayload.createdAt
+        };
+      }
+    } catch (_) {}
+
     // Fallback verify token payload if JWT signature valid
     const jwtPayload = this.verifySecureToken(cleanToken);
     if (jwtPayload) {
@@ -251,11 +267,105 @@ class AuthService {
         email: jwtPayload.email,
         name: jwtPayload.name,
         role: jwtPayload.role,
+        isGuest: Boolean(jwtPayload.isGuest),
         createdAt: jwtPayload.iat * 1000
       };
     }
 
     return null;
+  }
+
+  createGuestSession() {
+    const authGuard = require('../api/auth-guard');
+    const guestId = 'guest_' + crypto.randomBytes(8).toString('hex');
+    let token;
+    try {
+      token = authGuard.generateSessionToken(guestId, true);
+    } catch (_) {
+      token = this.generateSecureToken({
+        userId: guestId,
+        email: `${guestId}@guest.miloai.io`,
+        name: 'Guest Researcher',
+        role: 'Guest Demo',
+        isGuest: true
+      });
+    }
+
+    const sessionData = {
+      userId: guestId,
+      email: `${guestId}@guest.miloai.io`,
+      name: 'Guest Researcher',
+      role: 'Guest Demo',
+      isGuest: true,
+      createdAt: Date.now()
+    };
+    this.db.saveSession(token, sessionData);
+
+    return {
+      success: true,
+      token,
+      user: {
+        id: guestId,
+        email: sessionData.email,
+        name: sessionData.name,
+        role: sessionData.role,
+        isGuest: true
+      }
+    };
+  }
+
+  oauthLogin({ provider, email, name, avatar }) {
+    if (!provider) {
+      return { error: 'OAuth provider (Google, GitHub) is required.' };
+    }
+    const cleanProvider = String(provider).toLowerCase();
+    const cleanEmail = (email || `${cleanProvider}_user_${crypto.randomBytes(4).toString('hex')}@miloai.io`).trim().toLowerCase();
+    const cleanName = (name || `${cleanProvider.toUpperCase()} User`).trim();
+
+    let user = this.db.getUser(cleanEmail);
+    if (!user) {
+      user = {
+        id: `usr_${cleanProvider}_${crypto.randomBytes(6).toString('hex')}`,
+        email: cleanEmail,
+        name: cleanName,
+        role: 'Pro Developer',
+        avatar: avatar || null,
+        provider: cleanProvider,
+        createdAt: new Date().toISOString(),
+        passwordHash: this.hashPassword(crypto.randomBytes(16).toString('hex'))
+      };
+      this.db.saveUser(user);
+    }
+
+    const token = this.generateSecureToken({
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      isGuest: false
+    });
+
+    const sessionData = {
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      isGuest: false,
+      createdAt: Date.now()
+    };
+    this.db.saveSession(token, sessionData);
+
+    return {
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        isGuest: false
+      }
+    };
   }
 
   logout(token) {

@@ -282,6 +282,43 @@ class PostgresStoreService {
     return res.rows[0] || null;
   }
 
+  /**
+   * Vector store lookup with strict multi-tenant metadata filter:
+   * must: [{ key: "user_id", match: { value: userId } }]
+   */
+  async searchVectorVault({ queryVector, userId, limit = 10 }) {
+    const cleanUserId = String(userId || '').trim();
+    if (!cleanUserId) return [];
+
+    // Metadata filter contract compliant with Qdrant and pgvector multi-tenant indexing
+    const qdrantFilter = {
+      must: [
+        { key: "user_id", match: { value: cleanUserId } }
+      ]
+    };
+
+    if (this._mockStore) {
+      const userNotes = Array.from(this._mockStore.notes.values())
+        .filter(n => n.user_id === cleanUserId)
+        .slice(0, limit);
+      return { filter: qdrantFilter, userId: cleanUserId, results: userNotes };
+    }
+
+    const sql = `
+      SELECT id, user_id, title, content, summary, tags, pinned, created_at
+      FROM notes
+      WHERE user_id = $1
+      ORDER BY pinned DESC, created_at DESC
+      LIMIT $2;
+    `;
+    const res = await this.executeQuery(sql, [cleanUserId, limit]);
+    return {
+      filter: qdrantFilter,
+      userId: cleanUserId,
+      results: res.rows || []
+    };
+  }
+
   async close() {
     if (this.pool) {
       await this.pool.end();

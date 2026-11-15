@@ -215,38 +215,28 @@ export function HydratedComponent({ data }) {
       return this.generateImageResponse(prompt);
     }
 
-    const keys = this.getAPIKeys();
-
-    if (keys.geminiKey && (model.startsWith('gemini') || model.includes('flash') || model.includes('pro') || keys.preferredProvider === 'gemini')) {
-      try {
-        return await this.callGeminiAPI(prompt, keys.geminiKey, model, systemPrompt, ragContext, imageAttachment, chatHistory);
-      } catch (err) {
-        console.warn('Gemini API call failed, attempting Gateway or fallback:', err);
-      }
-    }
-
-    if (keys.openaiKey && (model.startsWith('gpt') || keys.preferredProvider === 'openai')) {
-      try {
-        return await this.callOpenAIAPI(prompt, keys.openaiKey, model, systemPrompt, ragContext, chatHistory);
-      } catch (err) {
-        console.warn('OpenAI API call failed, attempting Gateway or fallback:', err);
-      }
-    }
-
-    // Try server AI Gateway if available
+    // Route all model calls through authenticated BFF /api/ai/gateway
     try {
       if (typeof fetch !== 'undefined') {
+        const authHeaders = (typeof AuthClient !== 'undefined' && AuthClient.getAuthHeaders)
+          ? AuthClient.getAuthHeaders()
+          : {};
+
         const gatewayRes = await fetch('/api/ai/gateway', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt, model, apiKey: keys.geminiKey })
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            ...authHeaders
+          },
+          body: JSON.stringify({ prompt, model, history: chatHistory })
         });
         if (gatewayRes.ok) {
           const gData = await gatewayRes.json();
           if (gData && gData.success && gData.answer) {
             return {
               text: gData.answer,
-              provider: 'Second Brain AI Gateway',
+              provider: 'Milo BFF AI Gateway',
               grounded: (gData.citations && gData.citations.length > 0),
               citations: gData.citations || []
             };
@@ -254,7 +244,7 @@ export function HydratedComponent({ data }) {
         }
       }
     } catch (gwErr) {
-      console.warn('AI Gateway endpoint unavailable, using local synthesis:', gwErr);
+      console.warn('AI Gateway call failed, falling back to local synthesis:', gwErr);
     }
 
     // Default: Built-in Intelligent ChatGPT Brain & NLP Synthesizer (Zero-config)
@@ -284,132 +274,51 @@ export function HydratedComponent({ data }) {
   }
 
   async callGeminiAPI(prompt, apiKey, modelName = 'gemini-1.5-flash', systemPrompt = '', ragContext = '', imageAttachment = null, chatHistory = []) {
-    let endpointModel = 'gemini-1.5-flash';
-    if (modelName.includes('2.0') || modelName.includes('thinking')) {
-      endpointModel = 'gemini-2.0-flash';
-    } else if (modelName.includes('pro') || modelName.includes('1.5-pro')) {
-      endpointModel = 'gemini-1.5-pro';
-    } else {
-      endpointModel = 'gemini-1.5-flash';
-    }
+    // Route securely through authenticated server BFF gateway
+    try {
+      const authHeaders = (typeof AuthClient !== 'undefined' && AuthClient.getAuthHeaders)
+        ? AuthClient.getAuthHeaders()
+        : {};
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${endpointModel}:generateContent?key=${apiKey}`;
-
-    let fullPrompt = prompt;
-    if (ragContext) {
-      fullPrompt = `[Grounding Knowledge Context]\n${ragContext}\n\n[User Prompt]\n${prompt}`;
-    }
-
-    const parts = [{ text: fullPrompt }];
-
-    if (imageAttachment && imageAttachment.base64) {
-      const base64Clean = imageAttachment.base64.replace(/^data:image\/\w+;base64,/, '');
-      parts.push({
-        inlineData: {
-          mimeType: imageAttachment.mimeType || 'image/jpeg',
-          data: base64Clean
-        }
+      const res = await fetch('/api/ai/gateway', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', ...authHeaders },
+        body: JSON.stringify({ prompt, model: modelName, history: chatHistory, ragContext })
       });
-    }
 
-    const contents = [];
-    if (Array.isArray(chatHistory) && chatHistory.length > 0) {
-      chatHistory.forEach(msg => {
-        if (msg && msg.content) {
-          contents.push({
-            role: msg.role === 'assistant' ? 'model' : 'user',
-            parts: [{ text: msg.content }]
-          });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success && data.answer) {
+          return { text: data.answer, provider: 'Milo BFF AI Gateway (Gemini)', grounded: Boolean(ragContext) };
         }
-      });
-    }
-    contents.push({ role: 'user', parts: parts });
+      }
+    } catch (_) {}
 
-    const payload = { contents: contents };
-    if (systemPrompt) {
-      payload.systemInstruction = { parts: [{ text: systemPrompt }] };
-    }
-
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) {
-      let errDetail = res.statusText;
-      try {
-        const errJson = await res.json();
-        if (errJson && errJson.error && errJson.error.message) {
-          errDetail = errJson.error.message;
-        }
-      } catch (e) {}
-      throw new Error(`Gemini API Error ${res.status}: ${errDetail}`);
-    }
-
-    const data = await res.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error('Invalid or empty response structure from Gemini API');
-
-    return {
-      text: text,
-      provider: 'Gemini (' + endpointModel + ')',
-      grounded: !!ragContext
-    };
+    return this.fallbackSynthesize(prompt, modelName, ragContext, imageAttachment, chatHistory);
   }
 
   async callOpenAIAPI(prompt, apiKey, modelName = 'gpt-4o-mini', systemPrompt = '', ragContext = '', chatHistory = []) {
-    const endpointModel = modelName.includes('gpt-4o') ? 'gpt-4o' : 'gpt-4o-mini';
-    const url = 'https://api.openai.com/v1/chat/completions';
+    // Route securely through authenticated server BFF gateway
+    try {
+      const authHeaders = (typeof AuthClient !== 'undefined' && AuthClient.getAuthHeaders)
+        ? AuthClient.getAuthHeaders()
+        : {};
 
-    const messages = [];
-    if (systemPrompt) {
-      messages.push({ role: 'system', content: systemPrompt });
-    }
-
-    if (Array.isArray(chatHistory) && chatHistory.length > 0) {
-      chatHistory.forEach(msg => {
-        if (msg && msg.content) {
-          messages.push({
-            role: msg.role === 'assistant' ? 'assistant' : 'user',
-            content: msg.content
-          });
-        }
+      const res = await fetch('/api/ai/gateway', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', ...authHeaders },
+        body: JSON.stringify({ prompt, model: modelName, history: chatHistory, ragContext })
       });
-    }
 
-    let userContent = prompt;
-    if (ragContext) {
-      userContent = `[Grounding Knowledge Context]\n${ragContext}\n\n[User Query]\n${prompt}`;
-    }
-    messages.push({ role: 'user', content: userContent });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.success && data.answer) {
+          return { text: data.answer, provider: 'Milo BFF AI Gateway (OpenAI Compatible)', grounded: Boolean(ragContext) };
+        }
+      }
+    } catch (_) {}
 
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: endpointModel,
-        messages: messages,
-        temperature: 0.7
-      })
-    });
-
-    if (!res.ok) {
-      throw new Error(`OpenAI API HTTP Error ${res.status}: ${res.statusText}`);
-    }
-
-    const data = await res.json();
-    const text = data.choices?.[0]?.message?.content;
-    if (!text) throw new Error('Invalid or empty response from OpenAI API');
-
-    return {
-      text: text,
-      provider: 'OpenAI API (' + endpointModel + ')',
-      grounded: !!ragContext
-    };
+    return this.fallbackSynthesize(prompt, modelName, ragContext, null, chatHistory);
   }
 
   fallbackSynthesize(prompt = '', model = 'gemini-2.5-flash', ragContext = '', imageAttachment = null, chatHistory = []) {

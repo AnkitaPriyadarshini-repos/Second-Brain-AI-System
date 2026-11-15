@@ -32,6 +32,86 @@ class DistributedRateLimiter {
     this.FAILSAFE_DEGRADED_LIMIT = 5; // Strict limit when Redis is experiencing outage
   }
 
+  /**
+   * Check daily token budget per user/guest.
+   * Enforces 100k daily tokens for authenticated users, 20k for guests.
+   */
+  async checkDailyTokenBudget(key, estimatedTokens = 100, dailyCap = 100_000) {
+    const windowSec = 86400; // 24 hours
+    const namespacedKey = `milo:tokencap:${key}`;
+
+    if (this.isDistributedConfigured()) {
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+
+        const pipelineUrl = `${this.redisUrl}/pipeline`;
+        const pipelineBody = JSON.stringify([
+          ['INCRBY', namespacedKey, Math.max(1, estimatedTokens)],
+          ['EXPIRE', namespacedKey, windowSec, 'NX'],
+          ['TTL', namespacedKey]
+        ]);
+
+        const response = await fetch(pipelineUrl, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.redisToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: pipelineBody,
+          signal: controller.signal
+        });
+        clearTimeout(timer);
+
+        if (response.ok) {
+          const data = await response.json();
+          const totalTokens = Array.isArray(data) && data[0] && typeof data[0].result === 'number'
+            ? data[0].result
+            : estimatedTokens;
+          const ttl = Array.isArray(data) && data[2] && typeof data[2].result === 'number'
+            ? data[2].result
+            : windowSec;
+
+          return {
+            allowed: totalTokens <= dailyCap,
+            used: totalTokens,
+            limit: dailyCap,
+            remainingTokens: Math.max(0, dailyCap - totalTokens),
+            resetSeconds: ttl > 0 ? ttl : windowSec
+          };
+        }
+      } catch (err) {
+        console.warn(`[DistributedRateLimiter] Token budget check failed (${err.message})`);
+      }
+    }
+
+    // Local in-memory daily bucket fallback
+    if (!this.dailyTokenBuckets) this.dailyTokenBuckets = new Map();
+    const now = Date.now();
+    const existing = this.dailyTokenBuckets.get(key);
+    if (!existing || now - existing.startedAt >= 86400 * 1000) {
+      this.dailyTokenBuckets.set(key, { startedAt: now, used: estimatedTokens });
+      return {
+        allowed: true,
+        used: estimatedTokens,
+        limit: dailyCap,
+        remainingTokens: Math.max(0, dailyCap - estimatedTokens),
+        resetSeconds: 86400
+      };
+    }
+
+    existing.used += estimatedTokens;
+    const remainingTokens = Math.max(0, dailyCap - existing.used);
+    const resetSeconds = Math.max(1, Math.ceil((existing.startedAt + 86400 * 1000 - now) / 1000));
+    return {
+      allowed: existing.used <= dailyCap,
+      used: existing.used,
+      limit: dailyCap,
+      remainingTokens,
+      resetSeconds
+    };
+  }
+
   isDistributedConfigured() {
     return Boolean(this.redisUrl && this.redisToken);
   }

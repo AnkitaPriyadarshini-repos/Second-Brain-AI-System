@@ -609,17 +609,23 @@
         selectedMode = Store.getAssistantMode();
       }
 
+      const authHeaders = (typeof AuthClient !== 'undefined' && AuthClient.getAuthHeaders)
+        ? AuthClient.getAuthHeaders()
+        : {};
+
       const response = await fetch('/api/ai/gateway', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Accept: 'application/json',
-          'X-Client-Version': 'milo-2'
+          'Accept': 'text/event-stream, application/json',
+          'X-Client-Version': 'milo-2',
+          ...authHeaders
         },
         body: JSON.stringify({
           prompt,
           model: selectedModel,
           mode: selectedMode,
+          stream: true,
           history: getHistory(),
           // IMPORTANT: the gateway expects note objects, not a formatted string.
           contextNotes: retrieved.contextNotes,
@@ -628,19 +634,71 @@
         signal: controller.signal
       });
 
-      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const errJson = await response.json().catch(() => ({}));
+        throw new Error(errJson.error || `AI request failed (HTTP ${response.status}).`);
+      }
+
       if (queryId !== activeQueryId) {
-        // Session was switched or reset while request was in flight; discard safely
         return false;
       }
 
-      if (!response.ok || !data.success || !data.answer) {
-        throw new Error(data.error || `AI request failed (HTTP ${response.status}).`);
+      const contentType = response.headers.get('content-type') || '';
+      let answer = '';
+      let data = {};
+
+      if (contentType.includes('text/event-stream') && response.body && typeof response.body.getReader === 'function') {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+        let streamDone = false;
+
+        while (!streamDone) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith('data:')) continue;
+            const jsonStr = trimmed.slice(5).trim();
+            if (!jsonStr) continue;
+            try {
+              const eventData = JSON.parse(jsonStr);
+              if (eventData.done) {
+                streamDone = true;
+                data = eventData;
+                answer = eventData.fullAnswer || answer;
+                break;
+              } else if (eventData.currentText) {
+                answer = eventData.currentText;
+                if (queryId === activeQueryId) {
+                  replaceMessage(thinking, answer, { dataSources: dataSourcesStr });
+                }
+              }
+            } catch (_) {}
+          }
+        }
+      } else {
+        data = await response.json().catch(() => ({}));
+        if (!data || !data.answer) {
+          throw new Error(data?.error || `AI request failed (HTTP ${response.status}).`);
+        }
+        answer = clean(data.answer);
       }
 
-      let answer = clean(data.answer);
+      if (queryId !== activeQueryId) {
+        return false;
+      }
+
       if (data.grounded && Array.isArray(data.citations) && data.citations.length) {
-        answer += `\n\n---\n**From your Second Brain:** ${data.citations.map((c) => c.title).join(' · ')}`;
+        const citationLabels = data.citations.map((c, i) => `[${c.title}, p. ${c.page || (i + 1)}]`);
+        answer += `\n\n---\n**From your Second Brain:** ${citationLabels.join(' · ')}`;
+      } else if (retrieved.citations && retrieved.citations.length) {
+        const citationLabels = retrieved.citations.map((c, i) => `[${c.title}, p. ${c.page || (i + 1)}]`);
+        answer += `\n\n---\n**From your Second Brain:** ${citationLabels.join(' · ')}`;
       }
       replaceMessage(thinking, answer, { dataSources: dataSourcesStr });
       saveTurn(prompt, answer);

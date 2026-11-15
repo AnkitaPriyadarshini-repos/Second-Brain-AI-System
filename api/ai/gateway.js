@@ -3,9 +3,13 @@ import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
 let distributedLimiter = null;
+let validationSchemas = null;
 try {
   const DistributedRateLimiter = require('../../services/DistributedRateLimiter');
   distributedLimiter = DistributedRateLimiter.rateLimiter || new DistributedRateLimiter();
+} catch (_) {}
+try {
+  validationSchemas = require('../validation-schemas');
 } catch (_) {}
 
 const PRIMARY_MODEL = 'gemini-3.8-flash';
@@ -830,6 +834,41 @@ function redactSecrets(text) {
       model: returnedModel,
       createdAt: Date.now()
     });
+
+    const isStream = Boolean(body.stream) || req.headers?.accept === 'text/event-stream';
+    if (isStream && typeof res.write === 'function') {
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache, no-transform');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('X-Accel-Buffering', 'no');
+      if (typeof res.flushHeaders === 'function') res.flushHeaders();
+
+      const words = answer.split(/(\s+)/);
+      let sentText = '';
+      for (let i = 0; i < words.length; i++) {
+        sentText += words[i];
+        res.write(`data: ${JSON.stringify({
+          chunk: words[i],
+          currentText: sentText,
+          done: false,
+          requestId
+        })}\n\n`);
+        if (i % 3 === 0 && words.length > 10) {
+          await sleep(6);
+        }
+      }
+
+      res.write(`data: ${JSON.stringify({
+        done: true,
+        fullAnswer: answer,
+        grounded: isGrounded,
+        citations: isGrounded ? citations : [],
+        model: returnedModel,
+        requestId,
+        latencyMs: Date.now() - startedAt
+      })}\n\n`);
+      return res.end();
+    }
 
     return res.status(200).json({
       success: true,

@@ -125,38 +125,11 @@
           </div>
         </div>
 
-        <!-- Section 3: Recents (Chat history list matching screenshot) -->
+        <!-- Section 3: Recents (Dynamic multi-tenant chat threads) -->
         <div class="onyx-sidebar-section-title">Recents</div>
         <div class="onyx-sidebar-items-group" id="onyx-recents-list">
-          <div class="onyx-sidebar-item" data-session-id="call_recordings" onclick="if(window.OnyxInterface) window.OnyxInterface.loadSession('call_recordings')" title="Call recordings for">
-            <span>Call recordings for</span>
-          </div>
-          <div class="onyx-sidebar-item" data-session-id="onyx_use_cases" onclick="if(window.OnyxInterface) window.OnyxInterface.loadSession('onyx_use_cases')" title="Milo Use Cases">
-            <span>Milo Use Cases</span>
-          </div>
-          <div class="onyx-sidebar-item" data-session-id="auth_config" onclick="if(window.OnyxInterface) window.OnyxInterface.loadSession('auth_config')" title="Auth configurations">
-            <span>Auth configurations</span>
-          </div>
-          <div class="onyx-sidebar-item" data-session-id="confluence_data_center" onclick="if(window.OnyxInterface) window.OnyxInterface.loadSession('confluence_data_center')" title="Confluence Data Center A...">
-            <span>Confluence Data Center A...</span>
-          </div>
-          <div class="onyx-sidebar-item" data-session-id="deployment_info" onclick="if(window.OnyxInterface) window.OnyxInterface.loadSession('deployment_info')" title="Deployment Info">
-            <span>Deployment Info</span>
-          </div>
-          <div class="onyx-sidebar-item" data-session-id="onyx_sso_support_details" onclick="if(window.OnyxInterface) window.OnyxInterface.loadSession('onyx_sso_support_details')" title="Milo SSO Support Details">
-            <span>Milo SSO Support Details</span>
-          </div>
-          <div class="onyx-sidebar-item" data-session-id="scaling_qdrant" onclick="if(window.OnyxInterface) window.OnyxInterface.loadSession('scaling_qdrant')" title="Scaling Qdrant Deployme...">
-            <span>Scaling Qdrant Deployme...</span>
-          </div>
-          <div class="onyx-sidebar-item" data-session-id="onyx_sso_support" onclick="if(window.OnyxInterface) window.OnyxInterface.loadSession('onyx_sso_support')" title="Milo SSO Support">
-            <span>Milo SSO Support</span>
-          </div>
-          <div class="onyx-sidebar-item" data-session-id="hello_world_request" onclick="if(window.OnyxInterface) window.OnyxInterface.loadSession('hello_world_request')" title="Hello World Request">
-            <span>Hello World Request</span>
-          </div>
-          <div class="onyx-sidebar-item" data-session-id="sales_call_search" onclick="if(window.OnyxInterface) window.OnyxInterface.loadSession('sales_call_search')" title="Sales Call Document Sear...">
-            <span>Sales Call Document Sear...</span>
+          <div class="onyx-sidebar-item active" data-session-id="current" onclick="if(window.OnyxInterface) window.OnyxInterface.loadSession('current')" title="Current Thread">
+            <span>New Chat Session</span>
           </div>
         </div>
       </div>
@@ -167,10 +140,10 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span>Admin Panel</span>
         </button>
-        <div class="onyx-user-row user-profile-row" onclick="window.openUserOnboardingModal()" title="Ankita · Account Settings">
+        <div class="onyx-user-row user-profile-row" onclick="window.openUserOnboardingModal()" title="Account Settings">
           <div class="onyx-user-left">
-            <div class="onyx-user-avatar">A</div>
-            <span class="onyx-user-name" id="user-display-name">Ankita</span>
+            <div class="onyx-user-avatar">U</div>
+            <span class="onyx-user-name" id="user-display-name">User</span>
           </div>
           <div class="onyx-user-badge-dot" title="Active"></div>
         </div>
@@ -235,10 +208,10 @@
       </div>
       <div class="drawer-footer">
         <div class="user-profile-row" onclick="window.openUserOnboardingModal(); window.toggleMobileDrawer(false);">
-          <div class="user-avatar-circle">A</div>
+          <div class="user-avatar-circle">U</div>
           <div class="user-info">
-            <div class="user-name">Ankita</div>
-            <div class="user-role">Second Brain Pro</div>
+            <div class="user-name">User</div>
+            <div class="user-role">Research Workspace</div>
           </div>
         </div>
       </div>
@@ -2117,22 +2090,34 @@
         <h3 style="font-size: 16px; font-weight: 700; color: #111827; margin: 0;">Connectors &amp; Knowledge Sources</h3>
         <button type="button" class="onyx-icon-btn" onclick="window.OnyxInterface.closeConnectorsModal()">✕</button>
       </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-        <div class="onyx-source-card" style="cursor: pointer;" onclick="window.showToast('Slack connector connected', 'success')">
-          <div style="font-weight: 600; font-size: 13.5px;">💬 Slack</div>
-          <div style="font-size: 12px; color: #6B7280;">14 indexed channels • Connected</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px;">
+        <div class="onyx-source-card" style="cursor: pointer;" onclick="window.OnyxInterface.promptConnectorAuth('Slack')">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 600; font-size: 13.5px;">💬 Slack</div>
+            <span style="font-size: 10.5px; background: #F3F4F6; color: #4B5563; padding: 2px 6px; border-radius: 4px; font-weight: 600;">OAuth 2.0</span>
+          </div>
+          <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">Organization Channels • Connect OAuth</div>
         </div>
-        <div class="onyx-source-card" style="cursor: pointer;" onclick="window.showToast('Google Drive connector connected', 'success')">
-          <div style="font-weight: 600; font-size: 13.5px;">📁 Google Drive</div>
-          <div style="font-size: 12px; color: #6B7280;">280 docs indexed • Connected</div>
+        <div class="onyx-source-card" style="cursor: pointer;" onclick="window.OnyxInterface.promptConnectorAuth('Google Drive')">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 600; font-size: 13.5px;">📁 Google Drive</div>
+            <span style="font-size: 10.5px; background: #F3F4F6; color: #4B5563; padding: 2px 6px; border-radius: 4px; font-weight: 600;">OAuth 2.0</span>
+          </div>
+          <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">Workspace Files • Connect OAuth</div>
         </div>
-        <div class="onyx-source-card" style="cursor: pointer;" onclick="window.showToast('Fireflies connector connected', 'success')">
-          <div style="font-weight: 600; font-size: 13.5px;">🎙️ Fireflies</div>
-          <div style="font-size: 12px; color: #6B7280;">Meeting intelligence • Connected</div>
+        <div class="onyx-source-card" style="cursor: pointer;" onclick="window.OnyxInterface.promptConnectorAuth('Fireflies')">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 600; font-size: 13.5px;">🎙️ Fireflies</div>
+            <span style="font-size: 10.5px; background: #F3F4F6; color: #4B5563; padding: 2px 6px; border-radius: 4px; font-weight: 600;">Webhook</span>
+          </div>
+          <div style="font-size: 12px; color: #6B7280; margin-top: 4px;">Meeting Intelligence • Connect Integration</div>
         </div>
-        <div class="onyx-source-card" style="cursor: pointer;" onclick="window.activateView('vault'); window.OnyxInterface.closeConnectorsModal();">
-          <div style="font-weight: 600; font-size: 13.5px;">🧠 Second Brain Vault</div>
-          <div style="font-size: 12px; color: #6B7280;">100 notes • Local RAG</div>
+        <div class="onyx-source-card" style="cursor: pointer; border-color: #3B82F6; background: #EFF6FF;" onclick="window.activateView('vault'); window.OnyxInterface.closeConnectorsModal();">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-weight: 600; font-size: 13.5px; color: #1D4ED8;">🧠 Second Brain Vault</div>
+            <span style="font-size: 10.5px; background: #DBEAFE; color: #1D4ED8; padding: 2px 6px; border-radius: 4px; font-weight: 600;">Connected</span>
+          </div>
+          <div style="font-size: 12px; color: #1E40AF; margin-top: 4px;">Multi-Tenant Hybrid RAG • Active</div>
         </div>
       </div>
     </div>
@@ -2167,6 +2152,7 @@
   <script src="js/pwa-installer.js?v=61.0"></script>
   <script src="js/nori-companion.js?v=70.0"></script>
   <script src="js/milo-welcome.js?v=1.0"></script>
+  <script src="js/auth-client.js?v=1.0"></script>
   <script src="js/app.js?v=70.0"></script>
 </body>
 </html>

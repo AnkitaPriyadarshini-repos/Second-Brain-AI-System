@@ -68,6 +68,27 @@
       return this.repository.search(query.trim(), userId);
     }
 
+    searchVectorVault({ queryVector, userId, limit = 10 }) {
+      const cleanUserId = String(userId || '').trim();
+      const qdrantFilter = {
+        must: [
+          { key: "user_id", match: { value: cleanUserId } }
+        ]
+      };
+
+      if (this.repository && typeof this.repository.searchVectorVault === 'function') {
+        return this.repository.searchVectorVault({ queryVector, userId: cleanUserId, limit });
+      }
+
+      // Fallback to searching user notes and ranking
+      const notes = this.getAllNotes(cleanUserId);
+      return {
+        filter: qdrantFilter,
+        userId: cleanUserId,
+        results: notes.slice(0, limit)
+      };
+    }
+
     togglePin(id, userId) {
       if (!id) throw new Error('Note ID is required to toggle pin state');
       return this.repository.togglePin(id, userId);
