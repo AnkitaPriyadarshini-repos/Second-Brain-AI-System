@@ -81,7 +81,7 @@
      * Extracts the most relevant chunk/passage window from a document
      * around the highest concentration of query tokens.
      */
-    extractBestChunk(doc, queryTokens, maxChunkLen = 350) {
+    extractBestChunk(doc, queryTokens, maxChunkLen = 650) {
       const rawText = `${doc.title || ''}\n\n${doc.summary || ''}\n\n${doc.content || ''}`.trim();
       if (rawText.length <= maxChunkLen) {
         return rawText;
@@ -340,6 +340,21 @@
           // Penalize multi-token queries where only a single incidental word matched deep in body with zero title/tag/summary hits
           if (queryTokens.length >= 2 && coverage < 0.5 && !hasTitleOrTagHit && summaryMatches.length === 0) {
             confidence *= 0.20;
+          }
+
+          // Penalize multi-token queries where overall keyword coverage is very low (< 35%)
+          if (queryTokens.length >= 3 && coverage < 0.35) {
+            confidence *= 0.15;
+          }
+
+          // Penalize specific year mismatch if query contains an explicit 4-digit year that doc lacks
+          const yearMatch = cleanQuery.match(/\b(20\d{2})\b/);
+          if (yearMatch) {
+            const y = yearMatch[1];
+            const hasY = p.allTokens.includes(y) || (doc.title && doc.title.includes(y)) || (doc.dateStr && String(doc.dateStr).includes(y));
+            if (!hasY) {
+              confidence *= 0.15;
+            }
           }
 
           confidence = Math.min(1.0, Math.max(0.0, confidence));
