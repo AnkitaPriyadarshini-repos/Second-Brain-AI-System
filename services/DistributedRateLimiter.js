@@ -12,19 +12,33 @@
 
 class DistributedRateLimiter {
   constructor(options = {}) {
-    this.redisUrl = (
+    let resolvedUrl = (
       options.redisUrl ||
       process.env.UPSTASH_REDIS_REST_URL ||
       process.env.KV_REST_API_URL ||
+      process.env.REDIS_REST_URL ||
       ''
     ).replace(/\/$/, '');
 
-    this.redisToken = (
+    let resolvedToken = (
       options.redisToken ||
       process.env.UPSTASH_REDIS_REST_TOKEN ||
       process.env.KV_REST_API_TOKEN ||
+      process.env.REDIS_REST_TOKEN ||
+      process.env.REDIS_TOKEN ||
       ''
     );
+
+    // If REDIS_URL starts with http/https, use it directly as the REST endpoint
+    if (!resolvedUrl && process.env.REDIS_URL) {
+      const raw = process.env.REDIS_URL.trim();
+      if (raw.startsWith('http://') || raw.startsWith('https://')) {
+        resolvedUrl = raw.replace(/\/$/, '');
+      }
+    }
+
+    this.redisUrl = resolvedUrl;
+    this.redisToken = resolvedToken;
 
     this.timeoutMs = options.timeoutMs || 1500;
     this.localBuckets = new Map();

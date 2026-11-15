@@ -25,7 +25,7 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ success: false, error: 'fileName is required for ingestion' });
     }
 
-    const job = ingestionJobService.createJob({
+    const job = await ingestionJobService.createJob({
       fileName,
       fileSize: fileSize || (content ? Buffer.byteLength(content) : 0),
       mimeType,

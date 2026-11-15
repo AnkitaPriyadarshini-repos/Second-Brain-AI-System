@@ -7,16 +7,84 @@
  */
 
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
 const { validateFileUpload, computeSHA256 } = require('../api/validation-schemas');
+
+const DURABLE_STORAGE_DIR = path.join(os.tmpdir(), 'milo_ingest_jobs');
+
+function ensureDurableStorageDir() {
+  try {
+    if (!fs.existsSync(DURABLE_STORAGE_DIR)) {
+      fs.mkdirSync(DURABLE_STORAGE_DIR, { recursive: true });
+    }
+  } catch (err) {
+    // Filesystem may be restricted in read-only containers
+  }
+}
+
+ensureDurableStorageDir();
 
 class IngestionJobService {
   constructor() {
     this.jobs = new Map();
+    this.redisUrl = (
+      process.env.UPSTASH_REDIS_REST_URL ||
+      process.env.KV_REST_API_URL ||
+      process.env.REDIS_REST_URL ||
+      ''
+    ).replace(/\/$/, '');
+    this.redisToken = (
+      process.env.UPSTASH_REDIS_REST_TOKEN ||
+      process.env.KV_REST_API_TOKEN ||
+      process.env.REDIS_REST_TOKEN ||
+      process.env.REDIS_TOKEN ||
+      ''
+    );
+
     // Auto-cleanup finished jobs older than 1 hour
     this.cleanupTimer = setInterval(() => this.cleanup(), 15 * 60 * 1000);
     if (this.cleanupTimer && typeof this.cleanupTimer.unref === 'function') {
       this.cleanupTimer.unref();
     }
+  }
+
+  persistDurable(job) {
+    if (!job || !job.id) return;
+    try {
+      const safeId = String(job.id).replace(/[^a-zA-Z0-9_-]/g, '');
+      const filePath = path.join(DURABLE_STORAGE_DIR, `${safeId}.json`);
+      fs.writeFileSync(filePath, JSON.stringify(job), 'utf8');
+    } catch (_) {}
+
+    // Asynchronously replicate to Upstash Redis KV if configured
+    if (this.redisUrl && this.redisToken) {
+      try {
+        const key = `milo:job:${job.id}`;
+        fetch(`${this.redisUrl}/set/${encodeURIComponent(key)}?ex=86400`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.redisToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(job)
+        }).catch(() => {});
+      } catch (_) {}
+    }
+  }
+
+  loadDurable(jobId) {
+    if (!jobId) return null;
+    try {
+      const safeId = String(jobId).replace(/[^a-zA-Z0-9_-]/g, '');
+      const filePath = path.join(DURABLE_STORAGE_DIR, `${safeId}.json`);
+      if (fs.existsSync(filePath)) {
+        const raw = fs.readFileSync(filePath, 'utf8');
+        return JSON.parse(raw);
+      }
+    } catch (_) {}
+    return null;
   }
 
   cleanup() {
@@ -28,7 +96,7 @@ class IngestionJobService {
     }
   }
 
-  createJob({ fileName, fileSize, mimeType, content, buffer, userId = 'usr_guest' }) {
+  async createJob({ fileName, fileSize, mimeType, content, buffer, userId = 'usr_guest' }) {
     // 1. Strict validation via Zod guard
     const validation = validateFileUpload({
       fileName,
@@ -60,22 +128,38 @@ class IngestionJobService {
     };
 
     this.jobs.set(jobId, job);
+    this.persistDurable(job);
 
-    // Kick off background asynchronous extraction worker
-    setImmediate(() => this._executeJob(jobId, { fileName, content, buffer, userId, hash }));
+    // In serverless environments (Vercel / AWS Lambda), the runtime freezes
+    // immediately when the HTTP response returns. We MUST await the indexing
+    // to completion so no unawaited promise is killed or frozen mid-flight!
+    const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+    if (isServerless) {
+      await this._executeJob(jobId, { fileName, content, buffer, userId, hash });
+    } else {
+      setImmediate(() => this._executeJob(jobId, { fileName, content, buffer, userId, hash }));
+    }
 
+    const currentJob = this.jobs.get(jobId) || job;
     return {
       success: true,
       jobId,
-      status: job.status,
-      progress: job.progress,
+      status: currentJob.status,
+      progress: currentJob.progress,
       hash,
-      message: 'Document enqueued for asynchronous extraction and indexing'
+      result: currentJob.result,
+      message: currentJob.status === 'ready'
+        ? 'Document extracted and indexed into Knowledge Vault'
+        : 'Document enqueued for asynchronous extraction and indexing'
     };
   }
 
   getJob(jobId, userId) {
-    const job = this.jobs.get(jobId);
+    let job = this.jobs.get(jobId);
+    if (!job) {
+      job = this.loadDurable(jobId);
+      if (job) this.jobs.set(jobId, job);
+    }
     if (!job) return null;
     if (userId && job.userId && job.userId !== userId && !job.userId.startsWith('guest_') && !userId.startsWith('guest_')) {
       return null; // Tenant isolation

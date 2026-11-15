@@ -100,11 +100,17 @@ class PostgresStoreService {
         throw new Error(`DATABASE_CONNECTION_ERROR: PostgreSQL client module 'pg' is not installed. Run 'npm install pg' to enable PostgreSQL support.`);
       }
 
+      const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+      const defaultPoolMax = isServerless ? 2 : 10;
+      const defaultIdleTimeout = isServerless ? 10000 : 30000;
+      const poolMax = parseInt(process.env.PG_POOL_MAX || String(defaultPoolMax), 10);
+      const idleTimeout = parseInt(process.env.PG_IDLE_TIMEOUT || String(defaultIdleTimeout), 10);
+
       const poolConfig = this.connectionString
         ? {
             connectionString: this.connectionString,
-            max: parseInt(process.env.PG_POOL_MAX || '10', 10),
-            idleTimeoutMillis: 30000,
+            max: poolMax,
+            idleTimeoutMillis: idleTimeout,
             connectionTimeoutMillis: 5000,
             ssl: process.env.NODE_ENV === 'production' && !this.connectionString.includes('localhost') ? { rejectUnauthorized: false } : undefined
           }
@@ -114,8 +120,8 @@ class PostgresStoreService {
             database: this.config.database,
             user: this.config.user,
             password: this.config.password,
-            max: parseInt(process.env.PG_POOL_MAX || '10', 10),
-            idleTimeoutMillis: 30000,
+            max: poolMax,
+            idleTimeoutMillis: idleTimeout,
             connectionTimeoutMillis: 5000,
             ssl: this.config.ssl
           };
