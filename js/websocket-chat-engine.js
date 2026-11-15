@@ -108,7 +108,8 @@
     startHeartbeat() {
       this.stopHeartbeat();
       this.pingInterval = setInterval(() => {
-        if (this.connected && this.socket.readyState === WebSocket.OPEN) {
+        const isOpen = this.socket && (this.socket.readyState === (this.socket.OPEN !== undefined ? this.socket.OPEN : 1));
+        if (this.connected && isOpen) {
           const pingTime = performance.now();
           this.socket.send(JSON.stringify({ type: 'PING', clientTimestamp: pingTime }));
         }
@@ -152,7 +153,8 @@
         deliveryLatencyMs: 0
       };
 
-      if (this.connected && this.socket.readyState === WebSocket.OPEN) {
+      const isOpen = this.socket && (this.socket.readyState === (this.socket.OPEN !== undefined ? this.socket.OPEN : 1));
+      if (this.connected && isOpen) {
         this.socket.send(JSON.stringify(payload));
       } else {
         // Fallback simulate local delivery if disconnected
