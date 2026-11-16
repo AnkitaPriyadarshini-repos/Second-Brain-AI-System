@@ -1,7 +1,4 @@
-import authGuard from '../auth-guard.js';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
+const authGuard = require('../auth-guard');
 let distributedLimiter = null;
 let validationSchemas = null;
 try {
@@ -503,7 +500,7 @@ function getApiKey() {
   return direct;
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   const requestId = `juno_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`;
   const startedAt = Date.now();
 
@@ -842,6 +839,8 @@ function redactSecrets(text) {
       res.setHeader('Cache-Control', 'no-cache, no-transform');
       res.setHeader('Connection', 'keep-alive');
       res.setHeader('X-Accel-Buffering', 'no');
+      const ttftMs = Date.now() - startedAt;
+      res.setHeader('X-Time-To-First-Token-Ms', String(ttftMs));
       if (typeof res.flushHeaders === 'function') res.flushHeaders();
 
       const words = answer.split(/(\s+)/);
@@ -904,4 +903,6 @@ function redactSecrets(text) {
     activeInFlightRequests.delete(inFlightKey);
     globalThis.__miloGlobalInFlightAICalls = Math.max(0, (globalThis.__miloGlobalInFlightAICalls || 1) - 1);
   }
-}
+};
+
+module.exports.default = module.exports;

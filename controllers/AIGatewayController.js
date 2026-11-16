@@ -41,7 +41,27 @@ class AIGatewayController {
     const clientIdentity = authGuard.extractClientIdentity(req);
     const userId = clientIdentity.id;
 
-    // 2. Sliding-Window Daily Token Budget Cap (100k auth, 20k guest)
+    // 2a. Atomic Request Rate Limiting (30 req/min auth, 15 req/min guest)
+    const maxRequests = clientIdentity.isGuest ? 15 : 30;
+    const rateLimitKey = `${userId}:${clientIdentity.ip || 'ip'}`;
+    const rateCheck = await this.limiter.checkLimit(rateLimitKey, maxRequests, 60_000);
+    if (typeof res.setHeader === 'function') {
+      res.setHeader('X-RateLimit-Limit', String(maxRequests));
+      res.setHeader('X-RateLimit-Remaining', String(rateCheck.remaining));
+      res.setHeader('X-RateLimit-Reset', String(rateCheck.resetSeconds));
+      if (rateCheck.distributed) res.setHeader('X-RateLimit-Mode', 'distributed');
+      if (rateCheck.degraded) res.setHeader('X-RateLimit-Degraded', 'true');
+    }
+    if (!rateCheck.allowed) {
+      if (typeof res.setHeader === 'function') res.setHeader('Retry-After', String(rateCheck.resetSeconds));
+      return res.status(429).json({
+        success: false,
+        requestId,
+        error: `Rate limit exceeded. Maximum ${maxRequests} requests per minute. Please try again shortly.`
+      });
+    }
+
+    // 2b. Sliding-Window Daily Token Budget Cap (100k auth, 20k guest)
     const estimatedTokens = Math.max(25, Math.ceil((prompt.length + 200) / 4));
     const dailyCap = clientIdentity.isGuest ? 20_000 : 100_000;
     const tokenCheck = await this.limiter.checkDailyTokenBudget(userId, estimatedTokens, dailyCap);
@@ -157,6 +177,8 @@ class AIGatewayController {
         res.setHeader('Cache-Control', 'no-cache, no-transform');
         res.setHeader('Connection', 'keep-alive');
         res.setHeader('X-Accel-Buffering', 'no');
+        const ttftMs = Date.now() - startTime;
+        res.setHeader('X-Time-To-First-Token-Ms', String(ttftMs));
         if (typeof res.flushHeaders === 'function') res.flushHeaders();
 
         const answerText = result.answer || '';

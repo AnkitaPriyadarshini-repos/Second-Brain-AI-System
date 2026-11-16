@@ -5,6 +5,10 @@
     {
       "source": "/api/auth/:action*",
       "destination": "/api/auth?action=:action*"
+    },
+    {
+      "source": "/api/notes/:id*",
+      "destination": "/api/notes?id=:id*"
     }
   ],
   "functions": {

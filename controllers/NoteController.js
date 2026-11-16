@@ -83,6 +83,30 @@
       }
     }
 
+    getNoteById(req, res) {
+      try {
+        const identity = this.extractIdentity(req);
+        const userId = identity ? identity.id : null;
+        const id = (req && req.params && req.params.id) ? req.params.id : (req && req.query && req.query.id ? req.query.id : (req && req.id ? req.id : null));
+        const note = this.noteService.getNoteById(id, userId);
+        if (!note) {
+          if (res && typeof res.status === 'function') {
+            return res.status(404).json({ success: false, error: 'Note not found or unauthorized' });
+          }
+          return null;
+        }
+        if (res && typeof res.json === 'function') {
+          return res.status(200).json({ success: true, data: note });
+        }
+        return { success: true, data: note };
+      } catch (err) {
+        if (res && typeof res.status === 'function') {
+          return res.status(404).json({ success: false, error: err.message });
+        }
+        throw err;
+      }
+    }
+
     createNote(req, res) {
       try {
         const identity = this.extractIdentity(req);

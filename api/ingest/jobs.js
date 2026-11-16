@@ -19,7 +19,8 @@ module.exports = async function handler(req, res) {
 
   if (req.method === 'POST') {
     const body = req.body || {};
-    const { fileName, fileSize, mimeType, content, buffer } = body;
+    const fileName = body.fileName || body.title || (body.content ? 'document.md' : null);
+    const { fileSize, mimeType, content, buffer } = body;
 
     if (!fileName) {
       return res.status(400).json({ success: false, error: 'fileName is required for ingestion' });
