@@ -316,6 +316,25 @@
     }
   }
 
+  function ensureActivePlaceholder(input) {
+    if (!input) input = document.getElementById('rag-query-input');
+    if (!input) return;
+    const hasCodingChip = Boolean(typeof window !== 'undefined' && window.activeComposerChips && window.activeComposerChips.has('@Coding'));
+    let modeId = 'milo';
+    try {
+      if (typeof window !== 'undefined' && window.MiloWelcome && typeof window.MiloWelcome.getSelectedMode === 'function') {
+        modeId = window.MiloWelcome.getSelectedMode();
+      }
+    } catch (_) {}
+    if (hasCodingChip || modeId === 'coding') {
+      input.placeholder = 'Describe a bug, paste code to debug, or architect an algorithm...';
+    } else {
+      input.placeholder = 'Ask Milo anything, or type / for commands...';
+    }
+    input.setAttribute('aria-label', input.placeholder);
+  }
+  window.ensureActivePlaceholder = ensureActivePlaceholder;
+
   function setBusy(value) {
     busy = Boolean(value);
     window.isAIProcessing = busy;
@@ -324,6 +343,9 @@
     if (input) {
       input.setAttribute('aria-busy', busy ? 'true' : 'false');
       input.disabled = busy;
+      if (!busy) {
+        ensureActivePlaceholder(input);
+      }
     }
     if (button) {
       button.disabled = busy;
@@ -915,6 +937,7 @@
     if (input) {
       input.value = '';
       input.style.height = 'auto';
+      ensureActivePlaceholder(input);
     }
     focusComposer();
   }
@@ -966,6 +989,7 @@
         event.stopPropagation();
         const value = clean(input.value);
         if (value) input.value = '';
+        ensureActivePlaceholder(input);
         handleRAGQuery(value);
       }, true);
     }
@@ -1102,7 +1126,10 @@
     if (busy || window.isAIProcessing) return false;
     const input = document.getElementById('rag-query-input');
     const prompt = input ? clean(input.value) : '';
-    if (input && prompt) input.value = '';
+    if (input && prompt) {
+      input.value = '';
+      ensureActivePlaceholder(input);
+    }
     return handleRAGQuery(prompt);
   };
   window.sendMessage = window.submitRAGQuery;

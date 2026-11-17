@@ -442,7 +442,8 @@
      */
     updateComposerPlaceholder() {
       const input = document.getElementById('rag-query-input');
-      const activeMeta = ASSISTANT_MODES[this.selectedMode] || ASSISTANT_MODES.milo;
+      const hasCodingChip = Boolean(typeof window !== 'undefined' && window.activeComposerChips && window.activeComposerChips.has('@Coding'));
+      const activeMeta = hasCodingChip ? ASSISTANT_MODES.coding : (ASSISTANT_MODES[this.selectedMode] || ASSISTANT_MODES.milo);
       if (input && activeMeta) {
         input.placeholder = activeMeta.placeholder;
         input.setAttribute('aria-label', activeMeta.placeholder);
@@ -659,6 +660,7 @@
           suggestions.style.display = 'none';
           suggestions.classList.add('hidden');
         }
+        this.updateComposerPlaceholder();
       }
     }
 

@@ -36,7 +36,9 @@ html[data-theme="onyx"] {
 
   --main-bg: #FFFFFF !important;
   --surface-bg: #FFFFFF !important;
+  --bg-surface: #FFFFFF !important;
   --border-color: #E5E7EB !important;
+  --border-subtle: #E5E7EB !important;
   --bg-dark: #FFFFFF !important;
   --bg-dark-gradient: #FFFFFF !important;
   --bg-card: #FFFFFF !important;
@@ -76,8 +78,20 @@ html[data-theme="onyx"] #view-jarvis {
 }
 
 #gemini-flow-canvas,
-html[data-theme="onyx"] #gemini-flow-canvas {
+html[data-theme="onyx"] #gemini-flow-canvas,
+.floating-astronaut-wrapper,
+.cute-bee-mascot-wrapper,
+.ambient-orbs-container,
+div[class*="monica"], div[id*="monica"],
+div[class*="sider"], div[id*="sider"],
+div[class*="merlin"], div[id*="merlin"],
+div[class*="sidebar-tab"], div[class*="floating-widget"],
+.floating-right-widget,
+.edge-floating-widget {
   display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .app-layout-wrapper,
