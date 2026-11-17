@@ -2126,15 +2126,34 @@ html[data-theme="onyx"] .tufy-starter-chip:hover {
 }
 
 .artifact-split-canvas {
+  display: none !important;
   width: 50% !important;
   flex: 0 0 50% !important;
-  display: flex !important;
   flex-direction: column !important;
   background: #FFFFFF !important;
   height: calc(100vh - 56px) !important;
   overflow: hidden !important;
   box-sizing: border-box !important;
-  animation: canvasSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-main-canvas.artifact-canvas-open .artifact-split-canvas,
+.artifact-split-canvas.open {
+  display: flex !important;
+  animation: canvasSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Hide main-canvas top-left toggle when sidebar is expanded on desktop */
+@media (min-width: 769px) {
+  .main-canvas-sidebar-toggle,
+  .onyx-top-left .onyx-sidebar-collapse-btn {
+    display: none !important;
+  }
+
+  body.sidebar-collapsed .main-canvas-sidebar-toggle,
+  body.sidebar-collapsed .onyx-top-left .onyx-sidebar-collapse-btn,
+  #app-sidebar.sidebar-collapsed ~ .app-main-canvas .onyx-top-left .onyx-sidebar-collapse-btn {
+    display: flex !important;
+  }
 }
 
 @keyframes canvasSlideIn {

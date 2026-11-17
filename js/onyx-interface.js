@@ -498,6 +498,15 @@
       if (!sidebar) return;
       this.isSidebarCollapsed = !this.isSidebarCollapsed;
       sidebar.classList.toggle('sidebar-collapsed', this.isSidebarCollapsed);
+      document.body.classList.toggle('sidebar-collapsed', this.isSidebarCollapsed);
+      const mainCanvasToggle = document.getElementById('main-canvas-sidebar-toggle');
+      if (mainCanvasToggle) {
+        if (window.innerWidth >= 769) {
+          mainCanvasToggle.style.display = this.isSidebarCollapsed ? 'flex' : 'none';
+        } else {
+          mainCanvasToggle.style.display = 'flex';
+        }
+      }
     }
 
     bindModelPill() {
@@ -890,9 +899,11 @@
       }
       if (input) {
         input.value = '';
-        input.placeholder = 'How can Milo help you today?';
+        input.placeholder = 'Ask Milo anything, or type / for commands...';
         input.focus();
       }
+      if (window.closeArtifactCanvas) window.closeArtifactCanvas();
+      if (window.updateShareControlsVisibility) window.updateShareControlsVisibility();
 
       document.querySelectorAll('.onyx-sidebar-item').forEach(i => i.classList.remove('active'));
       if (window.showToast) window.showToast('New session started', 'info');
@@ -1239,6 +1250,12 @@
   window.removeComposerContextChip = function(tag) {
     window.activeComposerChips.delete(tag);
     window.renderComposerChips();
+    if (!window.activeComposerChips.has('@Coding')) {
+      const input = document.getElementById('rag-query-input');
+      if (input && input.placeholder.includes('Describe a bug')) {
+        input.placeholder = 'Ask Milo anything, or type / for commands...';
+      }
+    }
   };
 
   window.renderComposerChips = function() {
@@ -1344,6 +1361,7 @@
     }
 
     mainCanvas.classList.add('artifact-canvas-open');
+    canvas.classList.add('open');
     canvas.style.display = 'flex';
   };
 
@@ -1351,8 +1369,9 @@
     const canvas = document.getElementById('artifact-split-canvas');
     const mainCanvas = document.querySelector('.app-main-canvas');
     if (canvas) {
-      canvas.style.display = 'none';
+      canvas.classList.remove('open');
       canvas.classList.remove('fullscreen');
+      canvas.style.display = 'none';
     }
     if (mainCanvas) mainCanvas.classList.remove('artifact-canvas-open');
   };
@@ -1390,9 +1409,42 @@
     if (e.detail) window.openArtifactCanvas(e.detail);
   });
 
+  // Dynamic Header Share & Copy-Link Controls Visibility
+  window.updateShareControlsVisibility = function() {
+    const container = document.getElementById('chat-container');
+    const shareBtn = document.getElementById('onyx-header-share-btn') || document.querySelector('.onyx-share-btn');
+    const copyLinkBtn = document.getElementById('onyx-header-copy-link-btn') || document.querySelector('.onyx-copy-link-btn');
+
+    const hasMessages = Boolean(
+      container &&
+      container.style.display !== 'none' &&
+      container.children.length > 0 &&
+      container.querySelectorAll('.chat-bubble, .message-bubble, .user-bubble, .assistant-bubble, .chat-message, .milo-turn-card').length > 0
+    );
+
+    if (shareBtn) shareBtn.style.display = hasMessages ? 'inline-flex' : 'none';
+    if (copyLinkBtn) copyLinkBtn.style.display = hasMessages ? 'inline-flex' : 'none';
+  };
+
+  function setupShareControlsObserver() {
+    window.updateShareControlsVisibility();
+    if (window.closeArtifactCanvas) window.closeArtifactCanvas();
+    const chatContainer = document.getElementById('chat-container');
+    if (chatContainer && typeof MutationObserver !== 'undefined') {
+      const observer = new MutationObserver(() => {
+        window.updateShareControlsVisibility();
+      });
+      observer.observe(chatContainer, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
+    }
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => window.OnyxInterface.init());
+    document.addEventListener('DOMContentLoaded', () => {
+      window.OnyxInterface.init();
+      setupShareControlsObserver();
+    });
   } else {
     window.OnyxInterface.init();
+    setupShareControlsObserver();
   }
 })();

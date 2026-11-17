@@ -1044,7 +1044,7 @@
 
     const input = document.getElementById('rag-query-input');
     if (input) {
-      input.placeholder = 'How can Milo help you today?';
+      input.placeholder = 'Ask Milo anything, or type / for commands...';
       input.setAttribute('autocomplete', 'off');
       input.setAttribute('enterkeyhint', 'send');
     }
