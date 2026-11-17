@@ -1545,6 +1545,10 @@
     };
 
     window.openSearchChatsModal = function() {
+      if (typeof window.openCommandPalette === 'function') {
+        window.openCommandPalette();
+        return;
+      }
       const query = prompt("Search chat history:");
       if (query && query.trim()) {
         const threads = (typeof Store !== 'undefined' && Store.getChatThreads) ? Store.getChatThreads() : [];
@@ -3992,14 +3996,15 @@
       handleRAGQuery(cleanQuery);
     };
 
-    // Slash Commands Auto-complete Handler
+    // Slash & Mention Commands Auto-complete Handler
     window.handleSlashCommandsInput = function(e) {
-      const val = e.target.value;
+      const val = (e && e.target && e.target.value) || '';
       const menu = document.getElementById('slash-commands-menu');
       if (!menu) return;
 
-      if (val.startsWith('/')) {
-        menu.style.display = 'block';
+      if (val.startsWith('/') || val.includes('@')) {
+        menu.style.display = 'flex';
+        menu.style.flexDirection = 'column';
       } else {
         menu.style.display = 'none';
       }

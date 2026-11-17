@@ -293,6 +293,7 @@
         modeNav.className = 'milo-mode-nav-container';
         hero.appendChild(modeNav);
       }
+      modeNav.style.display = 'none'; // Progressive disclosure: modes managed via @ mentions & command palette
 
       const modeKeys = ['milo', 'coach', 'research', 'coding'];
       const currentMode = this.selectedMode;
@@ -349,9 +350,12 @@
         container = document.createElement('div');
         container.id = 'milo-welcome-suggestions';
         container.className = 'milo-welcome-suggestions';
+        container.style.display = 'none'; // Hidden in favor of sleek adaptive prompt pills
 
         if (chipsSlot) {
-          chipsSlot.innerHTML = '';
+          if (!chipsSlot.querySelector('#hero-adaptive-chips')) {
+            chipsSlot.innerHTML = '';
+          }
           chipsSlot.appendChild(container);
           chipsSlot.classList.remove('hidden');
           chipsSlot.style.display = 'flex';

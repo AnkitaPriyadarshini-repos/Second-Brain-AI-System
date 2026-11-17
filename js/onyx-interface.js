@@ -463,6 +463,7 @@
       this.bindInputEvents();
       this.bindKeyboardShortcuts();
       this.bindComposerTools();
+      this.initCommandPalette();
 
       // Sync active model from Store or default to auto
       const savedModel = (window.Store && window.Store.settings && window.Store.settings.selectedModel) || 'auto';
@@ -563,11 +564,15 @@
     bindInputEvents() {
       const input = document.getElementById('rag-query-input');
       const submitBtn = document.getElementById('rag-submit-btn');
-      if (!input || !submitBtn) return;
+      const starterChips = document.getElementById('hero-starter-chips');
+      if (!input) return;
 
       input.addEventListener('input', () => {
         const val = input.value.trim();
-        submitBtn.classList.toggle('active', val.length > 0);
+        if (submitBtn) submitBtn.classList.toggle('active', val.length > 0);
+        if (starterChips) {
+          starterChips.classList.toggle('faded-out', val.length > 0);
+        }
       });
     }
 
@@ -597,7 +602,18 @@
       window.addEventListener('keydown', (e) => {
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
           e.preventDefault();
-          if (window.openSearchChatsModal) window.openSearchChatsModal();
+          if (window.openCommandPalette) window.openCommandPalette();
+          else if (window.openSearchChatsModal) window.openSearchChatsModal();
+        }
+        if ((e.metaKey || e.ctrlKey) && e.key === '\\') {
+          e.preventDefault();
+          this.toggleSidebar();
+        }
+        if (e.key === 'Escape') {
+          if (window.closeCommandPalette) window.closeCommandPalette();
+          if (window.toggleProfilePopover) window.toggleProfilePopover(false);
+          if (window.toggleComposerAddPopover) window.toggleComposerAddPopover(false);
+          if (window.closeArtifactCanvas) window.closeArtifactCanvas();
         }
       });
     }
@@ -1005,6 +1021,149 @@
       }
     }
 
+    initCommandPalette() {
+      window.openCommandPalette = () => {
+        const modal = document.getElementById('command-palette-modal');
+        const input = document.getElementById('command-palette-input');
+        if (!modal) return;
+        modal.style.display = 'flex';
+        if (input) {
+          input.value = '';
+          input.focus();
+        }
+        window.renderCommandPaletteResults('');
+      };
+
+      window.closeCommandPalette = () => {
+        const modal = document.getElementById('command-palette-modal');
+        if (modal) modal.style.display = 'none';
+      };
+
+      window.filterCommandPalette = (query) => {
+        window.renderCommandPaletteResults(query);
+      };
+
+      window.handleCommandPaletteKeydown = (e) => {
+        const results = document.getElementById('command-palette-results');
+        if (!results) return;
+        const items = Array.from(results.querySelectorAll('.command-palette-item'));
+        if (!items.length) return;
+
+        let activeIdx = items.findIndex(el => el.classList.contains('selected'));
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (activeIdx >= 0) items[activeIdx].classList.remove('selected');
+          const nextIdx = (activeIdx + 1) % items.length;
+          items[nextIdx].classList.add('selected');
+          items[nextIdx].scrollIntoView({ block: 'nearest' });
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (activeIdx >= 0) items[activeIdx].classList.remove('selected');
+          const prevIdx = (activeIdx - 1 + items.length) % items.length;
+          items[prevIdx].classList.add('selected');
+          items[prevIdx].scrollIntoView({ block: 'nearest' });
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (activeIdx >= 0 && items[activeIdx]) {
+            items[activeIdx].click();
+          } else if (items[0]) {
+            items[0].click();
+          }
+        } else if (e.key === 'Escape') {
+          window.closeCommandPalette();
+        }
+      };
+
+      window.renderCommandPaletteResults = (query) => {
+        const container = document.getElementById('command-palette-results');
+        if (!container) return;
+        const q = (query || '').toLowerCase().trim();
+
+        // 1. Recents
+        const recents = [
+          { title: 'New Chat Session', type: 'recent', action: () => { window.OnyxInterface.createNewSession(); window.closeCommandPalette(); } },
+          { title: 'Milo Use Cases & Enterprise Retrieval', type: 'recent', action: () => { window.OnyxInterface.loadSession('onyx_use_cases'); window.closeCommandPalette(); } },
+          { title: 'Customer Discovery Call Recordings', type: 'recent', action: () => { window.OnyxInterface.loadSession('call_recordings'); window.closeCommandPalette(); } },
+          { title: 'Auth & SSO Configuration Guidelines', type: 'recent', action: () => { window.OnyxInterface.loadSession('auth_config'); window.closeCommandPalette(); } }
+        ];
+
+        // 2. Agents & Tools
+        const agents = [
+          { title: 'Diff-First Coding Agent', desc: 'Safe virtual sandbox code execution & unified diffs', type: 'agent', icon: '💻', action: () => { window.setComposerAgentMode('coding'); window.closeCommandPalette(); } },
+          { title: 'Deep Research Agent', desc: 'Multi-angle evidence synthesis & citation analysis', type: 'agent', icon: '🔬', action: () => { window.setComposerAgentMode('research'); window.closeCommandPalette(); } },
+          { title: 'Customer Support AI', desc: 'Instant SLA ticket resolution & knowledge ingestion', type: 'agent', icon: '🎧', action: () => { window.OnyxInterface.selectAgent('support'); window.closeCommandPalette(); } },
+          { title: 'Sales Assistant AI', desc: 'Account research, objection handling & customer signals', type: 'agent', icon: '📈', action: () => { window.OnyxInterface.selectAgent('sales'); window.closeCommandPalette(); } },
+          { title: 'Create Studio', desc: 'High-resolution image generation & temporal video', type: 'agent', icon: '✨', action: () => { window.activateView('create'); window.closeCommandPalette(); } }
+        ];
+
+        // 3. Knowledge Vault
+        const vaultItems = [
+          { title: 'Enterprise Arch Specification v4', desc: 'Distributed VPC isolation & vector indexing', type: 'vault', icon: '📄', action: () => { window.activateView('vault'); window.closeCommandPalette(); } },
+          { title: 'Auth Guard Canary Note', desc: 'Multi-tenant IDOR validation & test secrets', type: 'vault', icon: '🔐', action: () => { window.activateView('vault'); window.closeCommandPalette(); } }
+        ];
+
+        // 4. Themes & Customizations
+        const themes = [
+          { title: 'Theme Studio', desc: 'Open custom CSS & design token editor', type: 'theme', icon: '🎨', action: () => { if (window.openThemeStudio) window.openThemeStudio(); else window.activateView('settings'); window.closeCommandPalette(); } },
+          { title: 'Onyx Dark Theme', desc: 'High contrast obsidian night canvas', type: 'theme', icon: '🌙', action: () => { if (window.setThemeMode) window.setThemeMode('onyx-dark'); window.closeCommandPalette(); } },
+          { title: 'Onyx Light Theme', desc: 'Clean paper minimal day canvas', type: 'theme', icon: '☀️', action: () => { if (window.setThemeMode) window.setThemeMode('onyx'); window.closeCommandPalette(); } }
+        ];
+
+        const filterGroup = (items) => items.filter(i => !q || i.title.toLowerCase().includes(q) || (i.desc && i.desc.toLowerCase().includes(q)));
+
+        const fRecents = filterGroup(recents);
+        const fAgents = filterGroup(agents);
+        const fVault = filterGroup(vaultItems);
+        const fThemes = filterGroup(themes);
+
+        let html = '';
+        let isFirst = true;
+        const allItems = [];
+
+        const renderGroup = (title, list, defaultIcon) => {
+          if (!list.length) return;
+          html += `<div class="command-palette-group-title">${title}</div>`;
+          list.forEach(item => {
+            const selectedClass = isFirst ? ' selected' : '';
+            isFirst = false;
+            allItems.push(item);
+            html += `
+              <div class="command-palette-item${selectedClass}" data-item-idx="${allItems.length - 1}">
+                <div class="command-palette-item-left">
+                  <span class="command-palette-item-icon">${item.icon || defaultIcon}</span>
+                  <div>
+                    <div class="command-palette-item-title">${this.escapeHTML(item.title)}</div>
+                    ${item.desc ? `<div style="font-size: 11.5px; color: #6B7280;">${this.escapeHTML(item.desc)}</div>` : ''}
+                  </div>
+                </div>
+                <span class="command-palette-badge">${item.type.toUpperCase()}</span>
+              </div>
+            `;
+          });
+        };
+
+        renderGroup('Recent Conversations', fRecents, '💬');
+        renderGroup('Agents & Sandbox', fAgents, '🤖');
+        renderGroup('Knowledge Vault', fVault, '📚');
+        renderGroup('Themes & Tokens', fThemes, '🎨');
+
+        if (!allItems.length) {
+          html = `<div style="padding: 24px 16px; text-align: center; color: #9CA3AF; font-size: 13px;">No results matching "${this.escapeHTML(q)}"</div>`;
+        }
+
+        container.innerHTML = html;
+
+        container.querySelectorAll('.command-palette-item').forEach((el) => {
+          const idx = parseInt(el.getAttribute('data-item-idx'), 10);
+          el.onclick = () => {
+            if (allItems[idx] && typeof allItems[idx].action === 'function') {
+              allItems[idx].action();
+            }
+          };
+        });
+      };
+    }
+
     escapeHTML(str) {
       if (!str) return '';
       return String(str)
@@ -1026,6 +1185,210 @@
   window.copyCurrentTurn = function(btn) {
     if (window.OnyxInterface) return window.OnyxInterface.copyCurrentTurn(btn);
   };
+
+  // Override Search Chats Modal to trigger Command Palette
+  window.openSearchChatsModal = function() {
+    if (window.openCommandPalette) window.openCommandPalette();
+  };
+
+  // Profile Popover Controller
+  window.toggleProfilePopover = function(force) {
+    const popover = document.getElementById('onyx-profile-popover');
+    if (!popover) return;
+    const shouldOpen = typeof force === 'boolean' ? force : (popover.style.display === 'none' || !popover.style.display);
+    popover.style.display = shouldOpen ? 'flex' : 'none';
+  };
+
+  // Composer [+] Popover Controller
+  window.toggleComposerAddPopover = function(force) {
+    const popover = document.getElementById('composer-add-popover');
+    if (!popover) return;
+    const shouldOpen = typeof force === 'boolean' ? force : (popover.style.display === 'none' || !popover.style.display);
+    popover.style.display = shouldOpen ? 'flex' : 'none';
+  };
+
+  // Close popovers on outside click
+  document.addEventListener('click', (e) => {
+    const profileWrap = document.getElementById('onyx-user-profile-row');
+    const profilePopover = document.getElementById('onyx-profile-popover');
+    if (profilePopover && profilePopover.style.display !== 'none') {
+      if (!profileWrap || !profileWrap.contains(e.target)) {
+        profilePopover.style.display = 'none';
+      }
+    }
+    const addWrap = document.querySelector('.composer-add-wrap');
+    const addPopover = document.getElementById('composer-add-popover');
+    if (addPopover && addPopover.style.display !== 'none') {
+      if (!addWrap || !addWrap.contains(e.target)) {
+        addPopover.style.display = 'none';
+      }
+    }
+  });
+
+  // Composer Dynamic Context Chips
+  window.activeComposerChips = new Set();
+
+  window.setComposerContextChip = function(tag) {
+    window.activeComposerChips.add(tag);
+    window.renderComposerChips();
+    const input = document.getElementById('rag-query-input');
+    if (input) input.focus();
+    if (window.showToast) window.showToast(`Context active: ${tag}`, 'info');
+  };
+
+  window.removeComposerContextChip = function(tag) {
+    window.activeComposerChips.delete(tag);
+    window.renderComposerChips();
+  };
+
+  window.renderComposerChips = function() {
+    const container = document.getElementById('composer-context-chips');
+    if (!container) return;
+    if (!window.activeComposerChips.size) {
+      container.style.display = 'none';
+      container.innerHTML = '';
+      return;
+    }
+    container.style.display = 'flex';
+    container.innerHTML = Array.from(window.activeComposerChips).map(tag => `
+      <span class="composer-chip">
+        <span>${window.OnyxInterface ? window.OnyxInterface.escapeHTML(tag) : tag}</span>
+        <button type="button" class="composer-chip-remove" onclick="window.removeComposerContextChip('${tag}')" title="Remove context">×</button>
+      </span>
+    `).join('');
+  };
+
+  window.setComposerAgentMode = function(mode) {
+    if (mode === 'coding') {
+      window.setComposerContextChip('@Coding');
+      const input = document.getElementById('rag-query-input');
+      if (input) input.placeholder = 'Describe a bug, paste code to debug, or architect an algorithm...';
+    } else if (mode === 'research') {
+      window.setComposerContextChip('@Research');
+      const input = document.getElementById('rag-query-input');
+      if (input) input.placeholder = 'Explore research topics, compare evidence, or search your saved notes...';
+    } else if (mode === 'vault') {
+      window.setComposerContextChip('@Vault');
+      const input = document.getElementById('rag-query-input');
+      if (input) input.placeholder = 'Search knowledge vault and synthesis notes...';
+    }
+  };
+
+  // Adaptive Prompt Selection
+  window.useAdaptivePrompt = function(promptText) {
+    if (!promptText) return;
+    const input = document.getElementById('rag-query-input');
+    if (!input) return;
+    input.value = promptText;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    input.focus();
+    const chips = document.getElementById('hero-starter-chips');
+    if (chips) chips.classList.add('faded-out');
+  };
+
+  // Mention Autocomplete Tag Click
+  window.selectMentionTag = function(tag) {
+    window.setComposerContextChip(tag);
+    const input = document.getElementById('rag-query-input');
+    const menu = document.getElementById('slash-commands-menu');
+    if (input) {
+      input.value = input.value.replace(/@\w*$/, '').trim() + ' ';
+      input.focus();
+    }
+    if (menu) menu.style.display = 'none';
+  };
+
+  // Enhanced Slash Commands & Mention Trigger
+  window.handleSlashCommandsInput = function(e) {
+    const val = e.target.value;
+    const menu = document.getElementById('slash-commands-menu');
+    if (!menu) return;
+
+    if (val.startsWith('/') || val.includes('@')) {
+      menu.style.display = 'flex';
+      menu.style.flexDirection = 'column';
+    } else {
+      menu.style.display = 'none';
+    }
+  };
+
+  // Clean Split-Pane Artifact Canvas Controller
+  window.openArtifactCanvas = function(artifact) {
+    if (!artifact) return;
+    const canvas = document.getElementById('artifact-split-canvas');
+    const mainCanvas = document.querySelector('.app-main-canvas');
+    if (!canvas || !mainCanvas) return;
+
+    window.currentCanvasArtifact = artifact;
+    const titleEl = document.getElementById('artifact-canvas-title');
+    const badgeEl = document.getElementById('artifact-canvas-badge');
+    const iconEl = document.getElementById('artifact-canvas-icon');
+    const bodyEl = document.getElementById('artifact-canvas-body');
+
+    const title = artifact.title || 'Artifact Preview';
+    const type = (artifact.type || 'markdown').toLowerCase();
+    const content = artifact.content || '';
+
+    if (titleEl) titleEl.textContent = title;
+    if (badgeEl) badgeEl.textContent = type.toUpperCase();
+    if (iconEl) {
+      iconEl.textContent = type.includes('diff') || type.includes('patch') || type.includes('code') ? '💻' : (type.includes('image') ? '🎨' : '📄');
+    }
+
+    if (bodyEl) {
+      if (type.includes('diff') || type.includes('patch') || type.includes('code') || type.includes('json') || type.includes('js')) {
+        bodyEl.innerHTML = `<pre><code>${window.OnyxInterface ? window.OnyxInterface.escapeHTML(content) : content}</code></pre>`;
+      } else {
+        bodyEl.innerHTML = `<div style="white-space: pre-wrap; font-family: inherit;">${window.OnyxInterface ? window.OnyxInterface.escapeHTML(content) : content}</div>`;
+      }
+    }
+
+    mainCanvas.classList.add('artifact-canvas-open');
+    canvas.style.display = 'flex';
+  };
+
+  window.closeArtifactCanvas = function() {
+    const canvas = document.getElementById('artifact-split-canvas');
+    const mainCanvas = document.querySelector('.app-main-canvas');
+    if (canvas) {
+      canvas.style.display = 'none';
+      canvas.classList.remove('fullscreen');
+    }
+    if (mainCanvas) mainCanvas.classList.remove('artifact-canvas-open');
+  };
+
+  window.toggleArtifactCanvasFullscreen = function() {
+    const canvas = document.getElementById('artifact-split-canvas');
+    if (canvas) canvas.classList.toggle('fullscreen');
+  };
+
+  window.copyArtifactFromCanvas = async function() {
+    if (window.currentCanvasArtifact && window.currentCanvasArtifact.content) {
+      try {
+        await navigator.clipboard.writeText(window.currentCanvasArtifact.content);
+        if (window.showToast) window.showToast('Copied artifact to clipboard 📋');
+      } catch (_) {}
+    }
+  };
+
+  window.downloadArtifactFromCanvas = function() {
+    if (!window.currentCanvasArtifact) return;
+    const blob = new Blob([window.currentCanvasArtifact.content || ''], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (window.currentCanvasArtifact.title || 'artifact').replace(/\s+/g, '_') + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    if (window.showToast) window.showToast('Downloaded artifact 📥');
+  };
+
+  // Global event listener for artifacts created across engines
+  window.addEventListener('milo:artifact-created', (e) => {
+    if (e.detail) window.openArtifactCanvas(e.detail);
+  });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => window.OnyxInterface.init());
